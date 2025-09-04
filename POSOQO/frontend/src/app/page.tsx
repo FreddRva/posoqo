@@ -1,5 +1,5 @@
 "use client";
-// Trigger Vercel deployment
+// Trigger Vercel deployment - second attempt
 import Image from "next/image";
 import { Montserrat, Playfair_Display, Inter, Poppins, Cormorant_Garamond } from "next/font/google";
 import { SparklesIcon, FireIcon, BeakerIcon, MapPinIcon, EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/solid";
