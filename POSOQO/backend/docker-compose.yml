@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: posoqo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: posoqo_user
+      POSTGRES_PASSWORD: posoqoEvelinSuarez
+      POSTGRES_DB: posoqo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  redis:
+    image: redis:7
+    container_name: posoqo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-net
+
+  backend:
+    build: .
+    container_name: posoqo-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - backend-net
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  backend-net:
+    driver: bridge 
