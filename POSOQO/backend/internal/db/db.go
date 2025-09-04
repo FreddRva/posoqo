@@ -28,8 +28,8 @@ func InitDB() error {
 		password = "posoqoEvelinSuarez"
 	}
 
-	// URL con SSL deshabilitado para desarrollo
-	url := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbname)
+	// URL con SSL habilitado para producción
+	url := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=require", user, password, host, port, dbname)
 
 	pool, err := pgxpool.New(context.Background(), url)
 	if err != nil {
