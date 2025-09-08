@@ -592,9 +592,9 @@ export default function HomePage() {
         
       </section>
 
-      {/* Sección de Cervezas - Diseño premium con fondo blanco elegante */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        {/* Patrón de espuma de cerveza dorada - Temático y elegante sobre blanco */}
+      {/* Sección de Cervezas - Diseño premium con fondo gris elegante */}
+      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300">
+        {/* Patrón de espuma de cerveza dorada - Temático y elegante sobre gris */}
         <div className="absolute inset-0 opacity-8">
           <div className="w-full h-full" style={{
             backgroundImage: `
@@ -608,7 +608,7 @@ export default function HomePage() {
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas sutiles */}
+        {/* Efectos de partículas doradas sutiles sobre gris */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-16 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-30"></div>
           <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-40" style={{animationDelay: '2s'}}></div>
@@ -747,16 +747,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gastronomía - Diseño premium con fondo blanco/gris elegante */}
-      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
-        {/* Fondo con patrón dorado sutil sobre blanco */}
+      {/* Gastronomía - Diseño premium con fondo gris elegante */}
+      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-300 relative overflow-hidden">
+        {/* Fondo con patrón dorado sutil sobre gris */}
         <div className="absolute inset-0 opacity-6">
           <div className="w-full h-full bg-repeat" style={{
             backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.08\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas sutiles */}
+        {/* Efectos de partículas doradas sutiles sobre gris */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-20 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-30"></div>
           <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-40" style={{animationDelay: '1.5s'}}></div>
