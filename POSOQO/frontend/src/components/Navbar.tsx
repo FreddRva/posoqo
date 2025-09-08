@@ -81,20 +81,24 @@ const DropdownMenu = ({
   isOpen,
   onClose,
   onItemClick,
+  dropdownRef,
 }: {
   items: { label: string; href: string; description?: string }[];
   isMobile: boolean;
   isOpen: boolean;
   onClose: () => void;
   onItemClick?: () => void;
+  dropdownRef: React.RefObject<HTMLDivElement>;
 }) => {
   if (!isOpen) return null;
 
   return (
-        <div className={`
+        <div 
+          ref={dropdownRef}
+          className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
+        : "absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
     `}>
       {items.map((item, index) => (
         <Link
@@ -139,6 +143,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   const navbarRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Notificaciones
   const { notifications, stats, markAsRead, markAllAsRead, loading, loadNotifications } = useNotifications();
@@ -187,11 +192,17 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           !(event.target as HTMLElement).closest('.notifications-content')) {
         setShowNotifications(false);
       }
+      // Cerrar dropdown al hacer clic fuera
+      if (activeDropdown && dropdownRef.current && 
+          !dropdownRef.current.contains(event.target as Node) &&
+          !(event.target as HTMLElement).closest('button[aria-expanded="true"]')) {
+        setActiveDropdown(null);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [mobileMenuOpen, showNotifications]);
+  }, [mobileMenuOpen, showNotifications, activeDropdown]);
 
   // Manejar teclado para accesibilidad
   useEffect(() => {
@@ -269,6 +280,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 onItemClick={() => {
                   if (isMobile) setMobileMenuOpen(false);
                 }}
+                dropdownRef={dropdownRef}
               />
             </div>
           )}
