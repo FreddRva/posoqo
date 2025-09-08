@@ -97,17 +97,17 @@ const DropdownMenu = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`
+        <div className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "absolute left-0 mt-3 w-72 bg-gray-900 border border-posoqo-gray-dark/50 rounded-2xl shadow-2xl py-3 z-50 animate-fade-in"}
+        : "absolute left-0 mt-3 w-72 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-3 z-50 animate-fade-in gold-glow"}
     `}>
       {items.map((item, index) => (
         <Link
           key={`${item.label}-${item.href}`}
           href={item.href}
           className={`
-            block px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] transition-all duration-200 rounded-xl mx-2
+            block px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 rounded-xl mx-2 premium-hover
             ${isMobile ? "text-base" : ""}
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
@@ -117,9 +117,9 @@ const DropdownMenu = ({
             onItemClick?.();
           }}
         >
-          <div className="font-semibold text-sm text-[#FFD700]">{item.label}</div>
+          <div className="font-semibold text-sm gold-text">{item.label}</div>
           {item.description && (
-            <div className="text-xs text-white mt-1">{item.description}</div>
+            <div className="text-xs text-gray-300 mt-1">{item.description}</div>
           )}
         </Link>
       ))}
@@ -239,8 +239,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
   // Renderizar elemento de navegación
   const renderNavItem = (item: NavItem, isMobile = false) => {
-    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-200 relative group rounded-xl hover:bg-posoqo-black-light/30";
-    const textClasses = item.highlight ? 'text-[#FFD700] font-bold' : 'text-[#FFD700] hover:text-[#FFA500]';
+    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl premium-hover";
+    const textClasses = item.highlight ? 'gold-text font-bold premium-text-shadow' : 'text-white hover:gold-text';
 
     // Elementos con dropdown
     if (item.dropdown && item.subitems) {
@@ -248,11 +248,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         <div key={item.label} className="relative">
           <button
             className={`
-              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-200 rounded-xl
+              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-300 rounded-xl premium-hover
               ${isMobile 
-                ? "w-full text-left hover:bg-posoqo-black-light/50" 
-                : "hover:text-[#FFA500] hover:bg-posoqo-black-light/30"}
-              ${activeDropdown === item.label ? "text-[#FFA500] bg-posoqo-black-light/50" : "text-[#FFD700]"}
+                ? "w-full text-left gold-glass" 
+                : "hover:gold-glass"}
+              ${activeDropdown === item.label ? "gold-text gold-glass" : "text-white hover:gold-text"}
             `}
             onClick={() => toggleDropdown(item.label)}
             aria-expanded={activeDropdown === item.label}
@@ -260,8 +260,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           >
             {item.label}
             <ChevronDown 
-              className={`w-4 h-4 text-[#FFD700] transition-transform duration-200 ${
-                activeDropdown === item.label ? "rotate-180" : ""
+              className={`w-4 h-4 text-white transition-transform duration-300 ${
+                activeDropdown === item.label ? "rotate-180 gold-text" : ""
               }`}
             />
           </button>
@@ -362,7 +362,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         ref={navbarRef}
         className={`
           fixed top-0 left-0 w-full z-50 transition-all duration-300 
-          ${scrolled ? "bg-gray-900 border-b border-posoqo-gray-dark/50 shadow-xl" : "bg-gray-900"}
+          ${scrolled ? "premium-gradient border-b border-yellow-400/20 shadow-2xl gold-glow" : "premium-gradient"}
           ${montserrat.className}
         `}
       >
@@ -385,7 +385,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   priority
                 />
               </div>
-              <span className={`text-xl lg:text-2xl font-extrabold bg-gradient-to-r from-posoqo-gold via-posoqo-gold-accent to-posoqo-gold bg-clip-text text-transparent tracking-wide ${playfair.className} group-hover:from-posoqo-gold-light group-hover:to-posoqo-gold-accent transition-all duration-200`}>
+              <span className={`text-xl lg:text-2xl font-extrabold gold-text tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 premium-text-shadow`}>
                 POSOQO
               </span>
             </Link>
@@ -403,10 +403,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2.5 rounded-xl hover:bg-posoqo-black-light/30 transition-all duration-200"
+                    className="relative p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                     aria-label="Notificaciones"
                   >
-                    <Bell className="w-5 h-5 text-[#FFD700]" />
+                    <Bell className="w-5 h-5 text-white" />
                     {stats.unread > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">
                         {stats.unread}
@@ -521,10 +521,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2.5 rounded-xl hover:bg-posoqo-black-light/30 transition-all duration-200"
+                className="relative p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                 aria-label="Carrito"
               >
-                <ShoppingCart className="w-5 h-5 text-[#FFD700]" />
+                <ShoppingCart className="w-5 h-5 text-white" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-posoqo-black shadow-lg">
                     {cartCount}
@@ -536,7 +536,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {user ? (
                 <div className="relative" ref={userMenuRef}>
                   <button
-                    className="flex items-center gap-2 p-2.5 rounded-xl hover:bg-posoqo-black-light/30 transition-all duration-200"
+                    className="flex items-center gap-2 p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     aria-label="Menú de usuario"
                     aria-expanded={userMenuOpen}
@@ -550,22 +550,22 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                         className="rounded-full"
                       />
                     ) : (
-                      <User className="w-7 h-7 text-[#FFD700]" />
+                      <User className="w-7 h-7 text-white" />
                     )}
-                    <span className="text-[#FFD700] font-medium text-sm max-w-[120px] truncate">
+                    <span className="text-white font-medium text-sm max-w-[120px] truncate">
                       {user.name || "Mi cuenta"}
                     </span>
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-gray-900 border border-posoqo-gray-dark/50 rounded-2xl shadow-2xl py-3 z-50">
+                    <div className="absolute right-0 mt-3 w-56 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-3 z-50 gold-glow">
                       {user?.role === 'admin' && (
                         <button
                           onClick={() => {
                             router.push("/dashboard");
                             setUserMenuOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] font-semibold transition-all duration-200 flex items-center gap-3"
+                          className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass font-semibold transition-all duration-300 flex items-center gap-3 premium-hover"
                         >
                           <Crown className="w-4 h-4" />
                           Panel Admin
@@ -576,7 +576,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] transition-all duration-200 flex items-center gap-3"
+                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
                       >
                         <User className="w-4 h-4" />
                         Mi Perfil
@@ -586,7 +586,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile/payments");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] transition-all duration-200 flex items-center gap-3"
+                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
                       >
                         <CreditCard className="w-4 h-4" />
                         Mis Pagos
@@ -596,7 +596,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/favorites");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] transition-all duration-200 flex items-center gap-3"
+                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
                       >
                         <Heart className="w-4 h-4" />
                         Favoritos
@@ -606,7 +606,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/orders");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-[#FFD700] hover:bg-posoqo-gold/10 hover:text-[#FFA500] transition-all duration-200 flex items-center gap-3"
+                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
                       >
                         <Package className="w-4 h-4" />
                         Mis Pedidos
@@ -628,7 +628,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="px-6 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black hover:from-posoqo-gold-light hover:to-posoqo-gold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-6 py-2.5 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow premium-hover"
                 >
                   Iniciar sesión
                 </button>
@@ -643,10 +643,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 rounded-xl hover:bg-posoqo-black-light/30 transition-all duration-200"
+                    className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                     aria-label="Notificaciones"
                   >
-                    <Bell className="w-5 h-5 text-[#FFD700]" />
+                    <Bell className="w-5 h-5 text-white" />
                     {stats.unread > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-lg">
                         {stats.unread}
@@ -761,10 +761,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito móvil */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl hover:bg-posoqo-black-light/30 transition-all duration-200"
+                className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                 aria-label="Carrito"
               >
-                <ShoppingCart className="w-5 h-5 text-[#FFD700]" />
+                <ShoppingCart className="w-5 h-5 text-white" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center border border-posoqo-black shadow-lg">
                     {cartCount}
@@ -775,14 +775,14 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Menú móvil */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl hover:bg-posoqo-black-light/30 focus:outline-none transition-all duration-200"
+                className="p-2 rounded-xl gold-glass hover:gold-glow focus:outline-none transition-all duration-300 premium-hover"
                 aria-label="Menú"
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5 text-[#FFD700]" />
+                  <X className="w-5 h-5 text-white" />
                 ) : (
-                  <Menu className="w-5 h-5 text-[#FFD700]" />
+                  <Menu className="w-5 h-5 text-white" />
                 )}
               </button>
             </div>
@@ -794,7 +794,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       <div 
         ref={mobileMenuRef}
         className={`
-          lg:hidden fixed inset-0 z-40 bg-gray-900 transition-all duration-300 ease-in-out
+          lg:hidden fixed inset-0 z-40 premium-gradient transition-all duration-300 ease-in-out
           ${mobileMenuOpen 
             ? "opacity-100 translate-y-0 mt-16" 
             : "opacity-0 -translate-y-full pointer-events-none"}
@@ -811,7 +811,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               <>
                 <Link
                   href="/profile"
-                  className="block px-4 py-3 text-base font-medium text-[#FFD700] hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="w-5 h-5" />
@@ -819,7 +819,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/profile/payments"
-                  className="block px-4 py-3 text-base font-medium text-[#FFD700] hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <CreditCard className="w-5 h-5" />
@@ -827,7 +827,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/favorites"
-                  className="block px-4 py-3 text-base font-medium text-[#FFD700] hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Heart className="w-5 h-5" />
@@ -835,7 +835,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/orders"
-                  className="block px-4 py-3 text-base font-medium text-[#FFD700] hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Package className="w-5 h-5" />
@@ -844,7 +844,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 {user?.role === 'admin' && (
                   <Link
                     href="/dashboard"
-                    className="block px-4 py-3 text-base font-medium text-[#FFD700] hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                    className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Crown className="w-5 h-5" />
@@ -864,15 +864,15 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </button>
               </>
             ) : (
-              <button
-                onClick={() => {
-                  router.push("/login");
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black hover:from-posoqo-gold-light hover:to-posoqo-gold transition-all duration-200 shadow-lg"
-              >
-                Iniciar sesión
-              </button>
+                <button
+                  onClick={() => {
+                    router.push("/login");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full px-6 py-3 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg gold-glow premium-hover"
+                >
+                  Iniciar sesión
+                </button>
             )}
           </div>
         </div>

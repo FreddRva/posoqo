@@ -19,20 +19,22 @@ module.exports = {
     extend: {
       colors: {
         // Colores personalizados POSOQO
-        posoqo: {
-          black: '#0A0A0A',
-          'black-light': '#1A1A1A',
-          'black-medium': '#2A2A2A',
-          gold: '#D4AF37',
-          'gold-light': '#F4E4BC',
-          'gold-dark': '#B8860B',
-          'gold-accent': '#FFD700',
-          white: '#FFFFFF',
-          'white-off': '#F8F8F8',
-          'gray-dark': '#333333',
-          'gray-medium': '#666666',
-          'gray-light': '#999999',
+        gold: {
+          primary: '#D4AF37',
+          light: '#FFD700',
+          dark: '#B8860B',
+          accent: '#F4E4BC',
         },
+        black: {
+          primary: '#000000',
+          soft: '#1A1A1A',
+          medium: '#2A2A2A',
+        },
+        white: {
+          primary: '#FFFFFF',
+          soft: '#F8F8F8',
+        },
+        // Colores del sistema existente
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -81,12 +83,57 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "gold-sparkle": {
+          "0%, 100%": {
+            opacity: "0",
+            transform: "scale(0) rotate(0deg)",
+          },
+          "50%": {
+            opacity: "1",
+            transform: "scale(1) rotate(180deg)",
+          },
+        },
+        "float": {
+          "0%, 100%": {
+            transform: "translateY(0px)",
+          },
+          "50%": {
+            transform: "translateY(-10px)",
+          },
+        },
+        "glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px rgba(212, 175, 55, 0.3)",
+          },
+          "50%": {
+            boxShadow: "0 0 30px rgba(212, 175, 55, 0.5)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "gold-sparkle": "gold-sparkle 2s ease-in-out infinite",
+        "float": "float 3s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite",
+      },
+      backgroundImage: {
+        'gradient-gold': 'linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%)',
+        'gradient-black': 'linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%)',
+        'gradient-gold-text': 'linear-gradient(135deg, #D4AF37, #FFD700, #B8860B)',
+      },
+      boxShadow: {
+        'gold': '0 0 20px rgba(212, 175, 55, 0.3)',
+        'gold-hover': '0 0 30px rgba(212, 175, 55, 0.5)',
+        'premium': '0 20px 40px rgba(0, 0, 0, 0.3)',
+      },
+      fontFamily: {
+        'montserrat': ['Montserrat', 'sans-serif'],
+        'playfair': ['Playfair Display', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'cormorant': ['Cormorant Garamond', 'serif'],
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-} 
+}

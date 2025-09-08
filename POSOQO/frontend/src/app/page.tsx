@@ -1,18 +1,20 @@
 "use client";
-// Trigger Vercel deployment - second attempt
+
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Montserrat, Playfair_Display, Inter, Poppins, Cormorant_Garamond } from "next/font/google";
-import { SparklesIcon, FireIcon, BeakerIcon, MapPinIcon, EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/solid";
-import { Wheat, Mountain, Beer, Mail, Phone, MapPin, Sparkles, Flame, TestTube, UtensilsCrossed, ArrowRight, Calendar, Clock, Star } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
-import { apiFetch } from "@/lib/api";
-import { motion, useAnimation } from "framer-motion";
-import FeaturedFoods from "@/components/FeaturedFoods";
-import { useSession } from "next-auth/react";
+import { Montserrat, Playfair_Display, Inter, Cormorant_Garamond } from "next/font/google";
+import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsCrossed, Calendar } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
+
+// Components
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import ProductCard from "@/components/ui/ProductCard";
+import SectionHeader from "@/components/ui/SectionHeader";
 
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -193,24 +195,24 @@ export default function HomePage() {
   // Renderizado condicional para mobile/desktop
   const ProductCard = ({ product }: { product: Product }) => (
     <motion.div
-      className="group relative bg-gradient-to-br from-posoqo-black-light/30 via-posoqo-black-medium/20 to-posoqo-black-light/30 backdrop-blur-sm p-6 rounded-3xl border border-posoqo-gray-dark/50 hover:border-posoqo-gold/30 transition-all duration-500 hover:shadow-2xl hover:shadow-posoqo-gold/10 w-full h-auto min-h-[320px]"
+      className="group relative premium-gradient backdrop-blur-sm p-6 rounded-3xl gold-border hover:gold-glow transition-all duration-500 hover:shadow-2xl w-full h-auto min-h-[320px] premium-hover"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => openProductModal(product)}
     >
       {/* Fondo con efecto premium mejorado */}
-              <div className="absolute inset-0 bg-gradient-to-br from-posoqo-black-light via-posoqo-black-medium to-posoqo-black rounded-2xl shadow-xl border border-posoqo-gray-medium/30 group-hover:border-posoqo-gold/50 group-hover:shadow-posoqo-gold/30 transition-all duration-500">
+      <div className="absolute inset-0 premium-gradient rounded-2xl shadow-xl gold-border group-hover:gold-glow transition-all duration-500">
         {/* Efecto de profundidad premium */}
-        <div className="absolute inset-0 bg-gradient-to-br from-posoqo-gold/5 via-transparent to-posoqo-black/20 rounded-2xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-black/20 rounded-2xl"></div>
         
         {/* Efecto de brillo superior elegante */}
-        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-posoqo-gold-light/15 via-transparent to-transparent rounded-t-2xl"></div>
+        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-yellow-300/15 via-transparent to-transparent rounded-t-2xl"></div>
         
         {/* Efecto de sombra inferior sofisticada */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-posoqo-black/60 via-transparent to-transparent rounded-b-2xl"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-b-2xl"></div>
         
         {/* Efecto de terminal premium */}
-        <div className="absolute inset-0 border border-transparent group-hover:border-posoqo-gold/40 rounded-2xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
+        <div className="absolute inset-0 border border-transparent group-hover:border-yellow-400/40 rounded-2xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
       </div>
 
       {/* Contenido principal */}
@@ -218,7 +220,7 @@ export default function HomePage() {
         {/* Imagen con efectos premium */}
         <div className="relative w-24 h-32 flex-shrink-0 mb-4 group">
           {/* Efecto de resplandor premium */}
-          <div className="absolute inset-0 bg-gradient-to-br from-posoqo-gold/30 via-posoqo-gold-light/20 to-posoqo-gold-accent/10 rounded-xl blur-lg scale-110 group-hover:bg-posoqo-gold/40 transition-all duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-yellow-300/20 to-yellow-500/10 rounded-xl blur-lg scale-110 group-hover:bg-yellow-400/40 transition-all duration-700"></div>
           
           {/* Imagen con efecto flotante premium */}
           <div className="relative transform group-hover:translate-y-[-4px] md:group-hover:translate-y-[-6px] group-hover:scale-105 transition-all duration-700">
@@ -230,25 +232,25 @@ export default function HomePage() {
         />
             
             {/* Efecto de brillo premium */}
-            <div className="absolute inset-0 bg-gradient-to-br from-posoqo-gold-light/30 via-transparent to-transparent rounded-lg pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/30 via-transparent to-transparent rounded-lg pointer-events-none"></div>
             
             {/* Efecto de reflejo premium */}
             <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 via-transparent to-transparent rounded-t-lg"></div>
       </div>
           
           {/* Efecto de terminal premium cerca de la imagen */}
-          <div className="absolute inset-0 border-2 border-transparent group-hover:border-posoqo-gold/60 rounded-xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
+          <div className="absolute inset-0 border-2 border-transparent group-hover:border-yellow-400/60 rounded-xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
         </div>
 
         {/* Información del producto premium */}
         <div className="flex flex-col items-center text-center w-full space-y-3">
           {/* Nombre del producto con tipografía premium */}
-          <h2 className="text-lg font-black text-posoqo-gold tracking-[0.05em] drop-shadow-lg group-hover:text-posoqo-gold-light transition-all duration-500 uppercase letter-spacing-wider line-clamp-2">
+          <h2 className="text-lg font-black gold-text tracking-[0.05em] premium-text-shadow group-hover:scale-105 transition-all duration-500 uppercase letter-spacing-wider line-clamp-2">
           {product.name}
         </h2>
           
           {/* Descripción con tipografía elegante */}
-          <p className="text-sm text-posoqo-gray-light leading-relaxed font-light italic line-clamp-2">
+          <p className="text-sm text-gray-300 leading-relaxed font-light italic line-clamp-2">
           {product.description}
         </p>
           
@@ -256,25 +258,25 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-2 mt-3 justify-center">
           {/* ABV */}
         {product.abv && (
-            <div className="text-center bg-posoqo-gold/10 rounded-lg px-3 py-2 border border-posoqo-gold/20">
-              <div className="text-xs font-semibold text-posoqo-gold-light">ABV</div>
-              <div className="text-sm font-bold text-posoqo-gold">{product.abv}</div>
+            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
+              <div className="text-xs font-semibold gold-text">ABV</div>
+              <div className="text-sm font-bold gold-text">{product.abv}</div>
             </div>
           )}
           
           {/* IBU */}
           {product.ibu && (
-            <div className="text-center bg-posoqo-gold/10 rounded-lg px-3 py-2 border border-posoqo-gold/20">
-              <div className="text-xs font-semibold text-posoqo-gold-light">IBU</div>
-              <div className="text-sm font-bold text-posoqo-gold">{product.ibu}</div>
+            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
+              <div className="text-xs font-semibold gold-text">IBU</div>
+              <div className="text-sm font-bold gold-text">{product.ibu}</div>
       </div>
           )}
           
           {/* COLOR */}
           {product.color && (
-            <div className="text-center bg-posoqo-gold/10 rounded-lg px-3 py-2 border border-posoqo-gold/20">
-              <div className="text-xs font-semibold text-posoqo-gold-light">COLOR</div>
-              <div className="text-sm font-bold text-posoqo-gold">{product.color}</div>
+            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
+              <div className="text-xs font-semibold gold-text">COLOR</div>
+              <div className="text-sm font-bold gold-text">{product.color}</div>
     </div>
           )}
           </div>
@@ -282,12 +284,12 @@ export default function HomePage() {
       </div>
 
       {/* Efecto de resplandor premium en hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-posoqo-gold/0 via-posoqo-gold/15 to-posoqo-gold/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-1000 pointer-events-none blur-sm group-hover:blur-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/15 to-yellow-400/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-1000 pointer-events-none blur-sm group-hover:blur-0"></div>
       
       {/* Indicador de click premium mejorado */}
       <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
-        <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm border border-posoqo-gold-light/30">
-          <svg className="w-4 h-4 md:w-5 md:h-5 text-posoqo-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-8 h-8 md:w-10 md:h-10 gold-gradient rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm gold-border">
+          <svg className="w-4 h-4 md:w-5 md:h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -308,15 +310,23 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-posoqo-black via-posoqo-black-light to-posoqo-black text-posoqo-white ${montserrat.className} pt-4 lg:pt-8 relative overflow-hidden`}>
-      {/* Fondo profesional con patrón sutil */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(120,119,198,0.05)_50%,transparent_75%)] bg-[length:20px_20px]"></div>
+    <div className={`min-h-screen premium-gradient text-white ${montserrat.className} pt-4 lg:pt-8 relative overflow-hidden`}>
+      {/* Fondo premium con efectos dorados */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.1),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(212,175,55,0.05)_50%,transparent_75%)] bg-[length:20px_20px]"></div>
+      
+      {/* Efectos de partículas doradas */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full gold-sparkle"></div>
+        <div className="absolute top-40 right-20 w-1 h-1 bg-yellow-300 rounded-full gold-sparkle" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-yellow-500 rounded-full gold-sparkle" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-80 right-1/3 w-1 h-1 bg-yellow-400 rounded-full gold-sparkle" style={{animationDelay: '0.5s'}}></div>
+      </div>
       
       <Navbar scrolled={isScrolled} />
       
-      {/* Hero Section - Mejorado y más prominente */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-posoqo-black via-posoqo-black-light to-posoqo-black pt-20 lg:pt-32">
+      {/* Hero Section - Diseño premium dorado/negro */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden premium-gradient pt-20 lg:pt-32">
         {/* Fondo con imagen y overlay mejorado */}
         <div className="absolute inset-0 z-0">
           <div 
@@ -328,7 +338,7 @@ export default function HomePage() {
               filter: "brightness(0.8) contrast(1.1)"
             }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-posoqo-black/70 via-posoqo-black/60 to-posoqo-black/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/80"></div>
         </div>
         
         <motion.div 
@@ -355,12 +365,12 @@ export default function HomePage() {
               />
             </div>
             
-            <h2 className={`text-4xl md:text-6xl lg:text-7xl mb-8 text-amber-400 ${cormorant.className} italic font-extralight leading-tight drop-shadow-lg`}>
+            <h2 className={`text-4xl md:text-6xl lg:text-7xl mb-8 gold-text ${cormorant.className} italic font-extralight leading-tight premium-text-shadow`}>
               Cerveza Ayacuchana
             </h2>
             
-            <p className={`text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl leading-relaxed ${inter.className} font-extralight text-stone-100 drop-shadow-md`}>
-              Posoqo viene del quechua <span className="font-light text-amber-300">pusuqu</span>, que significa <span className="font-light text-amber-300">espuma</span>.<br/>
+            <p className={`text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl leading-relaxed ${inter.className} font-extralight text-white drop-shadow-md`}>
+              Posoqo viene del quechua <span className="font-light gold-text">pusuqu</span>, que significa <span className="font-light gold-text">espuma</span>.<br/>
               Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.
             </p>
             
@@ -368,7 +378,7 @@ export default function HomePage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-10 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-bold text-lg hover:from-amber-400 hover:to-amber-500 transition-all shadow-2xl focus:outline-none focus:ring-4 focus:ring-amber-400/40 transform hover:shadow-amber-400/25"
+                className="px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg hover:scale-105 transition-all duration-300 shadow-2xl gold-glow premium-hover"
                 onClick={() => scrollToSection(productosRef)}
               >
                 Nuestras Cervezas
@@ -376,7 +386,7 @@ export default function HomePage() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-10 py-4 rounded-full border-2 border-amber-400 text-amber-400 font-bold text-lg hover:bg-amber-400/10 transition-all shadow-xl focus:outline-none focus:ring-4 focus:ring-amber-400/40"
+                className="px-10 py-4 rounded-full gold-border text-white font-bold text-lg hover:gold-glow transition-all duration-300 shadow-xl premium-hover"
                 onClick={() => scrollToSection(taproomsRef)}
               >
                 Visítanos
@@ -406,7 +416,7 @@ export default function HomePage() {
       </section>
 
       {/* Raíces Ayacuchanas */}
-      <section className="py-16 bg-gradient-to-br from-red-950 via-stone-800 to-red-950 relative overflow-hidden">
+      <section className="py-16 premium-gradient relative overflow-hidden">
         {/* Fondo con patrón sutil */}
         <div className="absolute inset-0 opacity-12">
           <div className="w-full h-full bg-repeat" style={{
@@ -422,17 +432,17 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <span className="text-yellow-400 font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
               <Mountain className="inline w-5 h-5 mr-2" /> RAÍCES AYACUCHANAS
             </span>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-black gold-text ${cormorant.className} italic tracking-wider premium-text-shadow`}>
               Tradición en cada sorbo
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-4xl mx-auto text-stone-300 leading-relaxed ${inter.className} font-light`}>
-              Posoqo viene del quechua <span className="font-light text-amber-300">pusuqu</span>, que significa <span className="font-light text-amber-300">espuma</span>. Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica.
+            <p className={`text-lg md:text-xl mt-8 max-w-4xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              Posoqo viene del quechua <span className="font-light gold-text">pusuqu</span>, que significa <span className="font-light gold-text">espuma</span>. Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica.
             </p>
           </motion.div>
           
@@ -474,23 +484,23 @@ export default function HomePage() {
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
                 
                 {/* Contenido principal */}
-                <div className="relative bg-stone-800/30 backdrop-blur-sm p-8 rounded-3xl border border-stone-700/50 hover:border-amber-400/30 transition-all duration-500 group-hover:bg-stone-800/50">
+                <div className="relative premium-gradient backdrop-blur-sm p-8 rounded-3xl gold-border hover:gold-glow transition-all duration-500 group-hover:scale-105 premium-hover">
                   {/* Icono elegante */}
-                  <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
+                  <div className="w-20 h-20 gold-gradient rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg gold-glow">
                     {item.icon}
                 </div>
                   
                   {/* Título */}
-                  <h3 className="text-2xl font-bold mb-6 text-amber-400 text-center group-hover:text-amber-300 transition-colors duration-300">
+                  <h3 className="text-2xl font-bold mb-6 gold-text text-center group-hover:scale-105 transition-all duration-300 premium-text-shadow">
                     {item.title}
                   </h3>
                   
                   {/* Descripción */}
-                  <p className="text-stone-300 leading-relaxed text-center font-light" dangerouslySetInnerHTML={{ __html: item.text }} />
+                  <p className="text-gray-300 leading-relaxed text-center font-light" dangerouslySetInnerHTML={{ __html: item.text }} />
                 </div>
                 
                 {/* Efecto de resplandor en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/10 to-yellow-400/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
               </motion.div>
             ))}
           </motion.div>
@@ -499,9 +509,9 @@ export default function HomePage() {
       </section>
 
       {/* Sección de productos */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <section ref={productosRef} className="py-20 relative overflow-hidden premium-gradient">
         {/* Fondo con efectos profesionales */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"></div>
+        <div className="absolute inset-0 premium-gradient"></div>
         <div className="absolute inset-0 opacity-10">
           <div className="w-full h-full bg-repeat" style={{
             backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23a8a29e\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
@@ -526,17 +536,17 @@ export default function HomePage() {
             {/* Sin efecto de resplandor */}
             
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 bg-amber-500/20 rounded-lg">
-                <Beer className="w-6 h-6 text-amber-400" />
+              <div className="p-2 gold-glass rounded-lg">
+                <Beer className="w-6 h-6 gold-text" />
               </div>
-              <span className="text-amber-400 font-black tracking-[0.3em] text-sm md:text-base relative z-10 uppercase">
+              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base relative z-10 uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 bg-clip-text text-transparent ${playfair.className} relative z-10 tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-black gold-text ${playfair.className} relative z-10 tracking-wider premium-text-shadow`}>
               Cervezas
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
           </motion.div>
           
           <motion.div 
@@ -623,7 +633,7 @@ export default function HomePage() {
                 href="/products?filter=cerveza"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center px-8 py-4 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-stone-900 font-bold text-lg shadow-2xl hover:shadow-yellow-400/25 transition-all duration-300 hover:from-yellow-300 hover:to-orange-400 border-2 border-yellow-300 relative z-20"
+                className="flex items-center justify-center px-8 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 hover:scale-105 premium-hover relative z-20"
               >
                 <span className="flex items-center gap-3">
                   <Beer className="w-5 h-5" />

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/design-system.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -45,30 +46,30 @@
 
 :root {
   --radius: 0.625rem;
-  /* POSOQO Color Scheme - Light Mode */
+  /* POSOQO Premium Color Scheme - Light Mode */
   --background: #FFFFFF;
   --foreground: #0A0A0A;
   --card: #FFFFFF;
   --card-foreground: #0A0A0A;
   --popover: #FFFFFF;
   --popover-foreground: #0A0A0A;
-  --primary: #D4AF37;
+  --primary: #D4AF37;        /* Dorado principal */
   --primary-foreground: #0A0A0A;
   --secondary: #F8F8F8;
   --secondary-foreground: #0A0A0A;
   --muted: #F8F8F8;
   --muted-foreground: #666666;
-  --accent: #F4E4BC;
+  --accent: #FFD700;         /* Dorado brillante */
   --accent-foreground: #0A0A0A;
   --destructive: #DC2626;
   --border: #E5E5E5;
   --input: #F8F8F8;
   --ring: #D4AF37;
-  --chart-1: #D4AF37;
-  --chart-2: #B8860B;
-  --chart-3: #FFD700;
-  --chart-4: #F4E4BC;
-  --chart-5: #333333;
+  --chart-1: #D4AF37;        /* Dorado */
+  --chart-2: #B8860B;        /* Dorado oscuro */
+  --chart-3: #FFD700;        /* Dorado brillante */
+  --chart-4: #F4E4BC;        /* Dorado claro */
+  --chart-5: #000000;        /* Negro */
   --sidebar: #FFFFFF;
   --sidebar-foreground: #0A0A0A;
   --sidebar-primary: #D4AF37;
@@ -80,34 +81,34 @@
 }
 
 .dark {
-  /* POSOQO Color Scheme - Dark Mode */
-  --background: #0A0A0A;
+  /* POSOQO Premium Color Scheme - Dark Mode */
+  --background: #000000;     /* Negro profundo */
   --foreground: #FFFFFF;
-  --card: #1A1A1A;
+  --card: #1A1A1A;           /* Negro suave */
   --card-foreground: #FFFFFF;
   --popover: #1A1A1A;
   --popover-foreground: #FFFFFF;
-  --primary: #D4AF37;
-  --primary-foreground: #0A0A0A;
-  --secondary: #2A2A2A;
+  --primary: #D4AF37;        /* Dorado principal */
+  --primary-foreground: #000000;
+  --secondary: #2A2A2A;      /* Negro medio */
   --secondary-foreground: #FFFFFF;
   --muted: #2A2A2A;
   --muted-foreground: #999999;
-  --accent: #333333;
-  --accent-foreground: #FFFFFF;
+  --accent: #FFD700;         /* Dorado brillante */
+  --accent-foreground: #000000;
   --destructive: #DC2626;
   --border: #333333;
   --input: #2A2A2A;
   --ring: #D4AF37;
-  --chart-1: #D4AF37;
-  --chart-2: #B8860B;
-  --chart-3: #FFD700;
-  --chart-4: #F4E4BC;
-  --chart-5: #666666;
+  --chart-1: #D4AF37;        /* Dorado */
+  --chart-2: #B8860B;        /* Dorado oscuro */
+  --chart-3: #FFD700;        /* Dorado brillante */
+  --chart-4: #F4E4BC;        /* Dorado claro */
+  --chart-5: #FFFFFF;        /* Blanco */
   --sidebar: #1A1A1A;
   --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #D4AF37;
-  --sidebar-primary-foreground: #0A0A0A;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: #2A2A2A;
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #333333;
@@ -158,12 +159,88 @@
 }
 
 html, body {
-  background: #0A0A0A !important;
+  background: #000000 !important;
 }
 
 /* Aplicar modo oscuro por defecto */
 html {
   color-scheme: dark;
+}
+
+/* Estilos premium para el tema dorado/negro/blanco */
+.premium-gradient {
+  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #D4AF37, #FFD700, #B8860B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gold-border {
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #000000, #000000) padding-box,
+              linear-gradient(135deg, #D4AF37, #FFD700) border-box;
+}
+
+.gold-glow {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
+              0 0 40px rgba(212, 175, 55, 0.1),
+              0 0 60px rgba(212, 175, 55, 0.05);
+}
+
+.gold-glow:hover {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5),
+              0 0 60px rgba(212, 175, 55, 0.2),
+              0 0 90px rgba(212, 175, 55, 0.1);
+}
+
+/* Efectos de partículas doradas */
+@keyframes gold-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.gold-sparkle {
+  animation: gold-sparkle 2s ease-in-out infinite;
+}
+
+/* Efectos de hover premium */
+.premium-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+              0 0 30px rgba(212, 175, 55, 0.2);
+}
+
+/* Glassmorphism dorado */
+.gold-glass {
+  background: rgba(212, 175, 55, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Efectos de texto premium */
+.premium-text-shadow {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
+               0 0 20px rgba(212, 175, 55, 0.3),
+               0 0 30px rgba(212, 175, 55, 0.1);
 }
 
 /* Estilos personalizados para scroll moderno y profesional */
