@@ -593,31 +593,14 @@ export default function HomePage() {
       </section>
 
       {/* Sección de Cervezas - Diseño premium con fondo elegante */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900">
-        {/* Patrón de espuma de cerveza dorada - Temático y elegante */}
-        <div className="absolute inset-0 opacity-15">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              radial-gradient(circle at 15% 15%, rgba(212, 175, 55, 0.15) 0%, transparent 20%),
-              radial-gradient(circle at 85% 85%, rgba(212, 175, 55, 0.12) 0%, transparent 20%),
-              radial-gradient(circle at 50% 30%, rgba(212, 175, 55, 0.10) 0%, transparent 15%),
-              radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 18%),
-              radial-gradient(circle at 70% 50%, rgba(212, 175, 55, 0.06) 0%, transparent 12%)
-            `,
-            backgroundSize: '200px 200px, 250px 250px, 180px 180px, 220px 220px, 160px 160px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas elegantes */}
+      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-100 via-white to-gray-50">
+        {/* Efectos de partículas doradas sutiles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-16 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-50" style={{animationDelay: '4s'}}></div>
-          <div className="absolute top-60 right-1/3 w-1 h-1 bg-gold-accent rounded-full gold-sparkle opacity-65" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-20 left-16 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-40"></div>
+          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-50" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-30" style={{animationDelay: '4s'}}></div>
+          <div className="absolute top-60 right-1/3 w-1 h-1 bg-gold-accent rounded-full gold-sparkle opacity-45" style={{animationDelay: '1s'}}></div>
         </div>
-        
-        {/* Overlay sutil para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-slate-800/10"></div>
         
 
         
@@ -751,23 +734,13 @@ export default function HomePage() {
       </section>
 
       {/* Gastronomía - Diseño premium con fondo elegante */}
-      <section id="gastronomia" className="py-20 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 relative overflow-hidden">
-        {/* Fondo con patrón dorado sutil */}
-        <div className="absolute inset-0 opacity-12">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23D4AF37\" fill-opacity=\"0.12\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas elegantes */}
+      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-100 via-white to-gray-50 relative overflow-hidden">
+        {/* Efectos de partículas doradas sutiles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-20 left-20 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-40"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-50" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-30" style={{animationDelay: '3s'}}></div>
         </div>
-        
-        {/* Overlay sutil para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-slate-800/10"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -796,7 +769,7 @@ export default function HomePage() {
             
             {/* Descripción elegante */}
             <div className="max-w-3xl mx-auto mb-12">
-              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-gray-700 leading-relaxed ${inter.className} font-light`}>
                 Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
               </p>
             </div>
@@ -845,10 +818,10 @@ export default function HomePage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group relative"
                 >
-                  <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gold-primary/30 hover:border-gold-primary/50 hover:shadow-2xl hover:shadow-gold-primary/20 transition-all duration-500 premium-hover h-full">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gold-primary/20 hover:border-gold-primary/40 hover:shadow-2xl hover:shadow-gold-primary/10 transition-all duration-500 premium-hover h-full">
                     {/* Imagen del producto */}
                     <div className="relative mb-4">
-                      <div className="w-full h-48 bg-gradient-to-br from-gold-primary/20 to-gold-accent/20 rounded-xl overflow-hidden border border-gold-primary/40">
+                      <div className="w-full h-48 bg-gradient-to-br from-gold-primary/10 to-gold-accent/10 rounded-xl overflow-hidden border border-gold-primary/30">
                         <img
                           src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
                           alt={product.name}
@@ -867,7 +840,7 @@ export default function HomePage() {
                       <h3 className="text-lg font-bold text-gold-primary group-hover:text-gold-accent transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-gray-300 text-sm line-clamp-2">
+                      <p className="text-gray-600 text-sm line-clamp-2">
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
