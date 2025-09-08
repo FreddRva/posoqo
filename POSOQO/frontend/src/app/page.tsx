@@ -323,8 +323,6 @@ export default function HomePage() {
         <div className="absolute top-80 right-1/3 w-1 h-1 bg-yellow-400 rounded-full gold-sparkle" style={{animationDelay: '0.5s'}}></div>
       </div>
       
-      <Navbar scrolled={isScrolled} />
-      
       {/* Hero Section - Diseño premium dorado/negro */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden premium-gradient pt-20 lg:pt-32">
         {/* Fondo con imagen y overlay mejorado */}
