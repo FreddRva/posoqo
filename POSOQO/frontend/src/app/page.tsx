@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Montserrat, Playfair_Display, Inter, Cormorant_Garamond } from "next/font/google";
-import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsCrossed, Calendar } from "lucide-react";
-import { motion } from "framer-motion";
+import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsCrossed, Calendar, Flame, TestTube, Sparkles } from "lucide-react";
+import { motion, useAnimation } from "framer-motion";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 // Components
 import Navbar from "@/components/Navbar";
@@ -764,7 +765,9 @@ export default function HomePage() {
         </div>
       ) : (
           <div className="max-w-7xl mx-auto px-6 mt-16">
-        <FeaturedFoods />
+            <div className="text-center text-gray-400">
+              <p>No hay comidas destacadas disponibles en este momento.</p>
+            </div>
           </div>
       )}
         
