@@ -632,16 +632,16 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-full border border-posoqo-gold/30 backdrop-blur-sm">
-              <Beer className="w-5 h-5 text-posoqo-gold" />
-              <span className="text-posoqo-gold font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/10 to-gold-accent/10 rounded-full border border-gold-primary/30 backdrop-blur-sm">
+              <Beer className="w-5 h-5 text-gold-primary" />
+              <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-posoqo-gold ${playfair.className} tracking-wider drop-shadow-lg`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${playfair.className} tracking-wider drop-shadow-lg`}>
                 Cervezas
               </h2>
               {/* Línea decorativa dorada */}
@@ -772,16 +772,16 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-full border border-posoqo-gold/30 backdrop-blur-sm">
-              <UtensilsCrossed className="w-5 h-5 text-posoqo-gold" />
-              <span className="text-posoqo-gold font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/10 to-gold-accent/10 rounded-full border border-gold-primary/30 backdrop-blur-sm">
+              <UtensilsCrossed className="w-5 h-5 text-gold-primary" />
+              <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-posoqo-gold ${cormorant.className} italic tracking-wider drop-shadow-lg`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${cormorant.className} italic tracking-wider drop-shadow-lg`}>
                 Gastronomía
               </h2>
               {/* Línea decorativa dorada */}
@@ -815,13 +815,13 @@ export default function HomePage() {
                 href="/reservas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-posoqo-gold text-posoqo-gold font-bold text-lg hover:bg-posoqo-gold hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-gold-primary text-gold-primary font-bold text-lg hover:bg-gold-primary hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Calendar className="w-5 h-5" />
                   Reservar Mesa
                 </span>
-                <div className="absolute inset-0 bg-posoqo-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </div>
           </motion.div>
@@ -839,10 +839,10 @@ export default function HomePage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group relative"
                 >
-                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-posoqo-gold/20 hover:border-posoqo-gold/40 hover:shadow-2xl hover:shadow-posoqo-gold/10 transition-all duration-500 premium-hover h-full">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-gold-primary/20 hover:border-gold-primary/40 hover:shadow-2xl hover:shadow-gold-primary/10 transition-all duration-500 premium-hover h-full">
                     {/* Imagen del producto */}
                     <div className="relative mb-4">
-                      <div className="w-full h-48 bg-gradient-to-br from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-xl overflow-hidden border border-posoqo-gold/30">
+                      <div className="w-full h-48 bg-gradient-to-br from-gold-primary/10 to-gold-accent/10 rounded-xl overflow-hidden border border-gold-primary/30">
                         <img
                           src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
                           alt={product.name}
@@ -858,17 +858,17 @@ export default function HomePage() {
                     
                     {/* Información del producto */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-bold text-posoqo-gold group-hover:text-posoqo-gold-accent transition-colors">
+                      <h3 className="text-lg font-bold text-gold-primary group-hover:text-gold-accent transition-colors">
                         {product.name}
                       </h3>
                       <p className="text-gray-600 text-sm line-clamp-2">
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-posoqo-gold font-bold text-lg">
+                        <span className="text-gold-primary font-bold text-lg">
                           S/ {product.price?.toFixed(2) || '0.00'}
                         </span>
-                        <button className="gold-gradient text-posoqo-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
+                        <button className="gold-gradient text-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
                           Ver más
                         </button>
                       </div>
