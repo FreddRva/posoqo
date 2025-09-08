@@ -94,7 +94,7 @@ const DropdownMenu = ({
         <div className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "absolute left-0 top-full mt-2 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow transform -translate-x-1/2 left-1/2"}
+        : "absolute left-0 top-full mt-4 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow transform -translate-x-1/2 left-1/2"}
     `}>
       {items.map((item, index) => (
         <Link
