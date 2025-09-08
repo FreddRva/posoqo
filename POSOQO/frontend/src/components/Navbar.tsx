@@ -93,12 +93,20 @@ const DropdownMenu = ({
   if (!isOpen) return null;
 
   return (
+    <>
+      {/* Overlay invisible para cerrar al hacer clic */}
+      {!isMobile && (
         <div 
-          ref={dropdownRef}
-          className={`
+          className="fixed inset-0 z-[9998]"
+          onClick={onClose}
+        />
+      )}
+      <div 
+        ref={dropdownRef}
+        className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "absolute left-1/2 transform -translate-x-1/2 top-full mt-2 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
+        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
     `}>
       {items.map((item, index) => (
         <Link
@@ -122,6 +130,7 @@ const DropdownMenu = ({
         </Link>
       ))}
     </div>
+    </>
   );
 };
 
