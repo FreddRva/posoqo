@@ -596,9 +596,18 @@ export default function HomePage() {
       <section ref={productosRef} className="py-20 relative overflow-hidden premium-gradient">
         {/* Fondo con efectos dorados profesionales */}
         <div className="absolute inset-0 premium-gradient"></div>
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.12\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+        
+        {/* Patrón de espuma de cerveza dorada - Temático y elegante */}
+        <div className="absolute inset-0 opacity-12">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              radial-gradient(circle at 15% 15%, rgba(255, 215, 0, 0.12) 0%, transparent 20%),
+              radial-gradient(circle at 85% 85%, rgba(255, 215, 0, 0.10) 0%, transparent 20%),
+              radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 15%),
+              radial-gradient(circle at 30% 70%, rgba(255, 215, 0, 0.06) 0%, transparent 18%),
+              radial-gradient(circle at 70% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 12%)
+            `,
+            backgroundSize: '200px 200px, 250px 250px, 180px 180px, 220px 220px, 160px 160px'
           }}></div>
         </div>
         
