@@ -459,15 +459,18 @@ export default function HomePage() {
         {/* Fondo principal con gradiente elegante */}
         <div className="absolute inset-0 bg-gradient-to-br from-posoqo-black via-posoqo-black-light to-posoqo-black"></div>
         
-        {/* Patrón geométrico dorado sutil */}
-        <div className="absolute inset-0 opacity-10">
+        {/* Patrón de granos de cebada dorados - Temático y elegante */}
+        <div className="absolute inset-0 opacity-12">
           <div className="w-full h-full" style={{
             backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
-              linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.05) 50%, transparent 70%)
+              radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 30%),
+              radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.12) 0%, transparent 30%),
+              radial-gradient(circle at 40% 60%, rgba(255, 215, 0, 0.08) 0%, transparent 25%),
+              radial-gradient(circle at 60% 40%, rgba(255, 215, 0, 0.10) 0%, transparent 28%),
+              linear-gradient(30deg, transparent 40%, rgba(255, 215, 0, 0.06) 50%, transparent 60%),
+              linear-gradient(-30deg, transparent 35%, rgba(255, 215, 0, 0.04) 45%, transparent 55%)
             `,
-            backgroundSize: '400px 400px, 600px 600px, 200px 200px'
+            backgroundSize: '300px 300px, 400px 400px, 250px 250px, 350px 350px, 150px 150px, 200px 200px'
           }}></div>
         </div>
         
