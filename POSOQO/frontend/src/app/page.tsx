@@ -618,7 +618,7 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/10 to-gold-accent/10 rounded-full border border-gold-primary/30 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
               <Beer className="w-5 h-5 text-gold-primary" />
               <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
@@ -627,7 +627,7 @@ export default function HomePage() {
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${playfair.className} tracking-wider drop-shadow-lg`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${playfair.className} tracking-wider drop-shadow-2xl`}>
                 Cervezas
               </h2>
               {/* Línea decorativa dorada */}
@@ -751,7 +751,7 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/10 to-gold-accent/10 rounded-full border border-gold-primary/30 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
               <UtensilsCrossed className="w-5 h-5 text-gold-primary" />
               <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
@@ -760,7 +760,7 @@ export default function HomePage() {
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${cormorant.className} italic tracking-wider drop-shadow-lg`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
                 Gastronomía
               </h2>
               {/* Línea decorativa dorada */}
