@@ -30,7 +30,7 @@ type NavItem = {
   }[];
 };
 
-// Configuración de navegación
+// Configuración de navegación - Más limpia y organizada
 const navItems: NavItem[] = [
   { label: "Nosotros", href: "/about" },
   { 
@@ -38,12 +38,12 @@ const navItems: NavItem[] = [
     dropdown: true, 
     subitems: [
       { 
-        label: "Cervezas Artesanales", 
+        label: "Cervezas", 
         href: "/products?filter=cerveza",
         description: "Nuestra colección de cervezas únicas"
       },
       { 
-        label: "Comidas Gourmet", 
+        label: "Comidas", 
         href: "/products?filter=comidas",
         description: "Platos que complementan nuestras cervezas"
       },
@@ -62,22 +62,16 @@ const navItems: NavItem[] = [
       { 
         label: "Club POSOQO", 
         href: "/#club-posoqo",
-        description: "Únete a nuestra comunidad cervecera"
+        description: "Únete a nuestra comunidad"
       },
       { 
         label: "Eventos", 
         href: "/#eventos",
         description: "Festivales y eventos especiales"
       },
-      { 
-        label: "Blog", 
-        href: "/blog",
-        description: "Noticias y contenido cervecero"
-      },
     ] 
   },
   { label: "Contacto", href: "/#contacto" },
-  { label: "Chela Gratis", href: "/chela-gratis", highlight: true },
 ];
 
 // Componente de menú desplegable
@@ -362,12 +356,12 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         ref={navbarRef}
         className={`
           fixed top-0 left-0 w-full z-50 transition-all duration-300 
-          ${scrolled ? "premium-gradient border-b border-yellow-400/20 shadow-2xl gold-glow" : "premium-gradient"}
+          ${scrolled ? "navbar-premium border-b border-yellow-400/20 shadow-2xl gold-glow" : "navbar-premium"}
           ${montserrat.className}
         `}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-16 lg:h-18">
             
             {/* Logo */}
             <Link 
@@ -390,20 +384,20 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               </span>
             </Link>
 
-            {/* Navegación desktop */}
-            <div className="hidden lg:flex items-center space-x-2">
+            {/* Navegación desktop - Más limpia y organizada */}
+            <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => renderNavItem(item))}
             </div>
 
-            {/* Acciones desktop */}
-            <div className="hidden lg:flex items-center space-x-3">
+            {/* Acciones desktop - Más organizadas */}
+            <div className="hidden lg:flex items-center space-x-2">
               
               {/* Notificaciones */}
               {session && (
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                    className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                     aria-label="Notificaciones"
                   >
                     <Bell className="w-5 h-5 text-white" />
@@ -521,7 +515,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
                 aria-label="Carrito"
               >
                 <ShoppingCart className="w-5 h-5 text-white" />
@@ -628,15 +622,15 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="px-6 py-2.5 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow premium-hover"
+                  className="px-6 py-2 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow premium-hover"
                 >
                   Iniciar sesión
                 </button>
               )}
             </div>
 
-            {/* Botones móviles */}
-            <div className="flex lg:hidden items-center space-x-2">
+            {/* Botones móviles - Más organizados */}
+            <div className="flex lg:hidden items-center space-x-1">
               
               {/* Notificaciones móvil */}
               {session && (
@@ -790,7 +784,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         </div>
       </nav>
 
-      {/* Menú móvil */}
+      {/* Menú móvil - Más limpio y organizado */}
       <div 
         ref={mobileMenuRef}
         className={`
@@ -800,13 +794,13 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
             : "opacity-0 -translate-y-full pointer-events-none"}
         `}
       >
-        <div className="px-6 py-8 space-y-2 overflow-y-auto h-full pt-4">
+        <div className="px-6 py-8 space-y-1 overflow-y-auto h-full pt-4">
           
           {/* Navegación móvil */}
           {navItems.map((item) => renderNavItem(item, true))}
           
-          {/* Sección de usuario móvil */}
-          <div className="pt-8 border-t border-posoqo-gray-dark/50 space-y-2">
+          {/* Sección de usuario móvil - Más limpia */}
+          <div className="pt-6 border-t border-posoqo-gray-dark/50 space-y-1">
             {user ? (
               <>
                 <Link
