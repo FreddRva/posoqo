@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "../styles/design-system.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -44,55 +43,16 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* ========================================
-   POSOQO DESIGN SYSTEM - GLOBALS
-   Sistema de diseño dorado/negro/blanco
-   ======================================== */
-
 :root {
   --radius: 0.625rem;
   
-  /* === COLORES PRINCIPALES === */
-  --gold-primary: #D4AF37;      /* Dorado principal */
-  --gold-light: #FFD700;        /* Dorado brillante */
-  --gold-dark: #B8860B;         /* Dorado oscuro */
-  --gold-accent: #F4E4BC;       /* Dorado claro */
-  --gold-bright: #FFC107;       /* Dorado brillante alternativo */
-  --gold-deep: #8B6914;         /* Dorado muy oscuro */
-  
-  --black-primary: #000000;     /* Negro profundo */
-  --black-soft: #1A1A1A;        /* Negro suave */
-  --black-medium: #2A2A2A;      /* Negro medio */
-  --black-light: #1F1F1F;       /* Negro claro */
-  
-  --white-primary: #FFFFFF;     /* Blanco puro */
-  --white-soft: #F8F8F8;        /* Blanco suave */
-  --white-cream: #F5F5F5;       /* Blanco crema */
-  
-  /* === GRADIENTES === */
-  --gradient-gold: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
-  --gradient-gold-hover: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
-  --gradient-gold-text: linear-gradient(135deg, var(--gold-primary), var(--gold-light), var(--gold-dark));
-  --gradient-black: linear-gradient(135deg, var(--black-primary) 0%, var(--black-soft) 50%, var(--black-primary) 100%);
-  --gradient-card: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.7), rgba(26, 26, 26, 0.9));
-  --gradient-glow: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05), rgba(212, 175, 55, 0.1));
-  
-  /* === SOMBRAS === */
-  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
-  --shadow-gold-hover: 0 0 30px rgba(212, 175, 55, 0.5);
-  --shadow-gold-strong: 0 0 40px rgba(212, 175, 55, 0.4);
-  --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1);
-  --shadow-glow-strong: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
-  
-  /* === EFECTOS DE TEXTO === */
-  --text-shadow-gold: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
-  --text-shadow-strong: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 30px rgba(212, 175, 55, 0.4);
-  
-  /* === TRANSICIONES === */
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-premium: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-glow: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  /* === COLORES POSOQO === */
+  --gold: #D4AF37;
+  --gold-light: #FFD700;
+  --gold-dark: #B8860B;
+  --black: #000000;
+  --black-soft: #1A1A1A;
+  --white: #FFFFFF;
   
   /* === POSOQO COLOR SCHEME === */
   --background: #000000;
@@ -163,12 +123,30 @@
 }
 
 /* ========================================
-   CLASES UTILITARIAS PRINCIPALES
+   ESTILOS BASE
+   ======================================== */
+
+@layer base {
+  * {
+    @apply outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background: #000000 !important;
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+/* ========================================
+   CLASES PRINCIPALES POSOQO
    ======================================== */
 
 /* === FONDOS === */
 .premium-gradient {
-  background: var(--gradient-black);
+  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
   position: relative;
   overflow: hidden;
 }
@@ -180,63 +158,45 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-glow);
-  opacity: 0.3;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1), transparent 50%);
   pointer-events: none;
 }
 
 .gold-gradient {
-  background: var(--gradient-gold);
-  box-shadow: var(--shadow-gold);
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .gold-gradient:hover {
-  background: var(--gradient-gold-hover);
-  box-shadow: var(--shadow-gold-hover);
-}
-
-.bg-card {
-  background: var(--gradient-card);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
 /* === TEXTO === */
 .gold-text {
-  background: var(--gradient-gold-text);
+  background: linear-gradient(135deg, #D4AF37, #FFD700, #B8860B);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: var(--text-shadow-gold);
-}
-
-.gold-text:hover {
-  background: var(--gradient-gold-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
 .premium-text-shadow {
-  text-shadow: var(--text-shadow-gold);
-}
-
-.premium-text-shadow-strong {
-  text-shadow: var(--text-shadow-strong);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 /* === BORDES === */
 .gold-border {
   border: 2px solid transparent;
-  background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
-              var(--gradient-gold) border-box;
-  box-shadow: var(--shadow-gold);
+  background: linear-gradient(#000000, #000000) padding-box,
+              linear-gradient(135deg, #D4AF37, #FFD700) border-box;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .gold-border:hover {
-  background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
-              var(--gradient-gold-hover) border-box;
-  box-shadow: var(--shadow-gold-hover);
+  background: linear-gradient(#000000, #000000) padding-box,
+              linear-gradient(135deg, #FFD700, #D4AF37) border-box;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
 /* === EFECTOS DE VIDRIO === */
@@ -245,67 +205,36 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
 
 .gold-glass:hover {
   background: rgba(212, 175, 55, 0.15);
   border-color: rgba(212, 175, 55, 0.3);
-  box-shadow: var(--shadow-gold-hover);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
 /* === SOMBRAS === */
 .gold-glow {
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
+              0 0 40px rgba(212, 175, 55, 0.1),
+              0 0 60px rgba(212, 175, 55, 0.05);
 }
 
 .gold-glow:hover {
-  box-shadow: var(--shadow-gold-hover);
-}
-
-.gold-glow-strong {
-  box-shadow: var(--shadow-gold-strong);
-}
-
-.shadow-premium {
-  box-shadow: var(--shadow-premium);
-}
-
-.shadow-glow {
-  box-shadow: var(--shadow-glow);
-}
-
-.shadow-glow-strong {
-  box-shadow: var(--shadow-glow-strong);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5),
+              0 0 60px rgba(212, 175, 55, 0.2),
+              0 0 90px rgba(212, 175, 55, 0.1);
 }
 
 /* === EFECTOS HOVER === */
 .premium-hover {
-  transition: var(--transition-smooth);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .premium-hover:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-premium), var(--shadow-gold);
-}
-
-.hover-glow {
-  transition: var(--transition-glow);
-}
-
-.hover-glow:hover {
-  box-shadow: var(--shadow-glow-strong);
-  transform: translateY(-2px);
-}
-
-.hover-gold {
-  transition: var(--transition-premium);
-}
-
-.hover-gold:hover {
-  background: var(--gradient-gold-hover);
-  box-shadow: var(--shadow-gold-hover);
-  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 175, 55, 0.2);
 }
 
 /* ========================================
@@ -315,9 +244,9 @@
 /* === BOTONES === */
 .btn-primary {
   @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
-  background: var(--gradient-gold);
-  color: var(--black-primary);
-  box-shadow: var(--shadow-gold);
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+  color: #000000;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -339,16 +268,16 @@
 
 .btn-primary:hover {
   transform: scale(1.05);
-  box-shadow: var(--shadow-gold-hover);
-  background: var(--gradient-gold-hover);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #B8860B 100%);
 }
 
 .btn-secondary {
   @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
   background: transparent;
-  color: var(--white-primary);
-  border: 2px solid var(--gold-primary);
-  box-shadow: var(--shadow-gold);
+  color: #FFFFFF;
+  border: 2px solid #D4AF37;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -360,7 +289,7 @@
   left: 0;
   width: 0;
   height: 100%;
-  background: var(--gradient-gold);
+  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
   transition: width 0.3s;
   z-index: -1;
 }
@@ -370,17 +299,17 @@
 }
 
 .btn-secondary:hover {
-  color: var(--black-primary);
+  color: #000000;
   transform: scale(1.05);
-  box-shadow: var(--shadow-gold-hover);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
 /* === CARDS === */
 .card-premium {
   @apply rounded-3xl p-6 transition-all duration-500;
-  background: var(--gradient-card);
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.7), rgba(26, 26, 26, 0.9));
   border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -392,7 +321,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-glow);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05), rgba(212, 175, 55, 0.1));
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -404,41 +333,42 @@
 
 .card-premium:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-gold-hover);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
   border-color: rgba(212, 175, 55, 0.4);
 }
 
-/* === PRODUCT CARDS === */
-.product-card {
-  @apply relative group cursor-pointer rounded-3xl p-6 transition-all duration-500;
-  background: var(--gradient-card);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: var(--shadow-gold);
+/* === NAVBAR === */
+.navbar-premium {
+  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* === FOOTER === */
+.footer-premium {
+  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+/* === SECCIONES === */
+.section-premium {
+  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
   position: relative;
   overflow: hidden;
 }
 
-.product-card::before {
+.section-premium::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--gradient-glow);
-  opacity: 0;
-  transition: opacity 0.3s;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1), transparent 50%);
   pointer-events: none;
-}
-
-.product-card:hover::before {
-  opacity: 0.4;
-}
-
-.product-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-gold-hover);
-  border-color: rgba(212, 175, 55, 0.4);
 }
 
 /* ========================================
@@ -537,57 +467,10 @@
 }
 
 .group:hover .group-hover\:text-gold {
-  background: var(--gradient-gold-text);
+  background: linear-gradient(135deg, #D4AF37, #FFD700, #B8860B);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* ========================================
-   SCROLLBAR PERSONALIZADO
-   ======================================== */
-
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: #374151;
-  border-radius: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #4B5563;
-  border-radius: 3px;
-  transition: background 0.2s ease;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #6B7280;
-}
-
-.scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: #4B5563 #374151;
-  scroll-behavior: smooth;
-}
-
-/* ========================================
-   BASE STYLES
-   ======================================== */
-
-@layer base {
-  * {
-    @apply outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-    background: #000000 !important;
-  }
-}
-
-html {
-  color-scheme: dark;
 }
 
 /* ========================================
@@ -627,7 +510,36 @@ html {
 }
 
 /* ========================================
-   RESPONSIVE UTILITIES
+   SCROLLBAR PERSONALIZADO
+   ======================================== */
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #374151;
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   RESPONSIVE
    ======================================== */
 
 @media (max-width: 768px) {
