@@ -19,7 +19,6 @@ import SectionHeader from "@/components/ui/SectionHeader";
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
-const poppins = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 interface Product {

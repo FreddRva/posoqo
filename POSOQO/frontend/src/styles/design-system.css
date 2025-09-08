@@ -212,6 +212,134 @@
   }
 }
 
+/* === CLASES GROUP === */
+.group {
+  position: relative;
+}
+
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.group:hover .group-hover\:translate-x-2 {
+  transform: translateX(0.5rem);
+}
+
+.group:hover .group-hover\:translate-y-\[-4px\] {
+  transform: translateY(-4px);
+}
+
+.group:hover .group-hover\:translate-y-\[-6px\] {
+  transform: translateY(-6px);
+}
+
+.group:hover .group-hover\:text-gold {
+  background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.group:hover .group-hover\:text-yellow-300 {
+  color: #fbbf24;
+}
+
+.group:hover .group-hover\:text-yellow-400 {
+  color: #facc15;
+}
+
+.group:hover .group-hover\:text-orange-200 {
+  color: #fed7aa;
+}
+
+.group:hover .group-hover\:text-orange-300 {
+  color: #fdba74;
+}
+
+.group:hover .group-hover\:text-orange-400 {
+  color: #fb923c;
+}
+
+.group:hover .group-hover\:text-orange-500 {
+  color: #f97316;
+}
+
+.group:hover .group-hover\:text-emerald-300 {
+  color: #6ee7b7;
+}
+
+.group:hover .group-hover\:text-emerald-400 {
+  color: #34d399;
+}
+
+.group:hover .group-hover\:text-teal-400 {
+  color: #2dd4bf;
+}
+
+.group:hover .group-hover\:text-blue-400 {
+  color: #60a5fa;
+}
+
+.group:hover .group-hover\:text-cyan-400 {
+  color: #22d3ee;
+}
+
+.group:hover .group-hover\:text-amber-300 {
+  color: #fcd34d;
+}
+
+.group:hover .group-hover\:text-amber-400 {
+  color: #fbbf24;
+}
+
+.group:hover .group-hover\:text-red-400 {
+  color: #f87171;
+}
+
+.group:hover .group-hover\:text-red-500 {
+  color: #ef4444;
+}
+
+.group:hover .group-hover\:text-gray-300 {
+  color: #d1d5db;
+}
+
+.group:hover .group-hover\:text-gray-400 {
+  color: #9ca3af;
+}
+
+.group:hover .group-hover\:text-gray-500 {
+  color: #6b7280;
+}
+
+.group:hover .group-hover\:text-gray-600 {
+  color: #4b5563;
+}
+
+.group:hover .group-hover\:text-gray-700 {
+  color: #374151;
+}
+
+.group:hover .group-hover\:text-gray-800 {
+  color: #1f2937;
+}
+
+.group:hover .group-hover\:text-gray-900 {
+  color: #111827;
+}
+
+.group:hover .group-hover\:text-black {
+  color: #000000;
+}
+
+.group:hover .group-hover\:text-white {
+  color: #ffffff;
+}
+
 /* === COMPONENTES ESPECÍFICOS === */
 
 /* Navbar */
