@@ -44,67 +44,80 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ========================================
+   POSOQO DESIGN SYSTEM - GLOBALS
+   Sistema de diseño dorado/negro/blanco
+   ======================================== */
+
 :root {
   --radius: 0.625rem;
-  /* POSOQO Premium Color Scheme - Light Mode */
-  --background: #FFFFFF;
-  --foreground: #0A0A0A;
-  --card: #FFFFFF;
-  --card-foreground: #0A0A0A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0A0A0A;
-  --primary: #D4AF37;        /* Dorado principal */
-  --primary-foreground: #0A0A0A;
-  --secondary: #F8F8F8;
-  --secondary-foreground: #0A0A0A;
-  --muted: #F8F8F8;
-  --muted-foreground: #666666;
-  --accent: #FFD700;         /* Dorado brillante */
-  --accent-foreground: #0A0A0A;
-  --destructive: #DC2626;
-  --border: #E5E5E5;
-  --input: #F8F8F8;
-  --ring: #D4AF37;
-  --chart-1: #D4AF37;        /* Dorado */
-  --chart-2: #B8860B;        /* Dorado oscuro */
-  --chart-3: #FFD700;        /* Dorado brillante */
-  --chart-4: #F4E4BC;        /* Dorado claro */
-  --chart-5: #000000;        /* Negro */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #0A0A0A;
-  --sidebar-primary: #D4AF37;
-  --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: #F8F8F8;
-  --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: #E5E5E5;
-  --sidebar-ring: #D4AF37;
-}
-
-.dark {
-  /* POSOQO Premium Color Scheme - Dark Mode */
-  --background: #000000;     /* Negro profundo */
+  
+  /* === COLORES PRINCIPALES === */
+  --gold-primary: #D4AF37;      /* Dorado principal */
+  --gold-light: #FFD700;        /* Dorado brillante */
+  --gold-dark: #B8860B;         /* Dorado oscuro */
+  --gold-accent: #F4E4BC;       /* Dorado claro */
+  --gold-bright: #FFC107;       /* Dorado brillante alternativo */
+  --gold-deep: #8B6914;         /* Dorado muy oscuro */
+  
+  --black-primary: #000000;     /* Negro profundo */
+  --black-soft: #1A1A1A;        /* Negro suave */
+  --black-medium: #2A2A2A;      /* Negro medio */
+  --black-light: #1F1F1F;       /* Negro claro */
+  
+  --white-primary: #FFFFFF;     /* Blanco puro */
+  --white-soft: #F8F8F8;        /* Blanco suave */
+  --white-cream: #F5F5F5;       /* Blanco crema */
+  
+  /* === GRADIENTES === */
+  --gradient-gold: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
+  --gradient-gold-hover: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
+  --gradient-gold-text: linear-gradient(135deg, var(--gold-primary), var(--gold-light), var(--gold-dark));
+  --gradient-black: linear-gradient(135deg, var(--black-primary) 0%, var(--black-soft) 50%, var(--black-primary) 100%);
+  --gradient-card: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.7), rgba(26, 26, 26, 0.9));
+  --gradient-glow: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05), rgba(212, 175, 55, 0.1));
+  
+  /* === SOMBRAS === */
+  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
+  --shadow-gold-hover: 0 0 30px rgba(212, 175, 55, 0.5);
+  --shadow-gold-strong: 0 0 40px rgba(212, 175, 55, 0.4);
+  --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1);
+  --shadow-glow-strong: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
+  
+  /* === EFECTOS DE TEXTO === */
+  --text-shadow-gold: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+  --text-shadow-strong: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 30px rgba(212, 175, 55, 0.4);
+  
+  /* === TRANSICIONES === */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-premium: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-glow: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* === POSOQO COLOR SCHEME === */
+  --background: #000000;
   --foreground: #FFFFFF;
-  --card: #1A1A1A;           /* Negro suave */
+  --card: #1A1A1A;
   --card-foreground: #FFFFFF;
   --popover: #1A1A1A;
   --popover-foreground: #FFFFFF;
-  --primary: #D4AF37;        /* Dorado principal */
+  --primary: #D4AF37;
   --primary-foreground: #000000;
-  --secondary: #2A2A2A;      /* Negro medio */
+  --secondary: #2A2A2A;
   --secondary-foreground: #FFFFFF;
   --muted: #2A2A2A;
   --muted-foreground: #999999;
-  --accent: #FFD700;         /* Dorado brillante */
+  --accent: #FFD700;
   --accent-foreground: #000000;
   --destructive: #DC2626;
   --border: #333333;
   --input: #2A2A2A;
   --ring: #D4AF37;
-  --chart-1: #D4AF37;        /* Dorado */
-  --chart-2: #B8860B;        /* Dorado oscuro */
-  --chart-3: #FFD700;        /* Dorado brillante */
-  --chart-4: #F4E4BC;        /* Dorado claro */
-  --chart-5: #FFFFFF;        /* Blanco */
+  --chart-1: #D4AF37;
+  --chart-2: #B8860B;
+  --chart-3: #FFD700;
+  --chart-4: #F4E4BC;
+  --chart-5: #FFFFFF;
   --sidebar: #1A1A1A;
   --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #D4AF37;
@@ -113,6 +126,351 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #333333;
   --sidebar-ring: #D4AF37;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #1A1A1A;
+  --card-foreground: #FFFFFF;
+  --popover: #1A1A1A;
+  --popover-foreground: #FFFFFF;
+  --primary: #D4AF37;
+  --primary-foreground: #000000;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #FFFFFF;
+  --muted: #2A2A2A;
+  --muted-foreground: #999999;
+  --accent: #FFD700;
+  --accent-foreground: #000000;
+  --destructive: #DC2626;
+  --border: #333333;
+  --input: #2A2A2A;
+  --ring: #D4AF37;
+  --chart-1: #D4AF37;
+  --chart-2: #B8860B;
+  --chart-3: #FFD700;
+  --chart-4: #F4E4BC;
+  --chart-5: #FFFFFF;
+  --sidebar: #1A1A1A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #D4AF37;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #2A2A2A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #333333;
+  --sidebar-ring: #D4AF37;
+}
+
+/* ========================================
+   CLASES UTILITARIAS PRINCIPALES
+   ======================================== */
+
+/* === FONDOS === */
+.premium-gradient {
+  background: var(--gradient-black);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.gold-gradient {
+  background: var(--gradient-gold);
+  box-shadow: var(--shadow-gold);
+}
+
+.gold-gradient:hover {
+  background: var(--gradient-gold-hover);
+  box-shadow: var(--shadow-gold-hover);
+}
+
+.bg-card {
+  background: var(--gradient-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* === TEXTO === */
+.gold-text {
+  background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: var(--text-shadow-gold);
+}
+
+.gold-text:hover {
+  background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.premium-text-shadow {
+  text-shadow: var(--text-shadow-gold);
+}
+
+.premium-text-shadow-strong {
+  text-shadow: var(--text-shadow-strong);
+}
+
+/* === BORDES === */
+.gold-border {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
+              var(--gradient-gold) border-box;
+  box-shadow: var(--shadow-gold);
+}
+
+.gold-border:hover {
+  background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
+              var(--gradient-gold-hover) border-box;
+  box-shadow: var(--shadow-gold-hover);
+}
+
+/* === EFECTOS DE VIDRIO === */
+.gold-glass {
+  background: rgba(212, 175, 55, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-gold);
+}
+
+.gold-glass:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: var(--shadow-gold-hover);
+}
+
+/* === SOMBRAS === */
+.gold-glow {
+  box-shadow: var(--shadow-gold);
+}
+
+.gold-glow:hover {
+  box-shadow: var(--shadow-gold-hover);
+}
+
+.gold-glow-strong {
+  box-shadow: var(--shadow-gold-strong);
+}
+
+.shadow-premium {
+  box-shadow: var(--shadow-premium);
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.shadow-glow-strong {
+  box-shadow: var(--shadow-glow-strong);
+}
+
+/* === EFECTOS HOVER === */
+.premium-hover {
+  transition: var(--transition-smooth);
+}
+
+.premium-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-premium), var(--shadow-gold);
+}
+
+.hover-glow {
+  transition: var(--transition-glow);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow-strong);
+  transform: translateY(-2px);
+}
+
+.hover-gold {
+  transition: var(--transition-premium);
+}
+
+.hover-gold:hover {
+  background: var(--gradient-gold-hover);
+  box-shadow: var(--shadow-gold-hover);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* ========================================
+   COMPONENTES PRINCIPALES
+   ======================================== */
+
+/* === BOTONES === */
+.btn-primary {
+  @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
+  background: var(--gradient-gold);
+  color: var(--black-primary);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-gold-hover);
+  background: var(--gradient-gold-hover);
+}
+
+.btn-secondary {
+  @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
+  background: transparent;
+  color: var(--white-primary);
+  border: 2px solid var(--gold-primary);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: var(--gradient-gold);
+  transition: width 0.3s;
+  z-index: -1;
+}
+
+.btn-secondary:hover::before {
+  width: 100%;
+}
+
+.btn-secondary:hover {
+  color: var(--black-primary);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-gold-hover);
+}
+
+/* === CARDS === */
+.card-premium {
+  @apply rounded-3xl p-6 transition-all duration-500;
+  background: var(--gradient-card);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.card-premium:hover::before {
+  opacity: 0.3;
+}
+
+.card-premium:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-gold-hover);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* === PRODUCT CARDS === */
+.product-card {
+  @apply relative group cursor-pointer rounded-3xl p-6 transition-all duration-500;
+  background: var(--gradient-card);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.product-card:hover::before {
+  opacity: 0.4;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-gold-hover);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes gold-sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.gold-sparkle {
+  animation: gold-sparkle 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 @keyframes glow-line {
@@ -145,9 +503,78 @@
     transform: translateY(0);
   }
 }
+
 .animate-fadeinup {
   animation: fadeinup 4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
+
+/* ========================================
+   CLASES GROUP PARA HOVER
+   ======================================== */
+
+.group {
+  position: relative;
+}
+
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.group:hover .group-hover\:translate-x-2 {
+  transform: translateX(0.5rem);
+}
+
+.group:hover .group-hover\:translate-y-\[-4px\] {
+  transform: translateY(-4px);
+}
+
+.group:hover .group-hover\:translate-y-\[-6px\] {
+  transform: translateY(-6px);
+}
+
+.group:hover .group-hover\:text-gold {
+  background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADO
+   ======================================== */
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4B5563;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #374151;
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
 
 @layer base {
   * {
@@ -155,398 +582,61 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: #000000 !important;
   }
 }
 
-html, body {
-  background: #000000 !important;
-}
-
-/* Aplicar modo oscuro por defecto */
 html {
   color-scheme: dark;
 }
 
-/* Estilos premium para el tema dorado/negro/blanco */
-.premium-gradient {
-  background: linear-gradient(135deg, #000000 0%, #1A1A1A 50%, #000000 100%);
+/* ========================================
+   UTILIDADES ADICIONALES
+   ======================================== */
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.gold-gradient {
-  background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.gold-text {
-  background: linear-gradient(135deg, #D4AF37, #FFD700, #B8860B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.letter-spacing-wider {
+  letter-spacing: 0.2em;
 }
 
-.gold-border {
-  border: 2px solid transparent;
-  background: linear-gradient(135deg, #000000, #000000) padding-box,
-              linear-gradient(135deg, #D4AF37, #FFD700) border-box;
+.drop-shadow-2xl {
+  filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
 }
 
-.gold-glow {
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3),
-              0 0 40px rgba(212, 175, 55, 0.1),
-              0 0 60px rgba(212, 175, 55, 0.05);
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.gold-glow:hover {
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5),
-              0 0 60px rgba(212, 175, 55, 0.2),
-              0 0 90px rgba(212, 175, 55, 0.1);
+.glass-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Efectos de partículas doradas */
-@keyframes gold-sparkle {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0) rotate(0deg);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1) rotate(180deg);
-  }
-}
+/* ========================================
+   RESPONSIVE UTILITIES
+   ======================================== */
 
-.gold-sparkle {
-  animation: gold-sparkle 2s ease-in-out infinite;
-}
-
-/* Efectos de hover premium */
-.premium-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.premium-hover:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
-              0 0 30px rgba(212, 175, 55, 0.2);
-}
-
-/* Glassmorphism dorado */
-.gold-glass {
-  background: rgba(212, 175, 55, 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-/* Efectos de texto premium */
-.premium-text-shadow {
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
-               0 0 20px rgba(212, 175, 55, 0.3),
-               0 0 30px rgba(212, 175, 55, 0.1);
-}
-
-/* Estilos personalizados para scroll moderno y profesional */
-@layer utilities {
-  /* Scrollbar personalizado para navegadores WebKit */
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
+@media (max-width: 768px) {
+  .card-premium {
+    @apply p-4;
   }
   
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: #374151; /* stone-700 */
-    border-radius: 3px;
+  .btn-primary,
+  .btn-secondary {
+    @apply px-6 py-3 text-base;
   }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #4B5563; /* stone-600 */
-    border-radius: 3px;
-    transition: background 0.2s ease;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: #6B7280; /* stone-500 */
-  }
-  
-  /* Scrollbar personalizado para Firefox */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: #4B5563 #374151; /* thumb track */
-  }
-  
-  /* Scrollbar personalizado para Edge */
-  .scrollbar-thin {
-    scrollbar-width: thin;
-    scrollbar-color: #4B5563 #374151;
-  }
-  
-  /* Animación suave para el scroll */
-  .scrollbar-thin {
-    scroll-behavior: smooth;
-  }
-  
-  /* Estilo adicional para scrollbar más elegante */
-  .scrollbar-thin::-webkit-scrollbar-corner {
-    background: #374151;
-  }
-  
-  /* Estilos específicos para el sidebar del dashboard */
-  .sidebar-scroll {
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #4B5563 #374151;
-  }
-  
-  .sidebar-scroll::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .sidebar-scroll::-webkit-scrollbar-track {
-    background: #374151;
-    border-radius: 3px;
-  }
-  
-  .sidebar-scroll::-webkit-scrollbar-thumb {
-    background: #4B5563;
-    border-radius: 3px;
-    transition: background 0.2s ease;
-  }
-  
-  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: #6B7280;
-  }
-  
-  /* Estilos específicos para el scroll de notificaciones */
-  .notification-scroll {
-    max-height: 384px; /* max-h-96 */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #4B5563 #374151;
-    scroll-behavior: smooth;
-  }
-  
-  .notification-scroll::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .notification-scroll::-webkit-scrollbar-track {
-    background: #374151;
-    border-radius: 4px;
-    margin: 4px 0;
-  }
-  
-  .notification-scroll::-webkit-scrollbar-thumb {
-    background: #4B5563;
-    border-radius: 4px;
-    transition: background 0.2s ease;
-    border: 1px solid #374151;
-  }
-  
-  .notification-scroll::-webkit-scrollbar-thumb:hover {
-    background: #6B7280;
-  }
-  
-  .notification-scroll::-webkit-scrollbar-corner {
-    background: #374151;
-  }
-  
-  /* Efectos para product cards */
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-  
-  .bg-radial-gradient {
-    background: radial-gradient(circle at center, var(--tw-gradient-stops));
-  }
-  
-  /* Animaciones personalizadas para partículas */
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-  
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  /* Efecto de glassmorphism mejorado */
-  .glass-card {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-  
-  /* Efecto de resplandor */
-  .glow-effect {
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-  }
-  
-  .glow-effect:hover {
-    box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
-  }
-  
-  /* Tipografías premium para ProductCards */
-  .letter-spacing-wider {
-    letter-spacing: 0.2em;
-  }
-  
-  .drop-shadow-2xl {
-    filter: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
-  }
-  
-  /* Efectos premium adicionales */
-  .backdrop-blur-sm {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-  
-  /* Animaciones premium */
-  @keyframes premium-float {
-    0%, 100% {
-      transform: translateY(0px) scale(1);
-    }
-    50% {
-      transform: translateY(-8px) scale(1.02);
-    }
-  }
-  
-  .animate-premium-float {
-    animation: premium-float 4s ease-in-out infinite;
-  }
-  
-  /* Efectos de texto premium */
-  .text-gradient {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-}
-
-/* Estilos para notificaciones móviles */
-.notifications-dropdown {
-  animation: slideDown 0.2s ease-out;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Asegurar que el dropdown esté por encima de otros elementos en móvil */
-@media (max-width: 1024px) {
-  .notifications-dropdown {
-    position: fixed !important;
-    top: 80px !important;
-    right: 16px !important;
-    left: 16px !important;
-    width: auto !important;
-    max-width: none !important;
-    z-index: 9999 !important;
-  }
-}
-
-/* Estilos para el scroll de notificaciones */
-.notification-scroll {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #4a5568 #2d3748;
-}
-
-.notification-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.notification-scroll::-webkit-scrollbar-track {
-  background: #2d3748;
-  border-radius: 3px;
-}
-
-.notification-scroll::-webkit-scrollbar-thumb {
-  background: #4a5568;
-  border-radius: 3px;
-}
-
-.notification-scroll::-webkit-scrollbar-thumb:hover {
-  background: #718096;
-}
-
-.notification-scroll::-webkit-scrollbar-corner {
-  background: #2d3748;
-}
-
-/* Estilos para scroll moderno */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
-  border-radius: 3px;
-  transition: background 0.2s ease;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
-}
-
-/* Animaciones suaves */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-out;
-}
-
-/* Efectos de hover mejorados */
-.hover-scale {
-  transition: transform 0.2s ease;
-}
-
-.hover-scale:hover {
-  transform: scale(1.02);
-}
-
-/* Estilos para notificaciones */
-.notification-item {
-  transition: all 0.2s ease;
-}
-
-.notification-item:hover {
-  transform: translateX(2px);
-}
-
-/* Efectos de glow para elementos activos */
-.glow-effect {
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
-}
-
-.glow-effect:hover {
-  box-shadow: 0 0 25px rgba(251, 191, 36, 0.2);
 }
