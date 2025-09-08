@@ -94,14 +94,14 @@ const DropdownMenu = ({
         <div className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "absolute left-0 mt-3 w-72 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-3 z-50 animate-fade-in gold-glow"}
+        : "absolute left-0 top-full mt-2 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
     `}>
       {items.map((item, index) => (
         <Link
           key={`${item.label}-${item.href}`}
           href={item.href}
           className={`
-            block px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 rounded-xl mx-2 premium-hover
+            block px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 rounded-xl mx-3 premium-hover
             ${isMobile ? "text-base" : ""}
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
@@ -260,15 +260,17 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
             />
           </button>
           {activeDropdown === item.label && item.subitems && (
-            <DropdownMenu
-              items={item.subitems}
-              isMobile={isMobile}
-              isOpen={true}
-              onClose={() => setActiveDropdown(null)}
-              onItemClick={() => {
-                if (isMobile) setMobileMenuOpen(false);
-              }}
-            />
+            <div className="relative z-[9999]">
+              <DropdownMenu
+                items={item.subitems}
+                isMobile={isMobile}
+                isOpen={true}
+                onClose={() => setActiveDropdown(null)}
+                onItemClick={() => {
+                  if (isMobile) setMobileMenuOpen(false);
+                }}
+              />
+            </div>
           )}
         </div>
       );
