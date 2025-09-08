@@ -568,14 +568,22 @@ export default function HomePage() {
         
       </section>
 
-      {/* Sección de productos */}
+      {/* Sección de Cervezas - Diseño premium dorado/negro */}
       <section ref={productosRef} className="py-20 relative overflow-hidden premium-gradient">
-        {/* Fondo con efectos profesionales */}
+        {/* Fondo con efectos dorados profesionales */}
         <div className="absolute inset-0 premium-gradient"></div>
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-8">
           <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23a8a29e\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.12\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
           }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-16 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-50"></div>
+          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-40" style={{animationDelay: '4s'}}></div>
+          <div className="absolute top-60 right-1/3 w-1 h-1 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '1s'}}></div>
         </div>
         
 
@@ -593,20 +601,22 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            {/* Sin efecto de resplandor */}
-            
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 gold-glass rounded-lg">
-                <Beer className="w-6 h-6 gold-text" />
-              </div>
-              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base relative z-10 uppercase">
+            {/* Badge superior con icono dorado */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 gold-glass rounded-full border border-posoqo-gold/30">
+              <Beer className="w-5 h-5 gold-text" />
+              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black gold-text ${playfair.className} relative z-10 tracking-wider premium-text-shadow`}>
-              Cervezas
-            </h2>
-            <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+            
+            {/* Título principal con efecto premium */}
+            <div className="relative mb-8">
+              <h2 className={`text-5xl md:text-7xl font-black gold-text ${playfair.className} tracking-wider premium-text-shadow`}>
+                Cervezas
+              </h2>
+              {/* Línea decorativa dorada */}
+              <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+            </div>
           </motion.div>
           
           <motion.div 
@@ -687,149 +697,164 @@ export default function HomePage() {
               
             </div>
             
-            {/* Botón al final de la sección */}
+            {/* Botón premium al final de la sección */}
             <div className="flex justify-center mt-12 relative z-20">
               <motion.a
                 href="/products?filter=cerveza"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center px-8 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 hover:scale-105 premium-hover relative z-20"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden"
               >
-                <span className="flex items-center gap-3">
+                <span className="relative z-10 flex items-center gap-3">
                   <Beer className="w-5 h-5" />
                   ¡Quiero chela!
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-posoqo-gold-accent to-posoqo-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Gastronomía */}
-      <section id="gastronomia" className="py-20 bg-gradient-to-br from-orange-950 via-slate-800 to-orange-950 relative overflow-hidden">
-        {/* Fondo con patrón sutil de comidas */}
-        <div className="absolute inset-0 opacity-12">
+      {/* Gastronomía - Diseño premium dorado/negro */}
+      <section id="gastronomia" className="py-20 premium-gradient relative overflow-hidden">
+        {/* Fondo con patrón dorado sutil */}
+        <div className="absolute inset-0 opacity-8">
           <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ea580c\" fill-opacity=\"0.25\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
           }}></div>
         </div>
         
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-50"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-40" style={{animationDelay: '3s'}}></div>
+        </div>
+        
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <motion.div 
+          <motion.div 
             className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-            {/* Diseño específico de comidas */}
-            
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-3 bg-orange-500/20 rounded-xl border border-orange-400/30">
-                <UtensilsCrossed className="w-7 h-7 text-orange-400" />
-              </div>
-              <span className="text-orange-400 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
+            viewport={{ once: true }}
+          >
+            {/* Badge superior con icono dorado */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 gold-glass rounded-full border border-posoqo-gold/30">
+              <UtensilsCrossed className="w-5 h-5 gold-text" />
+              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black text-orange-400 ${cormorant.className} italic relative z-10 tracking-wider`}>
-              Gastronomía
-            </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 mx-auto mt-6 rounded-full shadow-lg"></div>
             
-            {/* Descripción elegante con elementos culinarios */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-slate-300 leading-relaxed ${inter.className} font-light`}>
-              Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
-            </p>
+            {/* Título principal con efecto premium */}
+            <div className="relative mb-8">
+              <h2 className={`text-5xl md:text-7xl font-black gold-text ${cormorant.className} italic tracking-wider premium-text-shadow`}>
+                Gastronomía
+              </h2>
+              {/* Línea decorativa dorada */}
+              <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+            </div>
+            
+            {/* Descripción elegante */}
+            <div className="max-w-3xl mx-auto mb-12">
+              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
+                Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
+              </p>
+            </div>
 
-            {/* Botones de navegación mejorados con estilo culinario */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
-          <motion.a
+            {/* Botones de navegación premium */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.a
                 href="/products?filter=comidas"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center px-8 py-4 rounded-full bg-gradient-to-r from-orange-400 to-yellow-500 text-slate-900 font-bold text-lg shadow-2xl hover:shadow-orange-400/25 transition-all duration-300 hover:from-orange-300 hover:to-yellow-400 border-2 border-orange-300"
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden"
               >
-                <span className="flex items-center gap-3">
+                <span className="relative z-10 flex items-center gap-3">
                   <UtensilsCrossed className="w-5 h-5" />
                   ¡Quiero comer!
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
-          </motion.a>
+                <div className="absolute inset-0 bg-gradient-to-r from-posoqo-gold-accent to-posoqo-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </motion.a>
               
               <motion.a
                 href="/reservas"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center px-8 py-4 rounded-full border-2 border-orange-400 text-orange-400 font-bold text-lg hover:bg-orange-400/10 transition-all shadow-xl"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-border text-white font-bold text-lg hover:gold-glow transition-all duration-300 shadow-xl premium-hover overflow-hidden"
               >
-                <span className="flex items-center gap-3">
+                <span className="relative z-10 flex items-center gap-3">
                   <Calendar className="w-5 h-5" />
                   Reservar Mesa
                 </span>
+                <div className="absolute inset-0 gold-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
               </motion.a>
             </div>
-        </motion.div>
-      </div>
-
-        {/* Productos de comidas destacados */}
-      {featuredComidas && featuredComidas.length > 0 ? (
-          <div className="max-w-7xl mx-auto px-6 mt-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredComidas && featuredComidas.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative"
-              >
-                <div className="bg-gradient-to-br from-orange-800/20 to-orange-900/20 backdrop-blur-sm rounded-2xl p-6 border border-orange-400/30 hover:border-orange-300/50 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-400/20">
-                  {/* Imagen del producto */}
-                  <div className="relative mb-4">
-                    <div className="w-full h-48 bg-gradient-to-br from-orange-700/20 to-orange-800/20 rounded-xl overflow-hidden border border-orange-400/20">
-                      <img
-                        src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                    {/* Badge de comida */}
-                    <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                      🍽️ Comida
-                    </div>
-                  </div>
-                  
-                  {/* Información del producto */}
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-bold text-orange-300 group-hover:text-orange-200 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-slate-300 text-sm line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-orange-400 font-bold text-lg">
-                        S/ {product.price?.toFixed(2) || '0.00'}
-                      </span>
-                      <button className="bg-orange-500 hover:bg-orange-400 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                        Ver más
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          </motion.div>
         </div>
-      ) : (
+
+        {/* Productos de comidas destacados - Diseño premium dorado/negro */}
+        {featuredComidas && featuredComidas.length > 0 ? (
+          <div className="max-w-7xl mx-auto px-6 mt-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredComidas && featuredComidas.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group relative"
+                >
+                  <div className="premium-gradient backdrop-blur-sm rounded-2xl p-6 gold-border hover:gold-glow transition-all duration-500 hover:shadow-2xl premium-hover h-full">
+                    {/* Imagen del producto */}
+                    <div className="relative mb-4">
+                      <div className="w-full h-48 gold-glass rounded-xl overflow-hidden border border-posoqo-gold/30">
+                        <img
+                          src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                      {/* Badge de comida dorado */}
+                      <div className="absolute top-2 right-2 gold-gradient text-posoqo-black px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        🍽️ Comida
+                      </div>
+                    </div>
+                    
+                    {/* Información del producto */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-bold gold-text group-hover:text-posoqo-gold-accent transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-300 text-sm line-clamp-2">
+                        {product.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="gold-text font-bold text-lg">
+                          S/ {product.price?.toFixed(2) || '0.00'}
+                        </span>
+                        <button className="gold-gradient text-posoqo-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
+                          Ver más
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
           <div className="max-w-7xl mx-auto px-6 mt-16">
             <div className="text-center text-gray-400">
               <p>No hay comidas destacadas disponibles en este momento.</p>
             </div>
           </div>
-      )}
+        )}
         
       </section>
 
