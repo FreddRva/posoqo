@@ -189,3 +189,4 @@ psql "postgresql://usuario:password@host:puerto/database"
 ### CORS errors
 - Verificar `ALLOWED_ORIGINS` en el backend
 - Verificar `NEXT_PUBLIC_API_URL` en el frontend
+

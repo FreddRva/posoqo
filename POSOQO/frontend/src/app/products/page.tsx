@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -65,7 +65,8 @@ const SORT_LABELS: Record<SortOption, string> = {
   'popularity': 'Más populares'
 };
 
-export default function ProductsPage() {
+// Componente interno que usa useSearchParams
+function ProductsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const { addNotification } = useNotifications();
@@ -1355,5 +1356,21 @@ export default function ProductsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+// Componente principal con Suspense
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-24 pb-10 px-4 md:px-6 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto"></div>
+          <p className="text-yellow-100">Cargando productos...</p>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
