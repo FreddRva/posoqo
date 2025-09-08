@@ -135,5 +135,88 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities, addComponents, theme }) {
+      // Agregar utilidades personalizadas
+      addUtilities({
+        '.gold-text': {
+          background: 'linear-gradient(135deg, #D4AF37, #FFD700, #B8860B)',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+          'background-clip': 'text',
+        },
+        '.gold-gradient': {
+          background: 'linear-gradient(135deg, #D4AF37, #FFD700, #B8860B)',
+        },
+        '.gold-border': {
+          border: '2px solid transparent',
+          background: 'linear-gradient(var(--background), var(--background)) padding-box, linear-gradient(135deg, #D4AF37, #FFD700) border-box',
+        },
+        '.gold-glow': {
+          'box-shadow': '0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1), 0 0 60px rgba(212, 175, 55, 0.05)',
+        },
+        '.gold-glow:hover': {
+          'box-shadow': '0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2), 0 0 90px rgba(212, 175, 55, 0.1)',
+        },
+        '.premium-gradient': {
+          background: 'linear-gradient(135deg, var(--background) 0%, var(--card) 50%, var(--background) 100%)',
+        },
+        '.gold-glass': {
+          background: 'rgba(212, 175, 55, 0.1)',
+          'backdrop-filter': 'blur(20px)',
+          '-webkit-backdrop-filter': 'blur(20px)',
+          border: '1px solid rgba(212, 175, 55, 0.2)',
+        },
+        '.premium-text-shadow': {
+          'text-shadow': '0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3), 0 0 30px rgba(212, 175, 55, 0.1)',
+        },
+        '.premium-hover': {
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        },
+        '.premium-hover:hover': {
+          transform: 'translateY(-4px) scale(1.02)',
+          'box-shadow': '0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 175, 55, 0.2)',
+        },
+        '.gold-sparkle': {
+          animation: 'gold-sparkle 2s ease-in-out infinite',
+        },
+        '@keyframes gold-sparkle': {
+          '0%, 100%': {
+            opacity: '0',
+            transform: 'scale(0) rotate(0deg)',
+          },
+          '50%': {
+            opacity: '1',
+            transform: 'scale(1) rotate(180deg)',
+          },
+        },
+      });
+
+      // Agregar componentes personalizados
+      addComponents({
+        '.btn-primary': {
+          '@apply px-8 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 hover:scale-105 premium-hover': {},
+        },
+        '.btn-secondary': {
+          '@apply px-8 py-4 rounded-full gold-border text-white font-bold text-lg hover:gold-glow transition-all duration-300 shadow-xl premium-hover': {},
+        },
+        '.card-premium': {
+          '@apply relative premium-gradient backdrop-blur-sm p-6 rounded-3xl gold-border hover:gold-glow transition-all duration-500 hover:shadow-2xl premium-hover': {},
+        },
+        '.section-header': {
+          '@apply text-center mb-16 relative z-10': {},
+        },
+        '.section-title': {
+          '@apply text-5xl md:text-7xl font-black gold-text tracking-wider premium-text-shadow': {},
+        },
+        '.section-subtitle': {
+          '@apply gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10': {},
+        },
+        '.section-divider': {
+          '@apply w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg': {},
+        },
+      });
+    }
+  ],
 }

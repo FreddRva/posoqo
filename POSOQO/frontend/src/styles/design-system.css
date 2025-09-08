@@ -5,32 +5,48 @@
 
 /* === VARIABLES CSS === */
 :root {
-  /* Colores principales */
-  --gold-primary: #D4AF37;
-  --gold-light: #FFD700;
-  --gold-dark: #B8860B;
-  --gold-accent: #F4E4BC;
+  /* Colores principales MEJORADOS */
+  --gold-primary: #D4AF37;      /* Dorado principal */
+  --gold-light: #FFD700;        /* Dorado brillante */
+  --gold-dark: #B8860B;         /* Dorado oscuro */
+  --gold-accent: #F4E4BC;       /* Dorado claro */
+  --gold-bright: #FFC107;       /* Dorado brillante alternativo */
+  --gold-deep: #8B6914;         /* Dorado muy oscuro */
   
-  --black-primary: #000000;
-  --black-soft: #1A1A1A;
-  --black-medium: #2A2A2A;
+  --black-primary: #000000;     /* Negro profundo */
+  --black-soft: #1A1A1A;        /* Negro suave */
+  --black-medium: #2A2A2A;      /* Negro medio */
+  --black-light: #1F1F1F;       /* Negro claro */
   
-  --white-primary: #FFFFFF;
-  --white-soft: #F8F8F8;
+  --white-primary: #FFFFFF;     /* Blanco puro */
+  --white-soft: #F8F8F8;        /* Blanco suave */
+  --white-cream: #F5F5F5;       /* Blanco crema */
   
-  /* Gradientes */
+  /* Gradientes MEJORADOS */
   --gradient-gold: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
-  --gradient-black: linear-gradient(135deg, var(--black-primary) 0%, var(--black-soft) 50%, var(--black-primary) 100%);
+  --gradient-gold-hover: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
   --gradient-gold-text: linear-gradient(135deg, var(--gold-primary), var(--gold-light), var(--gold-dark));
+  --gradient-gold-text-hover: linear-gradient(135deg, var(--gold-light), var(--gold-primary), var(--gold-dark));
+  --gradient-black: linear-gradient(135deg, var(--black-primary) 0%, var(--black-soft) 50%, var(--black-primary) 100%);
+  --gradient-card: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.7), rgba(26, 26, 26, 0.9));
+  --gradient-glow: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05), rgba(212, 175, 55, 0.1));
   
-  /* Sombras */
+  /* Sombras MEJORADAS */
   --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
   --shadow-gold-hover: 0 0 30px rgba(212, 175, 55, 0.5);
+  --shadow-gold-strong: 0 0 40px rgba(212, 175, 55, 0.4);
   --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1);
+  --shadow-glow-strong: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
+  
+  /* Efectos de texto */
+  --text-shadow-gold: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.3);
+  --text-shadow-strong: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 30px rgba(212, 175, 55, 0.4);
   
   /* Transiciones */
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-premium: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-glow: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   
   /* Espaciado */
   --spacing-xs: 0.25rem;
@@ -49,45 +65,95 @@
 
 /* === CLASES UTILITARIAS === */
 
-/* Fondos */
+/* Fondos MEJORADOS */
 .bg-premium {
   background: var(--gradient-black);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0.3;
+  pointer-events: none;
 }
 
 .bg-gold {
   background: var(--gradient-gold);
+  box-shadow: var(--shadow-gold);
 }
 
-/* Texto */
+.bg-gold:hover {
+  background: var(--gradient-gold-hover);
+  box-shadow: var(--shadow-gold-hover);
+}
+
+.bg-card {
+  background: var(--gradient-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Texto MEJORADO */
 .text-gold {
   background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: var(--text-shadow-gold);
+}
+
+.text-gold:hover {
+  background: var(--gradient-gold-text-hover);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-glow {
-  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
-               0 0 20px rgba(212, 175, 55, 0.3),
-               0 0 30px rgba(212, 175, 55, 0.1);
+  text-shadow: var(--text-shadow-gold);
 }
 
-/* Bordes */
+.text-glow-strong {
+  text-shadow: var(--text-shadow-strong);
+}
+
+/* Bordes MEJORADOS */
 .border-gold {
   border: 2px solid transparent;
   background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
               var(--gradient-gold) border-box;
+  box-shadow: var(--shadow-gold);
 }
 
-/* Efectos de vidrio */
+.border-gold:hover {
+  background: linear-gradient(var(--black-primary), var(--black-primary)) padding-box,
+              var(--gradient-gold-hover) border-box;
+  box-shadow: var(--shadow-gold-hover);
+}
+
+/* Efectos de vidrio MEJORADOS */
 .glass-gold {
   background: rgba(212, 175, 55, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-gold);
 }
 
-/* Sombras */
+.glass-gold:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.3);
+  box-shadow: var(--shadow-gold-hover);
+}
+
+/* Sombras MEJORADAS */
 .shadow-gold {
   box-shadow: var(--shadow-gold);
 }
@@ -96,11 +162,23 @@
   box-shadow: var(--shadow-gold-hover);
 }
 
+.shadow-gold-strong {
+  box-shadow: var(--shadow-gold-strong);
+}
+
 .shadow-premium {
   box-shadow: var(--shadow-premium);
 }
 
-/* Hover effects */
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.shadow-glow-strong {
+  box-shadow: var(--shadow-glow-strong);
+}
+
+/* Hover effects MEJORADOS */
 .hover-lift {
   transition: var(--transition-smooth);
 }
@@ -110,42 +188,150 @@
   box-shadow: var(--shadow-premium), var(--shadow-gold);
 }
 
-/* Botones */
+.hover-glow {
+  transition: var(--transition-glow);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow-strong);
+  transform: translateY(-2px);
+}
+
+.hover-gold {
+  transition: var(--transition-premium);
+}
+
+.hover-gold:hover {
+  background: var(--gradient-gold-hover);
+  box-shadow: var(--shadow-gold-hover);
+  transform: translateY(-2px) scale(1.01);
+}
+
+/* Botones MEJORADOS */
 .btn-primary {
-  @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+  @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
   background: var(--gradient-gold);
   color: var(--black-primary);
   box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
 }
 
 .btn-primary:hover {
   transform: scale(1.05);
   box-shadow: var(--shadow-gold-hover);
+  background: var(--gradient-gold-hover);
 }
 
 .btn-secondary {
-  @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300;
+  @apply px-8 py-4 rounded-full font-bold text-lg transition-all duration-300;
   background: transparent;
   color: var(--white-primary);
   border: 2px solid var(--gold-primary);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: var(--gradient-gold);
+  transition: width 0.3s;
+  z-index: -1;
+}
+
+.btn-secondary:hover::before {
+  width: 100%;
 }
 
 .btn-secondary:hover {
-  background: var(--gold-primary);
   color: var(--black-primary);
   transform: scale(1.05);
+  box-shadow: var(--shadow-gold-hover);
 }
 
-/* Cards */
+/* Cards MEJORADAS */
 .card-premium {
-  @apply rounded-2xl p-6 transition-all duration-500;
-  background: var(--gradient-black);
+  @apply rounded-3xl p-6 transition-all duration-500;
+  background: var(--gradient-card);
   border: 1px solid rgba(212, 175, 55, 0.2);
   box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.card-premium:hover::before {
+  opacity: 0.3;
 }
 
 .card-premium:hover {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-gold-hover);
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Product Cards MEJORADAS */
+.product-card {
+  @apply relative group cursor-pointer rounded-3xl p-6 transition-all duration-500;
+  background: var(--gradient-card);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: var(--shadow-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.product-card:hover::before {
+  opacity: 0.4;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-gold-hover);
   border-color: rgba(212, 175, 55, 0.4);
 }
