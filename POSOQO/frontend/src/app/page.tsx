@@ -454,21 +454,42 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Sección premium mejorada */}
-      <section className="py-20 premium-gradient relative overflow-hidden">
-        {/* Fondo con patrón dorado sutil */}
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+      {/* Raíces Ayacuchanas - Diseño premium con fondo elegante */}
+      <section className="py-20 relative overflow-hidden">
+        {/* Fondo principal con gradiente elegante */}
+        <div className="absolute inset-0 bg-gradient-to-br from-posoqo-black via-posoqo-black-light to-posoqo-black"></div>
+        
+        {/* Patrón geométrico dorado sutil */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+              linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.05) 50%, transparent 70%)
+            `,
+            backgroundSize: '400px 400px, 600px 600px, 200px 200px'
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas */}
+        {/* Líneas doradas decorativas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-posoqo-gold/20 to-transparent"></div>
+          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-posoqo-gold/15 to-transparent"></div>
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-posoqo-gold/20 to-transparent"></div>
+          <div className="absolute bottom-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-posoqo-gold/15 to-transparent"></div>
+        </div>
+        
+        {/* Efectos de partículas doradas mejoradas */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-20 w-3 h-3 bg-posoqo-gold rounded-full gold-sparkle opacity-40"></div>
           <div className="absolute top-40 right-32 w-2 h-2 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '1.5s'}}></div>
           <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-60 left-1/2 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-20 right-1/4 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-45" style={{animationDelay: '4s'}}></div>
         </div>
+        
+        {/* Overlay sutil para profundidad */}
+        <div className="absolute inset-0 bg-gradient-to-t from-posoqo-black/20 via-transparent to-posoqo-black/10"></div>
         
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
