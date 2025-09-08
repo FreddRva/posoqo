@@ -592,31 +592,28 @@ export default function HomePage() {
         
       </section>
 
-      {/* Sección de Cervezas - Diseño premium dorado/negro */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden premium-gradient">
-        {/* Fondo con efectos dorados profesionales */}
-        <div className="absolute inset-0 premium-gradient"></div>
-        
-        {/* Patrón de espuma de cerveza dorada - Temático y elegante */}
-        <div className="absolute inset-0 opacity-12">
+      {/* Sección de Cervezas - Diseño premium con fondo blanco elegante */}
+      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        {/* Patrón de espuma de cerveza dorada - Temático y elegante sobre blanco */}
+        <div className="absolute inset-0 opacity-8">
           <div className="w-full h-full" style={{
             backgroundImage: `
-              radial-gradient(circle at 15% 15%, rgba(255, 215, 0, 0.12) 0%, transparent 20%),
-              radial-gradient(circle at 85% 85%, rgba(255, 215, 0, 0.10) 0%, transparent 20%),
-              radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 15%),
-              radial-gradient(circle at 30% 70%, rgba(255, 215, 0, 0.06) 0%, transparent 18%),
-              radial-gradient(circle at 70% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 12%)
+              radial-gradient(circle at 15% 15%, rgba(255, 215, 0, 0.08) 0%, transparent 20%),
+              radial-gradient(circle at 85% 85%, rgba(255, 215, 0, 0.06) 0%, transparent 20%),
+              radial-gradient(circle at 50% 30%, rgba(255, 215, 0, 0.05) 0%, transparent 15%),
+              radial-gradient(circle at 30% 70%, rgba(255, 215, 0, 0.04) 0%, transparent 18%),
+              radial-gradient(circle at 70% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 12%)
             `,
             backgroundSize: '200px 200px, 250px 250px, 180px 180px, 220px 220px, 160px 160px'
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas */}
+        {/* Efectos de partículas doradas sutiles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-16 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-50"></div>
-          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-40" style={{animationDelay: '4s'}}></div>
-          <div className="absolute top-60 right-1/3 w-1 h-1 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-20 left-16 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-30"></div>
+          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-40" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-25" style={{animationDelay: '4s'}}></div>
+          <div className="absolute top-60 right-1/3 w-1 h-1 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-35" style={{animationDelay: '1s'}}></div>
         </div>
         
 
@@ -635,16 +632,16 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 gold-glass rounded-full border border-posoqo-gold/30">
-              <Beer className="w-5 h-5 gold-text" />
-              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-full border border-posoqo-gold/30 backdrop-blur-sm">
+              <Beer className="w-5 h-5 text-posoqo-gold" />
+              <span className="text-posoqo-gold font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black gold-text ${playfair.className} tracking-wider premium-text-shadow`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-posoqo-gold ${playfair.className} tracking-wider drop-shadow-lg`}>
                 Cervezas
               </h2>
               {/* Línea decorativa dorada */}
@@ -750,20 +747,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gastronomía - Diseño premium dorado/negro */}
-      <section id="gastronomia" className="py-20 premium-gradient relative overflow-hidden">
-        {/* Fondo con patrón dorado sutil */}
-        <div className="absolute inset-0 opacity-8">
+      {/* Gastronomía - Diseño premium con fondo blanco/gris elegante */}
+      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+        {/* Fondo con patrón dorado sutil sobre blanco */}
+        <div className="absolute inset-0 opacity-6">
           <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23FFD700\" fill-opacity=\"0.08\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas */}
+        {/* Efectos de partículas doradas sutiles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-50"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-40" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-20 left-20 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-30"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-40" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-25" style={{animationDelay: '3s'}}></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -775,16 +772,16 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 gold-glass rounded-full border border-posoqo-gold/30">
-              <UtensilsCrossed className="w-5 h-5 gold-text" />
-              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-full border border-posoqo-gold/30 backdrop-blur-sm">
+              <UtensilsCrossed className="w-5 h-5 text-posoqo-gold" />
+              <span className="text-posoqo-gold font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black gold-text ${cormorant.className} italic tracking-wider premium-text-shadow`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-posoqo-gold ${cormorant.className} italic tracking-wider drop-shadow-lg`}>
                 Gastronomía
               </h2>
               {/* Línea decorativa dorada */}
@@ -793,7 +790,7 @@ export default function HomePage() {
             
             {/* Descripción elegante */}
             <div className="max-w-3xl mx-auto mb-12">
-              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-gray-700 leading-relaxed ${inter.className} font-light`}>
                 Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
               </p>
             </div>
@@ -818,13 +815,13 @@ export default function HomePage() {
                 href="/reservas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-border text-white font-bold text-lg hover:gold-glow transition-all duration-300 shadow-xl premium-hover overflow-hidden"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-posoqo-gold text-posoqo-gold font-bold text-lg hover:bg-posoqo-gold hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Calendar className="w-5 h-5" />
                   Reservar Mesa
                 </span>
-                <div className="absolute inset-0 gold-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-posoqo-gold opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </div>
           </motion.div>
@@ -842,10 +839,10 @@ export default function HomePage() {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="group relative"
                 >
-                  <div className="premium-gradient backdrop-blur-sm rounded-2xl p-6 gold-border hover:gold-glow transition-all duration-500 hover:shadow-2xl premium-hover h-full">
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-2 border-posoqo-gold/20 hover:border-posoqo-gold/40 hover:shadow-2xl hover:shadow-posoqo-gold/10 transition-all duration-500 premium-hover h-full">
                     {/* Imagen del producto */}
                     <div className="relative mb-4">
-                      <div className="w-full h-48 gold-glass rounded-xl overflow-hidden border border-posoqo-gold/30">
+                      <div className="w-full h-48 bg-gradient-to-br from-posoqo-gold/10 to-posoqo-gold-accent/10 rounded-xl overflow-hidden border border-posoqo-gold/30">
                         <img
                           src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
                           alt={product.name}
@@ -861,14 +858,14 @@ export default function HomePage() {
                     
                     {/* Información del producto */}
                     <div className="space-y-3">
-                      <h3 className="text-lg font-bold gold-text group-hover:text-posoqo-gold-accent transition-colors">
+                      <h3 className="text-lg font-bold text-posoqo-gold group-hover:text-posoqo-gold-accent transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-gray-300 text-sm line-clamp-2">
+                      <p className="text-gray-600 text-sm line-clamp-2">
                         {product.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="gold-text font-bold text-lg">
+                        <span className="text-posoqo-gold font-bold text-lg">
                           S/ {product.price?.toFixed(2) || '0.00'}
                         </span>
                         <button className="gold-gradient text-posoqo-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
