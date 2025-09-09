@@ -619,15 +619,15 @@ export default function HomePage() {
           >
             {/* Badge superior con icono dorado */}
             <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
-              <Beer className="w-5 h-5 text-gold-primary" />
-              <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
+              <Beer className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${playfair.className} tracking-wider drop-shadow-2xl`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${playfair.className} tracking-wider drop-shadow-2xl`}>
                 Cervezas
               </h2>
               {/* Línea decorativa dorada */}
@@ -752,15 +752,15 @@ export default function HomePage() {
           >
             {/* Badge superior con icono dorado */}
             <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
-              <UtensilsCrossed className="w-5 h-5 text-gold-primary" />
-              <span className="text-gold-primary font-black tracking-[0.3em] text-sm md:text-base uppercase">
+              <UtensilsCrossed className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-gold-primary ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
                 Gastronomía
               </h2>
               {/* Línea decorativa dorada */}
