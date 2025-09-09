@@ -1136,28 +1136,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto - Diseño premium con fondo negro elegante */}
-      <section id="contacto" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        {/* Fondo con patrón de líneas doradas sutiles */}
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
-              linear-gradient(-45deg, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
-              linear-gradient(90deg, rgba(212, 175, 55, 0.06) 0%, transparent 15%),
-              linear-gradient(0deg, rgba(212, 175, 55, 0.04) 0%, transparent 12%)
-            `,
-            backgroundSize: '200px 200px, 300px 300px, 150px 150px, 250px 250px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
-          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
-        </div>
+      {/* Contacto - Diseño premium con fondo blanco simple */}
+      <section id="contacto" className="py-20 bg-white relative overflow-hidden">
         
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
@@ -1188,12 +1168,12 @@ export default function HomePage() {
                     details: ["+51 966 123 456", "Lun-Vie: 9am - 6pm"]
                   }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 hover:border-[#D4AF37]/30 transition-all duration-300">
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#D4AF37]/30 transition-all duration-300">
                     <div className="mt-1 p-2 bg-[#D4AF37]/20 rounded-lg">{item.icon}</div>
                     <div>
                       <h3 className="font-bold text-lg text-[#D4AF37] mb-2">{item.title}</h3>
                       {item.details.map((detail, i) => (
-                        <p key={i} className="text-gray-300 mb-1">{detail}</p>
+                        <p key={i} className="text-gray-700 mb-1">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -1207,7 +1187,7 @@ export default function HomePage() {
                     <a 
                       key={index} 
                       href="#" 
-                      className="w-12 h-12 rounded-full bg-gray-800/50 border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
+                      className="w-12 h-12 rounded-full bg-gray-100 border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
                       aria-label={social}
                     >
                       <svg className="w-5 h-5 text-[#D4AF37] hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -1222,12 +1202,12 @@ export default function HomePage() {
             </motion.div>
             
             <motion.div 
-              className="bg-gray-800/60 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
+              className="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-200 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
             >
               <h3 className="text-2xl font-bold mb-6 text-[#D4AF37]">Envíanos un mensaje</h3>
               {!session && (
-                <p className="text-stone-400 text-sm mb-4">
-                  ¿Ya tienes cuenta? <Link href="/login" className="text-amber-400 hover:text-amber-300 transition-colors">Inicia sesión</Link>
+                <p className="text-gray-600 text-sm mb-4">
+                  ¿Ya tienes cuenta? <Link href="/login" className="text-[#D4AF37] hover:text-[#FFD700] transition-colors">Inicia sesión</Link>
                 </p>
               )}
               <form className="space-y-4">
@@ -1241,7 +1221,7 @@ export default function HomePage() {
                     <input 
                       type={field.type} 
                       id={field.id}
-                      className="w-full px-4 py-3 rounded bg-stone-700 border border-stone-600 focus:border-amber-400 focus:ring-amber-400 outline-none transition-all" 
+                      className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all" 
                       placeholder={field.placeholder}
                     />
                   </div>
@@ -1252,7 +1232,7 @@ export default function HomePage() {
                   <textarea 
                     id="message" 
                     rows={4} 
-                    className="w-full px-4 py-3 rounded bg-stone-700 border border-stone-600 focus:border-amber-400 focus:ring-amber-400 outline-none transition-all" 
+                    className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all" 
                     placeholder="Escribe tu mensaje aquí..."
                   ></textarea>
                 </div>
@@ -1261,7 +1241,7 @@ export default function HomePage() {
                   type="submit"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full px-8 py-3 rounded-full bg-amber-400 text-stone-900 font-bold hover:bg-amber-300 transition-all"
+                  className="w-full px-8 py-3 rounded-full bg-[#D4AF37] text-black font-bold hover:bg-[#FFD700] transition-all"
                 >
                   Enviar mensaje
                 </motion.button>

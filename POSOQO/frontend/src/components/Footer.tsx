@@ -31,13 +31,13 @@ export default function Footer() {
   const router = useRouter();
   
   return (
-    <footer className="w-full py-16 bg-posoqo-black text-posoqo-white border-t border-posoqo-gray-dark relative" style={{ zIndex: 10 }}>
+    <footer className="w-full py-16 bg-black text-white border-t border-gray-800 relative" style={{ zIndex: 10 }}>
               <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 px-6" style={{ pointerEvents: 'auto' }}>
         
         {/* Marca y descripción */}
         <div className="lg:col-span-1">
-          <h4 className="font-bold text-posoqo-gold mb-6 text-2xl tracking-wider">POSOQO</h4>
-          <p className="text-sm mb-6 leading-relaxed text-posoqo-white">
+          <h4 className="font-bold text-[#D4AF37] mb-6 text-2xl tracking-wider">POSOQO</h4>
+          <p className="text-sm mb-6 leading-relaxed text-white">
             Cerveza artesanal ayacuchana, elaborada con pasión y tradición andina. 
             Descubre sabores únicos que combinan ingredientes locales con técnicas 
             cerveceras tradicionales.
@@ -68,24 +68,24 @@ export default function Footer() {
 
           {/* Redes sociales */}
           <div className="mb-6">
-            <h5 className="font-semibold text-posoqo-gold-light mb-4 text-sm uppercase tracking-wider">Síguenos</h5>
+            <h5 className="font-semibold text-[#D4AF37] mb-4 text-sm uppercase tracking-wider">Síguenos</h5>
                          <div className="flex space-x-4" style={{ pointerEvents: 'auto' }}>
-               <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-posoqo-gray-light hover:text-posoqo-gold transition-colors duration-300 p-2 rounded-full hover:bg-posoqo-gold/10">
+               <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
                  <Facebook className="w-5 h-5" />
                  <span className="sr-only">Facebook</span>
                </a>
-               <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-posoqo-gray-light hover:text-posoqo-gold transition-colors duration-300 p-2 rounded-full hover:bg-posoqo-gold/10">
+               <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
                  <Instagram className="w-5 h-5" />
                  <span className="sr-only">Instagram</span>
                </a>
-               <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-posoqo-gray-light hover:text-posoqo-gold transition-colors duration-300 p-2 rounded-full hover:bg-posoqo-gold/10">
+               <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
                  <MessageCircle className="w-5 h-5" />
                  <span className="sr-only">WhatsApp</span>
                </a>
             </div>
           </div>
 
-          <div className="space-y-2 text-xs text-posoqo-gray-light">
+          <div className="space-y-2 text-xs text-gray-400">
             <p>© {new Date().getFullYear()} POSOQO Cervecería Artesanal. Todos los derechos reservados.</p>
             <p>El consumo de bebidas alcohólicas en exceso es perjudicial para la salud. Prohibida su venta a menores de 18 años.</p>
           </div>
@@ -93,7 +93,7 @@ export default function Footer() {
 
         {/* Productos y Servicios */}
         <div>
-          <h4 className="font-bold text-posoqo-gold mb-6 text-lg">Productos & Servicios</h4>
+          <h4 className="font-bold text-[#D4AF37] mb-6 text-lg">Productos & Servicios</h4>
           <ul className="space-y-4">
             <li>
               <a 
@@ -206,7 +206,7 @@ export default function Footer() {
 
         {/* Soporte y Atención */}
         <div>
-          <h4 className="font-bold text-posoqo-gold mb-6 text-lg">Soporte & Atención</h4>
+          <h4 className="font-bold text-[#D4AF37] mb-6 text-lg">Soporte & Atención</h4>
           <ul className="space-y-4">
             <li>
               <a 
@@ -298,7 +298,7 @@ export default function Footer() {
 
         {/* Newsletter y Legal */}
         <div>
-          <h4 className="font-bold text-posoqo-gold mb-6 text-lg">Mantente Conectado</h4>
+          <h4 className="font-bold text-[#D4AF37] mb-6 text-lg">Mantente Conectado</h4>
           
           {/* Newsletter */}
           <div className="mb-8">
