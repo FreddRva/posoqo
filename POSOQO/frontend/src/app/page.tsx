@@ -1007,13 +1007,28 @@ export default function HomePage() {
       
       
 
-      {/* Servicios */}
-      <section id="servicios" className="py-20 bg-gradient-to-br from-emerald-950 via-slate-800 to-emerald-950 relative overflow-hidden">
-        {/* Fondo con patrón sutil */}
-        <div className="absolute inset-0 opacity-12">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23059669\" fill-opacity=\"0.25\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+      {/* Servicios - Diseño premium con fondo negro elegante */}
+      <section id="servicios" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+        {/* Fondo con patrón de estrellas doradas sutiles */}
+        <div className="absolute inset-0 opacity-8">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+              radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
+              radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.06) 0%, transparent 15%),
+              radial-gradient(circle at 10% 90%, rgba(212, 175, 55, 0.05) 0%, transparent 18%),
+              radial-gradient(circle at 90% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 12%)
+            `,
+            backgroundSize: '200px 200px, 300px 300px, 150px 150px, 250px 250px, 180px 180px'
           }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -1027,20 +1042,20 @@ export default function HomePage() {
             {/* Sin efecto de resplandor */}
             
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 bg-emerald-500/20 rounded-lg">
-                <Sparkles className="w-6 h-6 text-emerald-400" />
+              <div className="p-2 bg-[#D4AF37]/20 rounded-lg border border-[#D4AF37]/30">
+                <Sparkles className="w-6 h-6 text-[#D4AF37]" />
               </div>
-              <span className="text-emerald-400 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
+              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
                 NUESTROS SERVICIOS
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-black text-[#D4AF37] ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
               Experiencias POSOQO
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-slate-300 leading-relaxed ${inter.className} font-light`}>
+            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
               Llevamos la experiencia POSOQO a tu evento con servicios personalizados y profesionales.
             </p>
           </motion.div>
@@ -1054,14 +1069,14 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-slate-800/30 via-slate-700/20 to-slate-800/30 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-slate-600/50 hover:border-emerald-400/30 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-400/10"
+                className="group relative bg-gradient-to-br from-gray-800/40 via-gray-700/30 to-gray-800/40 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-600/50 hover:border-[#D4AF37]/50 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
                 {/* Fondo con gradiente elegante */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 via-teal-400/3 to-emerald-400/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 via-[#FFD700]/5 to-[#D4AF37]/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
                 
                 {/* Contenido principal */}
                 <div className="relative">
@@ -1076,7 +1091,7 @@ export default function HomePage() {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-emerald-400/20 to-slate-700/50 flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center">
                         <span className="text-4xl md:text-6xl">🍺</span>
                       </div>
                     )}
@@ -1084,7 +1099,7 @@ export default function HomePage() {
                   </div>
                   
                   {/* Título */}
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300">
+                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors duration-300">
                     {service.name}
                   </h3>
                   
@@ -1098,7 +1113,7 @@ export default function HomePage() {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                      className="px-8 py-3 rounded-full border-2 border-emerald-400 text-emerald-400 font-bold text-sm hover:bg-emerald-400/10 transition-all shadow-lg"
+                      className="px-8 py-3 rounded-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-sm hover:bg-[#D4AF37]/10 transition-all shadow-lg"
                         >
                           Contáctanos
                         </motion.button>
@@ -1106,7 +1121,7 @@ export default function HomePage() {
                     </div>
                 
                 {/* Efecto de resplandor en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/10 to-emerald-400/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
               </motion.div>
             ))}
           </motion.div>
