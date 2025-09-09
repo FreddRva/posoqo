@@ -454,45 +454,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Diseño premium con fondo elegante */}
-      <section className="py-20 relative overflow-hidden">
-        {/* Fondo principal con gradiente elegante */}
-        <div className="absolute inset-0 bg-gradient-to-br from-posoqo-black via-posoqo-black-light to-posoqo-black"></div>
-        
-        {/* Patrón de granos de cebada dorados - Temático y elegante */}
-        <div className="absolute inset-0 opacity-12">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 30%),
-              radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.12) 0%, transparent 30%),
-              radial-gradient(circle at 40% 60%, rgba(255, 215, 0, 0.08) 0%, transparent 25%),
-              radial-gradient(circle at 60% 40%, rgba(255, 215, 0, 0.10) 0%, transparent 28%),
-              linear-gradient(30deg, transparent 40%, rgba(255, 215, 0, 0.06) 50%, transparent 60%),
-              linear-gradient(-30deg, transparent 35%, rgba(255, 215, 0, 0.04) 45%, transparent 55%)
-            `,
-            backgroundSize: '300px 300px, 400px 400px, 250px 250px, 350px 350px, 150px 150px, 200px 200px'
-          }}></div>
-        </div>
-        
-        {/* Líneas doradas decorativas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-posoqo-gold/20 to-transparent"></div>
-          <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-posoqo-gold/15 to-transparent"></div>
-          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-posoqo-gold/20 to-transparent"></div>
-          <div className="absolute bottom-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-posoqo-gold/15 to-transparent"></div>
-        </div>
-        
-        {/* Efectos de partículas doradas mejoradas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-3 h-3 bg-posoqo-gold rounded-full gold-sparkle opacity-40"></div>
-          <div className="absolute top-40 right-32 w-2 h-2 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-60" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-posoqo-gold rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
-          <div className="absolute top-60 left-1/2 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-20 right-1/4 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-45" style={{animationDelay: '4s'}}></div>
-        </div>
-        
-        {/* Overlay sutil para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-t from-posoqo-black/20 via-transparent to-posoqo-black/10"></div>
+      {/* Raíces Ayacuchanas - Diseño premium con fondo negro simple */}
+      <section className="py-20 relative overflow-hidden bg-black">
         
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
@@ -503,26 +466,26 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             {/* Badge superior con icono */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 gold-glass rounded-full border border-posoqo-gold/30">
-              <Mountain className="w-5 h-5 gold-text" />
-              <span className="gold-text font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-[#D4AF37]/20 rounded-full border border-[#D4AF37]/50 shadow-lg">
+              <Mountain className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
                 RAÍCES AYACUCHANAS
               </span>
             </div>
             
             {/* Título principal con efecto premium */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black gold-text ${cormorant.className} italic tracking-wider premium-text-shadow`}>
+              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
                 Tradición en cada sorbo
               </h2>
               {/* Línea decorativa dorada */}
-              <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
             
             {/* Descripción elegante con mejor tipografía */}
             <div className="max-w-4xl mx-auto">
               <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
-                Posoqo viene del quechua <span className="font-medium gold-text">pusuqu</span>, que significa <span className="font-medium gold-text">espuma</span>. 
+                Posoqo viene del quechua <span className="font-medium text-[#D4AF37]">pusuqu</span>, que significa <span className="font-medium text-[#D4AF37]">espuma</span>. 
               </p>
               <p className={`text-base md:text-lg mt-4 text-gray-400 leading-relaxed ${inter.className} font-light`}>
                 Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica que conecta nuestras raíces ayacuchanas con cada sorbo.
@@ -538,22 +501,22 @@ export default function HomePage() {
           >
             {[
               {
-                icon: <Beer className="w-8 h-8 text-posoqo-black" />,
+                icon: <Beer className="w-8 h-8 text-black" />,
                 title: "Tradición y dedicación",
                 text: "La espuma no es solo un símbolo de fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico en cada receta.",
-                gradient: "from-posoqo-gold/20 to-posoqo-gold-accent/20"
+                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
               },
               {
-                icon: <Wheat className="w-8 h-8 text-posoqo-black" />,
+                icon: <Wheat className="w-8 h-8 text-black" />,
                 title: "Orgullo ayacuchano",
                 text: "Cada una de nuestras cervezas artesanales nace de esta filosofía: honrar nuestras raíces con sabores únicos, elaborados con esmero y con el orgullo de ser ayacuchanos.",
-                gradient: "from-posoqo-gold-accent/20 to-posoqo-gold/20"
+                gradient: "from-[#FFD700]/20 to-[#D4AF37]/20"
               },
               {
-                icon: <Mountain className="w-8 h-8 text-posoqo-black" />,
+                icon: <Mountain className="w-8 h-8 text-black" />,
                 title: "Espuma que une",
                 text: "Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.",
-                gradient: "from-posoqo-gold/20 to-posoqo-gold-accent/20"
+                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
               }
             ].map((item, index) => (
               <motion.div 
@@ -568,14 +531,14 @@ export default function HomePage() {
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
                 
                 {/* Contenido principal */}
-                <div className="relative premium-gradient backdrop-blur-sm p-8 rounded-3xl gold-border hover:gold-glow transition-all duration-500 group-hover:scale-105 premium-hover h-full">
+                <div className="relative bg-gray-800/60 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 hover:shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500 group-hover:scale-105 h-full">
                   {/* Icono elegante con fondo dorado */}
-                  <div className="w-20 h-20 gold-gradient rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg gold-glow">
+                  <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
                   </div>
                   
                   {/* Título */}
-                  <h3 className="text-2xl font-bold mb-6 gold-text text-center group-hover:scale-105 transition-all duration-300 premium-text-shadow">
+                  <h3 className="text-2xl font-bold mb-6 text-[#D4AF37] text-center group-hover:scale-105 transition-all duration-300 drop-shadow-lg">
                     {item.title}
                   </h3>
                   
@@ -584,7 +547,7 @@ export default function HomePage() {
                 </div>
                 
                 {/* Efecto de resplandor dorado en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-posoqo-gold/0 via-posoqo-gold/10 to-posoqo-gold/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
               </motion.div>
             ))}
           </motion.div>
