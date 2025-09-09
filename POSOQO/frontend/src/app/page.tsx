@@ -950,29 +950,8 @@ export default function HomePage() {
       
       
 
-      {/* Servicios - Diseño premium con fondo negro elegante */}
-      <section id="servicios" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        {/* Fondo con patrón de estrellas doradas sutiles */}
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
-              radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
-              radial-gradient(circle at 50% 10%, rgba(212, 175, 55, 0.06) 0%, transparent 15%),
-              radial-gradient(circle at 10% 90%, rgba(212, 175, 55, 0.05) 0%, transparent 18%),
-              radial-gradient(circle at 90% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 12%)
-            `,
-            backgroundSize: '200px 200px, 300px 300px, 150px 150px, 250px 250px, 180px 180px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
-          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
-        </div>
+      {/* Servicios - Diseño premium con fondo blanco simple */}
+      <section id="servicios" className="py-20 bg-white relative overflow-hidden">
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -998,7 +977,7 @@ export default function HomePage() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
+            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-700 leading-relaxed ${inter.className} font-light`}>
               Llevamos la experiencia POSOQO a tu evento con servicios personalizados y profesionales.
             </p>
           </motion.div>
@@ -1012,7 +991,7 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-gray-800/40 via-gray-700/30 to-gray-800/40 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-600/50 hover:border-[#D4AF37]/50 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
+                className="group relative bg-gradient-to-br from-gray-50 via-white to-gray-100 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-200 hover:border-[#D4AF37]/50 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
@@ -1071,29 +1050,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Club de miembros - Diseño premium con fondo negro elegante */}
-      <section id="club-posoqo" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        {/* Fondo con patrón de espirales doradas sutiles */}
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.12) 0%, transparent 25%),
-              radial-gradient(circle at 70% 80%, rgba(212, 175, 55, 0.10) 0%, transparent 25%),
-              radial-gradient(circle at 20% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
-              radial-gradient(circle at 80% 30%, rgba(212, 175, 55, 0.06) 0%, transparent 22%),
-              radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 15%)
-            `,
-            backgroundSize: '400px 400px, 350px 350px, 300px 300px, 250px 250px, 200px 200px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
-          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
-        </div>
+      {/* Club de miembros - Diseño premium con fondo negro simple */}
+      <section id="club-posoqo" className="py-20 bg-black relative overflow-hidden">
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
