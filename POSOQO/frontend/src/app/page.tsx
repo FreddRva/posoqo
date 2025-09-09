@@ -1128,31 +1128,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Club de miembros */}
-      <section id="club-posoqo" className="py-20 bg-gradient-to-br from-red-950 via-slate-800 to-red-950 relative overflow-hidden">
-        {/* Fondo con patrón sutil */}
-        <div className="absolute inset-0 opacity-12">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23dc2626\" fill-opacity=\"0.25\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+      {/* Club de miembros - Diseño premium con fondo negro elegante */}
+      <section id="club-posoqo" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+        {/* Fondo con patrón de espirales doradas sutiles */}
+        <div className="absolute inset-0 opacity-8">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.12) 0%, transparent 25%),
+              radial-gradient(circle at 70% 80%, rgba(212, 175, 55, 0.10) 0%, transparent 25%),
+              radial-gradient(circle at 20% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
+              radial-gradient(circle at 80% 30%, rgba(212, 175, 55, 0.06) 0%, transparent 22%),
+              radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 15%)
+            `,
+            backgroundSize: '400px 400px, 350px 350px, 300px 300px, 250px 250px, 200px 200px'
           }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
         </div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
-            className="inline-block bg-amber-400/10 border border-amber-400/30 rounded-full px-6 py-2 mb-6"
+            className="inline-block bg-[#D4AF37]/20 border border-[#D4AF37]/50 rounded-full px-6 py-2 mb-6 shadow-lg"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
             <div className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-400" />
-              <span className="text-amber-400 font-bold">CLUB POSOQO</span>
+              <Star className="w-5 h-5 text-[#D4AF37]" />
+              <span className="text-[#D4AF37] font-bold tracking-wider">CLUB POSOQO</span>
             </div>
           </motion.div>
           
           <motion.h2 
-            className={`text-3xl md:text-5xl mb-6 ${playfair.className}`}
+            className={`text-4xl md:text-6xl mb-6 text-[#D4AF37] ${playfair.className} font-bold drop-shadow-2xl`}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -1162,7 +1177,7 @@ export default function HomePage() {
           </motion.h2>
           
           <motion.p 
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-slate-300"
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-300 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -1172,7 +1187,7 @@ export default function HomePage() {
           </motion.p>
           
           <motion.div 
-            className="max-w-md mx-auto bg-gradient-to-br from-slate-800/50 to-slate-900/50 p-6 md:p-8 rounded-xl border border-slate-600/30 backdrop-blur-sm"
+            className="max-w-md mx-auto bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 backdrop-blur-sm shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -1195,15 +1210,15 @@ export default function HomePage() {
               ].map((item, index) => (
                 <div key={index} className="flex items-start gap-4">
                   <div className="mt-1">
-                    <div className="w-6 h-6 rounded-full bg-amber-400 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-900" viewBox="0 0 20 20" fill="currentColor">
+                    <div className="w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-black" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-bold text-amber-400">{item.title}</h3>
-                    <p className="text-slate-300 text-sm">{item.text}</p>
+                    <h3 className="font-bold text-[#D4AF37] text-lg">{item.title}</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -1212,7 +1227,7 @@ export default function HomePage() {
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="mt-8 px-8 py-3 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-bold hover:from-amber-300 hover:to-orange-400 transition-all w-full shadow-lg hover:shadow-xl"
+              className="mt-8 px-8 py-4 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold hover:from-[#FFD700] hover:to-[#D4AF37] transition-all w-full shadow-lg hover:shadow-xl hover:shadow-[#D4AF37]/30"
             >
               Unirme al club
             </motion.button>
@@ -1220,9 +1235,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto */}
-      <section id="contacto" className="py-20 relative">
-        <div className="absolute inset-0 bg-[url('/contact-bg.jpg')] bg-cover bg-center opacity-10"></div>
+      {/* Contacto - Diseño premium con fondo negro elegante */}
+      <section id="contacto" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+        {/* Fondo con patrón de líneas doradas sutiles */}
+        <div className="absolute inset-0 opacity-8">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              linear-gradient(45deg, rgba(212, 175, 55, 0.1) 0%, transparent 20%),
+              linear-gradient(-45deg, rgba(212, 175, 55, 0.08) 0%, transparent 20%),
+              linear-gradient(90deg, rgba(212, 175, 55, 0.06) 0%, transparent 15%),
+              linear-gradient(0deg, rgba(212, 175, 55, 0.04) 0%, transparent 12%)
+            `,
+            backgroundSize: '200px 200px, 300px 300px, 150px 150px, 250px 250px'
+          }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
+          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-60 right-1/4 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '2s'}}></div>
+        </div>
+        
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
@@ -1231,33 +1266,33 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             <motion.div>
-              <span className="text-amber-400 font-bold tracking-widest">CONTÁCTANOS</span>
-              <h2 className={`text-3xl md:text-5xl mt-4 mb-8 ${playfair.className}`}>Hablemos de cerveza</h2>
+              <span className="text-[#D4AF37] font-bold tracking-widest text-lg">CONTÁCTANOS</span>
+              <h2 className={`text-4xl md:text-6xl mt-4 mb-8 text-[#D4AF37] ${playfair.className} font-bold drop-shadow-2xl`}>Hablemos de cerveza</h2>
               
               <div className="space-y-6">
                 {[
                   {
-                    icon: <MapPin className="w-6 h-6 text-amber-400" />,
+                    icon: <MapPin className="w-6 h-6 text-[#D4AF37]" />,
                     title: "Visítanos",
                     details: ["Jr. 28 de Julio 148, Ayacucho, Perú", "Av. Cervecera 245, Ayacucho, Perú"]
                   },
                   {
-                    icon: <Mail className="w-6 h-6 text-amber-400" />,
+                    icon: <Mail className="w-6 h-6 text-[#D4AF37]" />,
                     title: "Escríbenos",
                     details: ["hola@posoqo.com", "ventas@posoqo.com"]
                   },
                   {
-                    icon: <Phone className="w-6 h-6 text-amber-400" />,
+                    icon: <Phone className="w-6 h-6 text-[#D4AF37]" />,
                     title: "Llámamos",
                     details: ["+51 966 123 456", "Lun-Vie: 9am - 6pm"]
                   }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="mt-1">{item.icon}</div>
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/50 hover:border-[#D4AF37]/30 transition-all duration-300">
+                    <div className="mt-1 p-2 bg-[#D4AF37]/20 rounded-lg">{item.icon}</div>
                     <div>
-                      <h3 className="font-bold text-lg">{item.title}</h3>
+                      <h3 className="font-bold text-lg text-[#D4AF37] mb-2">{item.title}</h3>
                       {item.details.map((detail, i) => (
-                        <p key={i} className="text-stone-300">{detail}</p>
+                        <p key={i} className="text-gray-300 mb-1">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -1265,16 +1300,16 @@ export default function HomePage() {
               </div>
               
               <div className="mt-8 md:mt-12">
-                <h3 className="font-bold text-lg mb-4">Síguenos</h3>
+                <h3 className="font-bold text-lg mb-4 text-[#D4AF37]">Síguenos</h3>
                 <div className="flex gap-4">
                   {["Instagram", "Facebook", "WhatsApp"].map((social, index) => (
                     <a 
                       key={index} 
                       href="#" 
-                      className="w-10 h-10 rounded-full bg-stone-700 flex items-center justify-center hover:bg-amber-400 transition-all"
+                      className="w-12 h-12 rounded-full bg-gray-800/50 border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
                       aria-label={social}
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="w-5 h-5 text-[#D4AF37] hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill="currentColor" d={social === "Instagram" ? "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" : 
                         social === "Facebook" ? "M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" : 
                         "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29-3.588c.545 1.422 1.578 2.589 2.96 2.907.401.092.764.117 1.059.099.341-.021.66-.106.93-.236.24-.116.414-.237.558-.365.152-.138.312-.396.222-.644-.105-.29-.717-1.027-1.001-1.364-.1-.12-.198-.18-.347-.297-.149-.117-.366-.198-.52-.149-.223.064-.427.33-.633.545-.213.227-.416.386-.644.386-.173 0-.347-.074-.52-.223-.397-.345-.992-1.032-1.322-1.38-.248-.27-.495-.396-.669-.396-.173 0-.347.074-.446.223-.099.149-.396.744-.396 1.707 0 .962.793 1.988.892 2.085.099.099 1.61 2.456 3.96 3.385.57.223 1.016.322 1.364.322.198 0 .347-.008.446-.016.149-.008.248-.091.347-.091.099 0 .198.074.347.198.149.124.594.545.713.744.116.198.223.314.322.512.099.198.074.314-.025.463-.099.149-.248.314-.446.512a4.19 4.19 0 01-1.213.86c-.347.149-.793.238-1.29.238-.545 0-1.19-.074-1.934-.314a7.19 7.19 0 01-1.677-.76c-.793-.495-1.806-1.539-2.383-2.466-1.29-1.707-1.735-3.2-1.735-4.143 0-.962.248-1.707.694-2.223.248-.281.545-.463.892-.545.248-.057.495-.04.694.033.198.074.396.248.545.694"} />
@@ -1286,9 +1321,9 @@ export default function HomePage() {
             </motion.div>
             
             <motion.div 
-              className="bg-stone-800/50 p-6 md:p-8 rounded-xl border border-stone-700/50"
+              className="bg-gray-800/60 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
             >
-              <h3 className="text-2xl font-bold mb-6">Envíanos un mensaje</h3>
+              <h3 className="text-2xl font-bold mb-6 text-[#D4AF37]">Envíanos un mensaje</h3>
               {!session && (
                 <p className="text-stone-400 text-sm mb-4">
                   ¿Ya tienes cuenta? <Link href="/login" className="text-amber-400 hover:text-amber-300 transition-colors">Inicia sesión</Link>
