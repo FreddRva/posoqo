@@ -830,28 +830,8 @@ export default function HomePage() {
         
       </section>
 
-      {/* Taprooms y experiencias - Diseño premium con fondo negro elegante */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        {/* Fondo con patrón de círculos dorados sutiles */}
-        <div className="absolute inset-0 opacity-8">
-          <div className="w-full h-full" style={{
-            backgroundImage: `
-              radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 30%),
-              radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 30%),
-              radial-gradient(circle at 40% 60%, rgba(212, 175, 55, 0.06) 0%, transparent 25%),
-              radial-gradient(circle at 60% 40%, rgba(212, 175, 55, 0.05) 0%, transparent 28%)
-            `,
-            backgroundSize: '300px 300px, 400px 400px, 250px 250px, 350px 350px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de partículas doradas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-16 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
-          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '4s'}}></div>
-          <div className="absolute top-60 right-1/3 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '1s'}}></div>
-        </div>
+      {/* Taprooms y experiencias - Diseño premium con fondo negro simple */}
+      <section ref={taproomsRef} id="taprooms" className="py-20 bg-black relative overflow-hidden">
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
