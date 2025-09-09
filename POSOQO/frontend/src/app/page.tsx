@@ -794,13 +794,13 @@ export default function HomePage() {
                 href="/reservas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-gold-primary text-gold-primary font-bold text-lg hover:bg-gold-primary hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-black text-black font-bold text-lg hover:bg-black hover:text-white transition-all duration-300 shadow-xl premium-hover overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Calendar className="w-5 h-5" />
                   Reservar Mesa
                 </span>
-                <div className="absolute inset-0 bg-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </div>
           </motion.div>
