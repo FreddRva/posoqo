@@ -867,13 +867,27 @@ export default function HomePage() {
         
       </section>
 
-      {/* Taprooms y experiencias */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-        {/* Fondo con patrón sutil */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="w-full h-full bg-repeat" style={{
-            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23a8a29e\" fill-opacity=\"0.15\"%3E%3Cpath d=\"M40 20c11.046 0 20 8.954 20 20s-13.431 30-30 30-30-13.431-30-30 13.431-30 30-30zm0 2c-9.941 0-18 8.059-18 18s8.059 18 18 18 18-8.059 18-18-8.059-18-18-18z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+      {/* Taprooms y experiencias - Diseño premium con fondo negro elegante */}
+      <section ref={taproomsRef} id="taprooms" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+        {/* Fondo con patrón de círculos dorados sutiles */}
+        <div className="absolute inset-0 opacity-8">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              radial-gradient(circle at 20% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 30%),
+              radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 30%),
+              radial-gradient(circle at 40% 60%, rgba(212, 175, 55, 0.06) 0%, transparent 25%),
+              radial-gradient(circle at 60% 40%, rgba(212, 175, 55, 0.05) 0%, transparent 28%)
+            `,
+            backgroundSize: '300px 300px, 400px 400px, 250px 250px, 350px 350px'
           }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-16 w-2 h-2 bg-[#D4AF37] rounded-full gold-sparkle opacity-60"></div>
+          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-[#FFD700] rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-[#D4AF37] rounded-full gold-sparkle opacity-50" style={{animationDelay: '4s'}}></div>
+          <div className="absolute top-60 right-1/3 w-1 h-1 bg-[#FFD700] rounded-full gold-sparkle opacity-65" style={{animationDelay: '1s'}}></div>
         </div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -887,20 +901,20 @@ export default function HomePage() {
             {/* Sin efecto de resplandor */}
             
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <MapPin className="w-6 h-6 text-blue-400" />
+              <div className="p-2 bg-[#D4AF37]/20 rounded-lg border border-[#D4AF37]/30">
+                <MapPin className="w-6 h-6 text-[#D4AF37]" />
               </div>
-              <span className="text-blue-400 font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
+              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
                 ENCUENTRA POSOQO
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-black text-[#D4AF37] ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
               Nuestros espacios
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-slate-300 leading-relaxed ${inter.className} font-light`}>
+            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
               Descubre nuestros espacios únicos donde la tradición se encuentra con la innovación cervecera.
             </p>
           </motion.div>
@@ -917,11 +931,11 @@ export default function HomePage() {
                 title: "Taproom Histórico",
                 location: "Portal Independencia n65 – interior B",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Música en vivo con artistas ayacuchanos" },
-                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Cata de cervezas artesanales" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Fast food, platos a la carta, comida oriental, café y más" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Lanzamiento de cervezas estacionales" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Ambiente colonial con arte local" }
+                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Música en vivo con artistas ayacuchanos" },
+                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Cata de cervezas artesanales" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Fast food, platos a la carta, comida oriental, café y más" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Lanzamiento de cervezas estacionales" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Ambiente colonial con arte local" }
                 ]
               },
               {
@@ -929,11 +943,11 @@ export default function HomePage() {
                 title: "Taproom Rockero",
                 location: "Jr. Asamblea n310",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Música en vivo: Rock peruano, rock inglés, Punk y más" },
-                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Tributos musicales y bandas en vivo" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Fast food y snacks para acompañar" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Lanzamiento de cervezas estacionales" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Ambiente de alma rockera y underground" }
+                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Música en vivo: Rock peruano, rock inglés, Punk y más" },
+                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Tributos musicales y bandas en vivo" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Fast food y snacks para acompañar" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Lanzamiento de cervezas estacionales" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Ambiente de alma rockera y underground" }
                 ]
               },
               {
@@ -941,17 +955,17 @@ export default function HomePage() {
                 title: "Taproom Planta",
                 location: "Sector Publico Mz Y lote",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Tour por nuestra cervecería artesanal" },
-                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Eventos y talleres cerveceros" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Degustación de cervezas frescas" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Experiencias educativas cerveceras" },
-                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Vista directa al proceso de elaboración" }
+                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Tour por nuestra cervecería artesanal" },
+                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Eventos y talleres cerveceros" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Degustación de cervezas frescas" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Experiencias educativas cerveceras" },
+                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Vista directa al proceso de elaboración" }
                 ]
               }
             ].map((taproom, index) => (
               <motion.div 
                 key={index}
-                className="group relative rounded-3xl overflow-hidden h-96 md:h-[600px] shadow-2xl hover:shadow-amber-400/25 transition-all duration-500"
+                className="group relative rounded-3xl overflow-hidden h-96 md:h-[600px] shadow-2xl hover:shadow-[#D4AF37]/25 transition-all duration-500"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
@@ -968,7 +982,7 @@ export default function HomePage() {
                 <div className={`absolute left-0 right-0 p-6 md:p-8 ${
                   index === 2 ? 'bottom-8' : 'bottom-0'
                 }`}>
-                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-amber-400 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors duration-300 drop-shadow-lg">
                     {taproom.title}
                   </h3>
                   <p className="text-base md:text-lg lg:text-xl mb-4 md:mb-6 text-stone-100 font-medium drop-shadow-lg">
