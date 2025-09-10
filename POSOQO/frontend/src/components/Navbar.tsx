@@ -98,14 +98,14 @@ const DropdownMenu = ({
       className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 bg-gradient-to-br from-gray-800 via-gray-900 to-black border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in"}
+        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-50 border-2 border-yellow-300 rounded-2xl shadow-2xl shadow-yellow-500/30 py-4 z-[9999] animate-fade-in backdrop-blur-sm"}
     `}>
       {items.map((item, index) => (
         <Link
           key={`${item.label}-${item.href}`}
           href={item.href}
           className={`
-            block px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 rounded-xl mx-3
+            block px-4 py-3 text-gray-800 hover:text-black hover:bg-yellow-200 transition-all duration-300 rounded-xl mx-3 font-semibold
             ${isMobile ? "text-base" : ""}
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
@@ -115,9 +115,9 @@ const DropdownMenu = ({
             // Solo navegar, el dropdown se cierra automáticamente al navegar
           }}
         >
-          <div className="font-semibold text-sm text-yellow-400">{item.label}</div>
+          <div className="font-bold text-sm text-gray-800">{item.label}</div>
           {item.description && (
-            <div className="text-xs text-gray-300 mt-1">{item.description}</div>
+            <div className="text-xs text-gray-600 mt-1">{item.description}</div>
           )}
         </Link>
       ))}
@@ -244,8 +244,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
   // Renderizar elemento de navegación
   const renderNavItem = (item: NavItem, isMobile = false) => {
-    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl hover:bg-yellow-400/10";
-    const textClasses = item.highlight ? 'text-yellow-400 font-bold' : 'text-white hover:text-yellow-400';
+    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl hover:bg-black/20 hover:shadow-lg";
+    const textClasses = item.highlight ? 'text-black font-bold drop-shadow-lg' : 'text-black hover:text-gray-800 font-semibold';
 
     // Elementos con dropdown
     if (item.dropdown && item.subitems) {
@@ -253,11 +253,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         <div key={item.label} className="relative">
           <button
             className={`
-              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-300 rounded-xl hover:bg-yellow-400/10
+              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-300 rounded-xl hover:bg-black/20 hover:shadow-lg
               ${isMobile 
-                ? "w-full text-left bg-yellow-400/10" 
-                : "hover:bg-yellow-400/10"}
-              ${activeDropdown === item.label ? "text-yellow-400 bg-yellow-400/10" : "text-white hover:text-yellow-400"}
+                ? "w-full text-left bg-black/10" 
+                : "hover:bg-black/20"}
+              ${activeDropdown === item.label ? "text-black bg-black/20 shadow-lg font-bold" : "text-black hover:text-gray-800 font-semibold"}
             `}
             onClick={() => toggleDropdown(item.label)}
             aria-expanded={activeDropdown === item.label}
@@ -265,8 +265,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           >
             {item.label}
             <ChevronDown 
-              className={`w-4 h-4 text-white transition-transform duration-300 ${
-                activeDropdown === item.label ? "rotate-180 text-yellow-400" : ""
+              className={`w-4 h-4 text-black transition-transform duration-300 ${
+                activeDropdown === item.label ? "rotate-180 text-gray-800" : ""
               }`}
             />
           </button>
@@ -369,8 +369,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       <nav 
         ref={navbarRef}
         className={`
-          fixed top-0 left-0 w-full z-50 transition-all duration-300 
-          ${scrolled ? "navbar-premium border-b border-yellow-400/20 shadow-2xl gold-glow" : "navbar-premium"}
+          fixed top-0 left-0 w-full z-50 transition-all duration-500 
+          ${scrolled 
+            ? "bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-600 border-b-2 border-yellow-400 shadow-2xl shadow-yellow-500/25 backdrop-blur-sm" 
+            : "bg-gradient-to-r from-yellow-700 via-yellow-600 to-yellow-700 backdrop-blur-sm"
+          }
           ${montserrat.className}
         `}
       >
@@ -393,7 +396,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   priority
                 />
               </div>
-              <span className={`text-xl lg:text-2xl font-extrabold text-yellow-400 tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 premium-text-shadow`}>
+              <span className={`text-xl lg:text-2xl font-extrabold text-black tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 drop-shadow-lg`}>
                 POSOQO
               </span>
             </Link>
@@ -411,10 +414,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
+                    className="relative p-2 rounded-xl bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg"
                     aria-label="Notificaciones"
                   >
-                    <Bell className="w-5 h-5 text-white" />
+                    <Bell className="w-5 h-5 text-black" />
                     {stats.unread > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">
                         {stats.unread}
@@ -529,10 +532,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
+                className="relative p-2 rounded-xl bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg"
                 aria-label="Carrito"
               >
-                <ShoppingCart className="w-5 h-5 text-white" />
+                <ShoppingCart className="w-5 h-5 text-black" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-posoqo-black shadow-lg">
                     {cartCount}
@@ -544,7 +547,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {user ? (
                 <div className="relative" ref={userMenuRef}>
                   <button
-                    className="flex items-center gap-2 p-2.5 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     aria-label="Menú de usuario"
                     aria-expanded={userMenuOpen}
@@ -636,7 +639,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="px-6 py-2 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow hover:bg-yellow-400/10"
+                  className="px-6 py-2 rounded-xl font-semibold bg-black text-yellow-400 hover:bg-gray-800 hover:text-yellow-300 transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   Iniciar sesión
                 </button>
@@ -651,10 +654,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
+                    className="relative p-2 rounded-xl bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg"
                     aria-label="Notificaciones"
                   >
-                    <Bell className="w-5 h-5 text-white" />
+                    <Bell className="w-5 h-5 text-black" />
                     {stats.unread > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold shadow-lg">
                         {stats.unread}
@@ -769,10 +772,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito móvil */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
+                className="relative p-2 rounded-xl bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg"
                 aria-label="Carrito"
               >
-                <ShoppingCart className="w-5 h-5 text-white" />
+                <ShoppingCart className="w-5 h-5 text-black" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center border border-posoqo-black shadow-lg">
                     {cartCount}
@@ -783,14 +786,14 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Menú móvil */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl bg-yellow-400/10 hover:gold-glow focus:outline-none transition-all duration-300 hover:bg-yellow-400/10"
+                className="p-2 rounded-xl bg-black/20 hover:bg-black/30 focus:outline-none transition-all duration-300 hover:shadow-lg"
                 aria-label="Menú"
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5 text-black" />
                 ) : (
-                  <Menu className="w-5 h-5 text-white" />
+                  <Menu className="w-5 h-5 text-black" />
                 )}
               </button>
             </div>
@@ -802,7 +805,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       <div 
         ref={mobileMenuRef}
         className={`
-          lg:hidden fixed inset-0 z-40 premium-gradient transition-all duration-300 ease-in-out
+          lg:hidden fixed inset-0 z-40 bg-gradient-to-br from-yellow-600 via-yellow-500 to-yellow-600 transition-all duration-300 ease-in-out
           ${mobileMenuOpen 
             ? "opacity-100 translate-y-0 mt-16" 
             : "opacity-0 -translate-y-full pointer-events-none"}
