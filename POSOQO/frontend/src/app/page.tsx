@@ -329,16 +329,16 @@ export default function HomePage() {
         {/* Fondo con imagen y overlay elegante */}
         <div className="absolute inset-0 z-0">
           <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat opacity-50"
+            className="w-full h-full bg-cover bg-center bg-no-repeat opacity-70"
             style={{
               backgroundImage: "url('/FondoPo.jpg')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              filter: "brightness(0.7) contrast(1.2) saturate(1.1)"
+              filter: "brightness(0.8) contrast(1.1) saturate(1.0)"
             }}
           ></div>
           {/* Overlay con gradiente dorado sutil */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/80 to-black/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-posoqo-gold/5 via-transparent to-posoqo-gold/10"></div>
         </div>
         
@@ -427,7 +427,7 @@ export default function HomePage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <div className="relative w-[28rem] h-[40rem] lg:w-[32rem] lg:h-[44rem] animate-float">
+            <div className="relative w-[28rem] h-[40rem] lg:w-[32rem] lg:h-[44rem] animate-float flex items-center justify-center">
               {/* Efecto de resplandor dorado */}
               <div className="absolute inset-0 bg-gradient-to-br from-posoqo-gold/30 via-transparent to-posoqo-gold-accent/20 rounded-full blur-3xl scale-110"></div>
               
@@ -438,7 +438,7 @@ export default function HomePage() {
                   alt="Botella POSOQO" 
                   width={512}
                   height={704}
-                  className="object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-700"
+                  className="object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 mx-auto"
                   priority
                 />
                 
