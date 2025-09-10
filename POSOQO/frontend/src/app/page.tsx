@@ -577,35 +577,23 @@ export default function HomePage() {
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Patrón de hexágonos dorados */}
-        <div className="absolute inset-0 opacity-15">
+      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-slate-900 via-gray-800 to-slate-900">
+        {/* Patrón sutil de granos de cebada */}
+        <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M60 0l30 17.32v34.64L60 69.28 30 51.96V17.32L60 0z'/%3E%3Cpath d='M60 20l20 11.55v23.1L60 66.2 40 54.65V31.55L60 20z'/%3E%3Cpath d='M60 40l10 5.77v11.54L60 63.08 50 57.31V45.77L60 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '120px 120px'
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23D4AF37' fill-opacity='0.2'%3E%3Cpath d='M30 0c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S35.5 0 30 0zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z'/%3E%3Cpath d='M15 20c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm30 0c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath d='M30 40c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z'/%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
           }}></div>
         </div>
         
-        {/* Efectos de ondas concéntricas */}
+        {/* Líneas decorativas sutiles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-[#D4AF37]/20 rounded-full animate-ping"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-[#FFD700]/15 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-[#D4AF37]/25 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-[#FFD700]/30 rounded-full animate-ping" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+          <div className="absolute bottom-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
         </div>
         
-        {/* Efectos de partículas flotantes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-3 h-3 bg-[#D4AF37] rounded-full animate-bounce"></div>
-          <div className="absolute top-32 right-32 w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-32 left-1/4 w-4 h-4 bg-[#D4AF37] rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-20 right-1/3 w-2.5 h-2.5 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute top-1/2 left-20 w-3.5 h-3.5 bg-[#D4AF37] rounded-full animate-bounce" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-1/2 right-20 w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '2.5s'}}></div>
-        </div>
-        
-        {/* Gradiente radial dorado desde el centro */}
-        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/12 via-transparent to-transparent"></div>
+        {/* Efecto de resplandor sutil en los bordes */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5"></div>
         
 
         
