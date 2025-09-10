@@ -122,7 +122,6 @@ const DropdownMenu = ({
         </Link>
       ))}
     </div>
-    </>
   );
 };
 
