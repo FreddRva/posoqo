@@ -454,7 +454,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   e.stopPropagation();
                                   markAllAsRead();
                                 }}
-                                className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-posoqo-black-light/50 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+                                className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 font-medium flex items-center justify-center gap-2"
                               >
                                 <span className="text-lg">📋</span>
                                 Marcar todas como leídas ({stats.unread})
@@ -467,8 +467,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                             {notifications.slice(0, 8).map((notification) => (
                               <div
                                 key={notification.id}
-                                className={`p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-posoqo-black-light/50 hover:scale-[1.02] ${
-                                  !notification.is_read ? 'bg-posoqo-black-light/30 border-l-4 border-posoqo-gold shadow-lg' : 'bg-posoqo-black-light/10'
+                                className={`p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-700/50 hover:scale-[1.02] ${
+                                  !notification.is_read ? 'bg-gray-700/30 border-l-4 border-posoqo-gold shadow-lg' : 'bg-gray-700/10'
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -499,7 +499,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   </div>
                                   {!notification.is_read && (
                                     <div className="flex flex-col items-center space-y-1">
-                                      <span className="w-2 h-2 bg-posoqo-gold rounded-full flex-shrink-0 animate-pulse"></span>
+                                      <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 animate-pulse"></span>
                                                                               <span className="text-xs text-[#FFD700] font-medium">Nueva</span>
                                     </div>
                                   )}
@@ -517,7 +517,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                               e.stopPropagation();
                               console.log('Ver todas las notificaciones');
                             }}
-                            className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-posoqo-black-light/50 transition-all duration-200 flex items-center justify-center gap-2"
+                            className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center gap-2"
                           >
                             <span className="text-lg">📋</span>
                             Ver todas las notificaciones
@@ -537,7 +537,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               >
                 <ShoppingCart className="w-5 h-5 text-yellow-400" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-posoqo-black shadow-lg">
+                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-black shadow-lg">
                     {cartCount}
                   </span>
                 )}
@@ -694,7 +694,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   e.stopPropagation();
                                   markAllAsRead();
                                 }}
-                                className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-posoqo-black-light/50 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+                                className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 font-medium flex items-center justify-center gap-2"
                               >
                                 <span className="text-lg">📋</span>
                                 Marcar todas como leídas ({stats.unread})
@@ -707,8 +707,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                             {notifications.slice(0, 6).map((notification) => (
                               <div
                                 key={notification.id}
-                                className={`p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-posoqo-black-light/50 hover:scale-[1.02] ${
-                                  !notification.is_read ? 'bg-posoqo-black-light/30 border-l-4 border-posoqo-gold shadow-lg' : 'bg-posoqo-black-light/10'
+                                className={`p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-700/50 hover:scale-[1.02] ${
+                                  !notification.is_read ? 'bg-gray-700/30 border-l-4 border-posoqo-gold shadow-lg' : 'bg-gray-700/10'
                                 }`}
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -739,7 +739,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   </div>
                                   {!notification.is_read && (
                                     <div className="flex flex-col items-center space-y-1">
-                                      <span className="w-2 h-2 bg-posoqo-gold rounded-full flex-shrink-0 animate-pulse"></span>
+                                      <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 animate-pulse"></span>
                                                                               <span className="text-xs text-[#FFD700] font-medium">Nueva</span>
                                     </div>
                                   )}
@@ -757,7 +757,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                               e.stopPropagation();
                               console.log('Ver todas las notificaciones (móvil)');
                             }}
-                            className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-posoqo-black-light/50 transition-all duration-200 flex items-center justify-center gap-2"
+                            className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center gap-2"
                           >
                             <span className="text-lg">📋</span>
                             Ver todas las notificaciones
@@ -868,7 +868,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                     router.push("/api/auth/signout");
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left px-4 py-3 text-base font-medium text-red-400 hover:bg-posoqo-black-light/50 rounded-xl transition-all duration-200 flex items-center gap-3"
+                  className="block w-full text-left px-4 py-3 text-base font-medium text-red-400 hover:bg-gray-700/50 rounded-xl transition-all duration-200 flex items-center gap-3"
                 >
                   <LogOut className="w-5 h-5" />
                   Cerrar sesión
