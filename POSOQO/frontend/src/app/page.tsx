@@ -576,28 +576,36 @@ export default function HomePage() {
         
       </section>
 
-      {/* Sección de Cervezas - Diseño premium con fondo elegante */}
+      {/* Sección Combinada - Cervezas y Gastronomía */}
       <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Patrón de lúpulo y cebada */}
-        <div className="absolute inset-0 opacity-20">
+        {/* Patrón de hexágonos dorados */}
+        <div className="absolute inset-0 opacity-15">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M50 0c27.614 0 50 22.386 50 50s-22.386 50-50 50S0 77.614 0 50 22.386 0 50 0zm0 8c23.196 0 42 18.804 42 42s-18.804 42-42 42S8 73.196 8 50 26.804 8 50 8z'/%3E%3Cpath d='M25 25h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4z'/%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3Ccircle cx='80' cy='20' r='3'/%3E%3Ccircle cx='20' cy='80' r='3'/%3E%3Ccircle cx='80' cy='80' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '100px 100px'
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M60 0l30 17.32v34.64L60 69.28 30 51.96V17.32L60 0z'/%3E%3Cpath d='M60 20l20 11.55v23.1L60 66.2 40 54.65V31.55L60 20z'/%3E%3Cpath d='M60 40l10 5.77v11.54L60 63.08 50 57.31V45.77L60 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '120px 120px'
           }}></div>
         </div>
         
-        {/* Efectos de burbujas de cerveza */}
+        {/* Efectos de ondas concéntricas */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-16 h-16 bg-[#D4AF37]/20 rounded-full blur-2xl animate-pulse"></div>
-          <div className="absolute top-20 right-20 w-12 h-12 bg-[#FFD700]/25 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-[#D4AF37]/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
-          <div className="absolute bottom-10 right-1/3 w-14 h-14 bg-[#FFD700]/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-10 w-8 h-8 bg-[#D4AF37]/30 rounded-full blur-lg animate-pulse" style={{animationDelay: '3s'}}></div>
-          <div className="absolute top-1/2 right-10 w-10 h-10 bg-[#FFD700]/25 rounded-full blur-xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-[#D4AF37]/20 rounded-full animate-ping"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-[#FFD700]/15 rounded-full animate-ping" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-[#D4AF37]/25 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-[#FFD700]/30 rounded-full animate-ping" style={{animationDelay: '3s'}}></div>
+        </div>
+        
+        {/* Efectos de partículas flotantes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-20 w-3 h-3 bg-[#D4AF37] rounded-full animate-bounce"></div>
+          <div className="absolute top-32 right-32 w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+          <div className="absolute bottom-32 left-1/4 w-4 h-4 bg-[#D4AF37] rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-20 right-1/3 w-2.5 h-2.5 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute top-1/2 left-20 w-3.5 h-3.5 bg-[#D4AF37] rounded-full animate-bounce" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-1/2 right-20 w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{animationDelay: '2.5s'}}></div>
         </div>
         
         {/* Gradiente radial dorado desde el centro */}
-        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/10 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/12 via-transparent to-transparent"></div>
         
 
         
@@ -606,9 +614,10 @@ export default function HomePage() {
 
         
 
-        <div id="cervezas" className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Sección de Cervezas */}
           <motion.div 
-            className="text-center mb-16 relative z-10"
+            className="text-center mb-20"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -630,93 +639,19 @@ export default function HomePage() {
               {/* Línea decorativa dorada */}
               <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
-          </motion.div>
-          
-          <motion.div 
-            className="w-full flex flex-col items-center justify-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {/* Layout en fila horizontal con máximo espaciado - Productos destacados */}
-            <div className="w-full max-w-7xl flex flex-col items-center justify-center gap-8">
-              {/* Mostrar productos destacados de cerveza */}
-              {featuredCervezas && featuredCervezas.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 w-full max-w-6xl mx-auto">
-                  {featuredCervezas.slice(0, 4).map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18, delay: index * 0.1 }}
-                      className="w-full"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                // Fallback a productos normales si no hay destacados
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 w-full max-w-6xl mx-auto">
-                  {products && products.filter(p => p.name.trim().toUpperCase() === "KOKAKINTU").map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18, delay: index * 0.1 }}
-                      className="w-full"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
-                  
-                  {products && products.filter(p => p.name.trim().toUpperCase() === "PUKA LLAMPU").map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18, delay: (index + 1) * 0.1 }}
-                      className="w-full"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
-                  
-                  {products && products.filter(p => p.name.trim().toUpperCase() === "MARCIANA").map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18, delay: (index + 2) * 0.1 }}
-                      className="w-full"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
-                  
-                  {products && products.filter(p => p.name.trim().toUpperCase() === "TANKAR").map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 18, delay: (index + 3) * 0.1 }}
-                      className="w-full"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-              
-            </div>
             
-            {/* Botón premium al final de la sección */}
-            <div className="flex justify-center mt-12 relative z-20">
+            {/* Botón de acción principal */}
+            <motion.div 
+              className="mt-8"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               <motion.a
-                href="/products?filter=cerveza"
+                href="/products?filter=cervezas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden mx-auto w-fit"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Beer className="w-5 h-5" />
@@ -725,37 +660,19 @@ export default function HomePage() {
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-gold-accent to-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
-      </section>
+          
+          {/* Separador decorativo */}
+          <div className="flex items-center justify-center mb-20">
+            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+            <div className="mx-4 w-2 h-2 bg-[#D4AF37] rounded-full"></div>
+            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+          </div>
 
-      {/* Gastronomía - Diseño premium con fondo atractivo */}
-      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
-        {/* Patrón de ingredientes culinarios */}
-        <div className="absolute inset-0 opacity-15">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Cpath d='M40 0c22.091 0 40 17.909 40 40s-17.909 40-40 40S0 62.091 0 40 17.909 0 40 0zm0 8c17.673 0 32 14.327 32 32s-14.327 32-32 32S8 57.673 8 40 22.327 8 40 8z'/%3E%3Cpath d='M20 20h40v2H20v-2zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4z'/%3E%3Ccircle cx='15' cy='15' r='2'/%3E%3Ccircle cx='65' cy='15' r='2'/%3E%3Ccircle cx='15' cy='65' r='2'/%3E%3Ccircle cx='65' cy='65' r='2'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '80px 80px'
-          }}></div>
-        </div>
-        
-        {/* Efectos de vapor y aromas culinarios */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-15 left-15 w-18 h-18 bg-[#D4AF37]/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-25 right-25 w-14 h-14 bg-[#FFD700]/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2.5s'}}></div>
-          <div className="absolute bottom-25 left-1/3 w-22 h-22 bg-[#D4AF37]/12 rounded-full blur-3xl animate-pulse" style={{animationDelay: '5s'}}></div>
-          <div className="absolute bottom-15 right-1/4 w-16 h-16 bg-[#FFD700]/18 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute top-1/2 left-15 w-10 h-10 bg-[#D4AF37]/25 rounded-full blur-lg animate-pulse" style={{animationDelay: '3.5s'}}></div>
-          <div className="absolute top-1/2 right-15 w-12 h-12 bg-[#FFD700]/22 rounded-full blur-xl animate-pulse" style={{animationDelay: '0.8s'}}></div>
-        </div>
-        
-        {/* Gradiente radial dorado desde el centro */}
-        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/8 via-transparent to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          {/* Sección de Gastronomía */}
           <motion.div 
-            className="text-center mb-16"
+            className="text-center mb-20"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -779,7 +696,7 @@ export default function HomePage() {
             </div>
             
             {/* Descripción elegante */}
-            <div className="max-w-3xl mx-auto mb-12">
+            <div className="max-w-3xl mx-auto mb-8">
               <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
                 Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
               </p>
@@ -805,78 +722,16 @@ export default function HomePage() {
                 href="/reservas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-black text-black font-bold text-lg hover:bg-black hover:text-white transition-all duration-300 shadow-xl premium-hover overflow-hidden"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-lg hover:bg-[#D4AF37] hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Calendar className="w-5 h-5" />
                   Reservar Mesa
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </div>
           </motion.div>
-        </div>
-
-        {/* Productos de comidas destacados - Diseño premium dorado/negro */}
-        {featuredComidas && featuredComidas.length > 0 ? (
-          <div className="max-w-7xl mx-auto px-6 mt-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredComidas && featuredComidas.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-2 border-gold-primary/20 hover:border-gold-primary/40 hover:shadow-2xl hover:shadow-gold-primary/10 transition-all duration-500 premium-hover h-full">
-                    {/* Imagen del producto */}
-                    <div className="relative mb-4">
-                      <div className="w-full h-48 bg-gradient-to-br from-gold-primary/10 to-gold-accent/10 rounded-xl overflow-hidden border border-gold-primary/30">
-                        <img
-                          src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                        />
-                      </div>
-                      {/* Badge de comida dorado */}
-                      <div className="absolute top-2 right-2 gold-gradient text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                        🍽️ Comida
-                      </div>
-                    </div>
-                    
-                    {/* Información del producto */}
-                    <div className="space-y-3">
-                      <h3 className="text-lg font-bold text-gold-primary group-hover:text-gold-accent transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-2">
-                        {product.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gold-primary font-bold text-lg">
-                          S/ {product.price?.toFixed(2) || '0.00'}
-                        </span>
-                        <button className="gold-gradient text-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-lg">
-                          Ver más
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-7xl mx-auto px-6 mt-16">
-            <div className="text-center text-gray-400">
-              <p>No hay comidas destacadas disponibles en este momento.</p>
-            </div>
-          </div>
-        )}
-        
-      </section>
 
       {/* Taprooms y experiencias - Diseño premium con fondo negro simple */}
       <section ref={taproomsRef} id="taprooms" className="py-20 bg-black relative overflow-hidden">
