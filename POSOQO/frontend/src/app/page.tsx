@@ -732,6 +732,8 @@ export default function HomePage() {
               </motion.a>
             </div>
           </motion.div>
+        </div>
+      </section>
 
       {/* Taprooms y experiencias - Diseño premium con fondo negro simple */}
       <section ref={taproomsRef} id="taprooms" className="py-20 bg-black relative overflow-hidden">
