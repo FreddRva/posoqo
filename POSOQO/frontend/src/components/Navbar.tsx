@@ -120,8 +120,7 @@ const DropdownMenu = ({
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
           `}
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={() => {
             onItemClick?.();
             onClose();
             router.push(item.href);
