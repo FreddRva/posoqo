@@ -379,8 +379,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         className={`
           fixed top-0 left-0 w-full z-50 transition-all duration-500 
           ${scrolled 
-            ? "bg-gradient-to-r from-black via-gray-800 to-black border-b border-yellow-400/30 shadow-2xl shadow-yellow-500/20 backdrop-blur-md" 
-            : "bg-gradient-to-r from-black via-gray-700 to-black backdrop-blur-sm shadow-yellow-500/10"
+            ? "bg-gradient-to-r from-black via-gray-900 to-black border-b border-yellow-400/30 shadow-2xl shadow-yellow-500/20 backdrop-blur-md" 
+            : "bg-gradient-to-r from-black via-gray-800 to-black backdrop-blur-sm shadow-yellow-500/10"
           }
           ${montserrat.className}
         `}
@@ -813,7 +813,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       <div 
         ref={mobileMenuRef}
         className={`
-          lg:hidden fixed inset-0 z-40 bg-gradient-to-r from-black via-gray-700 to-black transition-all duration-300 ease-in-out
+          lg:hidden fixed inset-0 z-40 bg-gradient-to-r from-black via-gray-800 to-black transition-all duration-300 ease-in-out
           ${mobileMenuOpen 
             ? "opacity-100 translate-y-0 mt-16" 
             : "opacity-0 -translate-y-full pointer-events-none"}
