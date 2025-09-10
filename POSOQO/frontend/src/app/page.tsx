@@ -325,7 +325,7 @@ export default function HomePage() {
       </div>
       
       {/* Hero Section - Diseño premium dorado/negro mejorado */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden premium-gradient pt-20 lg:pt-32">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden premium-gradient">
         {/* Fondo con imagen y overlay elegante */}
         <div className="absolute inset-0 z-0">
           <div 
@@ -333,7 +333,8 @@ export default function HomePage() {
             style={{
               backgroundImage: "url('/FondoPo.jpg')",
               backgroundSize: "cover",
-              backgroundPosition: "center",
+              backgroundPosition: "center top",
+              backgroundAttachment: "fixed",
               filter: "brightness(0.8) contrast(1.1) saturate(1.0)"
             }}
           ></div>
@@ -343,7 +344,7 @@ export default function HomePage() {
         </div>
         
         <motion.div 
-          className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
+          className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16 pt-20 lg:pt-32"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
