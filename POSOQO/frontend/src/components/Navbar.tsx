@@ -112,7 +112,10 @@ const DropdownMenu = ({
           `}
           onClick={() => {
             onItemClick?.();
-            // Solo navegar, el dropdown se cierra automáticamente al navegar
+            // Cerrar el dropdown después de navegar
+            setTimeout(() => {
+              onClose();
+            }, 100);
           }}
         >
           <div className="font-bold text-sm text-yellow-400">{item.label}</div>
@@ -192,11 +195,16 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           !(event.target as HTMLElement).closest('.notifications-content')) {
         setShowNotifications(false);
       }
-      // Cerrar dropdown al hacer clic fuera
+      // Cerrar dropdown solo si se hace clic en otro botón de dropdown o en elementos específicos
       if (activeDropdown && dropdownRef.current && 
           !dropdownRef.current.contains(event.target as Node) &&
-          !(event.target as HTMLElement).closest('button[aria-expanded="true"]')) {
-        setActiveDropdown(null);
+          !(event.target as HTMLElement).closest('button[aria-expanded="true"]') &&
+          !(event.target as HTMLElement).closest('a[href]')) {
+        // Solo cerrar si no es un enlace de navegación
+        const target = event.target as HTMLElement;
+        if (!target.closest('a') && !target.closest('button[aria-expanded]')) {
+          setActiveDropdown(null);
+        }
       }
     };
 
@@ -245,7 +253,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   // Renderizar elemento de navegación
   const renderNavItem = (item: NavItem, isMobile = false) => {
     const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl hover:bg-yellow-400/20 hover:shadow-lg";
-    const textClasses = item.highlight ? 'text-yellow-400 font-bold drop-shadow-lg' : 'text-white hover:text-yellow-400 font-semibold';
+    const textClasses = item.highlight ? 'text-yellow-400 font-bold drop-shadow-lg' : 'bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent hover:from-yellow-400 hover:via-yellow-300 hover:to-yellow-400 font-semibold';
 
     // Elementos con dropdown
     if (item.dropdown && item.subitems) {
@@ -257,7 +265,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ${isMobile 
                 ? "w-full text-left bg-yellow-400/10" 
                 : "hover:bg-yellow-400/20"}
-              ${activeDropdown === item.label ? "text-yellow-400 bg-yellow-400/20 shadow-lg font-bold" : "text-white hover:text-yellow-400 font-semibold"}
+              ${activeDropdown === item.label ? "text-yellow-400 bg-yellow-400/20 shadow-lg font-bold" : "bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent hover:from-yellow-400 hover:via-yellow-300 hover:to-yellow-400 font-semibold"}
             `}
             onClick={() => toggleDropdown(item.label)}
             aria-expanded={activeDropdown === item.label}
