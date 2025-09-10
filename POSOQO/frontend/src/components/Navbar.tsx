@@ -118,9 +118,14 @@ const DropdownMenu = ({
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
           `}
-          onClick={() => {
-            onClose();
+          onClick={(e) => {
+            e.preventDefault();
             onItemClick?.();
+            // Pequeño delay para permitir la navegación antes de cerrar
+            setTimeout(() => {
+              onClose();
+              window.location.href = item.href;
+            }, 100);
           }}
         >
           <div className="font-semibold text-sm gold-text">{item.label}</div>
