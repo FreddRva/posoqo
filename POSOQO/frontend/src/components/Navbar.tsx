@@ -371,8 +371,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         className={`
           fixed top-0 left-0 w-full z-50 transition-all duration-500 
           ${scrolled 
-            ? "bg-black border-b-2 border-yellow-400 shadow-2xl shadow-yellow-500/25 backdrop-blur-sm" 
-            : "bg-black backdrop-blur-sm"
+            ? "bg-black/95 border-b border-yellow-400/30 shadow-2xl shadow-yellow-500/20 backdrop-blur-md" 
+            : "bg-black/90 backdrop-blur-sm shadow-yellow-500/10"
           }
           ${montserrat.className}
         `}
@@ -396,7 +396,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   priority
                 />
               </div>
-              <span className={`text-xl lg:text-2xl font-extrabold text-yellow-400 tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 drop-shadow-lg`}>
+              <span className={`text-xl lg:text-2xl font-extrabold text-yellow-400 tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 drop-shadow-lg shadow-yellow-500/30`}>
                 POSOQO
               </span>
             </Link>
@@ -532,10 +532,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl bg-yellow-400/20 hover:bg-yellow-400/30 transition-all duration-300 hover:shadow-lg"
+                className="relative p-2 rounded-full border border-yellow-400/30 bg-black/20 hover:bg-yellow-400/20 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/20"
                 aria-label="Carrito"
               >
-                <ShoppingCart className="w-5 h-5 text-yellow-400" />
+                <ShoppingCart className="w-5 h-5 text-white" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-black shadow-lg">
                     {cartCount}
@@ -639,7 +639,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="px-6 py-2 rounded-xl font-semibold bg-black text-yellow-400 hover:bg-gray-800 hover:text-yellow-300 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="px-6 py-2 rounded-lg font-semibold bg-yellow-400 text-black hover:bg-yellow-300 hover:shadow-lg hover:shadow-yellow-500/30 transition-all duration-300"
                 >
                   Iniciar sesión
                 </button>
