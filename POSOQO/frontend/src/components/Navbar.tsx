@@ -888,7 +888,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                     router.push("/login");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-6 py-3 rounded-xl font-semibold gold-gradient text-yellow-400 hover:scale-105 transition-all duration-300 shadow-lg gold-glow hover:bg-yellow-400/10"
+                  className="w-full px-6 py-3 rounded-xl font-semibold bg-yellow-400 text-black hover:scale-105 transition-all duration-300 shadow-lg hover:bg-yellow-300"
                 >
                   Iniciar sesión
                 </button>
