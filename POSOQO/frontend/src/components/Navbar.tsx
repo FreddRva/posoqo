@@ -98,14 +98,14 @@ const DropdownMenu = ({
       className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
+        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 bg-gradient-to-br from-gray-800 via-gray-900 to-black border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in"}
     `}>
       {items.map((item, index) => (
         <Link
           key={`${item.label}-${item.href}`}
           href={item.href}
           className={`
-            block px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 rounded-xl mx-3 premium-hover
+            block px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 rounded-xl mx-3
             ${isMobile ? "text-base" : ""}
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
@@ -115,7 +115,7 @@ const DropdownMenu = ({
             // Solo navegar, el dropdown se cierra automáticamente al navegar
           }}
         >
-          <div className="font-semibold text-sm gold-text">{item.label}</div>
+          <div className="font-semibold text-sm text-yellow-400">{item.label}</div>
           {item.description && (
             <div className="text-xs text-gray-300 mt-1">{item.description}</div>
           )}
@@ -244,8 +244,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
   // Renderizar elemento de navegación
   const renderNavItem = (item: NavItem, isMobile = false) => {
-    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl premium-hover";
-    const textClasses = item.highlight ? 'gold-text font-bold premium-text-shadow' : 'text-white hover:gold-text';
+    const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl hover:bg-yellow-400/10";
+    const textClasses = item.highlight ? 'text-yellow-400 font-bold' : 'text-white hover:text-yellow-400';
 
     // Elementos con dropdown
     if (item.dropdown && item.subitems) {
@@ -253,11 +253,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         <div key={item.label} className="relative">
           <button
             className={`
-              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-300 rounded-xl premium-hover
+              flex items-center gap-2 px-4 py-2 text-base font-medium transition-all duration-300 rounded-xl hover:bg-yellow-400/10
               ${isMobile 
-                ? "w-full text-left gold-glass" 
-                : "hover:gold-glass"}
-              ${activeDropdown === item.label ? "gold-text gold-glass" : "text-white hover:gold-text"}
+                ? "w-full text-left bg-yellow-400/10" 
+                : "hover:bg-yellow-400/10"}
+              ${activeDropdown === item.label ? "text-yellow-400 bg-yellow-400/10" : "text-white hover:text-yellow-400"}
             `}
             onClick={() => toggleDropdown(item.label)}
             aria-expanded={activeDropdown === item.label}
@@ -266,7 +266,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
             {item.label}
             <ChevronDown 
               className={`w-4 h-4 text-white transition-transform duration-300 ${
-                activeDropdown === item.label ? "rotate-180 gold-text" : ""
+                activeDropdown === item.label ? "rotate-180 text-yellow-400" : ""
               }`}
             />
           </button>
@@ -393,7 +393,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   priority
                 />
               </div>
-              <span className={`text-xl lg:text-2xl font-extrabold gold-text tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 premium-text-shadow`}>
+              <span className={`text-xl lg:text-2xl font-extrabold text-yellow-400 tracking-wide ${playfair.className} group-hover:scale-105 transition-all duration-200 premium-text-shadow`}>
                 POSOQO
               </span>
             </Link>
@@ -411,7 +411,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                    className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
                     aria-label="Notificaciones"
                   >
                     <Bell className="w-5 h-5 text-white" />
@@ -424,28 +424,28 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
                   {/* Dropdown de notificaciones */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-3 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-posoqo-gray-dark/50 py-3 z-50 notifications-content">
-                      <div className="px-4 py-3 border-b border-posoqo-gray-dark/50">
+                    <div className="absolute right-0 mt-3 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-gray-800/50 py-3 z-50 notifications-content">
+                      <div className="px-4 py-3 border-b border-gray-800/50">
                         <h3 className="text-[#FFD700] font-semibold text-sm flex items-center gap-2">
                           <Bell className="w-4 h-4 text-[#FFD700]" />
                           Notificaciones
                         </h3>
-                        <p className="text-posoqo-gray-light text-xs mt-1">
+                        <p className="text-gray-400 text-xs mt-1">
                           {stats.unread} sin leer de {stats.total} total
                         </p>
                       </div>
                       
                       {notifications.length === 0 ? (
                         <div className="px-4 py-8 text-center">
-                          <div className="text-posoqo-gray-light text-4xl mb-2">🔔</div>
-                          <p className="text-posoqo-gray-light text-sm">No hay notificaciones</p>
-                          <p className="text-posoqo-gray-medium text-xs mt-1">Te notificaremos cuando haya novedades</p>
+                          <div className="text-gray-400 text-4xl mb-2">🔔</div>
+                          <p className="text-gray-400 text-sm">No hay notificaciones</p>
+                          <p className="text-gray-500 text-xs mt-1">Te notificaremos cuando haya novedades</p>
                         </div>
                       ) : (
                         <div className="max-h-96 overflow-y-auto custom-scrollbar">
                           {/* Botón marcar todas como leídas */}
                           {stats.unread > 0 && (
-                            <div className="px-4 py-2 border-b border-posoqo-gray-dark/50">
+                            <div className="px-4 py-2 border-b border-gray-800/50">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -479,11 +479,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                       {notification.title}
                                     </div>
                                     {notification.message && notification.message !== notification.title && (
-                                      <div className="text-posoqo-gray-light text-xs mt-1 leading-relaxed">
+                                      <div className="text-gray-400 text-xs mt-1 leading-relaxed">
                                         {notification.message}
                                       </div>
                                     )}
-                                    <div className="text-posoqo-gray-light text-xs mt-2 flex items-center">
+                                    <div className="text-gray-400 text-xs mt-2 flex items-center">
                                       <span className="mr-2">🕒</span>
                                       {new Date(notification.created_at).toLocaleString('es-ES', {
                                         day: '2-digit',
@@ -508,7 +508,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                       )}
                       
                       {notifications.length > 8 && (
-                        <div className="px-4 py-2 border-t border-posoqo-gray-dark/50">
+                        <div className="px-4 py-2 border-t border-gray-800/50">
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
@@ -529,7 +529,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
                 aria-label="Carrito"
               >
                 <ShoppingCart className="w-5 h-5 text-white" />
@@ -544,7 +544,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {user ? (
                 <div className="relative" ref={userMenuRef}>
                   <button
-                    className="flex items-center gap-2 p-2.5 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                    className="flex items-center gap-2 p-2.5 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     aria-label="Menú de usuario"
                     aria-expanded={userMenuOpen}
@@ -573,7 +573,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                             router.push("/dashboard");
                             setUserMenuOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass font-semibold transition-all duration-300 flex items-center gap-3 premium-hover"
+                          className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-semibold transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                         >
                           <Crown className="w-4 h-4" />
                           Panel Admin
@@ -584,7 +584,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                       >
                         <User className="w-4 h-4" />
                         Mi Perfil
@@ -594,7 +594,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile/payments");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                       >
                         <CreditCard className="w-4 h-4" />
                         Mis Pagos
@@ -604,7 +604,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/favorites");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                       >
                         <Heart className="w-4 h-4" />
                         Favoritos
@@ -614,12 +614,12 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/orders");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:gold-text hover:gold-glass transition-all duration-300 flex items-center gap-3 premium-hover"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                       >
                         <Package className="w-4 h-4" />
                         Mis Pedidos
                       </button>
-                      <div className="border-t border-posoqo-gray-dark/50 my-2"></div>
+                      <div className="border-t border-gray-800/50 my-2"></div>
                       <button
                         onClick={() => {
                           router.push("/api/auth/signout");
@@ -636,7 +636,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               ) : (
                 <button
                   onClick={() => router.push("/login")}
-                  className="px-6 py-2 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow premium-hover"
+                  className="px-6 py-2 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl gold-glow hover:bg-yellow-400/10"
                 >
                   Iniciar sesión
                 </button>
@@ -651,7 +651,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 <div className="relative">
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                    className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
                     aria-label="Notificaciones"
                   >
                     <Bell className="w-5 h-5 text-white" />
@@ -664,28 +664,28 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
                   {/* Dropdown de notificaciones móvil */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-posoqo-gray-dark/50 py-3 z-50 notifications-dropdown notifications-content">
-                      <div className="px-4 py-3 border-b border-posoqo-gray-dark/50">
+                    <div className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-gray-800/50 py-3 z-50 notifications-dropdown notifications-content">
+                      <div className="px-4 py-3 border-b border-gray-800/50">
                         <h3 className="text-[#FFD700] font-semibold text-sm flex items-center gap-2">
                           <Bell className="w-4 h-4 text-[#FFD700]" />
                           Notificaciones
                         </h3>
-                        <p className="text-posoqo-gray-light text-xs mt-1">
+                        <p className="text-gray-400 text-xs mt-1">
                           {stats.unread} sin leer de {stats.total} total
                         </p>
                       </div>
                       
                       {notifications.length === 0 ? (
                         <div className="px-4 py-6 text-center">
-                          <div className="text-posoqo-gray-light text-3xl mb-2">🔔</div>
-                          <p className="text-posoqo-gray-light text-sm">No hay notificaciones</p>
-                          <p className="text-posoqo-gray-medium text-xs mt-1">Te notificaremos cuando haya novedades</p>
+                          <div className="text-gray-400 text-3xl mb-2">🔔</div>
+                          <p className="text-gray-400 text-sm">No hay notificaciones</p>
+                          <p className="text-gray-500 text-xs mt-1">Te notificaremos cuando haya novedades</p>
                         </div>
                       ) : (
                         <div className="max-h-64 overflow-y-auto custom-scrollbar">
                           {/* Botón marcar todas como leídas */}
                           {stats.unread > 0 && (
-                            <div className="px-4 py-2 border-b border-posoqo-gray-dark/50">
+                            <div className="px-4 py-2 border-b border-gray-800/50">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -719,11 +719,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                       {notification.title}
                                     </div>
                                     {notification.message && notification.message !== notification.title && (
-                                      <div className="text-posoqo-gray-light text-xs mt-1 leading-relaxed">
+                                      <div className="text-gray-400 text-xs mt-1 leading-relaxed">
                                         {notification.message}
                                       </div>
                                     )}
-                                    <div className="text-posoqo-gray-light text-xs mt-2 flex items-center">
+                                    <div className="text-gray-400 text-xs mt-2 flex items-center">
                                       <span className="mr-2">🕒</span>
                                       {new Date(notification.created_at).toLocaleString('es-ES', {
                                         day: '2-digit',
@@ -748,7 +748,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                       )}
                       
                       {notifications.length > 6 && (
-                        <div className="px-4 py-2 border-t border-posoqo-gray-dark/50">
+                        <div className="px-4 py-2 border-t border-gray-800/50">
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
@@ -769,7 +769,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Carrito móvil */}
               <button
                 onClick={() => router.push("/cart")}
-                className="relative p-2 rounded-xl gold-glass hover:gold-glow transition-all duration-300 premium-hover"
+                className="relative p-2 rounded-xl bg-yellow-400/10 hover:gold-glow transition-all duration-300 hover:bg-yellow-400/10"
                 aria-label="Carrito"
               >
                 <ShoppingCart className="w-5 h-5 text-white" />
@@ -783,7 +783,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               {/* Menú móvil */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-xl gold-glass hover:gold-glow focus:outline-none transition-all duration-300 premium-hover"
+                className="p-2 rounded-xl bg-yellow-400/10 hover:gold-glow focus:outline-none transition-all duration-300 hover:bg-yellow-400/10"
                 aria-label="Menú"
                 aria-expanded={mobileMenuOpen}
               >
@@ -814,12 +814,12 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           {navItems.map((item) => renderNavItem(item, true))}
           
           {/* Sección de usuario móvil - Más limpia */}
-          <div className="pt-6 border-t border-posoqo-gray-dark/50 space-y-1">
+          <div className="pt-6 border-t border-gray-800/50 space-y-1">
             {user ? (
               <>
                 <Link
                   href="/profile"
-                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="w-5 h-5" />
@@ -827,7 +827,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/profile/payments"
-                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <CreditCard className="w-5 h-5" />
@@ -835,7 +835,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/favorites"
-                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Heart className="w-5 h-5" />
@@ -843,7 +843,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 </Link>
                 <Link
                   href="/orders"
-                  className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <Package className="w-5 h-5" />
@@ -852,14 +852,14 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 {user?.role === 'admin' && (
                   <Link
                     href="/dashboard"
-                    className="block px-4 py-3 text-base font-medium text-white hover:gold-text hover:gold-glass rounded-xl transition-all duration-300 flex items-center gap-3 premium-hover"
+                    className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Crown className="w-5 h-5" />
                     Panel Admin
                   </Link>
                 )}
-                <div className="border-t border-posoqo-gray-dark/50 my-2"></div>
+                <div className="border-t border-gray-800/50 my-2"></div>
                 <button
                   onClick={() => {
                     router.push("/api/auth/signout");
@@ -877,7 +877,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                     router.push("/login");
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full px-6 py-3 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg gold-glow premium-hover"
+                  className="w-full px-6 py-3 rounded-xl font-semibold gold-gradient text-black hover:scale-105 transition-all duration-300 shadow-lg gold-glow hover:bg-yellow-400/10"
                 >
                   Iniciar sesión
                 </button>
