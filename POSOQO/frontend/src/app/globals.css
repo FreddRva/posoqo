@@ -552,3 +552,11 @@ html {
     @apply px-6 py-3 text-base;
   }
 }
+
+/* ========================================
+   GRADIENTES PERSONALIZADOS
+   ======================================== */
+
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--tw-gradient-stops));
+}

@@ -457,26 +457,26 @@ export default function HomePage() {
 
       {/* Raíces Ayacuchanas - Diseño premium con fondo atractivo */}
       <section className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
-        {/* Patrón de granos de cebada dorados */}
-        <div className="absolute inset-0 opacity-10">
+        {/* Patrón de espuma de cerveza elegante */}
+        <div className="absolute inset-0 opacity-15">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M30 0c16.569 0 30 13.431 30 30s-13.431 30-30 30S0 46.569 0 30 13.431 0 30 0zm0 4c14.359 0 26 11.641 26 26s-11.641 26-26 26S4 44.359 4 30 15.641 4 30 4z'/%3E%3Cpath d='M15 15h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Ccircle cx='20' cy='20' r='8'/%3E%3Ccircle cx='60' cy='20' r='6'/%3E%3Ccircle cx='40' cy='40' r='10'/%3E%3Ccircle cx='20' cy='60' r='7'/%3E%3Ccircle cx='60' cy='60' r='5'/%3E%3Ccircle cx='10' cy='40' r='4'/%3E%3Ccircle cx='70' cy='40' r='6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '80px 80px'
           }}></div>
         </div>
         
-        {/* Efectos de partículas doradas */}
+        {/* Efectos de ondas doradas suaves */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
-          <div className="absolute top-80 right-1/3 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-          <div className="absolute bottom-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-40 right-10 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-10 left-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute top-20 right-0 w-24 h-24 bg-[#FFD700]/15 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+            <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-[#D4AF37]/8 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+            <div className="absolute bottom-10 right-1/3 w-28 h-28 bg-[#FFD700]/12 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          </div>
         </div>
         
-        {/* Gradiente sutil de resplandor dorado */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#FFD700]/5"></div>
+        {/* Gradiente radial dorado desde el centro */}
+        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/8 via-transparent to-transparent"></div>
         
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
