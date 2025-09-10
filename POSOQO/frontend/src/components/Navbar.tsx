@@ -371,8 +371,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         className={`
           fixed top-0 left-0 w-full z-50 transition-all duration-500 
           ${scrolled 
-            ? "bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b-2 border-yellow-400 shadow-2xl shadow-yellow-500/25 backdrop-blur-sm" 
-            : "bg-gradient-to-r from-gray-900 via-black to-gray-900 backdrop-blur-sm"
+            ? "bg-black border-b-2 border-yellow-400 shadow-2xl shadow-yellow-500/25 backdrop-blur-sm" 
+            : "bg-black backdrop-blur-sm"
           }
           ${montserrat.className}
         `}
@@ -805,7 +805,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       <div 
         ref={mobileMenuRef}
         className={`
-          lg:hidden fixed inset-0 z-40 bg-gradient-to-br from-gray-900 via-black to-gray-900 transition-all duration-300 ease-in-out
+          lg:hidden fixed inset-0 z-40 bg-black transition-all duration-300 ease-in-out
           ${mobileMenuOpen 
             ? "opacity-100 translate-y-0 mt-16" 
             : "opacity-0 -translate-y-full pointer-events-none"}
