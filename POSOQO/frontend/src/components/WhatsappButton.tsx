@@ -6,7 +6,15 @@ export default function WhatsappButton() {
       href="https://wa.me/51966123456"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed z-50 top-1/2 right-6 -translate-y-1/2 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl hover:shadow-green-500/30 flex items-center justify-center w-16 h-16 transition-all duration-300 group hover:scale-110 animate-pulse"
+      className="fixed z-[9999] top-1/2 right-6 -translate-y-1/2 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-2xl hover:shadow-green-500/30 flex items-center justify-center w-16 h-16 transition-all duration-300 group hover:scale-110 animate-pulse"
+      style={{
+        position: 'fixed',
+        zIndex: 9999,
+        top: '50%',
+        right: '24px',
+        transform: 'translateY(-50%)',
+        pointerEvents: 'auto'
+      }}
       aria-label="Contactar por WhatsApp"
     >
       <svg
