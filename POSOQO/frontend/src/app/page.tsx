@@ -577,14 +577,27 @@ export default function HomePage() {
       </section>
 
       {/* Sección de Cervezas - Diseño premium con fondo elegante */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-100 via-white to-gray-50">
-        {/* Efectos de partículas doradas sutiles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-16 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-40"></div>
-          <div className="absolute top-40 right-24 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-50" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-40 left-1/4 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-30" style={{animationDelay: '4s'}}></div>
-          <div className="absolute top-60 right-1/3 w-1 h-1 bg-gold-accent rounded-full gold-sparkle opacity-45" style={{animationDelay: '1s'}}></div>
+      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        {/* Patrón de lúpulo y cebada */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M50 0c27.614 0 50 22.386 50 50s-22.386 50-50 50S0 77.614 0 50 22.386 0 50 0zm0 8c23.196 0 42 18.804 42 42s-18.804 42-42 42S8 73.196 8 50 26.804 8 50 8z'/%3E%3Cpath d='M25 25h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4zm0 8h50v4H25v-4z'/%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3Ccircle cx='80' cy='20' r='3'/%3E%3Ccircle cx='20' cy='80' r='3'/%3E%3Ccircle cx='80' cy='80' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '100px 100px'
+          }}></div>
         </div>
+        
+        {/* Efectos de burbujas de cerveza */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-10 w-16 h-16 bg-[#D4AF37]/20 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute top-20 right-20 w-12 h-12 bg-[#FFD700]/25 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-20 left-1/4 w-20 h-20 bg-[#D4AF37]/15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+          <div className="absolute bottom-10 right-1/3 w-14 h-14 bg-[#FFD700]/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-10 w-8 h-8 bg-[#D4AF37]/30 rounded-full blur-lg animate-pulse" style={{animationDelay: '3s'}}></div>
+          <div className="absolute top-1/2 right-10 w-10 h-10 bg-[#FFD700]/25 rounded-full blur-xl animate-pulse" style={{animationDelay: '0.5s'}}></div>
+        </div>
+        
+        {/* Gradiente radial dorado desde el centro */}
+        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/10 via-transparent to-transparent"></div>
         
 
         
@@ -717,14 +730,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gastronomía - Diseño premium con fondo elegante */}
-      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-100 via-white to-gray-50 relative overflow-hidden">
-        {/* Efectos de partículas doradas sutiles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-20 w-2 h-2 bg-gold-primary rounded-full gold-sparkle opacity-40"></div>
-          <div className="absolute top-40 right-32 w-1.5 h-1.5 bg-gold-accent rounded-full gold-sparkle opacity-50" style={{animationDelay: '1.5s'}}></div>
-          <div className="absolute bottom-32 left-1/3 w-2.5 h-2.5 bg-gold-primary rounded-full gold-sparkle opacity-30" style={{animationDelay: '3s'}}></div>
+      {/* Gastronomía - Diseño premium con fondo atractivo */}
+      <section id="gastronomia" className="py-20 bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
+        {/* Patrón de ingredientes culinarios */}
+        <div className="absolute inset-0 opacity-15">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Cpath d='M40 0c22.091 0 40 17.909 40 40s-17.909 40-40 40S0 62.091 0 40 17.909 0 40 0zm0 8c17.673 0 32 14.327 32 32s-14.327 32-32 32S8 57.673 8 40 22.327 8 40 8z'/%3E%3Cpath d='M20 20h40v2H20v-2zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4zm0 4h40v2H20v-4z'/%3E%3Ccircle cx='15' cy='15' r='2'/%3E%3Ccircle cx='65' cy='15' r='2'/%3E%3Ccircle cx='15' cy='65' r='2'/%3E%3Ccircle cx='65' cy='65' r='2'/%3E%3Ccircle cx='40' cy='40' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '80px 80px'
+          }}></div>
         </div>
+        
+        {/* Efectos de vapor y aromas culinarios */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-15 left-15 w-18 h-18 bg-[#D4AF37]/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-25 right-25 w-14 h-14 bg-[#FFD700]/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2.5s'}}></div>
+          <div className="absolute bottom-25 left-1/3 w-22 h-22 bg-[#D4AF37]/12 rounded-full blur-3xl animate-pulse" style={{animationDelay: '5s'}}></div>
+          <div className="absolute bottom-15 right-1/4 w-16 h-16 bg-[#FFD700]/18 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute top-1/2 left-15 w-10 h-10 bg-[#D4AF37]/25 rounded-full blur-lg animate-pulse" style={{animationDelay: '3.5s'}}></div>
+          <div className="absolute top-1/2 right-15 w-12 h-12 bg-[#FFD700]/22 rounded-full blur-xl animate-pulse" style={{animationDelay: '0.8s'}}></div>
+        </div>
+        
+        {/* Gradiente radial dorado desde el centro */}
+        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/8 via-transparent to-transparent"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -753,7 +780,7 @@ export default function HomePage() {
             
             {/* Descripción elegante */}
             <div className="max-w-3xl mx-auto mb-12">
-              <p className={`text-lg md:text-xl text-gray-700 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
                 Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
               </p>
             </div>
