@@ -121,10 +121,7 @@ const DropdownMenu = ({
           onClick={(e) => {
             e.stopPropagation(); // Evitar que se propague al overlay
             onItemClick?.();
-            // Cerrar el dropdown después de un pequeño delay para permitir la navegación
-            setTimeout(() => {
-              onClose();
-            }, 100);
+            // NO cerrar el dropdown al hacer clic dentro - solo navegar
           }}
         >
           <div className="font-semibold text-sm gold-text">{item.label}</div>
