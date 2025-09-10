@@ -93,17 +93,9 @@ const DropdownMenu = ({
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Overlay invisible para cerrar al hacer clic */}
-      {!isMobile && (
-        <div 
-          className="fixed inset-0 z-[9998]"
-          onClick={onClose}
-        />
-      )}
-      <div 
-        ref={dropdownRef}
-        className={`
+    <div 
+      ref={dropdownRef}
+      className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
         : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-4 z-[9999] animate-fade-in gold-glow"}
@@ -118,10 +110,9 @@ const DropdownMenu = ({
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
           `}
-          onClick={(e) => {
-            e.stopPropagation(); // Evitar que se propague al overlay
+          onClick={() => {
             onItemClick?.();
-            // NO cerrar el dropdown al hacer clic dentro - solo navegar
+            // Solo navegar, el dropdown se cierra automáticamente al navegar
           }}
         >
           <div className="font-semibold text-sm gold-text">{item.label}</div>
