@@ -455,8 +455,28 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Diseño premium con fondo negro simple */}
-      <section className="py-20 relative overflow-hidden bg-black">
+      {/* Raíces Ayacuchanas - Diseño premium con fondo atractivo */}
+      <section className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        {/* Patrón de granos de cebada dorados */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Cpath d='M30 0c16.569 0 30 13.431 30 30s-13.431 30-30 30S0 46.569 0 30 13.431 0 30 0zm0 4c14.359 0 26 11.641 26 26s-11.641 26-26 26S4 44.359 4 30 15.641 4 30 4z'/%3E%3Cpath d='M15 15h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2zm0 4h30v2H15v-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
+        
+        {/* Efectos de partículas doradas */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
+          <div className="absolute top-80 right-1/3 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+          <div className="absolute bottom-20 left-20 w-2 h-2 bg-[#D4AF37] rounded-full animate-pulse" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute bottom-40 right-10 w-1 h-1 bg-[#FFD700] rounded-full animate-pulse" style={{animationDelay: '3s'}}></div>
+        </div>
+        
+        {/* Gradiente sutil de resplandor dorado */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#FFD700]/5"></div>
         
         <div className="relative max-w-7xl mx-auto px-6">
           <motion.div 
@@ -532,7 +552,7 @@ export default function HomePage() {
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
                 
                 {/* Contenido principal */}
-                <div className="relative bg-gray-800/60 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 hover:shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500 group-hover:scale-105 h-full">
+                <div className="relative bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black/80 backdrop-blur-md p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 hover:shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500 group-hover:scale-105 h-full">
                   {/* Icono elegante con fondo dorado */}
                   <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
