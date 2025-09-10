@@ -1163,31 +1163,6 @@ export default function HomePage() {
         onClose={closeProductModal}
       />
 
-      <style jsx global>{`
-        .glass-card {
-          backdrop-filter: blur(8px) saturate(120%);
-          -webkit-backdrop-filter: blur(8px) saturate(120%);
-        }
-        .animate-float {
-          animation: float 3.5s ease-in-out infinite;
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-16px); }
-        }
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .line-clamp-3 {
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </div>
   );
 }
