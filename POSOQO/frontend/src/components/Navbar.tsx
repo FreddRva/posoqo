@@ -82,6 +82,7 @@ const DropdownMenu = ({
   onClose,
   onItemClick,
   dropdownRef,
+  router,
 }: {
   items: { label: string; href: string; description?: string }[];
   isMobile: boolean;
@@ -89,6 +90,7 @@ const DropdownMenu = ({
   onClose: () => void;
   onItemClick?: () => void;
   dropdownRef: React.RefObject<HTMLDivElement>;
+  router: any;
 }) => {
   if (!isOpen) return null;
 
@@ -121,11 +123,8 @@ const DropdownMenu = ({
           onClick={(e) => {
             e.preventDefault();
             onItemClick?.();
-            // Pequeño delay para permitir la navegación antes de cerrar
-            setTimeout(() => {
-              onClose();
-              window.location.href = item.href;
-            }, 100);
+            onClose();
+            router.push(item.href);
           }}
         >
           <div className="font-semibold text-sm gold-text">{item.label}</div>
@@ -295,6 +294,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   if (isMobile) setMobileMenuOpen(false);
                 }}
                 dropdownRef={dropdownRef}
+                router={router}
               />
             </div>
           )}
