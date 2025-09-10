@@ -118,9 +118,13 @@ const DropdownMenu = ({
             ${index === 0 ? "rounded-t-xl" : ""} 
             ${index === items.length - 1 ? "rounded-b-xl" : ""}
           `}
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation(); // Evitar que se propague al overlay
             onItemClick?.();
-            onClose();
+            // Cerrar el dropdown después de un pequeño delay para permitir la navegación
+            setTimeout(() => {
+              onClose();
+            }, 100);
           }}
         >
           <div className="font-semibold text-sm gold-text">{item.label}</div>
