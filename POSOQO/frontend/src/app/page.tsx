@@ -575,15 +575,6 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-        
-
-        
-
-        
-
-        
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Sección de Cervezas */}
           <motion.div 
             className="text-center mb-20"
