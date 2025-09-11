@@ -315,8 +315,10 @@ export default function HomePage() {
       {/* Fondo simple sin efectos */}
       
       
-      {/* Hero Section - Fondo negro simple */}
-      <section className="relative min-h-screen flex items-center justify-center bg-black pt-20 lg:pt-32">
+      {/* Hero Section - Fondo con imagen */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+        {/* Overlay semi-transparente para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/50"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -431,8 +433,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo gris oscuro simple */}
-      <section className="py-20 bg-gray-900">
+      {/* Raíces Ayacuchanas - Fondo gris simple */}
+      <section className="py-20 bg-gray-600">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
