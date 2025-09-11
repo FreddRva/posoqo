@@ -960,8 +960,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto - Fondo natural simple */}
-      <section id="contacto" className="py-20 bg-white">
+      {/* Contacto - Fondo gris claro */}
+      <section id="contacto" className="py-20 bg-gray-100">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
