@@ -526,7 +526,7 @@ export default function HomePage() {
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
-      <section ref={productosRef} className="py-20 bg-gray-900">
+      <section ref={productosRef} className="py-20 bg-gray-800">
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Sección de Cervezas */}
