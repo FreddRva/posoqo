@@ -68,13 +68,13 @@ export default function Footer() {
             <div className="mt-6">
               <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Síguenos</h5>
               <div className="flex space-x-3">
-                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
+                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37]">
                   <Facebook className="w-5 h-5" />
                 </a>
-                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
+                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37]">
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
+                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37]">
                   <MessageCircle className="w-5 h-5" />
                 </a>
               </div>
@@ -88,7 +88,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#cervezas" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -105,7 +105,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#taprooms" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -122,7 +122,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#servicios" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -139,7 +139,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#club-posoqo" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -156,7 +156,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#gastronomia" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -180,7 +180,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/envios" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     router.push("/envios");
@@ -192,7 +192,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/devoluciones" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     router.push("/devoluciones");
@@ -204,7 +204,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/reclamos" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     router.push("/reclamos");
@@ -216,7 +216,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/#contact" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     if (window.location.pathname === "/") {
@@ -233,7 +233,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="/sobre-nosotros" 
-                  className="hover:text-[#D4AF37] transition-colors duration-300 text-sm"
+                  className="text-sm text-gray-400 hover:text-[#D4AF37]"
                   onClick={(e) => {
                     e.preventDefault();
                     router.push("/sobre-nosotros");
@@ -258,13 +258,13 @@ export default function Footer() {
                   <input
                     type="email"
                     placeholder="Tu email"
-                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300"
+                    className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                     required
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-[#D4AF37] text-black font-bold px-4 py-2 rounded-lg hover:bg-[#FFD700] transition-colors duration-300 flex items-center justify-center space-x-2"
+                  className="w-full bg-[#D4AF37] text-black font-bold px-4 py-2 rounded-lg hover:bg-[#FFD700] flex items-center justify-center space-x-2"
                 >
                   <Send className="w-4 h-4" />
                   <span>Suscribirse</span>
@@ -277,17 +277,17 @@ export default function Footer() {
               <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Información Legal</h5>
               <ul className="space-y-2 text-xs">
                 <li>
-                  <a href="/terminos" className="hover:text-[#D4AF37] transition-colors duration-300">
+                  <a href="/terminos" className="text-gray-400 hover:text-[#D4AF37]">
                     Términos y condiciones
                   </a>
                 </li>
                 <li>
-                  <a href="/privacidad" className="hover:text-[#D4AF37] transition-colors duration-300">
+                  <a href="/privacidad" className="text-gray-400 hover:text-[#D4AF37]">
                     Política de privacidad
                   </a>
                 </li>
                 <li>
-                  <a href="/sobre-nosotros" className="hover:text-[#D4AF37] transition-colors duration-300">
+                  <a href="/sobre-nosotros" className="text-gray-400 hover:text-[#D4AF37]">
                     Nuestra empresa
                   </a>
                 </li>
