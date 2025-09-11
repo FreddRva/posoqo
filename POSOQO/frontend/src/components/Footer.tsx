@@ -309,6 +309,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
+        </div>
       </div>
 
       {/* Línea divisoria */}
@@ -338,4 +339,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}
