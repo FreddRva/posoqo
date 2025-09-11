@@ -873,9 +873,9 @@ export default function HomePage() {
       </section>
 
       {/* Club de miembros - Diseño premium con fondo de imagen */}
-      <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+      <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
@@ -912,7 +912,7 @@ export default function HomePage() {
           </motion.p>
           
           <motion.div 
-            className="max-w-md mx-auto bg-gradient-to-br from-gray-800/60 to-gray-900/60 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 backdrop-blur-sm shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
+            className="max-w-md mx-auto bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/50 backdrop-blur-sm shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
