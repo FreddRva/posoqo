@@ -512,11 +512,8 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                {/* Fondo con gradiente dorado elegante */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
-                
                 {/* Contenido principal */}
-                <div className="relative bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black/80 backdrop-blur-md p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 hover:shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500 group-hover:scale-105 h-full">
+                <div className="relative bg-gray-700 p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 transition-all duration-500 h-full">
                   {/* Icono elegante con fondo dorado */}
                   <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
@@ -531,8 +528,6 @@ export default function HomePage() {
                   <p className="text-gray-300 leading-relaxed text-center font-light text-sm md:text-base" dangerouslySetInnerHTML={{ __html: item.text }} />
                 </div>
                 
-                {/* Efecto de resplandor dorado en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
               </motion.div>
             ))}
           </motion.div>
