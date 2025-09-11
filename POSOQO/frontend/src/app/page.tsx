@@ -318,7 +318,7 @@ export default function HomePage() {
       {/* Hero Section - Fondo con imagen */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/70"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -433,8 +433,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo negro */}
-      <section className="py-20 bg-black">
+      {/* Raíces Ayacuchanas - Fondo gris personalizado */}
+      <section className="py-20" style={{backgroundColor: '#424242'}}>
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -654,7 +654,7 @@ export default function HomePage() {
       {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/75"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
