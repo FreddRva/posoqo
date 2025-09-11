@@ -432,7 +432,7 @@ export default function HomePage() {
       </section>
 
       {/* Raíces Ayacuchanas - Fondo gris oscuro simple */}
-      <section className="py-20 bg-gray-800">
+      <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
