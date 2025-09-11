@@ -312,17 +312,8 @@ export default function HomePage() {
 
   return (
     <div className={`min-h-screen premium-gradient text-white ${montserrat.className} pt-4 lg:pt-8 relative overflow-hidden`}>
-      {/* Fondo premium con efectos dorados */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.1),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(212,175,55,0.05)_50%,transparent_75%)] bg-[length:20px_20px]"></div>
+      {/* Fondo simple sin efectos */}
       
-      {/* Efectos de partículas doradas */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-yellow-400 rounded-full gold-sparkle"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-yellow-300 rounded-full gold-sparkle" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-yellow-500 rounded-full gold-sparkle" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-80 right-1/3 w-1 h-1 bg-yellow-400 rounded-full gold-sparkle" style={{animationDelay: '0.5s'}}></div>
-      </div>
       
       {/* Hero Section - Fondo negro simple */}
       <section className="relative min-h-screen flex items-center justify-center bg-black pt-20 lg:pt-32">
