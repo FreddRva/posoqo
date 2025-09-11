@@ -434,7 +434,7 @@ export default function HomePage() {
       </section>
 
       {/* Raíces Ayacuchanas - Fondo negro más oscuro */}
-      <section className="py-20" style={{backgroundColor: '#1a1a1a'}}>
+      <section className="py-20" style={{backgroundColor: '#0f0f0f'}}>
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -960,8 +960,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto - Fondo gris claro */}
-      <section id="contacto" className="py-20 bg-gray-100">
+      {/* Contacto - Fondo negro igual a RAÍCES AYACUCHANAS */}
+      <section id="contacto" className="py-20" style={{backgroundColor: '#0f0f0f'}}>
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
