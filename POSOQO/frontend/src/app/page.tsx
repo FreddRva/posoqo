@@ -324,23 +324,8 @@ export default function HomePage() {
         <div className="absolute top-80 right-1/3 w-1 h-1 bg-yellow-400 rounded-full gold-sparkle" style={{animationDelay: '0.5s'}}></div>
       </div>
       
-      {/* Hero Section - Diseño premium dorado/negro mejorado */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden premium-gradient pt-20 lg:pt-32">
-        {/* Fondo con imagen y overlay elegante */}
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat opacity-70"
-            style={{
-              backgroundImage: "url('/FondoPo.jpg')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "brightness(0.8) contrast(1.1) saturate(1.0)"
-            }}
-          ></div>
-          {/* Overlay con gradiente dorado sutil */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/70"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-posoqo-gold/5 via-transparent to-posoqo-gold/10"></div>
-        </div>
+      {/* Hero Section - Fondo negro simple */}
+      <section className="relative min-h-screen flex items-center justify-center bg-black pt-20 lg:pt-32">
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -455,8 +440,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo gris oscuro con diseño de cards */}
-      <section className="py-20 bg-gray-900">
+      {/* Raíces Ayacuchanas - Fondo gris oscuro simple */}
+      <section className="py-20 bg-gray-800">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
