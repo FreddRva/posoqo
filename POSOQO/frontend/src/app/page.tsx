@@ -433,8 +433,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo gris simple */}
-      <section className="py-20 bg-gray-600">
+      {/* Raíces Ayacuchanas - Fondo negro */}
+      <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -651,8 +651,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Taprooms y experiencias - Diseño premium con fondo negro simple */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 bg-black relative overflow-hidden">
+      {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
+      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+        {/* Overlay semi-transparente para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/60"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
