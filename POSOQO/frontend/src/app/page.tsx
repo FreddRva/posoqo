@@ -889,8 +889,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Club de miembros - Diseño premium con fondo negro simple */}
-      <section id="club-posoqo" className="py-20 bg-black relative overflow-hidden">
+      {/* Club de miembros - Diseño premium con fondo de imagen */}
+      <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+        {/* Overlay semi-transparente para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/70"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
