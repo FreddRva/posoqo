@@ -455,8 +455,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo negro simple */}
-      <section className="py-20 bg-black">
+      {/* Raíces Ayacuchanas - Fondo gris oscuro */}
+      <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
