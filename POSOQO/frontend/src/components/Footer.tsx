@@ -31,20 +31,20 @@ export default function Footer() {
   const router = useRouter();
   
   return (
-    <footer className="w-full bg-black text-white border-t border-gray-800">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <footer className="w-full bg-black text-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Marca y descripción */}
           <div className="lg:col-span-1">
-            <h4 className="font-bold text-[#D4AF37] mb-4 text-xl tracking-wider">POSOQO</h4>
-            <p className="text-sm mb-6 leading-relaxed text-gray-300">
+            <h4 className="font-bold text-[#D4AF37] mb-4 text-xl">POSOQO</h4>
+            <p className="text-sm mb-6 text-gray-300">
               Cerveza artesanal ayacuchana, elaborada con pasión y tradición andina. 
               Descubre sabores únicos que combinan ingredientes locales con técnicas 
               cerveceras tradicionales.
             </p>
             
-            {/* Información de contacto compacta */}
+            {/* Información de contacto */}
             <div className="space-y-2 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-[#D4AF37]" />
@@ -66,15 +66,15 @@ export default function Footer() {
 
             {/* Redes sociales */}
             <div className="mt-6">
-              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm uppercase tracking-wider">Síguenos</h5>
+              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Síguenos</h5>
               <div className="flex space-x-3">
-                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
+                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
                   <Facebook className="w-5 h-5" />
                 </a>
-                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
+                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300 p-2 rounded-full hover:bg-[#D4AF37]/10">
+                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#D4AF37] transition-colors duration-300">
                   <MessageCircle className="w-5 h-5" />
                 </a>
               </div>
@@ -274,7 +274,7 @@ export default function Footer() {
 
             {/* Enlaces legales */}
             <div className="mb-4">
-              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm uppercase tracking-wider">Información Legal</h5>
+              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Información Legal</h5>
               <ul className="space-y-2 text-xs">
                 <li>
                   <a href="/terminos" className="hover:text-[#D4AF37] transition-colors duration-300">
@@ -296,13 +296,13 @@ export default function Footer() {
 
             {/* Certificaciones */}
             <div>
-              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm uppercase tracking-wider">Certificaciones</h5>
+              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Certificaciones</h5>
               <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-xs bg-green-800/20 text-green-200 px-2 py-1 rounded border border-green-700/30">
+                <div className="flex items-center space-x-2 text-xs text-green-400">
                   <Award className="w-3 h-3" />
                   <span>Calidad Premium</span>
                 </div>
-                <div className="flex items-center space-x-2 text-xs bg-blue-800/20 text-blue-200 px-2 py-1 rounded border border-blue-700/30">
+                <div className="flex items-center space-x-2 text-xs text-blue-400">
                   <Leaf className="w-3 h-3" />
                   <span>100% Natural</span>
                 </div>
@@ -313,7 +313,7 @@ export default function Footer() {
       </div>
 
       {/* Línea divisoria */}
-      <div className="max-w-7xl mx-auto px-6 mt-8 pt-6 border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-6 pt-6 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-400 space-y-4 md:space-y-0">
           <div className="flex flex-wrap items-center space-x-4">
             <div className="flex items-center space-x-2">
