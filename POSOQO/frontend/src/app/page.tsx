@@ -455,104 +455,50 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo gris oscuro */}
+      {/* Raíces Ayacuchanas - Fondo gris oscuro simple */}
       <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-6">
-          <motion.div 
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            {/* Badge superior con icono */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-[#D4AF37]/20 rounded-full border border-[#D4AF37]/50 shadow-lg">
-              <Mountain className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
-                RAÍCES AYACUCHANAS
-              </span>
-            </div>
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-bold text-[#D4AF37] mb-8">
+              RAÍCES AYACUCHANAS
+            </h2>
+            <h3 className="text-2xl md:text-3xl font-bold text-[#D4AF37] mb-8">
+              Tradición en cada sorbo
+            </h3>
             
-            {/* Título principal con efecto premium */}
-            <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
-                Tradición en cada sorbo
-              </h2>
-              {/* Línea decorativa dorada */}
-              <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
-            </div>
-            
-            {/* Descripción elegante con mejor tipografía */}
             <div className="max-w-4xl mx-auto">
-              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
-                Posoqo viene del quechua <span className="font-medium text-[#D4AF37]">pusuqu</span>, que significa <span className="font-medium text-[#D4AF37]">espuma</span>. 
+              <p className="text-lg text-gray-300 mb-6">
+                Posoqo viene del quechua <span className="font-bold text-[#D4AF37]">pusuqu</span>, que significa <span className="font-bold text-[#D4AF37]">espuma</span>.
               </p>
-              <p className={`text-base md:text-lg mt-4 text-gray-400 leading-relaxed ${inter.className} font-light`}>
+              <p className="text-base text-gray-400 mb-8">
                 Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica que conecta nuestras raíces ayacuchanas con cada sorbo.
               </p>
             </div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {[
-              {
-                icon: <Beer className="w-8 h-8 text-black" />,
-                title: "Tradición y dedicación",
-                text: "La espuma no es solo un símbolo de fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico en cada receta.",
-                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
-              },
-              {
-                icon: <Wheat className="w-8 h-8 text-black" />,
-                title: "Orgullo ayacuchano",
-                text: "Cada una de nuestras cervezas artesanales nace de esta filosofía: honrar nuestras raíces con sabores únicos, elaborados con esmero y con el orgullo de ser ayacuchanos.",
-                gradient: "from-[#FFD700]/20 to-[#D4AF37]/20"
-              },
-              {
-                icon: <Mountain className="w-8 h-8 text-black" />,
-                title: "Espuma que une",
-                text: "Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.",
-                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
-              }
-            ].map((item, index) => (
-              <motion.div 
-                key={index}
-                className="group relative"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                viewport={{ once: true }}
-              >
-                {/* Fondo con gradiente dorado elegante */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700`}></div>
-                
-                {/* Contenido principal */}
-                <div className="relative bg-gradient-to-br from-gray-800/80 via-gray-900/90 to-black/80 backdrop-blur-md p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 hover:shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500 group-hover:scale-105 h-full">
-                  {/* Icono elegante con fondo dorado */}
-                  <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
-                    {item.icon}
-                  </div>
-                  
-                  {/* Título */}
-                  <h3 className="text-2xl font-bold mb-6 text-[#D4AF37] text-center group-hover:scale-105 transition-all duration-300 drop-shadow-lg">
-                    {item.title}
-                  </h3>
-                  
-                  {/* Descripción */}
-                  <p className="text-gray-300 leading-relaxed text-center font-light text-sm md:text-base" dangerouslySetInnerHTML={{ __html: item.text }} />
-                </div>
-                
-                {/* Efecto de resplandor dorado en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <h4 className="text-xl font-bold text-[#D4AF37] mb-4">Tradición y dedicación</h4>
+              <p className="text-gray-300">
+                La espuma no es solo un símbolo de fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico en cada receta.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <h4 className="text-xl font-bold text-[#D4AF37] mb-4">Orgullo ayacuchano</h4>
+              <p className="text-gray-300">
+                Cada una de nuestras cervezas artesanales nace de esta filosofía: honrar nuestras raíces con sabores únicos, elaborados con esmero y con el orgullo de ser ayacuchanos.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <h4 className="text-xl font-bold text-[#D4AF37] mb-4">Espuma que une</h4>
+              <p className="text-gray-300">
+                Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.
+              </p>
+            </div>
+          </div>
         </div>
-        
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
