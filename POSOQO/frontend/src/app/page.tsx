@@ -316,7 +316,7 @@ export default function HomePage() {
       
       
       {/* Hero Section - Fondo con imagen */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay semi-transparente para mejor legibilidad del texto */}
         <div className="absolute inset-0 bg-black/70"></div>
         
