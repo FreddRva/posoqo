@@ -506,7 +506,7 @@ export default function HomePage() {
                 viewport={{ once: true }}
               >
                 {/* Contenido principal */}
-                <div className="relative bg-gray-700 p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 transition-all duration-500 h-full">
+                <div className="relative bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 transition-all duration-500 h-full">
                   {/* Icono elegante con fondo dorado */}
                   <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
