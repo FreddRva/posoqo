@@ -910,6 +910,65 @@ export default function HomePage() {
           >
             Conviértete en miembro del Club POSOQO y accede a lanzamientos exclusivos, descuentos especiales y eventos privados.
           </motion.p>
+
+          {/* Estadísticas del club */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">500+</div>
+              <div className="text-gray-300 text-sm">Miembros activos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">50+</div>
+              <div className="text-gray-300 text-sm">Eventos exclusivos</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">15+</div>
+              <div className="text-gray-300 text-sm">Cervezas exclusivas</div>
+            </div>
+          </motion.div>
+
+          {/* Testimonios de miembros */}
+          <motion.div 
+            className="mb-12 max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-2xl md:text-3xl font-bold text-[#D4AF37] mb-8 text-center">Lo que dicen nuestros miembros</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-[#D4AF37]/30">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center text-black font-bold text-lg mr-4">
+                    M
+                  </div>
+                  <div>
+                    <div className="font-bold text-[#D4AF37]">María González</div>
+                    <div className="text-gray-400 text-sm">Miembro desde 2023</div>
+                  </div>
+                </div>
+                <p className="text-gray-200 italic">"Las cervezas exclusivas del club son increíbles. El acceso anticipado a nuevos lanzamientos es una experiencia única."</p>
+              </div>
+              <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-[#D4AF37]/30">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center text-black font-bold text-lg mr-4">
+                    C
+                  </div>
+                  <div>
+                    <div className="font-bold text-[#D4AF37]">Carlos Mendoza</div>
+                    <div className="text-gray-400 text-sm">Miembro desde 2022</div>
+                  </div>
+                </div>
+                <p className="text-gray-200 italic">"Los eventos VIP son espectaculares. Conocer al maestro cervecero y probar recetas experimentales es una pasión."</p>
+              </div>
+            </div>
+          </motion.div>
           
           <motion.div 
             className="max-w-md mx-auto bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 p-6 md:p-8 rounded-2xl border border-[#D4AF37]/50 backdrop-blur-sm shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500"
@@ -956,6 +1015,56 @@ export default function HomePage() {
             >
               Unirme al club
             </motion.button>
+          </motion.div>
+
+          {/* Beneficios adicionales */}
+          <motion.div 
+            className="mt-12 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-2xl md:text-3xl font-bold text-[#D4AF37] mb-8 text-center">Más beneficios exclusivos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-lg border border-[#D4AF37]/20">
+                <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-[#D4AF37] mb-2">Acceso 24/7</h4>
+                <p className="text-gray-300 text-sm">Portal exclusivo siempre disponible</p>
+              </div>
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-lg border border-[#D4AF37]/20">
+                <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-[#D4AF37] mb-2">Garantía</h4>
+                <p className="text-gray-300 text-sm">Satisfacción 100% garantizada</p>
+              </div>
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-lg border border-[#D4AF37]/20">
+                <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-[#D4AF37] mb-2">Envío gratis</h4>
+                <p className="text-gray-300 text-sm">En compras superiores a S/50</p>
+              </div>
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-lg border border-[#D4AF37]/20">
+                <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-[#D4AF37] mb-2">Soporte VIP</h4>
+                <p className="text-gray-300 text-sm">Atención personalizada prioritaria</p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
