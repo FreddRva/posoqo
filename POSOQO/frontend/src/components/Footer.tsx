@@ -33,50 +33,53 @@ export default function Footer() {
   return (
     <footer className="w-full bg-black text-white">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
           {/* Marca y descripción */}
-          <div className="lg:col-span-1">
+          <div>
             <h4 className="font-bold text-[#D4AF37] mb-4 text-xl">POSOQO</h4>
-            <p className="text-sm mb-6 text-gray-300">
+            <p className="text-sm mb-4 text-gray-300">
               Cerveza artesanal ayacuchana, elaborada con pasión y tradición andina. 
               Descubre sabores únicos que combinan ingredientes locales con técnicas 
               cerveceras tradicionales.
             </p>
             
-            {/* Información de contacto */}
-            <div className="space-y-2 text-sm text-gray-400">
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-[#D4AF37]" />
-                <span>Plaza de Armas, Portal Independencia Nº65, Ayacucho</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-[#D4AF37]" />
-                <span>+51 966 123 456</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-[#D4AF37]" />
-                <span>caposoqo@gmail.com</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-[#D4AF37]" />
-                <span>Lun-Vie: 9:00 - 18:00</span>
+            {/* Redes sociales */}
+            <div className="mb-4">
+              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Síguenos</h5>
+              <div className="flex space-x-3">
+                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
+                  <MessageCircle className="w-4 h-4" />
+                </a>
               </div>
             </div>
+          </div>
 
-            {/* Redes sociales */}
-            <div className="mt-6">
-              <h5 className="font-semibold text-[#D4AF37] mb-3 text-sm">Síguenos</h5>
-              <div className="flex space-x-4">
-                <a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
-                  <Facebook className="w-5 h-5" />
-                </a>
-                <a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-[#D4AF37] hover:text-black transition-all duration-300">
-                  <MessageCircle className="w-5 h-5" />
-                </a>
+          {/* Contacto */}
+          <div>
+            <h4 className="font-bold text-[#D4AF37] mb-4 text-lg">Contacto</h4>
+            <div className="space-y-3 text-sm text-gray-400">
+              <div className="flex items-start space-x-3">
+                <MapPin className="w-4 h-4 text-[#D4AF37] mt-0.5 flex-shrink-0" />
+                <span>Plaza de Armas, Portal Independencia Nº65, Ayacucho</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Phone className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
+                <span>+51 966 123 456</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
+                <span>caposoqo@gmail.com</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Clock className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
+                <span>Lun-Vie: 9:00 - 18:00</span>
               </div>
             </div>
           </div>
@@ -245,54 +248,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter y Legal */}
+          {/* Newsletter */}
           <div>
-            <h4 className="font-bold text-[#D4AF37] mb-4 text-lg">Mantente Conectado</h4>
-            
-            {/* Newsletter */}
-            <div className="mb-8">
-              <p className="text-sm mb-4 text-gray-300">Suscríbete para recibir noticias y promociones exclusivas.</p>
-              <form className="space-y-3">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="email"
-                    placeholder="Tu email"
-                    className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 border border-[#D4AF37]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-gray-200 placeholder-gray-400"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-3 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] flex items-center justify-center space-x-2 transition-all duration-300"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Suscribirse</span>
-                </button>
-              </form>
-            </div>
-
-            {/* Enlaces legales */}
-            <div>
-              <h5 className="font-semibold text-[#D4AF37] mb-4 text-sm">Información Legal</h5>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <a href="/terminos" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                    Términos y condiciones
-                  </a>
-                </li>
-                <li>
-                  <a href="/privacidad" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                    Política de privacidad
-                  </a>
-                </li>
-                <li>
-                  <a href="/sobre-nosotros" className="text-gray-400 hover:text-[#D4AF37] transition-colors">
-                    Nuestra empresa
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <h4 className="font-bold text-[#D4AF37] mb-4 text-lg">Newsletter</h4>
+            <p className="text-sm mb-4 text-gray-300">Suscríbete para recibir noticias y promociones exclusivas.</p>
+            <form className="space-y-3">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
+                  placeholder="Tu email"
+                  className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-[#D4AF37]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-gray-200 placeholder-gray-400"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-2 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] flex items-center justify-center space-x-2 transition-all duration-300"
+              >
+                <Send className="w-4 h-4" />
+                <span>Suscribirse</span>
+              </button>
+            </form>
           </div>
 
           {/* Horarios y Ubicaciones */}
@@ -319,8 +296,17 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Enlaces legales */}
+      <div className="max-w-7xl mx-auto px-6 py-4 border-t border-gray-800">
+        <div className="flex flex-wrap justify-center items-center space-x-6 text-sm text-gray-400 mb-4">
+          <a href="/terminos" className="hover:text-[#D4AF37] transition-colors">Términos y condiciones</a>
+          <a href="/privacidad" className="hover:text-[#D4AF37] transition-colors">Política de privacidad</a>
+          <a href="/sobre-nosotros" className="hover:text-[#D4AF37] transition-colors">Sobre nosotros</a>
+        </div>
+      </div>
+
       {/* Línea divisoria */}
-      <div className="max-w-7xl mx-auto px-6 pt-8 border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-6 pt-4 border-t border-gray-800">
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400 space-y-4 md:space-y-0">
           <div className="flex flex-wrap items-center justify-center md:justify-start space-x-6">
             <div className="flex items-center space-x-2">
