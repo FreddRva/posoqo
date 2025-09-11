@@ -991,12 +991,12 @@ export default function HomePage() {
                     details: ["+51 966 123 456", "Lun-Vie: 9am - 6pm"]
                   }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#D4AF37]/30 transition-all duration-300">
-                    <div className="mt-1 p-2 bg-[#D4AF37]/20 rounded-lg">{item.icon}</div>
+                  <div key={index} className="flex items-start gap-4 p-6 rounded-2xl bg-gray-800/60 backdrop-blur-sm border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 hover:bg-gray-700/60 transition-all duration-300">
+                    <div className="mt-1 p-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-xl shadow-lg">{item.icon}</div>
                     <div>
-                      <h3 className="font-bold text-lg text-[#D4AF37] mb-2">{item.title}</h3>
+                      <h3 className="font-bold text-lg text-[#D4AF37] mb-3">{item.title}</h3>
                       {item.details.map((detail, i) => (
-                        <p key={i} className="text-gray-700 mb-1">{detail}</p>
+                        <p key={i} className="text-gray-200 mb-2">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -1010,10 +1010,10 @@ export default function HomePage() {
                     <a 
                       key={index} 
                       href="#" 
-                      className="w-12 h-12 rounded-full bg-gray-100 border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
+                      className="w-14 h-14 rounded-full bg-gray-800/60 backdrop-blur-sm border border-[#D4AF37]/40 flex items-center justify-center hover:bg-gradient-to-r hover:from-[#D4AF37] hover:to-[#FFD700] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/30"
                       aria-label={social}
                     >
-                      <svg className="w-5 h-5 text-[#D4AF37] hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="w-6 h-6 text-[#D4AF37] hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill="currentColor" d={social === "Instagram" ? "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" : 
                         social === "Facebook" ? "M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" : 
                         "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29-3.588c.545 1.422 1.578 2.589 2.96 2.907.401.092.764.117 1.059.099.341-.021.66-.106.93-.236.24-.116.414-.237.558-.365.152-.138.312-.396.222-.644-.105-.29-.717-1.027-1.001-1.364-.1-.12-.198-.18-.347-.297-.149-.117-.366-.198-.52-.149-.223.064-.427.33-.633.545-.213.227-.416.386-.644.386-.173 0-.347-.074-.52-.223-.397-.345-.992-1.032-1.322-1.38-.248-.27-.495-.396-.669-.396-.173 0-.347.074-.446.223-.099.149-.396.744-.396 1.707 0 .962.793 1.988.892 2.085.099.099 1.61 2.456 3.96 3.385.57.223 1.016.322 1.364.322.198 0 .347-.008.446-.016.149-.008.248-.091.347-.091.099 0 .198.074.347.198.149.124.594.545.713.744.116.198.223.314.322.512.099.198.074.314-.025.463-.099.149-.248.314-.446.512a4.19 4.19 0 01-1.213.86c-.347.149-.793.238-1.29.238-.545 0-1.19-.074-1.934-.314a7.19 7.19 0 01-1.677-.76c-.793-.495-1.806-1.539-2.383-2.466-1.29-1.707-1.735-3.2-1.735-4.143 0-.962.248-1.707.694-2.223.248-.281.545-.463.892-.545.248-.057.495-.04.694.033.198.074.396.248.545.694"} />
@@ -1025,11 +1025,11 @@ export default function HomePage() {
             </motion.div>
             
             <motion.div 
-              className="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-200 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
+              className="bg-gray-800/60 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-[#D4AF37]/40 shadow-2xl hover:shadow-[#D4AF37]/30 transition-all duration-500"
             >
               <h3 className="text-2xl font-bold mb-6 text-[#D4AF37]">Envíanos un mensaje</h3>
               {!session && (
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-300 text-sm mb-4">
                   ¿Ya tienes cuenta? <Link href="/login" className="text-[#D4AF37] hover:text-[#FFD700] transition-colors">Inicia sesión</Link>
                 </p>
               )}
@@ -1040,22 +1040,22 @@ export default function HomePage() {
                   { id: "subject", label: "Asunto", type: "text", placeholder: "¿En qué podemos ayudarte?" }
                 ].map((field) => (
                   <div key={field.id}>
-                    <label htmlFor={field.id} className="block text-sm font-medium mb-1 text-gray-700">{field.label}</label>
+                    <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-[#D4AF37]">{field.label}</label>
                     <input 
                       type={field.type} 
                       id={field.id}
-                      className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all text-gray-900 placeholder-gray-500" 
+                      className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-[#D4AF37]/40 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 outline-none transition-all text-gray-200 placeholder-gray-400" 
                       placeholder={field.placeholder}
                     />
                   </div>
                 ))}
                 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-1 text-gray-700">Mensaje</label>
+                  <label htmlFor="message" className="block text-sm font-medium mb-2 text-[#D4AF37]">Mensaje</label>
                   <textarea 
                     id="message" 
                     rows={4} 
-                    className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all text-gray-900 placeholder-gray-500" 
+                    className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-[#D4AF37]/40 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 outline-none transition-all text-gray-200 placeholder-gray-400" 
                     placeholder="Escribe tu mensaje aquí..."
                   ></textarea>
                 </div>
