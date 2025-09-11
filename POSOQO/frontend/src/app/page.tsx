@@ -462,10 +462,10 @@ export default function HomePage() {
             
             {/* Descripción elegante con mejor tipografía */}
             <div className="max-w-4xl mx-auto">
-              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-gray-200 leading-relaxed ${inter.className} font-light`}>
                 Posoqo viene del quechua <span className="font-medium text-[#D4AF37]">pusuqu</span>, que significa <span className="font-medium text-[#D4AF37]">espuma</span>. 
               </p>
-              <p className={`text-base md:text-lg mt-4 text-gray-400 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-base md:text-lg mt-4 text-gray-300 leading-relaxed ${inter.className} font-light`}>
                 Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica que conecta nuestras raíces ayacuchanas con cada sorbo.
               </p>
             </div>
@@ -518,7 +518,7 @@ export default function HomePage() {
                   </h3>
                   
                   {/* Descripción */}
-                  <p className="text-gray-300 leading-relaxed text-center font-light text-sm md:text-base" dangerouslySetInnerHTML={{ __html: item.text }} />
+                  <p className="text-gray-200 leading-relaxed text-center font-light text-sm md:text-base" dangerouslySetInnerHTML={{ __html: item.text }} />
                 </div>
                 
               </motion.div>
