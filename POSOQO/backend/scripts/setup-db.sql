@@ -83,7 +83,7 @@ AND ev.expires_at > CURRENT_TIMESTAMP;
 
 -- Insertar usuario admin de prueba
 INSERT INTO users (name, last_name, dni, phone, email, password, role, email_verified) 
-VALUES ('Admin', 'POSOQO', '12345678', '999888777', 'admin@posoqo.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', true)
+VALUES ('Admin', 'POSOQO', '12345678', '999888777', 'rvfredy9@gmail.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', true)
 ON CONFLICT (email) DO NOTHING;
 
 -- Mostrar mensaje de éxito
