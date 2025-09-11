@@ -1017,10 +1017,36 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto - Diseño premium con fondo blanco simple */}
-      <section id="contacto" className="py-20 bg-white relative overflow-hidden">
+      {/* Contacto - Diseño premium con fondo atractivo */}
+      <section id="contacto" className="py-20 relative overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-800">
+        {/* Patrón de granos de cebada elegante */}
+        <div className="absolute inset-0 opacity-15">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.3'%3E%3Ccircle cx='20' cy='20' r='6'/%3E%3Ccircle cx='60' cy='20' r='4'/%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3Ccircle cx='20' cy='60' r='5'/%3E%3Ccircle cx='60' cy='60' r='3'/%3E%3Ccircle cx='10' cy='40' r='2'/%3E%3Ccircle cx='70' cy='40' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '80px 80px'
+          }}></div>
+        </div>
         
-        <div className="relative max-w-7xl mx-auto px-6">
+        {/* Efectos de ondas doradas suaves */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-20 left-0 w-40 h-40 bg-[#D4AF37]/8 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute top-40 right-0 w-32 h-32 bg-[#FFD700]/12 rounded-full blur-2xl animate-pulse" style={{animationDelay: '2s'}}></div>
+            <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-[#D4AF37]/6 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+            <div className="absolute bottom-40 right-1/3 w-36 h-36 bg-[#FFD700]/10 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          </div>
+        </div>
+        
+        {/* Líneas decorativas horizontales */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+          <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+        </div>
+        
+        {/* Gradiente radial dorado desde el centro */}
+        <div className="absolute inset-0 bg-gradient-radial from-[#D4AF37]/6 via-transparent to-transparent"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-6 z-10">
           <motion.div 
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
             initial="hidden"
@@ -1049,12 +1075,12 @@ export default function HomePage() {
                     details: ["+51 966 123 456", "Lun-Vie: 9am - 6pm"]
                   }
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#D4AF37]/30 transition-all duration-300">
+                  <div key={index} className="flex items-start gap-4 p-4 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-300">
                     <div className="mt-1 p-2 bg-[#D4AF37]/20 rounded-lg">{item.icon}</div>
                     <div>
                       <h3 className="font-bold text-lg text-[#D4AF37] mb-2">{item.title}</h3>
                       {item.details.map((detail, i) => (
-                        <p key={i} className="text-gray-700 mb-1">{detail}</p>
+                        <p key={i} className="text-gray-300 mb-1">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -1068,7 +1094,7 @@ export default function HomePage() {
                     <a 
                       key={index} 
                       href="#" 
-                      className="w-12 h-12 rounded-full bg-gray-100 border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
+                      className="w-12 h-12 rounded-full bg-gray-800/50 backdrop-blur-sm border border-[#D4AF37]/30 flex items-center justify-center hover:bg-[#D4AF37] hover:border-[#D4AF37] transition-all duration-300 shadow-lg hover:shadow-[#D4AF37]/20"
                       aria-label={social}
                     >
                       <svg className="w-5 h-5 text-[#D4AF37] hover:text-black transition-colors" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -1083,11 +1109,11 @@ export default function HomePage() {
             </motion.div>
             
             <motion.div 
-              className="bg-gray-50 p-6 md:p-8 rounded-2xl border border-gray-200 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
+              className="bg-gray-800/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl border border-[#D4AF37]/30 shadow-2xl hover:shadow-[#D4AF37]/20 transition-all duration-500"
             >
               <h3 className="text-2xl font-bold mb-6 text-[#D4AF37]">Envíanos un mensaje</h3>
               {!session && (
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-300 text-sm mb-4">
                   ¿Ya tienes cuenta? <Link href="/login" className="text-[#D4AF37] hover:text-[#FFD700] transition-colors">Inicia sesión</Link>
                 </p>
               )}
@@ -1098,22 +1124,22 @@ export default function HomePage() {
                   { id: "subject", label: "Asunto", type: "text", placeholder: "¿En qué podemos ayudarte?" }
                 ].map((field) => (
                   <div key={field.id}>
-                    <label htmlFor={field.id} className="block text-sm font-medium mb-1">{field.label}</label>
+                    <label htmlFor={field.id} className="block text-sm font-medium mb-1 text-gray-300">{field.label}</label>
                     <input 
                       type={field.type} 
                       id={field.id}
-                      className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all" 
+                      className="w-full px-4 py-3 rounded bg-gray-700/50 border border-gray-600 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all text-white placeholder-gray-400" 
                       placeholder={field.placeholder}
                     />
                   </div>
                 ))}
                 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-1">Mensaje</label>
+                  <label htmlFor="message" className="block text-sm font-medium mb-1 text-gray-300">Mensaje</label>
                   <textarea 
                     id="message" 
                     rows={4} 
-                    className="w-full px-4 py-3 rounded bg-white border border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all" 
+                    className="w-full px-4 py-3 rounded bg-gray-700/50 border border-gray-600 focus:border-[#D4AF37] focus:ring-[#D4AF37] outline-none transition-all text-white placeholder-gray-400" 
                     placeholder="Escribe tu mensaje aquí..."
                   ></textarea>
                 </div>
