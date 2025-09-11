@@ -33,7 +33,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-black text-white">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Marca y descripción */}
           <div className="lg:col-span-1">
@@ -292,6 +292,28 @@ export default function Footer() {
                   </a>
                 </li>
               </ul>
+            </div>
+          </div>
+
+          {/* Horarios y Ubicaciones */}
+          <div>
+            <h4 className="font-bold text-[#D4AF37] mb-4 text-lg">Horarios & Ubicaciones</h4>
+            <div className="space-y-4">
+              <div>
+                <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Histórico</h5>
+                <p className="text-xs text-gray-400 mb-1">Portal Independencia Nº65</p>
+                <p className="text-xs text-gray-400">Lun-Dom: 12:00 - 23:00</p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Rockero</h5>
+                <p className="text-xs text-gray-400 mb-1">Jr. Asamblea Nº310</p>
+                <p className="text-xs text-gray-400">Lun-Dom: 18:00 - 02:00</p>
+              </div>
+              <div>
+                <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Planta</h5>
+                <p className="text-xs text-gray-400 mb-1">Sector Público Mz Y</p>
+                <p className="text-xs text-gray-400">Lun-Vie: 9:00 - 17:00</p>
+              </div>
             </div>
           </div>
         </div>
