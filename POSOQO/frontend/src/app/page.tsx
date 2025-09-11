@@ -693,7 +693,7 @@ export default function HomePage() {
           >
             {[
               {
-                image: "/taproom-centro.jpg",
+                image: "/file.svg",
                 title: "Taproom Histórico",
                 location: "Portal Independencia n65 – interior B",
                 features: [
@@ -705,7 +705,7 @@ export default function HomePage() {
                 ]
               },
               {
-                image: "/taproom-moderno.jpg",
+                image: "/file.svg",
                 title: "Taproom Rockero",
                 location: "Jr. Asamblea n310",
                 features: [
@@ -717,7 +717,7 @@ export default function HomePage() {
                 ]
               },
               {
-                image: "/taproom-planta.jpg",
+                image: "/file.svg",
                 title: "Taproom Planta",
                 location: "Sector Publico Mz Y lote",
                 features: [

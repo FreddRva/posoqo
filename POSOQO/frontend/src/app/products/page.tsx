@@ -270,7 +270,7 @@ function ProductsContent() {
           {
             ...product,
             quantity: 1,
-            image_url: product.image_url || product.image || "/placeholder.png",
+            image_url: product.image_url || product.image || "/file.svg",
           }
         ];
 

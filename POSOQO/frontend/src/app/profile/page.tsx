@@ -126,7 +126,7 @@ export default function ProfilePage() {
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div>
           <Image
-            src={image || "/default-avatar.png"}
+            src={image || "/file.svg"}
             alt={name || "Avatar"}
             width={100}
             height={100}

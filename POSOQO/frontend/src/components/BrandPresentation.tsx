@@ -90,17 +90,17 @@ export default function BrandPresentation() {
       {/* Bloque de servicios ejemplo */}
       <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
         <div className="bg-[#18151f] border-2 border-[#E6B800] rounded-xl p-6 flex flex-col items-center shadow-lg">
-          <img src="/placeholder.png" alt="Draf Beer" className="w-32 h-32 object-cover rounded-lg mb-2" />
+          <img src="/file.svg" alt="Draf Beer" className="w-32 h-32 object-cover rounded-lg mb-2" />
           <span className="text-[#E6B800] font-extrabold text-lg mb-1 font-[Montserrat,sans-serif]">DRAF BEER</span>
           <span className="text-zinc-100 text-sm text-center">Múltiple dispensación de cerveza, equipos y atención especial para eventos.</span>
         </div>
         <div className="bg-[#18151f] border-2 border-[#E6B800] rounded-xl p-6 flex flex-col items-center shadow-lg">
-          <img src="/placeholder.png" alt="Party Pump" className="w-32 h-32 object-cover rounded-lg mb-2" />
+          <img src="/file.svg" alt="Party Pump" className="w-32 h-32 object-cover rounded-lg mb-2" />
           <span className="text-[#E6B800] font-extrabold text-lg mb-1 font-[Montserrat,sans-serif]">PARTY PUMP</span>
           <span className="text-zinc-100 text-sm text-center">Alquiler de Party Pump para fiestas, eventos y celebraciones.</span>
         </div>
         <div className="bg-[#18151f] border-2 border-[#E6B800] rounded-xl p-6 flex flex-col items-center shadow-lg">
-          <img src="/placeholder.png" alt="POSOQO Corporativo" className="w-32 h-32 object-cover rounded-lg mb-2" />
+          <img src="/file.svg" alt="POSOQO Corporativo" className="w-32 h-32 object-cover rounded-lg mb-2" />
           <span className="text-[#E6B800] font-extrabold text-lg mb-1 font-[Montserrat,sans-serif]">POSOQO CORPORATIVO</span>
           <span className="text-zinc-100 text-sm text-center">Cerveza personalizada para empresas, eventos y regalos corporativos.</span>
         </div>
