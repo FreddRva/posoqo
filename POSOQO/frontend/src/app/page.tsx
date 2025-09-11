@@ -873,9 +873,9 @@ export default function HomePage() {
       </section>
 
       {/* Club de miembros - Diseño premium con fondo de imagen */}
-      <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
+      <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/70"></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
@@ -902,7 +902,7 @@ export default function HomePage() {
           </motion.h2>
           
           <motion.p 
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-300 leading-relaxed"
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -943,7 +943,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-[#D4AF37] text-lg">{item.title}</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed">{item.text}</p>
+                    <p className="text-gray-200 text-sm leading-relaxed">{item.text}</p>
                   </div>
                 </div>
               ))}
