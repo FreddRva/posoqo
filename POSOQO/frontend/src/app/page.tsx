@@ -555,23 +555,7 @@ export default function HomePage() {
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
-      <section ref={productosRef} className="py-20 relative overflow-hidden bg-gradient-to-br from-slate-900 via-gray-800 to-slate-900">
-        {/* Patrón sutil de granos de cebada */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23D4AF37' fill-opacity='0.2'%3E%3Cpath d='M30 0c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S35.5 0 30 0zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z'/%3E%3Cpath d='M15 20c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm30 0c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z'/%3E%3Cpath d='M30 40c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm0 15c-2.8 0-5-2.2-5-5s2.2-5 5-5 5 2.2 5 5-2.2 5-5 5z'/%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundSize: '60px 60px'
-          }}></div>
-        </div>
-        
-        {/* Líneas decorativas sutiles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
-          <div className="absolute bottom-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
-        </div>
-        
-        {/* Efecto de resplandor sutil en los bordes */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 via-transparent to-[#D4AF37]/5"></div>
+      <section ref={productosRef} className="py-20 bg-gray-900">
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Sección de Cervezas */}
