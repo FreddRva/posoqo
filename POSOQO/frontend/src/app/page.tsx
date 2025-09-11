@@ -433,8 +433,8 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo gris personalizado */}
-      <section className="py-20" style={{backgroundColor: '#424242'}}>
+      {/* Raíces Ayacuchanas - Fondo negro suave */}
+      <section className="py-20" style={{backgroundColor: '#2a2a2a'}}>
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
