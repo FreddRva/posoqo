@@ -74,7 +74,7 @@ export default function OrdersPage() {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await apiFetch<{ success: boolean }>(`/admin/orders/${orderId}/status`, {
+      await apiFetch<{ success: boolean; error?: string }>(`/admin/orders/${orderId}/status`, {
         method: 'PUT',
         body: JSON.stringify({ status: newStatus })
       });
@@ -101,7 +101,7 @@ export default function OrdersPage() {
 
   const markNotificationAsRead = async (notificationId: string) => {
     try {
-      await apiFetch<{ success: boolean }>(`/admin/notifications/${notificationId}/read`, {
+      await apiFetch<{ success: boolean; error?: string }>(`/admin/notifications/${notificationId}/read`, {
         method: 'PUT'
       });
     } catch (error) {
