@@ -1,5 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   // Variables de entorno
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
@@ -28,6 +29,6 @@ const nextConfig = {
   
   // Configuración de compresión
   compress: true,
-}
+};
 
-module.exports = nextConfig
+export default nextConfig;
