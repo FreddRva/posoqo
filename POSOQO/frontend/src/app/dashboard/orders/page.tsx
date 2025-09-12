@@ -61,7 +61,7 @@ export default function OrdersPage() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/admin/orders/list');
+      const response = await apiFetch<{ data: any[] }>('/admin/orders/list');
       if ((response as any).data) {
         setOrders((response as any).data);
       }

@@ -56,7 +56,7 @@ export default function AdminCategories() {
   const loadCategories = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch("/categories");
+      const response = await apiFetch<{ data: any[] }>("/categories");
       if (response && typeof response === 'object' && 'success' in response && response.success) {
         const apiResponse = response as { success: boolean; data: Category[] };
         setCategories(apiResponse.data || []);
@@ -78,7 +78,7 @@ export default function AdminCategories() {
 
   const loadHierarchy = async () => {
     try {
-      const response = await apiFetch("/categories/hierarchy");
+      const response = await apiFetch<{ data: any[] }>("/categories/hierarchy");
       if (response && typeof response === 'object' && 'success' in response && response.success) {
         const apiResponse = response as { success: boolean; data: any[] };
         setHierarchyData(apiResponse.data || []);

@@ -55,7 +55,7 @@ export default function UsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/admin/users/list');
+      const response = await apiFetch<{ data: any[] }>('/admin/users/list');
       if ((response as any).data) {
         setUsers((response as any).data);
       }

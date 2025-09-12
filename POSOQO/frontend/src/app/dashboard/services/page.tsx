@@ -49,7 +49,7 @@ export default function ServicesPage() {
   const loadServices = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/admin/services/list');
+      const response = await apiFetch<{ data: any[] }>('/admin/services/list');
       if (response.data) {
         setServices(response.data);
       }
