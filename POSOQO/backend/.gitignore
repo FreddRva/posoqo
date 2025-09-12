@@ -1,0 +1,64 @@
+# Binarios
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Archivos de test
+*.test
+*.out
+
+# Archivos de cobertura
+*.cover
+*.coverprofile
+
+# Archivos de dependencias
+vendor/
+
+# Archivos de configuración local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de uploads (excepto .gitkeep)
+uploads/*
+!uploads/.gitkeep
+
+# Archivos de migración temporal
+*.sql.bak
+*.sql.tmp
+
+# Archivos de Docker
+.dockerignore
+
+# Archivos de Railway/Fly.io
+railway.json
+fly.toml
+
+# Scripts de desarrollo local
+*setup*.ps1
+*restore*.ps1
+*execute*.ps1
