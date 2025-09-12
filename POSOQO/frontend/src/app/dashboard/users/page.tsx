@@ -156,7 +156,7 @@ export default function UsersPage() {
     if (!selectedUser) return;
 
     try {
-      const response = await apiFetch(`/admin/users/${selectedUser.id}`, {
+      const response = await apiFetch<{ success: boolean }>(`/admin/users/${selectedUser.id}`, {
         method: 'PUT',
         body: JSON.stringify(editForm)
       });
@@ -178,7 +178,7 @@ export default function UsersPage() {
     if (!selectedUser) return;
 
     try {
-      const response = await apiFetch(`/admin/users/${selectedUser.id}/suspend`, {
+      const response = await apiFetch<{ success: boolean }>(`/admin/users/${selectedUser.id}/suspend`, {
         method: 'PUT'
       });
 
@@ -199,7 +199,7 @@ export default function UsersPage() {
     if (!selectedUser) return;
 
     try {
-      const response = await apiFetch(`/admin/users/${selectedUser.id}/reactivate`, {
+      const response = await apiFetch<{ success: boolean }>(`/admin/users/${selectedUser.id}/reactivate`, {
         method: 'PUT'
       });
 

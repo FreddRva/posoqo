@@ -79,7 +79,7 @@ export default function ServicesPage() {
       console.log('Guardando servicio:', updatedService);
       
       // Llamar al endpoint de actualización
-      const response = await apiFetch(`/protected/admin/services/${updatedService.id}`, {
+      const response = await apiFetch<{ success: boolean }>(`/protected/admin/services/${updatedService.id}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: updatedService.name,
