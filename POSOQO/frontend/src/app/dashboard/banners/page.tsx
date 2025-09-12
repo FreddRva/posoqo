@@ -22,7 +22,7 @@ export default function BannersPage() {
   const loadBanners = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/admin/banners/list');
+      const response = await apiFetch<{ data: any[] }>('/admin/banners/list');
       if (response.data) {
         setBanners(response.data);
       }
