@@ -46,7 +46,7 @@ func main() {
 	app.Use(middleware.SecurityLogger())
 	app.Use(cors.New(middleware.CorsConfig))
 
-	// Rate limiting global
+	// Rate limiting global (deshabilitado temporalmente)
 	// app.Use(middleware.GeneralRateLimiter)
 
 	// Rutas públicas
@@ -143,25 +143,10 @@ func main() {
 	protected.Put("/notifications/read-all", handlers.MarkAllNotificationsAsRead)
 	protected.Get("/notifications/stats", handlers.GetNotificationStats)
 
-	// Ruta para crear notificación de pago (para pruebas)
-	api.Post("/create-payment-notification", handlers.CreatePaymentNotification)
-
-	// Ruta de prueba para verificar tabla de notificaciones (solo desarrollo)
-	app.Get("/test-notifications", handlers.CreateTestNotifications)
+	// Rutas de notificaciones para admin
 	api.Get("/admin/notifications", handlers.GetNotifications)
 	api.Put("/admin/notifications/read-all", handlers.MarkAllNotificationsAsRead)
 	api.Get("/admin/notifications/stats", handlers.GetNotificationStats)
-
-	// Ruta de prueba pública para verificar tabla de notificaciones
-	// api.Get("/test-notifications-public", handlers.TestNotificationTablePublic)
-
-	// Rutas públicas para notificaciones (devuelven datos vacíos si no hay usuario autenticado)
-	// api.Get("/notifications", handlers.GetNotificationsPublic)
-	// api.Get("/notifications/unread", handlers.GetUnreadNotificationsPublic)
-	// api.Get("/notifications/stats", handlers.GetNotificationStatsPublic)
-	// api.Post("/notifications", handlers.CreateNotificationPublic)
-	// api.Delete("/notifications/:id", handlers.DeleteNotificationPublic)
-	// api.Put("/notifications/:id/read", handlers.MarkNotificationAsReadPublic)
 
 	// Rutas públicas para favoritos (devuelven datos vacíos si no hay usuario autenticado)
 	api.Get("/favorites", handlers.ListFavoritesPublic)
@@ -185,9 +170,6 @@ func main() {
 	admin.Delete("/products/:id", handlers.DeleteProduct)
 	admin.Get("/products/list", handlers.GetAllProductsAdmin)
 
-	// Endpoints públicos temporales para debugging
-	api.Get("/admin/products/list", handlers.GetAllProductsAdmin)
-
 	// Gestión de servicios (protegidas)
 	admin.Get("/services/list", handlers.GetAdminServicesListPublic)
 	admin.Post("/services", handlers.CreateService)
@@ -198,10 +180,6 @@ func main() {
 	admin.Post("/categories", handlers.CreateCategory)
 	admin.Put("/categories/:id", handlers.UpdateCategory)
 	admin.Delete("/categories/:id", handlers.DeleteCategory)
-
-	// Gestión de notificaciones del sistema (solo admin) - COMENTADAS TEMPORALMENTE
-	// admin.Post("/notifications/system", handlers.CreateSystemNotification)
-	// admin.Post("/notifications/cleanup", handlers.CleanupExpiredNotifications)
 
 	// Gestión de reclamos (solo admin)
 	admin.Get("/complaints", handlers.ListComplaints)
