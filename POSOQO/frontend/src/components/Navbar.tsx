@@ -88,7 +88,7 @@ const DropdownMenu = ({
   isOpen: boolean;
   onClose: () => void;
   onItemClick?: () => void;
-  dropdownRef: React.RefObject<HTMLDivElement>;
+  dropdownRef: React.RefObject<HTMLDivElement | null>;
 }) => {
   if (!isOpen) return null;
 
