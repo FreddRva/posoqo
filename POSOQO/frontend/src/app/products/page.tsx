@@ -135,7 +135,7 @@ function ProductsContent() {
       try {
         setLoading(true);
         const [productsRes, categoriesRes] = await Promise.all([
-          apiFetch<{ data: Product[] }>("/products"),
+          apiFetch<{ success: boolean; data: Product[]; total: number }>("/products"),
           apiFetch<Category[]>("/categories")
         ]);
 
