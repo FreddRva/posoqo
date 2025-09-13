@@ -53,7 +53,6 @@ type ProductResponse struct {
 
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
-	fmt.Printf("🔍 [PRODUCTS] Iniciando consulta de productos\n")
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
@@ -102,7 +101,6 @@ func GetProducts(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Printf("🔍 [PRODUCTS] Productos encontrados: %d\n", len(products))
 	return c.JSON(fiber.Map{
 		"success": true,
 		"data":    products,
