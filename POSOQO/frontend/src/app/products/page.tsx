@@ -136,11 +136,11 @@ function ProductsContent() {
         setLoading(true);
         const [productsRes, categoriesRes] = await Promise.all([
           apiFetch<{ success: boolean; data: Product[]; total: number }>("/products"),
-          apiFetch<Category[]>("/categories")
+          apiFetch<{ data: Category[] }>("/categories")
         ]);
 
         console.log("📦 [DATA] Productos cargados:", productsRes.data.length);
-        console.log("📦 [DATA] Categorías cargadas:", categoriesRes.map(c => c.name));
+        console.log("📦 [DATA] Categorías cargadas:", categoriesRes.data.map(c => c.name));
         console.log("📦 [DATA] Productos con categorías:", productsRes.data.map(p => ({
           name: p.name,
           category_id: p.category_id,
@@ -148,7 +148,7 @@ function ProductsContent() {
         })));
 
         setProducts(productsRes.data);
-        setCategories(categoriesRes);
+        setCategories(categoriesRes.data);
         
         // Calcular rango de precios real
         const prices = productsRes.data.map(p => p.price);
