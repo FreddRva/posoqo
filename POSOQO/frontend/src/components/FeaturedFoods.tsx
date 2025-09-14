@@ -18,9 +18,7 @@ export default function FeaturedFoods() {
     async function fetchFoods() {
       try {
         const categoriesResponse = await apiFetch<any>("/categories");
-        console.log("🍽️ [DEBUG] Respuesta de categorías:", categoriesResponse);
         const categories = categoriesResponse.data || categoriesResponse;
-        console.log("🍽️ [DEBUG] Categorías disponibles:", categories);
         
         // Buscar categoría "Comidas" (con diferentes variaciones)
         const comidasCategory = categories.find((c: any) => 
@@ -30,10 +28,7 @@ export default function FeaturedFoods() {
           c.name.toLowerCase() === "gastronomía"
         );
         
-        console.log("🍽️ [DEBUG] Categoría Comidas encontrada:", comidasCategory);
-        
         const res = await apiFetch<{ success: boolean; data: Product[] }>("/products");
-        console.log("🍽️ [DEBUG] Todos los productos:", res.data);
         
         let comidasDestacadas = [];
         
@@ -42,7 +37,6 @@ export default function FeaturedFoods() {
           comidasDestacadas = res.data.filter((p: any) => {
             const isComida = p.category_id === comidasCategory.id || p.subcategory === comidasCategory.id;
             const isFeatured = p.is_featured;
-            console.log(`🍽️ [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isComida=${isComida}`);
             return isComida && isFeatured;
           }).slice(0, 4);
         } else {
@@ -56,10 +50,8 @@ export default function FeaturedFoods() {
           }).slice(0, 4);
         }
         
-        console.log("🍽️ [DEBUG] Comidas destacadas encontradas:", comidasDestacadas);
         setFoods(comidasDestacadas);
       } catch (error) {
-        console.error("🍽️ [DEBUG] Error cargando comidas:", error);
         setFoods([]);
       } finally {
         setLoading(false);
@@ -90,9 +82,6 @@ export default function FeaturedFoods() {
             <Link href={`/products/${food.id}`} className="bg-yellow-400 text-stone-900 font-bold px-4 py-2 rounded-xl shadow hover:bg-yellow-300 transition-colors text-sm">Ver más</Link>
           </div>
         ))}
-      </div>
-      <div className="flex justify-end mt-6">
-        <Link href="/products?filter=comidas" className="text-yellow-400 font-bold hover:underline text-lg">Ver todas las comidas &rarr;</Link>
       </div>
     </section>
   );

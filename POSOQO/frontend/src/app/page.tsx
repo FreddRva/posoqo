@@ -81,9 +81,7 @@ export default function HomePage() {
   useEffect(() => {
     // Una sola llamada a la API para cargar todos los productos
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
-    console.log("📦 [DEBUG] API URL:", apiUrl);
     const productsUrl = apiUrl.endsWith('/api') ? `${apiUrl}/products` : `${apiUrl}/api/products`;
-    console.log("📦 [DEBUG] Products URL:", productsUrl);
     fetch(productsUrl)
       .then(res => res.json())
       .then(res => {
@@ -92,13 +90,10 @@ export default function HomePage() {
         
         // Buscar la categoría "Cervezas" por nombre
         const categoriesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/categories` : `${apiUrl}/api/categories`;
-        console.log("📦 [DEBUG] Categories URL:", categoriesUrl);
         fetch(categoriesUrl)
           .then(catRes => catRes.json())
           .then(catData => {
-            console.log("📦 [DEBUG] Categorías cargadas:", catData);
             const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
-            console.log("📦 [DEBUG] Categoría Cervezas encontrada:", cervezaCategory);
             
             if (cervezaCategory) {
               // Productos destacados de la categoría Cervezas
@@ -110,7 +105,6 @@ export default function HomePage() {
             }).slice(0, 4);
               setFeaturedCervezas(cervezasDestacadas);
             } else {
-              console.log("📦 [DEBUG] No se encontró categoría Cervezas, mostrando productos destacados");
               setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
             }
             
@@ -121,10 +115,8 @@ export default function HomePage() {
               const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
               const isNotCerveza = !isCerveza;
               const isFeatured = p.is_featured;
-              console.log(`📦 [DEBUG] Producto ${p.name} para comidas: isCerveza=${isCerveza}, isNotCerveza=${isNotCerveza}, isFeatured=${isFeatured}, resultado=${isNotCerveza && isFeatured}`);
               return isNotCerveza && isFeatured;
             }).slice(0, 4);
-            console.log("📦 [DEBUG] Comidas destacadas:", comidasDestacadas);
             setFeaturedComidas(comidasDestacadas);
           })
           .catch(catError => {
@@ -162,10 +154,6 @@ export default function HomePage() {
       });
   }, []);
 
-  // Debug: Log cuando featuredCervezas cambie
-  useEffect(() => {
-    console.log("📦 [DEBUG] featuredCervezas actualizado:", featuredCervezas.length, featuredCervezas);
-  }, [featuredCervezas]);
 
   // Scroll a hash en la URL
   useEffect(() => {
