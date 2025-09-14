@@ -425,6 +425,32 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 	})
 }
 
+// Endpoint temporal para ejecutar migración de stock
+func RunStockMigration(c *fiber.Ctx) error {
+	fmt.Printf("🔧 [MIGRATION] Ejecutando migración de columna stock...\n")
+
+	// Ejecutar la migración
+	_, err := db.DB.Exec(context.Background(), `
+		ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INTEGER DEFAULT 0;
+		CREATE INDEX IF NOT EXISTS idx_products_stock ON products(stock);
+		CREATE INDEX IF NOT EXISTS idx_products_low_stock ON products(stock) WHERE stock < 10 AND is_active = true;
+	`)
+
+	if err != nil {
+		fmt.Printf("❌ [MIGRATION] Error ejecutando migración: %v\n", err)
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error ejecutando migración: " + err.Error(),
+		})
+	}
+
+	fmt.Printf("✅ [MIGRATION] Migración de stock ejecutada exitosamente\n")
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Migración de columna stock ejecutada exitosamente",
+	})
+}
+
 // Endpoint temporal para lista de servicios (sin autenticación)
 func GetAdminServicesListPublic(c *fiber.Ctx) error {
 	// Consultar servicios reales de la base de datos
