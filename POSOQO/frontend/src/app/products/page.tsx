@@ -289,30 +289,71 @@ function ProductsContent() {
       let categoryMatch = true;
       
       if (filter !== "all") {
-        const productText = `${product.name} ${product.description}`.toLowerCase();
-        
-        // Filtro específico por categoría
-        if (filter === "cerveza") {
-          categoryMatch = productText.includes('cerveza') || 
-                         productText.includes('beer') ||
-                         product.name.toLowerCase().includes('cerveza') ||
-                         product.description.toLowerCase().includes('cerveza');
-        } else if (filter === "comidas" || filter === "comida") {
-          categoryMatch = productText.includes('comida') || 
-                         productText.includes('food') ||
-                         productText.includes('gastronomía') ||
-                         productText.includes('plato') ||
-                         product.name.toLowerCase().includes('comida') ||
-                         product.description.toLowerCase().includes('comida');
-        } else if (filter === "bebidas") {
-          // Para bebidas, excluir cervezas y comidas
-          const isCerveza = productText.includes('cerveza') || 
+        // Primero intentar usar las categorías de la base de datos
+        if (categories.length > 0) {
+          const selectedCategory = categories.find(cat => 
+            cat.name.toLowerCase() === filter ||
+            cat.name.toLowerCase().includes(filter) ||
+            filter.includes(cat.name.toLowerCase())
+          );
+          
+          if (selectedCategory) {
+            // Filtrar por category_id o subcategory
+            categoryMatch = product.category_id === selectedCategory.id ||
+                           product.subcategory_id === selectedCategory.id;
+          } else {
+            // Si no encuentra la categoría en BD, usar filtro por texto como fallback
+            const productText = `${product.name} ${product.description}`.toLowerCase();
+            
+            if (filter === "cerveza") {
+              categoryMatch = productText.includes('cerveza') || 
+                             productText.includes('beer') ||
+                             product.name.toLowerCase().includes('cerveza') ||
+                             product.description.toLowerCase().includes('cerveza');
+            } else if (filter === "comidas" || filter === "comida") {
+              categoryMatch = productText.includes('comida') || 
+                             productText.includes('food') ||
+                             productText.includes('gastronomía') ||
+                             productText.includes('plato') ||
+                             product.name.toLowerCase().includes('comida') ||
+                             product.description.toLowerCase().includes('comida');
+            } else if (filter === "bebidas") {
+              // Para bebidas, excluir cervezas y comidas
+              const isCerveza = productText.includes('cerveza') || 
+                               productText.includes('beer') ||
+                               product.name.toLowerCase().includes('cerveza');
+              const isComida = productText.includes('comida') || 
+                              productText.includes('food') ||
+                              product.name.toLowerCase().includes('comida');
+              categoryMatch = !isCerveza && !isComida;
+            }
+          }
+        } else {
+          // Si no hay categorías en BD, usar filtro por texto
+          const productText = `${product.name} ${product.description}`.toLowerCase();
+          
+          if (filter === "cerveza") {
+            categoryMatch = productText.includes('cerveza') || 
                            productText.includes('beer') ||
-                           product.name.toLowerCase().includes('cerveza');
-          const isComida = productText.includes('comida') || 
-                          productText.includes('food') ||
-                          product.name.toLowerCase().includes('comida');
-          categoryMatch = !isCerveza && !isComida;
+                           product.name.toLowerCase().includes('cerveza') ||
+                           product.description.toLowerCase().includes('cerveza');
+          } else if (filter === "comidas" || filter === "comida") {
+            categoryMatch = productText.includes('comida') || 
+                           productText.includes('food') ||
+                           productText.includes('gastronomía') ||
+                           productText.includes('plato') ||
+                           product.name.toLowerCase().includes('comida') ||
+                           product.description.toLowerCase().includes('comida');
+          } else if (filter === "bebidas") {
+            // Para bebidas, excluir cervezas y comidas
+            const isCerveza = productText.includes('cerveza') || 
+                             productText.includes('beer') ||
+                             product.name.toLowerCase().includes('cerveza');
+            const isComida = productText.includes('comida') || 
+                            productText.includes('food') ||
+                            product.name.toLowerCase().includes('comida');
+            categoryMatch = !isCerveza && !isComida;
+          }
         }
       }
 
@@ -923,6 +964,14 @@ function ProductsContent() {
                   : "space-y-4"
                 }>
                   {sortedProducts.filter(p => {
+                    // Usar categorías de BD si están disponibles
+                    if (categories.length > 0) {
+                      const cervezaCategory = categories.find(cat => cat.name.toLowerCase() === 'cervezas');
+                      if (cervezaCategory) {
+                        return p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id;
+                      }
+                    }
+                    // Fallback por texto
                     const productText = `${p.name} ${p.description}`.toLowerCase();
                     return productText.includes('cerveza') || 
                            productText.includes('beer') ||
@@ -954,6 +1003,19 @@ function ProductsContent() {
                   : "space-y-4"
                 }>
                   {sortedProducts.filter(p => {
+                    // Usar categorías de BD si están disponibles
+                    if (categories.length > 0) {
+                      const comidaCategory = categories.find(cat => 
+                        cat.name.toLowerCase() === 'comidas' || 
+                        cat.name.toLowerCase() === 'comida' ||
+                        cat.name.toLowerCase() === 'food' ||
+                        cat.name.toLowerCase() === 'gastronomía'
+                      );
+                      if (comidaCategory) {
+                        return p.category_id === comidaCategory.id || p.subcategory_id === comidaCategory.id;
+                      }
+                    }
+                    // Fallback por texto
                     const productText = `${p.name} ${p.description}`.toLowerCase();
                     return productText.includes('comida') || 
                            productText.includes('food') ||
@@ -987,9 +1049,25 @@ function ProductsContent() {
                   : "space-y-4"
                 }>
                   {sortedProducts.filter(p => {
-                    const productText = `${p.name} ${p.description}`.toLowerCase();
+                    // Usar categorías de BD si están disponibles
+                    if (categories.length > 0) {
+                      const cervezaCategory = categories.find(cat => cat.name.toLowerCase() === 'cervezas');
+                      const comidaCategory = categories.find(cat => 
+                        cat.name.toLowerCase() === 'comidas' || 
+                        cat.name.toLowerCase() === 'comida' ||
+                        cat.name.toLowerCase() === 'food' ||
+                        cat.name.toLowerCase() === 'gastronomía'
+                      );
+                      
+                      // Excluir cervezas y comidas por categoría
+                      const isCerveza = cervezaCategory && (p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id);
+                      const isComida = comidaCategory && (p.category_id === comidaCategory.id || p.subcategory_id === comidaCategory.id);
+                      
+                      return !isCerveza && !isComida;
+                    }
                     
-                    // Excluir cervezas y comidas
+                    // Fallback por texto
+                    const productText = `${p.name} ${p.description}`.toLowerCase();
                     const isCerveza = productText.includes('cerveza') || 
                                     productText.includes('beer') ||
                                     p.name.toLowerCase().includes('cerveza');
