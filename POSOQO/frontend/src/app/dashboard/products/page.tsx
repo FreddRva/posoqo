@@ -279,16 +279,28 @@ export default function AdminProducts() {
     }
 
     setValidationErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      console.log('❌ [VALIDATION] Errores encontrados:', errors);
+    } else {
+      console.log('✅ [VALIDATION] Formulario válido');
+    }
+    
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🔍 [PRODUCTS] Iniciando envío del formulario');
+    console.log('🔍 [PRODUCTS] Datos del formulario:', form);
+    
     if (!validateForm()) {
+      console.log('❌ [PRODUCTS] Validación falló');
       return;
     }
 
+    console.log('✅ [PRODUCTS] Validación exitosa');
     setIsSubmitting(true);
     setError(null);
 
@@ -984,7 +996,6 @@ export default function AdminProducts() {
                               />
                               <label
                                 htmlFor="image-upload"
-                                onClick={() => fileInputRef.current?.click()}
                                 className={`block w-full border border-stone-300 dark:border-stone-600 rounded-md py-2 px-3 text-center cursor-pointer text-sm transition-colors text-stone-900 ${
                                   isUploadingImage 
                                     ? 'bg-stone-100 dark:bg-stone-600 cursor-not-allowed' 
