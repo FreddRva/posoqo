@@ -291,11 +291,27 @@ function ProductsContent() {
       if (filter !== "all") {
         // Primero intentar usar las categorías de la base de datos
         if (categories.length > 0) {
-          const selectedCategory = categories.find(cat => 
-            cat.name.toLowerCase() === filter ||
-            cat.name.toLowerCase().includes(filter) ||
-            filter.includes(cat.name.toLowerCase())
-          );
+          let selectedCategory = null;
+          
+          // Buscar categoría específica según el filtro
+          if (filter === "cerveza" || filter === "cervezas") {
+            selectedCategory = categories.find(cat => 
+              cat.name.toLowerCase() === 'cervezas' ||
+              cat.name.toLowerCase() === 'cerveza'
+            );
+          } else if (filter === "comidas" || filter === "comida") {
+            selectedCategory = categories.find(cat => 
+              cat.name.toLowerCase() === 'comidas' || 
+              cat.name.toLowerCase() === 'comida' ||
+              cat.name.toLowerCase() === 'food' ||
+              cat.name.toLowerCase() === 'gastronomía'
+            );
+          } else if (filter === "bebidas") {
+            selectedCategory = categories.find(cat => 
+              cat.name.toLowerCase() === 'bebidas' ||
+              cat.name.toLowerCase() === 'bebida'
+            );
+          }
           
           if (selectedCategory) {
             // Filtrar por category_id o subcategory
@@ -966,7 +982,10 @@ function ProductsContent() {
                   {sortedProducts.filter(p => {
                     // Usar categorías de BD si están disponibles
                     if (categories.length > 0) {
-                      const cervezaCategory = categories.find(cat => cat.name.toLowerCase() === 'cervezas');
+                      const cervezaCategory = categories.find(cat => 
+                        cat.name.toLowerCase() === 'cervezas' ||
+                        cat.name.toLowerCase() === 'cerveza'
+                      );
                       if (cervezaCategory) {
                         return p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id;
                       }
@@ -1051,7 +1070,10 @@ function ProductsContent() {
                   {sortedProducts.filter(p => {
                     // Usar categorías de BD si están disponibles
                     if (categories.length > 0) {
-                      const cervezaCategory = categories.find(cat => cat.name.toLowerCase() === 'cervezas');
+                      const cervezaCategory = categories.find(cat => 
+                        cat.name.toLowerCase() === 'cervezas' ||
+                        cat.name.toLowerCase() === 'cerveza'
+                      );
                       const comidaCategory = categories.find(cat => 
                         cat.name.toLowerCase() === 'comidas' || 
                         cat.name.toLowerCase() === 'comida' ||
