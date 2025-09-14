@@ -106,7 +106,7 @@ export default function HomePage() {
               const cervezasDestacadas = res.data.filter((p: any) => {
                 const isCerveza = p.category_id === cervezaCategory.id;
                 const isFeatured = p.is_featured;
-                console.log(`📦 [DEBUG] Producto ${p.name}: category_id=${p.category_id}, is_featured=${isFeatured}, isCerveza=${isCerveza}`);
+                console.log(`📦 [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isCerveza=${isCerveza}`);
                 return isCerveza && isFeatured;
               }).slice(0, 4);
               console.log("📦 [DEBUG] Cervezas destacadas encontradas:", cervezasDestacadas);
