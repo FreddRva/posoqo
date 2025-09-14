@@ -81,21 +81,21 @@ export default function DashboardLayout({
       {/* Navbar Principal */}
       <Navbar />
       
-      {/* Botón flotante para abrir sidebar cuando está cerrado */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="fixed top-24 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110"
-          title="Abrir menú"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
-      )}
 
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out top-20 ${
         sidebarOpen ? 'w-64 translate-x-0' : 'w-16 -translate-x-0'
       }`}>
+        {/* Botón de flecha para abrir cuando está cerrado */}
+        {!sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 p-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110"
+            title="Abrir menú"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className={`flex items-center border-b border-stone-200 transition-all duration-300 ${
