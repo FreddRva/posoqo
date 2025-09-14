@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Menu, 
   ChevronRight, 
+  X,
   BarChart3, 
   ShoppingCart, 
   Package, 
