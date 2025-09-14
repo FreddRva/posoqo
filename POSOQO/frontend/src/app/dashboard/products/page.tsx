@@ -34,7 +34,7 @@ interface Product {
   id?: string;
   name: string;
   description: string;
-  price: number;
+  price?: number;
   image_url?: string;
   category_id?: string;
   subcategory_id?: string;
