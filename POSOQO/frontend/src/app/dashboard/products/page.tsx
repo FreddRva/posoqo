@@ -1031,7 +1031,6 @@ export default function AdminProducts() {
                             Formatos: JPG, PNG, GIF, WebP. Máximo 5MB
                           </p>
                         </div>
-                        </div>
                       </>
                     )}
                     
