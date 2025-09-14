@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { 
   Menu, 
-  X, 
+  ChevronRight, 
   BarChart3, 
   ShoppingCart, 
   Package, 
@@ -87,7 +87,7 @@ export default function DashboardLayout({
           className="fixed top-24 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110"
           title="Abrir menú"
         >
-          <Menu className="w-5 h-5" />
+          <ChevronRight className="w-5 h-5" />
         </button>
       )}
 
@@ -179,17 +179,7 @@ export default function DashboardLayout({
         <div className="bg-white shadow-sm border-b border-stone-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
-                title={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
-              >
-                {sidebarOpen ? (
-                  <X className="w-5 h-5 text-stone-600" />
-                ) : (
-                  <Menu className="w-5 h-5 text-stone-600" />
-                )}
-              </button>
+              {/* Botón removido - solo se usa el del sidebar */}
               <h2 className="text-2xl font-bold text-stone-800">
                 {menuItems.find(item => 
                   typeof window !== 'undefined' && window.location.pathname === item.href
