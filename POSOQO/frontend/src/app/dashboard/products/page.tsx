@@ -331,7 +331,7 @@ export default function AdminProducts() {
         price: parseFloat((form.price || 0).toString()),
         stock: parseInt((form.stock || 0).toString()),
         category_id: form.category_id,
-        subcategory_id: form.subcategory_id || null,
+        subcategory: form.subcategory_id || null,
         image_url: form.image_url || null,
         is_active: form.is_active ?? true,
         is_featured: form.is_featured ?? false,
