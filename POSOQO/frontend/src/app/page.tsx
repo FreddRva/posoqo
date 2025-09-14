@@ -709,11 +709,13 @@ export default function HomePage() {
               </motion.a>
             </div>
           </motion.div>
+
+          {/* Sección de Comidas Destacadas integrada */}
+          <div className="mt-16">
+            <FeaturedFoods />
+          </div>
         </div>
       </section>
-
-      {/* Sección de Comidas Destacadas */}
-      <FeaturedFoods />
 
       {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
