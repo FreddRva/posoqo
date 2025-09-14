@@ -120,7 +120,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className={`flex-1 py-6 space-y-2 transition-all duration-300 ${
+          <nav className={`flex-1 py-6 space-y-2 transition-all duration-300 overflow-y-auto ${
             sidebarOpen ? 'px-4' : 'px-2'
           }`}>
             {menuItems.map((item) => {
@@ -148,7 +148,7 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Info */}
-          <div className={`border-t border-stone-200 transition-all duration-300 ${
+          <div className={`border-t border-stone-200 transition-all duration-300 flex-shrink-0 ${
             sidebarOpen ? 'p-4' : 'p-2'
           }`}>
             <div className={`flex items-center ${
