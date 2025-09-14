@@ -35,6 +35,7 @@ interface Product {
   category?: string;
   category_id?: string;
   subcategory_id?: string;
+  subcategory?: string;
   stock?: number;
   rating?: number;
 }
