@@ -214,9 +214,10 @@ export default function AdminProducts() {
       errors.category_id = 'La categoría es requerida';
     }
     
-    // Validar subcategoría para bebidas
-    if (form.category_id === 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && !form.subcategory_id) {
-      errors.subcategory_id = 'La subcategoría es requerida para bebidas';
+    // Validar subcategoría para bebidas (buscar por nombre en lugar de ID hardcodeado)
+    const selectedCategory = allCategories.find(c => c.id === form.category_id);
+    if (selectedCategory?.name === 'Cervezas' && !form.subcategory_id) {
+      errors.subcategory_id = 'La subcategoría es requerida para cervezas';
     }
 
     setValidationErrors(errors);
@@ -473,7 +474,7 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
+                              src={product.image_url.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}`}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
@@ -612,7 +613,7 @@ export default function AdminProducts() {
                     </select>
                   </div>
                   
-                  {form.category_id && form.category_id === 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && (
+                  {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1">
                         Subcategoría*
@@ -638,8 +639,8 @@ export default function AdminProducts() {
                 </div>
                 
                 {(
-                      (form.category_id && form.category_id !== 'ba2359b7-6fcb-4c38-8b97-0961637ef032') ||
-                      (form.category_id && form.category_id === 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && form.subcategory_id)
+                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name !== 'Cervezas') ||
+                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && form.subcategory_id)
                 ) && (
                   <>
                         {/* Información básica */}
@@ -760,7 +761,7 @@ export default function AdminProducts() {
                         </div>
                         
                         {/* Campos de cerveza */}
-                        {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && (
+                        {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
@@ -861,7 +862,7 @@ export default function AdminProducts() {
                                                          {form.image_url && (
                                <div className="relative">
                                  <img
-                                   src={form.image_url.startsWith('http') ? form.image_url : `http://localhost:4000${form.image_url}`}
+                                   src={form.image_url.startsWith('http') ? form.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${form.image_url}`}
                                    alt="Vista previa"
                                    className="h-12 w-12 rounded object-cover border border-stone-200 dark:border-stone-600"
                                    onError={(e) => {
@@ -900,7 +901,7 @@ export default function AdminProducts() {
                        <button
                          type="submit"
                          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50 flex items-center gap-2"
-                         disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && !form.subcategory_id)}
+                         disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && !form.subcategory_id)}
                        >
                          {isSubmitting ? (
                            <>
