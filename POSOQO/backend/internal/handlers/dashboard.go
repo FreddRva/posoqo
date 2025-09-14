@@ -373,7 +373,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 	// Consultar productos reales de la base de datos
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, subcategory, 
-		       is_active, is_featured, stock, estilo, abv, ibu, color, created_at, updated_at
+		       is_active, is_featured, estilo, abv, ibu, color, created_at, updated_at
 		FROM products
 		ORDER BY name ASC
 	`)
@@ -390,11 +390,10 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 		var imageURL, subcategory sql.NullString
 		var price float64
 		var isActive, isFeatured bool
-		var stock int
 		var createdAt, updatedAt time.Time
 
 		err := rows.Scan(&id, &name, &description, &price, &imageURL, &categoryID, &subcategory,
-			&isActive, &isFeatured, &stock, &estilo, &abv, &ibu, &color, &createdAt, &updatedAt)
+			&isActive, &isFeatured, &estilo, &abv, &ibu, &color, &createdAt, &updatedAt)
 		if err != nil {
 			continue
 		}
@@ -409,7 +408,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 			"subcategory_id": subcategory.String, // Usar subcategory.String para manejar NULL
 			"is_active":      isActive,
 			"is_featured":    isFeatured,
-			"stock":          stock, // Usar el valor real del stock
+			"stock":          0, // Valor por defecto ya que no existe la columna
 			"estilo":         estilo,
 			"abv":            abv,
 			"ibu":            ibu,
@@ -422,32 +421,6 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"data":  products,
 		"total": len(products),
-	})
-}
-
-// Endpoint temporal para ejecutar migración de stock
-func RunStockMigration(c *fiber.Ctx) error {
-	fmt.Printf("🔧 [MIGRATION] Ejecutando migración de columna stock...\n")
-
-	// Ejecutar la migración
-	_, err := db.DB.Exec(context.Background(), `
-		ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INTEGER DEFAULT 0;
-		CREATE INDEX IF NOT EXISTS idx_products_stock ON products(stock);
-		CREATE INDEX IF NOT EXISTS idx_products_low_stock ON products(stock) WHERE stock < 10 AND is_active = true;
-	`)
-
-	if err != nil {
-		fmt.Printf("❌ [MIGRATION] Error ejecutando migración: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error ejecutando migración: " + err.Error(),
-		})
-	}
-
-	fmt.Printf("✅ [MIGRATION] Migración de stock ejecutada exitosamente\n")
-	return c.JSON(fiber.Map{
-		"success": true,
-		"message": "Migración de columna stock ejecutada exitosamente",
 	})
 }
 

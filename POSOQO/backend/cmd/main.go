@@ -297,7 +297,6 @@ func main() {
 	app.Get("/test-user-exists", handlers.TestUserExists)
 	app.Get("/test-orders-location", handlers.TestOrdersLocation)
 	app.Get("/run-migrations", handlers.RunMigrations)
-	app.Get("/run-stock-migration", handlers.RunStockMigration)
 
 	// Servir archivos estáticos de la carpeta uploads
 	app.Static("/uploads", "./uploads")
