@@ -100,21 +100,22 @@ export default function HomePage() {
             console.log("📦 [DEBUG] Categoría Cervezas encontrada:", cervezaCategory);
             
             if (cervezaCategory) {
-              // Productos de la categoría Cervezas
+              // Productos destacados de la categoría Cervezas
               const cervezasDestacadas = res.data.filter((p: any) => 
-                p.category_id === cervezaCategory.id
+                p.category_id === cervezaCategory.id && p.is_featured
               ).slice(0, 4);
               console.log("📦 [DEBUG] Cervezas destacadas:", cervezasDestacadas);
               setFeaturedCervezas(cervezasDestacadas);
             } else {
-              console.log("📦 [DEBUG] No se encontró categoría Cervezas, mostrando todos los productos");
-              setFeaturedCervezas(res.data.slice(0, 4));
+              console.log("📦 [DEBUG] No se encontró categoría Cervezas, mostrando productos destacados");
+              setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
             }
             
-            // Para comidas, buscar otras categorías (Vinos, Cocteles, Licores)
+            // Para comidas, buscar otras categorías destacadas (Vinos, Cocteles, Licores)
             const comidasDestacadas = res.data.filter((p: any) => 
               p.category_id !== cervezaCategory?.id && p.is_featured
             ).slice(0, 4);
+            console.log("📦 [DEBUG] Comidas destacadas:", comidasDestacadas);
             setFeaturedComidas(comidasDestacadas);
           })
           .catch(catError => {
