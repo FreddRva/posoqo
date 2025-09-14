@@ -370,6 +370,7 @@ func GetAdminUsersPublic(c *fiber.Ctx) error {
 
 // Endpoint temporal para lista de productos (sin autenticación)
 func GetAdminProductsListPublic(c *fiber.Ctx) error {
+	fmt.Printf("🔍 [LIST] Consultando productos desde la base de datos...\n")
 
 	// Consultar productos reales de la base de datos
 	rows, err := db.DB.Query(context.Background(), `
@@ -396,8 +397,11 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 		err := rows.Scan(&id, &name, &description, &price, &imageURL, &categoryID, &subcategory,
 			&isActive, &isFeatured, &estilo, &abv, &ibu, &color, &createdAt, &updatedAt)
 		if err != nil {
+			fmt.Printf("❌ [LIST] Error escaneando producto: %v\n", err)
 			continue
 		}
+
+		fmt.Printf("✅ [LIST] Producto encontrado: %s - %s\n", id, name)
 
 		products = append(products, fiber.Map{
 			"id":             id,
@@ -418,6 +422,8 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 			"updated_at":     updatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
+
+	fmt.Printf("📦 [LIST] Total productos encontrados: %d\n", len(products))
 
 	return c.JSON(fiber.Map{
 		"data":  products,
