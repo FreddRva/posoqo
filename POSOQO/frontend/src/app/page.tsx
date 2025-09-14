@@ -123,7 +123,10 @@ export default function HomePage() {
               const isCervezaByCategory = p.category_id === cervezaCategory?.id;
               const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
               const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-              return !isCerveza && p.is_featured;
+              const isNotCerveza = !isCerveza;
+              const isFeatured = p.is_featured;
+              console.log(`📦 [DEBUG] Producto ${p.name} para comidas: isCerveza=${isCerveza}, isNotCerveza=${isNotCerveza}, isFeatured=${isFeatured}, resultado=${isNotCerveza && isFeatured}`);
+              return isNotCerveza && isFeatured;
             }).slice(0, 4);
             console.log("📦 [DEBUG] Comidas destacadas:", comidasDestacadas);
             setFeaturedComidas(comidasDestacadas);
