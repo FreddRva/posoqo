@@ -35,7 +35,7 @@ type ServiceResponse struct {
 // GetServices devuelve todos los servicios desde la base de datos
 func GetServices(c *fiber.Ctx) error {
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, image_url, features, is_active, created_at, updated_at
+		SELECT id, name, description, image_url, is_active, created_at, updated_at
 		FROM services
 		WHERE is_active = true
 		ORDER BY id
@@ -52,7 +52,7 @@ func GetServices(c *fiber.Ctx) error {
 	var services []ServiceResponse
 	for rows.Next() {
 		var s Service
-		err := rows.Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.Features, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
+		err := rows.Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
 		if err != nil {
 			fmt.Println("ERROR AL LEER SERVICIO:", err)
 			return c.Status(500).JSON(fiber.Map{
@@ -68,7 +68,7 @@ func GetServices(c *fiber.Ctx) error {
 			IsActive:    s.IsActive,
 			CreatedAt:   nullableTimeToString(s.CreatedAt),
 			UpdatedAt:   nullableTimeToString(s.UpdatedAt),
-			Features:    s.Features,
+			Features:    []string{}, // Array vacío ya que no existe la columna
 		})
 	}
 
@@ -84,10 +84,10 @@ func GetService(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var s Service
 	err := db.DB.QueryRow(context.Background(), `
-		SELECT id, name, description, image_url, features, is_active, created_at, updated_at
+		SELECT id, name, description, image_url, is_active, created_at, updated_at
 		FROM services
 		WHERE id = $1 AND is_active = true
-	`, id).Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.Features, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
+	`, id).Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
 	if err != nil {
 		fmt.Println("ERROR AL LEER SERVICIO POR ID:", err)
 		return c.Status(404).JSON(fiber.Map{
@@ -103,7 +103,7 @@ func GetService(c *fiber.Ctx) error {
 		IsActive:    s.IsActive,
 		CreatedAt:   nullableTimeToString(s.CreatedAt),
 		UpdatedAt:   nullableTimeToString(s.UpdatedAt),
-		Features:    s.Features,
+		Features:    []string{}, // Array vacío ya que no existe la columna
 	}
 	return c.JSON(fiber.Map{
 		"success": true,
@@ -124,9 +124,9 @@ func CreateService(c *fiber.Ctx) error {
 	}
 	id := ""
 	err := db.DB.QueryRow(context.Background(),
-		`INSERT INTO services (name, description, image_url, features, is_active, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, true, NOW(), NOW()) RETURNING id`,
-		req.Name, req.Description, req.ImageURL, req.Features).Scan(&id)
+		`INSERT INTO services (name, description, image_url, is_active, created_at, updated_at)
+		 VALUES ($1, $2, $3, true, NOW(), NOW()) RETURNING id`,
+		req.Name, req.Description, req.ImageURL).Scan(&id)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el servicio"})
 	}
