@@ -328,6 +328,21 @@ function ProductsContent() {
             categoryMatch = product.category_id === selectedCategory.id ||
                            product.subcategory === selectedCategory.id;
             
+            // Si es filtro de "bebidas", también incluir productos de subcategorías (cervezas, refrescos, etc.)
+            if (!categoryMatch && (filter === "bebidas" || filter === "bebida")) {
+              // Buscar si el producto pertenece a una subcategoría de bebidas
+              const subcategoriesOfBebidas = categories.filter(cat => 
+                cat.name.toLowerCase() === 'cervezas' ||
+                cat.name.toLowerCase() === 'cerveza' ||
+                cat.name.toLowerCase() === 'refrescos' ||
+                cat.name.toLowerCase() === 'refresco'
+              );
+              
+              categoryMatch = subcategoriesOfBebidas.some(subcat => 
+                product.category_id === subcat.id || product.subcategory === subcat.id
+              );
+            }
+            
             console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory=${product.subcategory}, selectedCategory.id=${selectedCategory.id}`);
           } else {
             // Si no encuentra la categoría en BD, usar filtro por texto como fallback
@@ -1085,6 +1100,33 @@ function ProductsContent() {
                   {sortedProducts.filter(p => {
                     // Usar categorías de BD si están disponibles
                     if (categories.length > 0) {
+                      const bebidaCategory = categories.find(cat => 
+                        cat.name.toLowerCase() === 'bebidas' ||
+                        cat.name.toLowerCase() === 'bebida'
+                      );
+                      
+                      if (bebidaCategory) {
+                        // Incluir productos de la categoría bebidas
+                        let isBebida = p.category_id === bebidaCategory.id || p.subcategory === bebidaCategory.id;
+                        
+                        // También incluir productos de subcategorías de bebidas (cervezas, refrescos, etc.)
+                        if (!isBebida) {
+                          const subcategoriesOfBebidas = categories.filter(cat => 
+                            cat.name.toLowerCase() === 'cervezas' ||
+                            cat.name.toLowerCase() === 'cerveza' ||
+                            cat.name.toLowerCase() === 'refrescos' ||
+                            cat.name.toLowerCase() === 'refresco'
+                          );
+                          
+                          isBebida = subcategoriesOfBebidas.some(subcat => 
+                            p.category_id === subcat.id || p.subcategory === subcat.id
+                          );
+                        }
+                        
+                        return isBebida;
+                      }
+                      
+                      // Fallback: excluir cervezas y comidas por categoría
                       const cervezaCategory = categories.find(cat => 
                         cat.name.toLowerCase() === 'cervezas' ||
                         cat.name.toLowerCase() === 'cerveza'
@@ -1096,7 +1138,6 @@ function ProductsContent() {
                         cat.name.toLowerCase() === 'gastronomía'
                       );
                       
-                      // Excluir cervezas y comidas por categoría
                       const isCerveza = cervezaCategory && (p.category_id === cervezaCategory.id || p.subcategory === cervezaCategory.id);
                       const isComida = comidaCategory && (p.category_id === comidaCategory.id || p.subcategory === comidaCategory.id);
                       
