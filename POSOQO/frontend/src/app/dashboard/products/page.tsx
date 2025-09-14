@@ -256,14 +256,14 @@ export default function AdminProducts() {
       errors.category_id = '⚠️ La categoría es obligatoria';
     }
     
-    // Validar subcategoría para cervezas
+    // Validar subcategoría para bebidas
     const selectedCategory = allCategories.find(c => c.id === form.category_id);
-    if (selectedCategory?.name === 'Cervezas' && !form.subcategory_id) {
-      errors.subcategory_id = '⚠️ La subcategoría es obligatoria para cervezas';
+    if (selectedCategory?.name === 'Bebidas' && !form.subcategory_id) {
+      errors.subcategory_id = '⚠️ La subcategoría es obligatoria para bebidas';
     }
 
     // Validar campos específicos de cerveza si aplica
-    if (selectedCategory?.name === 'Cervezas') {
+    if (selectedCategory?.name === 'Bebidas' && form.subcategory_id && allSubcategories.find(s => s.id === form.subcategory_id)?.name === 'Cervezas') {
       if (form.estilo && form.estilo.length > 50) {
         errors.estilo = '⚠️ El estilo no puede exceder 50 caracteres';
       }
@@ -741,7 +741,7 @@ export default function AdminProducts() {
                     </select>
                   </div>
                   
-                  {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
+                  {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && (
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1">
                         Subcategoría*
@@ -768,8 +768,8 @@ export default function AdminProducts() {
                 </div>
                 
                 {(
-                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name !== 'Cervezas') ||
-                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && form.subcategory_id)
+                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name !== 'Bebidas') ||
+                      (form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && form.subcategory_id)
                 ) && (
                   <>
                         {/* Sección 2: Información Básica */}
@@ -896,7 +896,7 @@ export default function AdminProducts() {
                         </div>
                         
                         {/* Sección 3: Campos de Cerveza */}
-                        {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
+                        {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && form.subcategory_id && allSubcategories.find(s => s.id === form.subcategory_id)?.name === 'Cervezas' && (
                           <div className="bg-amber-50 rounded-lg p-6">
                             <h3 className="text-lg font-semibold text-stone-800 mb-4 flex items-center">
                               <DollarSign className="w-5 h-5 mr-2 text-amber-600" />
@@ -1048,7 +1048,7 @@ export default function AdminProducts() {
                       <button
                         type="submit"
                         className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-blue-400 disabled:to-blue-500 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none"
-                        disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && !form.subcategory_id)}
+                        disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Bebidas' && !form.subcategory_id)}
                       >
                         {isSubmitting ? (
                           <>
