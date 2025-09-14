@@ -323,21 +323,11 @@ function ProductsContent() {
           }
           
           if (selectedCategory) {
-            // Filtrar por category_id o subcategory
+            // Filtrar por category_id o subcategory (usando la misma lógica que la página principal)
             categoryMatch = product.category_id === selectedCategory.id ||
-                           product.subcategory_id === selectedCategory.id;
+                           product.subcategory === selectedCategory.id;
             
-            // Si es filtro de cervezas y no coincide por categoría, intentar por texto
-            if (!categoryMatch && (filter === "cerveza" || filter === "cervezas")) {
-              const productText = `${product.name} ${product.description}`.toLowerCase();
-              categoryMatch = productText.includes('cerveza') || 
-                             productText.includes('beer') ||
-                             product.name.toLowerCase().includes('cerveza') ||
-                             product.description.toLowerCase().includes('cerveza');
-              console.log(`🔍 [FILTER] Producto ${product.name}: fallback por texto, categoryMatch=${categoryMatch}`);
-            }
-            
-            console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory_id=${product.subcategory_id}, selectedCategory.id=${selectedCategory.id}`);
+            console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory=${product.subcategory}, selectedCategory.id=${selectedCategory.id}`);
           } else {
             // Si no encuentra la categoría en BD, usar filtro por texto como fallback
             const productText = `${product.name} ${product.description}`.toLowerCase();
@@ -400,7 +390,7 @@ function ProductsContent() {
       // Categorías múltiples
       const categoriesMatch = selectedCategories.length === 0 || 
         selectedCategories.some(catId => 
-          product.category_id === catId || product.subcategory_id === catId
+          product.category_id === catId || product.subcategory === catId
         );
 
       return searchMatch && categoryMatch && priceMatch && categoriesMatch;
@@ -1011,18 +1001,7 @@ function ProductsContent() {
                         cat.name.toLowerCase() === 'cerveza'
                       );
                       if (cervezaCategory) {
-                        const categoryMatch = p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id;
-                        
-                        // Si no coincide por categoría, intentar por texto
-                        if (!categoryMatch) {
-                          const productText = `${p.name} ${p.description}`.toLowerCase();
-                          return productText.includes('cerveza') || 
-                                 productText.includes('beer') ||
-                                 p.name.toLowerCase().includes('cerveza') ||
-                                 p.description.toLowerCase().includes('cerveza');
-                        }
-                        
-                        return categoryMatch;
+                        return p.category_id === cervezaCategory.id || p.subcategory === cervezaCategory.id;
                       }
                     }
                     // Fallback por texto
@@ -1066,7 +1045,7 @@ function ProductsContent() {
                         cat.name.toLowerCase() === 'gastronomía'
                       );
                       if (comidaCategory) {
-                        return p.category_id === comidaCategory.id || p.subcategory_id === comidaCategory.id;
+                        return p.category_id === comidaCategory.id || p.subcategory === comidaCategory.id;
                       }
                     }
                     // Fallback por texto
@@ -1117,8 +1096,8 @@ function ProductsContent() {
                       );
                       
                       // Excluir cervezas y comidas por categoría
-                      const isCerveza = cervezaCategory && (p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id);
-                      const isComida = comidaCategory && (p.category_id === comidaCategory.id || p.subcategory_id === comidaCategory.id);
+                      const isCerveza = cervezaCategory && (p.category_id === cervezaCategory.id || p.subcategory === cervezaCategory.id);
+                      const isComida = comidaCategory && (p.category_id === comidaCategory.id || p.subcategory === comidaCategory.id);
                       
                       return !isCerveza && !isComida;
                     }
