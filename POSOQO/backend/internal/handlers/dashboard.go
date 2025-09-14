@@ -19,6 +19,52 @@ func TestDashboardEndpoint(c *fiber.Ctx) error {
 	})
 }
 
+// Endpoint temporal para debug de categorías y productos
+func DebugCategoriesAndProducts(c *fiber.Ctx) error {
+	// Obtener todas las categorías
+	categoriesRows, err := db.DB.Query(context.Background(), "SELECT id, name FROM categories ORDER BY name")
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener categorías"})
+	}
+	defer categoriesRows.Close()
+
+	var categories []fiber.Map
+	for categoriesRows.Next() {
+		var id, name string
+		categoriesRows.Scan(&id, &name)
+		categories = append(categories, fiber.Map{
+			"id":   id,
+			"name": name,
+		})
+	}
+
+	// Obtener todos los productos
+	productsRows, err := db.DB.Query(context.Background(), 
+		"SELECT id, name, category_id, is_featured FROM products ORDER BY name")
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener productos"})
+	}
+	defer productsRows.Close()
+
+	var products []fiber.Map
+	for productsRows.Next() {
+		var id, name, categoryID string
+		var isFeatured bool
+		productsRows.Scan(&id, &name, &categoryID, &isFeatured)
+		products = append(products, fiber.Map{
+			"id":          id,
+			"name":        name,
+			"category_id": categoryID,
+			"is_featured": isFeatured,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"categories": categories,
+		"products":   products,
+	})
+}
+
 // Resumen general para dashboard
 func DashboardSummary(c *fiber.Ctx) error {
 	var totalSales float64
