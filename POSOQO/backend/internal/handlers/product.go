@@ -166,6 +166,7 @@ func CreateProduct(c *fiber.Ctx) error {
 		IBU         string  `json:"ibu"`
 		Color       string  `json:"color"`
 		IsFeatured  bool    `json:"is_featured"`
+		Stock       int     `json:"stock"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
@@ -187,9 +188,9 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 	id := ""
 	err := db.DB.QueryRow(context.Background(),
-		`INSERT INTO products (name, description, price, image_url, category_id, subcategory, estilo, abv, ibu, color, is_active, is_featured, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, NOW(), NOW()) RETURNING id`,
-		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsFeatured).Scan(&id)
+		`INSERT INTO products (name, description, price, image_url, category_id, subcategory, estilo, abv, ibu, color, is_active, is_featured, stock, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, $12, NOW(), NOW()) RETURNING id`,
+		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsFeatured, req.Stock).Scan(&id)
 	if err != nil {
 		fmt.Printf("❌ [CREATE] Error creando producto: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el producto: " + err.Error()})
@@ -215,6 +216,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 		Color       string  `json:"color"`
 		IsActive    bool    `json:"is_active"`
 		IsFeatured  bool    `json:"is_featured"`
+		Stock       int     `json:"stock"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
@@ -237,8 +239,8 @@ func UpdateProduct(c *fiber.Ctx) error {
 	fmt.Printf("🔍 [UPDATE] Datos recibidos: %+v\n", req)
 
 	_, err := db.DB.Exec(context.Background(),
-		`UPDATE products SET name=$1, description=$2, price=$3, image_url=$4, category_id=$5, subcategory=$6, estilo=$7, abv=$8, ibu=$9, color=$10, is_active=$11, is_featured=$12, updated_at=NOW() WHERE id=$13`,
-		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsActive, req.IsFeatured, id)
+		`UPDATE products SET name=$1, description=$2, price=$3, image_url=$4, category_id=$5, subcategory=$6, estilo=$7, abv=$8, ibu=$9, color=$10, is_active=$11, is_featured=$12, stock=$13, updated_at=NOW() WHERE id=$14`,
+		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsActive, req.IsFeatured, req.Stock, id)
 	if err != nil {
 		fmt.Printf("❌ [UPDATE] Error actualizando producto: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Error al actualizar producto"})
