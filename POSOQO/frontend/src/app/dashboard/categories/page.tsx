@@ -147,7 +147,7 @@ export default function AdminCategories() {
         return;
       }
 
-      // Verificar si ya existe una categoría con el mismo nombre
+      // Verificar si ya existe una categoría con el mismo nombre (excluyendo la que se está editando)
       const existingCategory = categories.find(cat => 
         cat.name.toLowerCase() === form.name.toLowerCase().trim() && 
         cat.id !== editingId
@@ -155,6 +155,13 @@ export default function AdminCategories() {
 
       if (existingCategory) {
         setError('⚠️ Ya existe una categoría con este nombre. Por favor, elige un nombre diferente');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validación adicional para subcategorías: no pueden ser su propia categoría padre
+      if (isSubcategory && form.parent_id === editingId) {
+        setError('⚠️ Una categoría no puede ser su propia categoría padre');
         setIsSubmitting(false);
         return;
       }
@@ -232,10 +239,31 @@ export default function AdminCategories() {
   };
 
   const handleEdit = (category: Category) => {
-    setForm(category);
-    setEditingId(category.id || null);
+    // Validar que la categoría tenga los datos necesarios
+    if (!category || !category.id) {
+      setError('⚠️ Error: No se pudo cargar la información de la categoría');
+      return;
+    }
+
+    // Preparar los datos del formulario
+    const formData = {
+      name: category.name || "",
+      parent_id: category.parent_id || "",
+      image_url: category.image_url || ""
+    };
+
+    setForm(formData);
+    setEditingId(category.id);
     setIsSubcategory(!!category.parent_id);
+    setError(null); // Limpiar errores previos
     setShowForm(true);
+    
+    console.log('📝 [CATEGORIES] Editando categoría:', {
+      id: category.id,
+      name: category.name,
+      parent_id: category.parent_id,
+      isSubcategory: !!category.parent_id
+    });
   };
 
   const handleAdd = () => {
@@ -489,15 +517,17 @@ export default function AdminCategories() {
                         <div className="flex space-x-2">
                           <button
                             onClick={() => handleEdit(category)}
-                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                            title={`Editar ${category.name}`}
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-4 h-4 group-hover:scale-110 transition-transform" />
                           </button>
                           <button
                             onClick={() => handleDelete(category.id!)}
-                            className="text-red-600 hover:text-red-900 transition-colors"
+                            className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                            title={`Eliminar ${category.name}`}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                           </button>
                         </div>
                       </td>
@@ -523,15 +553,17 @@ export default function AdminCategories() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleEdit({ id: category.id, name: category.name })}
-                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                        className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                        title={`Editar ${category.name}`}
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-4 h-4 group-hover:scale-110 transition-transform" />
                       </button>
                       <button
                         onClick={() => handleDelete(category.id)}
-                        className="text-red-600 hover:text-red-900 transition-colors"
+                        className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                        title={`Eliminar ${category.name}`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
                       </button>
                     </div>
                   </div>
@@ -554,15 +586,17 @@ export default function AdminCategories() {
                               <div className="flex space-x-2">
                                 <button
                                   onClick={() => handleEdit({ id: sub.id, name: sub.name, parent_id: category.id })}
-                                  className="text-blue-600 hover:text-blue-900 transition-colors"
+                                  className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+                                  title={`Editar ${sub.name}`}
                                 >
-                                  <Edit className="w-3 h-3" />
+                                  <Edit className="w-3 h-3 group-hover:scale-110 transition-transform" />
                                 </button>
                                 <button
                                   onClick={() => handleDelete(sub.id)}
-                                  className="text-red-600 hover:text-red-900 transition-colors"
+                                  className="p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+                                  title={`Eliminar ${sub.name}`}
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-3 h-3 group-hover:scale-110 transition-transform" />
                                 </button>
                               </div>
                             </div>
