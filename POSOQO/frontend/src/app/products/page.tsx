@@ -277,6 +277,15 @@ function ProductsContent() {
 
   // Filtrado y ordenamiento de productos
   const filteredProducts = useMemo(() => {
+    console.log("🔍 [FILTER] Aplicando filtro:", filter);
+    console.log("🔍 [FILTER] Total productos:", products.length);
+    console.log("🔍 [FILTER] Categorías disponibles:", categories.map(c => c.name));
+    console.log("🔍 [FILTER] Productos con categorías:", products.map(p => ({
+      name: p.name,
+      category_id: p.category_id,
+      subcategory_id: p.subcategory_id
+    })));
+    
     return products.filter(product => {
       // Búsqueda
       const searchMatch = debouncedSearch
@@ -317,6 +326,7 @@ function ProductsContent() {
             // Filtrar por category_id o subcategory
             categoryMatch = product.category_id === selectedCategory.id ||
                            product.subcategory_id === selectedCategory.id;
+            console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory_id=${product.subcategory_id}, selectedCategory.id=${selectedCategory.id}`);
           } else {
             // Si no encuentra la categoría en BD, usar filtro por texto como fallback
             const productText = `${product.name} ${product.description}`.toLowerCase();
@@ -385,6 +395,9 @@ function ProductsContent() {
       return searchMatch && categoryMatch && priceMatch && categoriesMatch;
     });
   }, [products, debouncedSearch, filter, priceRange, selectedCategories]);
+  
+  // Log del resultado del filtrado
+  console.log("🔍 [FILTER] Productos filtrados:", filteredProducts.length);
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
