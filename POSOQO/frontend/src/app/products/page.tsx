@@ -101,7 +101,6 @@ function ProductsContent() {
   useEffect(() => {
     const urlFilter = searchParams.get("filter");
     if (urlFilter) {
-      console.log("🔄 [FILTER] Actualizando filtro desde URL:", urlFilter);
       setFilter(urlFilter);
     }
   }, [searchParams]);
@@ -139,13 +138,6 @@ function ProductsContent() {
           apiFetch<{ data: Category[] }>("/categories")
         ]);
 
-        console.log("📦 [DATA] Productos cargados:", productsRes.data.length);
-        console.log("📦 [DATA] Categorías cargadas:", categoriesRes.data.map(c => c.name));
-        console.log("📦 [DATA] Productos con categorías:", productsRes.data.map(p => ({
-          name: p.name,
-          category_id: p.category_id,
-          subcategory_id: p.subcategory_id
-        })));
 
         setProducts(productsRes.data);
         setCategories(categoriesRes.data);
@@ -285,15 +277,6 @@ function ProductsContent() {
 
   // Filtrado y ordenamiento de productos
   const filteredProducts = useMemo(() => {
-    console.log("🔍 [FILTER] Aplicando filtro:", filter);
-    console.log("🔍 [FILTER] Estado actual del filtro:", filter);
-    console.log("🔍 [FILTER] Categorías disponibles:", categories.map(c => c.name));
-    console.log("🔍 [FILTER] Productos con categorías:", products.map(p => ({
-      name: p.name,
-      category_id: p.category_id,
-      subcategory_id: p.subcategory_id
-    })));
-    
     return products.filter(product => {
       // Búsqueda
       const searchMatch = debouncedSearch
@@ -302,39 +285,34 @@ function ProductsContent() {
           )
         : true;
 
-      // Filtro por categoría principal - Mejorado para funcionar sin categorías en BD
+      // Filtro por categoría principal
       let categoryMatch = true;
       
       if (filter !== "all") {
-        // Filtro inteligente que funciona con o sin categorías en BD
         const productText = `${product.name} ${product.description}`.toLowerCase();
-        const filterText = filter.toLowerCase();
         
-        console.log("🔍 [FILTER] Verificando producto:", product.name);
-        console.log("🔍 [FILTER] Texto del producto:", productText);
-        console.log("🔍 [FILTER] Filtro buscado:", filterText);
-        
-        // Primero intentar con categorías de BD si existen
-        if (categories.length > 0) {
-          const selectedCategory = categories.find(cat => 
-            cat.name.toLowerCase() === filterText ||
-            cat.name.toLowerCase().includes(filterText) ||
-            filterText.includes(cat.name.toLowerCase())
-          );
-          
-          if (selectedCategory) {
-            categoryMatch = product.category_id === selectedCategory.id ||
-                           product.subcategory_id === selectedCategory.id;
-            console.log("🔍 [FILTER] Categoría encontrada en BD:", selectedCategory.name);
-          } else {
-            // Si no encuentra categoría en BD, usar filtro por texto
-            categoryMatch = productText.includes(filterText);
-            console.log("🔍 [FILTER] Usando filtro por texto, resultado:", categoryMatch);
-          }
-        } else {
-          // Si no hay categorías en BD, usar filtro por texto
-          categoryMatch = productText.includes(filterText);
-          console.log("🔍 [FILTER] Sin categorías en BD, usando filtro por texto, resultado:", categoryMatch);
+        // Filtro específico por categoría
+        if (filter === "cerveza") {
+          categoryMatch = productText.includes('cerveza') || 
+                         productText.includes('beer') ||
+                         product.name.toLowerCase().includes('cerveza') ||
+                         product.description.toLowerCase().includes('cerveza');
+        } else if (filter === "comidas" || filter === "comida") {
+          categoryMatch = productText.includes('comida') || 
+                         productText.includes('food') ||
+                         productText.includes('gastronomía') ||
+                         productText.includes('plato') ||
+                         product.name.toLowerCase().includes('comida') ||
+                         product.description.toLowerCase().includes('comida');
+        } else if (filter === "bebidas") {
+          // Para bebidas, excluir cervezas y comidas
+          const isCerveza = productText.includes('cerveza') || 
+                           productText.includes('beer') ||
+                           product.name.toLowerCase().includes('cerveza');
+          const isComida = productText.includes('comida') || 
+                          productText.includes('food') ||
+                          product.name.toLowerCase().includes('comida');
+          categoryMatch = !isCerveza && !isComida;
         }
       }
 
@@ -349,7 +327,7 @@ function ProductsContent() {
 
       return searchMatch && categoryMatch && priceMatch && categoriesMatch;
     });
-  }, [products, debouncedSearch, filter, priceRange, selectedCategories, categories]);
+  }, [products, debouncedSearch, filter, priceRange, selectedCategories]);
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
@@ -650,10 +628,7 @@ function ProductsContent() {
              <div className="relative min-w-[180px]">
                <select
                  value={filter}
-                 onChange={(e) => {
-                   console.log("🔄 [FILTER] Cambiando filtro a:", e.target.value);
-                   setFilter(e.target.value);
-                 }}
+                 onChange={(e) => setFilter(e.target.value)}
                  className="w-full px-4 py-3 bg-slate-800/80 border border-slate-600/50 rounded-xl text-slate-100 appearance-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all pr-8"
                >
                  <option value="all">Todas las categorías</option>
@@ -816,10 +791,7 @@ function ProductsContent() {
                      <select
                        id="mobile-category"
                        value={filter}
-                       onChange={(e) => {
-                         console.log("🔄 [FILTER] Cambiando filtro móvil a:", e.target.value);
-                         setFilter(e.target.value);
-                       }}
+                       onChange={(e) => setFilter(e.target.value)}
                        className="w-full px-3 py-2 bg-stone-800 border border-yellow-400/30 rounded-lg text-yellow-100 focus:border-yellow-400 outline-none transition-all"
                      >
                        <option value="all">Todas las categorías</option>
@@ -952,41 +924,10 @@ function ProductsContent() {
                 }>
                   {sortedProducts.filter(p => {
                     const productText = `${p.name} ${p.description}`.toLowerCase();
-                    const isCerveza = productText.includes('cerveza') || 
+                    return productText.includes('cerveza') || 
                            productText.includes('beer') ||
-                           productText.includes('frutal') ||
-                           productText.includes('herbal') ||
-                           productText.includes('ayacuchana') ||
-                           productText.includes('posoqo') ||
-                           productText.includes('llampu') ||
-                           productText.includes('negraschallay') ||
-                           productText.includes('puka') ||
-                           productText.includes('retama') ||
-                           productText.includes('tankar') ||
                            p.name.toLowerCase().includes('cerveza') ||
-                           p.description.toLowerCase().includes('cerveza') ||
-                           p.name.toLowerCase().includes('beer') ||
-                           p.description.toLowerCase().includes('beer') ||
-                           p.name.toLowerCase().includes('frutal') ||
-                           p.description.toLowerCase().includes('frutal') ||
-                           p.name.toLowerCase().includes('herbal') ||
-                           p.description.toLowerCase().includes('herbal') ||
-                           p.name.toLowerCase().includes('ayacuchana') ||
-                           p.description.toLowerCase().includes('ayacuchana') ||
-                           p.name.toLowerCase().includes('posoqo') ||
-                           p.description.toLowerCase().includes('posoqo') ||
-                           p.name.toLowerCase().includes('llampu') ||
-                           p.description.toLowerCase().includes('llampu') ||
-                           p.name.toLowerCase().includes('negraschallay') ||
-                           p.description.toLowerCase().includes('negraschallay') ||
-                           p.name.toLowerCase().includes('puka') ||
-                           p.description.toLowerCase().includes('puka') ||
-                           p.name.toLowerCase().includes('retama') ||
-                           p.description.toLowerCase().includes('retama') ||
-                           p.name.toLowerCase().includes('tankar') ||
-                           p.description.toLowerCase().includes('tankar');
-                    
-                    return isCerveza;
+                           p.description.toLowerCase().includes('cerveza');
                   }).map((product) => (
                     <div key={product.id}>
                       {ProductCard({ product })}
@@ -1015,14 +956,11 @@ function ProductsContent() {
                   {sortedProducts.filter(p => {
                     const productText = `${p.name} ${p.description}`.toLowerCase();
                     return productText.includes('comida') || 
-                           productText.includes('comidaa') || // Agregado 'comidaa' para el typo en BD
                            productText.includes('food') ||
                            productText.includes('gastronomía') ||
                            productText.includes('plato') ||
-                           productText.includes('cena') ||
-                           productText.includes('almuerzo') ||
-                           productText.includes('desayuno') ||
-                           p.category_id === (categories.find(cat => cat.name.toLowerCase() === "comida")?.id);
+                           p.name.toLowerCase().includes('comida') ||
+                           p.description.toLowerCase().includes('comida');
                   }).map((product) => (
                     <div key={product.id}>
                       {ProductCard({ product })}
@@ -1051,51 +989,14 @@ function ProductsContent() {
                   {sortedProducts.filter(p => {
                     const productText = `${p.name} ${p.description}`.toLowerCase();
                     
-                    // Excluir TODAS las cervezas - Detección más exhaustiva
+                    // Excluir cervezas y comidas
                     const isCerveza = productText.includes('cerveza') || 
                                     productText.includes('beer') ||
-                                    productText.includes('frutal') ||
-                                    productText.includes('herbal') ||
-                                    productText.includes('ayacuchana') ||
-                                    productText.includes('posoqo') ||
-                                    productText.includes('llampu') ||
-                                    productText.includes('negraschallay') ||
-                                    productText.includes('puka') ||
-                                    productText.includes('retama') ||
-                                    productText.includes('tankar') ||
-                                    p.name.toLowerCase().includes('cerveza') ||
-                                    p.description.toLowerCase().includes('cerveza') ||
-                                    p.name.toLowerCase().includes('beer') ||
-                                    p.description.toLowerCase().includes('beer') ||
-                                    p.name.toLowerCase().includes('frutal') ||
-                                    p.description.toLowerCase().includes('frutal') ||
-                                    p.name.toLowerCase().includes('herbal') ||
-                                    p.description.toLowerCase().includes('herbal') ||
-                                    p.name.toLowerCase().includes('ayacuchana') ||
-                                    p.description.toLowerCase().includes('ayacuchana') ||
-                                    p.name.toLowerCase().includes('posoqo') ||
-                                    p.description.toLowerCase().includes('posoqo') ||
-                                    p.name.toLowerCase().includes('llampu') ||
-                                    p.description.toLowerCase().includes('llampu') ||
-                                    p.name.toLowerCase().includes('negraschallay') ||
-                                    p.description.toLowerCase().includes('negraschallay') ||
-                                    p.name.toLowerCase().includes('puka') ||
-                                    p.description.toLowerCase().includes('puka') ||
-                                    p.name.toLowerCase().includes('retama') ||
-                                    p.description.toLowerCase().includes('retama') ||
-                                    p.name.toLowerCase().includes('tankar') ||
-                                    p.description.toLowerCase().includes('tankar');
-                    
-                    // Excluir comidas
+                                    p.name.toLowerCase().includes('cerveza');
                     const isComida = productText.includes('comida') || 
                                    productText.includes('food') ||
-                                   productText.includes('gastronomía') ||
-                                   productText.includes('plato') ||
-                                   productText.includes('cena') ||
-                                   productText.includes('almuerzo') ||
-                                   productText.includes('desayuno');
+                                   p.name.toLowerCase().includes('comida');
                      
-                    // Solo mostrar si NO es cerveza y NO es comida
                     return !isCerveza && !isComida;
                   }).map((product) => (
                     <div key={product.id}>
