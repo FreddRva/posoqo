@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { 
@@ -30,7 +30,23 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Cargar estado del sidebar desde localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('sidebarOpen');
+    if (savedState !== null) {
+      setSidebarOpen(JSON.parse(savedState));
+    } else {
+      // Por defecto, empezar cerrado
+      setSidebarOpen(false);
+    }
+  }, []);
+
+  // Guardar estado del sidebar en localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarOpen', JSON.stringify(sidebarOpen));
+  }, [sidebarOpen]);
 
   if (status === 'loading') {
     return (
@@ -64,6 +80,17 @@ export default function DashboardLayout({
       {/* Navbar Principal */}
       <Navbar />
       
+      {/* Botón flotante para abrir sidebar cuando está cerrado */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-24 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110"
+          title="Abrir menú"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out top-20 ${
         sidebarOpen ? 'w-64 translate-x-0' : 'w-16 -translate-x-0'
@@ -81,18 +108,14 @@ export default function DashboardLayout({
                 <h1 className="text-xl font-bold text-stone-800">POSOQO</h1>
               )}
             </div>
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className={`p-2 rounded-lg hover:bg-stone-100 transition-colors ${
-                !sidebarOpen ? 'absolute right-2' : ''
-              }`}
-            >
-              {sidebarOpen ? (
+            {sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
+              >
                 <X className="w-5 h-5 text-stone-600" />
-              ) : (
-                <Menu className="w-5 h-5 text-stone-600" />
-              )}
-            </button>
+              </button>
+            )}
           </div>
 
           {/* Navigation */}
@@ -158,9 +181,14 @@ export default function DashboardLayout({
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 rounded-lg hover:bg-stone-100 transition-colors lg:hidden"
+                className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
+                title={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
               >
-                <Menu className="w-5 h-5 text-stone-600" />
+                {sidebarOpen ? (
+                  <X className="w-5 h-5 text-stone-600" />
+                ) : (
+                  <Menu className="w-5 h-5 text-stone-600" />
+                )}
               </button>
               <h2 className="text-2xl font-bold text-stone-800">
                 {menuItems.find(item => 
