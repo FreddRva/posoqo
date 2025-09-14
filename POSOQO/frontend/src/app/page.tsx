@@ -81,14 +81,18 @@ export default function HomePage() {
     // Una sola llamada a la API para cargar todos los productos
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
     console.log("📦 [DEBUG] API URL:", apiUrl);
-    fetch(`${apiUrl}/api/products`)
+    const productsUrl = apiUrl.endsWith('/api') ? `${apiUrl}/products` : `${apiUrl}/api/products`;
+    console.log("📦 [DEBUG] Products URL:", productsUrl);
+    fetch(productsUrl)
       .then(res => res.json())
       .then(res => {
         // Cargar todos los productos para el fallback
         setProducts(res.data);
         
         // Buscar la categoría "Cervezas" por nombre
-        fetch(`${apiUrl}/api/categories`)
+        const categoriesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/categories` : `${apiUrl}/api/categories`;
+        console.log("📦 [DEBUG] Categories URL:", categoriesUrl);
+        fetch(categoriesUrl)
           .then(catRes => catRes.json())
           .then(catData => {
             console.log("📦 [DEBUG] Categorías cargadas:", catData);
@@ -121,7 +125,8 @@ export default function HomePage() {
           });
         
         // Cargar servicios reales desde la API
-        fetch(`${apiUrl}/api/services`)
+        const servicesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/services` : `${apiUrl}/api/services`;
+        fetch(servicesUrl)
           .then(servicesRes => servicesRes.json())
           .then(servicesData => {
             if (servicesData.success && servicesData.data) {
