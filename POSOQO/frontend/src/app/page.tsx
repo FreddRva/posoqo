@@ -545,6 +545,50 @@ export default function HomePage() {
               <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
             
+            {/* Grid de productos destacados */}
+            {featuredCervezas.length > 0 && (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                {featuredCervezas.map((product, index) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 transition-all duration-300 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
+                  >
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center">
+                        <Beer className="w-10 h-10 text-black" />
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-gray-400 mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+                      <div className="text-2xl font-bold text-[#D4AF37] mb-4">
+                        S/ {product.price.toFixed(2)}
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300"
+                      >
+                        Ver Detalles
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
+
             {/* Botón de acción principal */}
             <motion.div 
               className="mt-8"
