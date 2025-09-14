@@ -90,13 +90,20 @@ export default function HomePage() {
         fetch(`${apiUrl}/api/categories`)
           .then(catRes => catRes.json())
           .then(catData => {
+            console.log("📦 [DEBUG] Categorías cargadas:", catData);
             const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
+            console.log("📦 [DEBUG] Categoría Cervezas encontrada:", cervezaCategory);
+            
             if (cervezaCategory) {
               // Productos de la categoría Cervezas
               const cervezasDestacadas = res.data.filter((p: any) => 
                 p.category_id === cervezaCategory.id
               ).slice(0, 4);
+              console.log("📦 [DEBUG] Cervezas destacadas:", cervezasDestacadas);
               setFeaturedCervezas(cervezasDestacadas);
+            } else {
+              console.log("📦 [DEBUG] No se encontró categoría Cervezas, mostrando todos los productos");
+              setFeaturedCervezas(res.data.slice(0, 4));
             }
             
             // Para comidas, buscar otras categorías (Vinos, Cocteles, Licores)
@@ -546,6 +553,7 @@ export default function HomePage() {
             </div>
             
             {/* Grid de productos destacados */}
+            {console.log("📦 [DEBUG] featuredCervezas en render:", featuredCervezas.length, featuredCervezas)}
             {featuredCervezas.length > 0 && (
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
