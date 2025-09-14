@@ -146,6 +146,11 @@ export default function HomePage() {
       });
   }, []);
 
+  // Debug: Log cuando featuredCervezas cambie
+  useEffect(() => {
+    console.log("📦 [DEBUG] featuredCervezas actualizado:", featuredCervezas.length, featuredCervezas);
+  }, [featuredCervezas]);
+
   // Scroll a hash en la URL
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -553,7 +558,6 @@ export default function HomePage() {
             </div>
             
             {/* Grid de productos destacados */}
-            {console.log("📦 [DEBUG] featuredCervezas en render:", featuredCervezas.length, featuredCervezas)}
             {featuredCervezas.length > 0 && (
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
