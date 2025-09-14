@@ -104,9 +104,11 @@ export default function HomePage() {
               console.log("📦 [DEBUG] Buscando productos destacados de categoría:", cervezaCategory.id);
               console.log("📦 [DEBUG] Todos los productos:", res.data);
               const cervezasDestacadas = res.data.filter((p: any) => {
-                const isCerveza = p.category_id === cervezaCategory.id;
+                const isCervezaByCategory = p.category_id === cervezaCategory.id;
+                const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
+                const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
                 const isFeatured = p.is_featured;
-                console.log(`📦 [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isCerveza=${isCerveza}`);
+                console.log(`📦 [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isCervezaByCategory=${isCervezaByCategory}, isCervezaBySubcategory=${isCervezaBySubcategory}, isCerveza=${isCerveza}`);
                 return isCerveza && isFeatured;
               }).slice(0, 4);
               console.log("📦 [DEBUG] Cervezas destacadas encontradas:", cervezasDestacadas);
@@ -117,9 +119,12 @@ export default function HomePage() {
             }
             
             // Para comidas, buscar otras categorías destacadas (Vinos, Cocteles, Licores)
-            const comidasDestacadas = res.data.filter((p: any) => 
-              p.category_id !== cervezaCategory?.id && p.is_featured
-            ).slice(0, 4);
+            const comidasDestacadas = res.data.filter((p: any) => {
+              const isCervezaByCategory = p.category_id === cervezaCategory?.id;
+              const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
+              const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
+              return !isCerveza && p.is_featured;
+            }).slice(0, 4);
             console.log("📦 [DEBUG] Comidas destacadas:", comidasDestacadas);
             setFeaturedComidas(comidasDestacadas);
           })
