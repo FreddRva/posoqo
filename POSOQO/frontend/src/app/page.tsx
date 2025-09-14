@@ -574,7 +574,7 @@ export default function HomePage() {
                         {product.description}
                       </p>
                       <div className="text-2xl font-bold text-[#D4AF37] mb-4">
-                        S/ {product.price.toFixed(2)}
+                        S/ {product.price?.toFixed(2) || '0.00'}
                       </div>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
