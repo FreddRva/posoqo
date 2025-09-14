@@ -171,28 +171,46 @@ export default function AdminProducts() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validar tamaño del archivo (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('⚠️ La imagen no puede exceder 5MB');
+      return;
+    }
+
+    // Validar tipo de archivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('⚠️ Solo se permiten archivos JPG, PNG, GIF y WebP');
+      return;
+    }
+
     setIsUploadingImage(true);
+    setError(null);
+    
     const formData = new FormData();
     formData.append('image', file);
 
     try {
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/upload`, {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Error al subir imagen');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al subir imagen');
       }
 
       const data = await response.json();
+      console.log('✅ [UPLOAD] Imagen subida exitosamente:', data);
+      
       setForm(prev => ({
         ...prev,
-        image_url: data.url
+        image_url: data.url || data.image_url
       }));
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('Error al subir imagen');
+    } catch (error: any) {
+      console.error('❌ [UPLOAD] Error subiendo imagen:', error);
+      setError(`⚠️ Error al subir imagen: ${error.message || 'Error desconocido'}`);
     } finally {
       setIsUploadingImage(false);
     }
@@ -201,23 +219,63 @@ export default function AdminProducts() {
   const validateForm = () => {
     const errors: {[key: string]: string} = {};
 
-    if (!form.name.trim()) {
-      errors.name = 'El nombre es requerido';
+    // Validar nombre
+    if (!form.name || !form.name.trim()) {
+      errors.name = '⚠️ El nombre del producto es obligatorio';
+    } else if (form.name.trim().length < 2) {
+      errors.name = '⚠️ El nombre debe tener al menos 2 caracteres';
+    } else if (form.name.trim().length > 100) {
+      errors.name = '⚠️ El nombre no puede exceder 100 caracteres';
     }
-    if (!form.description.trim()) {
-      errors.description = 'La descripción es requerida';
+
+    // Validar descripción
+    if (!form.description || !form.description.trim()) {
+      errors.description = '⚠️ La descripción es obligatoria';
+    } else if (form.description.trim().length < 10) {
+      errors.description = '⚠️ La descripción debe tener al menos 10 caracteres';
+    } else if (form.description.trim().length > 500) {
+      errors.description = '⚠️ La descripción no puede exceder 500 caracteres';
     }
-    if (form.price <= 0) {
-      errors.price = 'El precio debe ser mayor a 0';
+
+    // Validar precio
+    if (!form.price || form.price <= 0) {
+      errors.price = '⚠️ El precio debe ser mayor a 0';
+    } else if (form.price > 9999.99) {
+      errors.price = '⚠️ El precio no puede exceder S/ 9,999.99';
     }
+
+    // Validar stock
+    if (form.stock === undefined || form.stock < 0) {
+      errors.stock = '⚠️ El stock debe ser 0 o mayor';
+    } else if (form.stock > 9999) {
+      errors.stock = '⚠️ El stock no puede exceder 9,999 unidades';
+    }
+
+    // Validar categoría
     if (!form.category_id) {
-      errors.category_id = 'La categoría es requerida';
+      errors.category_id = '⚠️ La categoría es obligatoria';
     }
     
-    // Validar subcategoría para bebidas (buscar por nombre en lugar de ID hardcodeado)
+    // Validar subcategoría para cervezas
     const selectedCategory = allCategories.find(c => c.id === form.category_id);
     if (selectedCategory?.name === 'Cervezas' && !form.subcategory_id) {
-      errors.subcategory_id = 'La subcategoría es requerida para cervezas';
+      errors.subcategory_id = '⚠️ La subcategoría es obligatoria para cervezas';
+    }
+
+    // Validar campos específicos de cerveza si aplica
+    if (selectedCategory?.name === 'Cervezas') {
+      if (form.estilo && form.estilo.length > 50) {
+        errors.estilo = '⚠️ El estilo no puede exceder 50 caracteres';
+      }
+      if (form.abv && (isNaN(parseFloat(form.abv)) || parseFloat(form.abv) < 0 || parseFloat(form.abv) > 100)) {
+        errors.abv = '⚠️ El ABV debe ser un número entre 0 y 100';
+      }
+      if (form.ibu && (isNaN(parseFloat(form.ibu)) || parseFloat(form.ibu) < 0 || parseFloat(form.ibu) > 120)) {
+        errors.ibu = '⚠️ El IBU debe ser un número entre 0 y 120';
+      }
+      if (form.color && form.color.length > 30) {
+        errors.color = '⚠️ El color no puede exceder 30 caracteres';
+      }
     }
 
     setValidationErrors(errors);
@@ -235,12 +293,43 @@ export default function AdminProducts() {
     setError(null);
 
     try {
+      // Verificar duplicados antes de enviar
+      const existingProduct = products.find(p => 
+        p.name.toLowerCase() === form.name.toLowerCase().trim() && 
+        p.id !== editingId
+      );
+
+      if (existingProduct) {
+        setError('⚠️ Ya existe un producto con este nombre. Por favor, elige un nombre diferente');
+        setIsSubmitting(false);
+        return;
+      }
+
       const url = editingId ? `/admin/products/${editingId}` : '/admin/products';
       const method = editingId ? 'PUT' : 'POST';
 
+      // Preparar los datos a enviar
+      const dataToSend = {
+        name: form.name.trim(),
+        description: form.description.trim(),
+        price: parseFloat(form.price.toString()),
+        stock: parseInt(form.stock.toString()),
+        category_id: form.category_id,
+        subcategory_id: form.subcategory_id || null,
+        image_url: form.image_url || null,
+        is_active: form.is_active ?? true,
+        is_featured: form.is_featured ?? false,
+        estilo: form.estilo?.trim() || null,
+        abv: form.abv?.trim() || null,
+        ibu: form.ibu?.trim() || null,
+        color: form.color?.trim() || null
+      };
+
+      console.log('📤 [PRODUCTS] Enviando datos:', dataToSend);
+
       const response = await apiFetch(url, {
         method,
-        body: JSON.stringify(form)
+        body: JSON.stringify(dataToSend)
       });
 
       if (response) {
@@ -249,9 +338,33 @@ export default function AdminProducts() {
         reloadProducts();
         reloadCategories();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ [PRODUCTS] Error:', error);
-      setError(`Error al ${editingId ? 'actualizar' : 'crear'} producto`);
+      
+      // Manejo de errores más específico y profesional
+      let errorMessage = '❌ Error inesperado al procesar la solicitud';
+      
+      if (error?.message) {
+        if (error.message.includes('duplicate') || error.message.includes('unique')) {
+          errorMessage = '⚠️ Ya existe un producto con este nombre. Por favor, elige un nombre diferente';
+        } else if (error.message.includes('validation')) {
+          errorMessage = '⚠️ Los datos ingresados no son válidos. Por favor, revisa la información';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = '🌐 Error de conexión. Por favor, verifica tu internet e intenta nuevamente';
+        } else if (error.message.includes('unauthorized') || error.message.includes('401')) {
+          errorMessage = '🔒 Sesión expirada. Por favor, inicia sesión nuevamente';
+        } else if (error.message.includes('forbidden') || error.message.includes('403')) {
+          errorMessage = '🚫 No tienes permisos para realizar esta acción';
+        } else if (error.message.includes('not found') || error.message.includes('404')) {
+          errorMessage = '🔍 Recurso no encontrado. Por favor, recarga la página';
+        } else if (error.message.includes('server') || error.message.includes('500')) {
+          errorMessage = '🛠️ Error del servidor. Por favor, intenta más tarde';
+        } else {
+          errorMessage = `⚠️ ${error.message}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -349,10 +462,10 @@ export default function AdminProducts() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 group"
           >
-            <Plus className="w-5 h-5" />
-            <span>Agregar Producto</span>
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+            <span className="font-medium">Agregar Producto</span>
           </button>
         </div>
 
@@ -569,32 +682,47 @@ export default function AdminProducts() {
 
         {/* Modal para agregar/editar producto */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-stone-800">
-                  {editingId ? 'Editar Producto' : 'Agregar Producto'}
-                </h2>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-stone-400 hover:text-stone-600 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden">
+              {/* Header del Modal */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      {editingId ? 'Editar Producto' : 'Agregar Producto'}
+                    </h2>
+                    <p className="text-blue-100 mt-1">
+                      {editingId ? 'Modifica los datos del producto' : 'Completa la información del nuevo producto'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-white hover:text-blue-200 transition-colors p-2 hover:bg-blue-600 rounded-lg"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
 
-              {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="w-5 h-5 text-red-600" />
-                    <span className="text-red-800">{error}</span>
+              {/* Contenido del Modal */}
+              <div className="p-6 max-h-[calc(95vh-120px)] overflow-y-auto">
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <AlertCircle className="w-5 h-5 text-red-600" />
+                      <span className="text-red-800 font-medium">{error}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Categorías */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Sección 1: Categorización */}
+                <div className="bg-stone-50 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-stone-800 mb-4 flex items-center">
+                    <Tag className="w-5 h-5 mr-2 text-blue-600" />
+                    Categorización
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1">
                       Categoría*
@@ -636,6 +764,7 @@ export default function AdminProducts() {
                       )}
                     </div>
                   )}
+                  </div>
                 </div>
                 
                 {(
@@ -643,8 +772,13 @@ export default function AdminProducts() {
                       (form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && form.subcategory_id)
                 ) && (
                   <>
-                        {/* Información básica */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Sección 2: Información Básica */}
+                        <div className="bg-stone-50 rounded-lg p-6">
+                          <h3 className="text-lg font-semibold text-stone-800 mb-4 flex items-center">
+                            <Package className="w-5 h-5 mr-2 text-green-600" />
+                            Información Básica
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-stone-700 mb-1">
                               Nombre*
@@ -718,10 +852,11 @@ export default function AdminProducts() {
                               <p className="mt-1 text-xs text-red-600 dark:text-red-400">{validationErrors.stock}</p>
                             )}
                           </div>
+                          </div>
                         </div>
                         
                         {/* Checkboxes */}
-                        <div className="flex gap-6">
+                        <div className="flex gap-6 mt-4">
                           <label className="flex items-center">
                             <input
                               type="checkbox"
@@ -746,7 +881,7 @@ export default function AdminProducts() {
                         </div>
                         
                         {/* Descripción */}
-                        <div>
+                        <div className="mt-4">
                           <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                             Descripción
                           </label>
@@ -759,9 +894,15 @@ export default function AdminProducts() {
                             className="w-full border border-stone-300 dark:border-stone-600 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-stone-700 dark:text-white text-sm relative z-30"
                           />
                         </div>
+                        </div>
                         
-                        {/* Campos de cerveza */}
+                        {/* Sección 3: Campos de Cerveza */}
                         {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
+                          <div className="bg-amber-50 rounded-lg p-6">
+                            <h3 className="text-lg font-semibold text-stone-800 mb-4 flex items-center">
+                              <DollarSign className="w-5 h-5 mr-2 text-amber-600" />
+                              Detalles de Cerveza
+                            </h3>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
                               <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
@@ -819,10 +960,15 @@ export default function AdminProducts() {
                               />
                             </div>
                           </div>
+                          </div>
                         )}
                         
-                        {/* Imagen */}
-                        <div>
+                        {/* Sección 4: Imagen */}
+                        <div className="bg-blue-50 rounded-lg p-6">
+                          <h3 className="text-lg font-semibold text-stone-800 mb-4 flex items-center">
+                            <ImageIcon className="w-5 h-5 mr-2 text-blue-600" />
+                            Imagen del Producto
+                          </h3>
                           <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                             Imagen
                           </label>
@@ -839,7 +985,8 @@ export default function AdminProducts() {
                               />
                               <label
                                 htmlFor="image-upload"
-                                className={`block w-full border border-stone-300 dark:border-stone-600 rounded-md py-2 px-3 text-center cursor-pointer text-sm transition-colors ${
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`block w-full border border-stone-300 dark:border-stone-600 rounded-md py-2 px-3 text-center cursor-pointer text-sm transition-colors text-stone-900 ${
                                   isUploadingImage 
                                     ? 'bg-stone-100 dark:bg-stone-600 cursor-not-allowed' 
                                     : 'bg-white dark:bg-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600'
@@ -882,39 +1029,41 @@ export default function AdminProducts() {
                              )}
                           </div>
                           <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                            Formatos: JPG, PNG, GIF. Máximo 5MB
+                            Formatos: JPG, PNG, GIF, WebP. Máximo 5MB
                           </p>
+                        </div>
                         </div>
                       </>
                     )}
                     
                     {/* Botones */}
-                    <div className="flex justify-between gap-3 pt-4 border-t border-stone-200 dark:border-stone-700">
-                                             <button
-                         type="button"
-                         onClick={handleCloseModal}
-                         className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-stone-700 border border-red-300 dark:border-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
-                       >
-                         <X className="w-4 h-4" />
-                         Cancelar
-                       </button>
-                       <button
-                         type="submit"
-                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md disabled:opacity-50 flex items-center gap-2"
-                         disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && !form.subcategory_id)}
-                       >
-                         {isSubmitting ? (
-                           <>
-                             <Loader2 className="w-4 h-4 animate-spin" />
-                             Guardando...
-                           </>
-                         ) : (
-                           <>
-                             {editingId ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-                             {editingId ? 'Actualizar' : 'Crear'}
-                           </>
-                         )}
-                       </button>
+                    <div className="flex justify-end gap-4 pt-6 border-t border-stone-200">
+                      <button
+                        type="button"
+                        onClick={handleCloseModal}
+                        className="px-6 py-3 text-sm font-medium text-stone-600 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        Cancelar
+                      </button>
+                      
+                      <button
+                        type="submit"
+                        className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-blue-400 disabled:to-blue-500 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl disabled:shadow-none"
+                        disabled={isSubmitting || !form.category_id || (allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && !form.subcategory_id)}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            {editingId ? 'Actualizando...' : 'Creando...'}
+                          </>
+                        ) : (
+                          <>
+                            {editingId ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                            {editingId ? 'Actualizar Producto' : 'Crear Producto'}
+                          </>
+                        )}
+                      </button>
                     </div>
               </form>
             </div>
