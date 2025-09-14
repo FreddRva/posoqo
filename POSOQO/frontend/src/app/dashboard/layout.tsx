@@ -99,14 +99,14 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className={`flex items-center border-b border-stone-200 transition-all duration-300 ${
-            sidebarOpen ? 'justify-between p-3' : 'justify-center p-2'
+            sidebarOpen ? 'justify-between p-6' : 'justify-center p-4'
           }`}>
-            <div className="flex items-center space-x-2">
-              <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-4 h-4 text-white" />
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-white" />
               </div>
               {sidebarOpen && (
-                <h1 className="text-lg font-bold text-stone-800">POSOQO</h1>
+                <h1 className="text-xl font-bold text-stone-800">POSOQO</h1>
               )}
             </div>
             {sidebarOpen && (
