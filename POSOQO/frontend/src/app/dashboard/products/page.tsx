@@ -894,7 +894,6 @@ export default function AdminProducts() {
                             className="w-full border border-stone-300 dark:border-stone-600 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-stone-700 dark:text-white text-sm relative z-30"
                           />
                         </div>
-                        </div>
                         
                         {/* Sección 3: Campos de Cerveza */}
                         {form.category_id && allCategories.find(c => c.id === form.category_id)?.name === 'Cervezas' && (
