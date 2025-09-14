@@ -374,7 +374,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 	// Consultar productos reales de la base de datos
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, subcategory_id, 
-		       is_active, stock, estilo, abv, ibu, color, created_at, updated_at
+		       is_active, is_featured, stock, estilo, abv, ibu, color, created_at, updated_at
 		FROM products
 		ORDER BY name ASC
 	`)
@@ -390,12 +390,12 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 		var id, name, description, categoryID, subcategoryID, estilo, abv, ibu, color string
 		var imageURL sql.NullString
 		var price float64
-		var isActive bool
+		var isActive, isFeatured bool
 		var stock int
 		var createdAt, updatedAt time.Time
 
 		err := rows.Scan(&id, &name, &description, &price, &imageURL, &categoryID, &subcategoryID,
-			&isActive, &stock, &estilo, &abv, &ibu, &color, &createdAt, &updatedAt)
+			&isActive, &isFeatured, &stock, &estilo, &abv, &ibu, &color, &createdAt, &updatedAt)
 		if err != nil {
 			continue
 		}
@@ -409,6 +409,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 			"category_id":    categoryID,
 			"subcategory_id": subcategoryID,
 			"is_active":      isActive,
+			"is_featured":    isFeatured,
 			"stock":          stock,
 			"estilo":         estilo,
 			"abv":            abv,
