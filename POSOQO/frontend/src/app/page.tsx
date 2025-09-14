@@ -79,7 +79,8 @@ export default function HomePage() {
     // Cargar productos
   useEffect(() => {
     // Una sola llamada a la API para cargar todos los productos
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
+    console.log("📦 [DEBUG] API URL:", apiUrl);
     fetch(`${apiUrl}/api/products`)
       .then(res => res.json())
       .then(res => {
