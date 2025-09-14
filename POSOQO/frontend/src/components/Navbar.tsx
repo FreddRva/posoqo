@@ -631,16 +631,6 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                         Mis Pedidos
                       </button>
                       <div className="border-t border-gray-800/50 my-2"></div>
-                      <button
-                        onClick={() => {
-                          router.push("/api/auth/signout");
-                          setUserMenuOpen(false);
-                        }}
-                        className="block w-full text-left px-4 py-3 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 flex items-center gap-3"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Cerrar sesión
-                      </button>
                     </div>
                   )}
                 </div>
@@ -818,82 +808,111 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
             ? "opacity-100 translate-y-0 mt-16" 
             : "opacity-0 -translate-y-full pointer-events-none"}
         `}
+        style={{ top: mobileMenuOpen ? '64px' : '-100vh' }}
       >
-        <div className="px-6 py-8 space-y-1 overflow-y-auto h-full pt-4">
+        <div className="px-6 py-8 space-y-6 overflow-y-auto h-full">
+          
+          {/* Header del menú móvil */}
+          <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
+                <Menu className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Menú</h2>
+                <p className="text-sm text-gray-400">Navegación principal</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all duration-200"
+            >
+              <X className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
           
           {/* Navegación móvil */}
-          {navItems.map((item) => renderNavItem(item, true))}
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Navegación</h3>
+            {navItems.map((item) => renderNavItem(item, true))}
+          </div>
           
           {/* Sección de usuario móvil - Más limpia */}
-          <div className="pt-6 border-t border-gray-800/50 space-y-1">
-            {user ? (
-              <>
+          {user && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Mi Cuenta</h3>
+              <div className="space-y-1">
                 <Link
                   href="/profile"
-                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <User className="w-5 h-5" />
-                  Mi Perfil
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span>Mi Perfil</span>
                 </Link>
                 <Link
                   href="/profile/payments"
-                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <CreditCard className="w-5 h-5" />
-                  Mis Pagos
+                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <CreditCard className="w-4 h-4" />
+                  </div>
+                  <span>Mis Pagos</span>
                 </Link>
                 <Link
                   href="/favorites"
-                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Heart className="w-5 h-5" />
-                  Favoritos
+                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <Heart className="w-4 h-4" />
+                  </div>
+                  <span>Favoritos</span>
                 </Link>
                 <Link
                   href="/orders"
-                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                  className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Package className="w-5 h-5" />
-                  Mis Pedidos
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <Package className="w-4 h-4" />
+                  </div>
+                  <span>Mis Pedidos</span>
                 </Link>
                 {user?.role === 'admin' && (
                   <Link
                     href="/dashboard"
-                    className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                    className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <Crown className="w-5 h-5" />
-                    Panel Admin
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                      <Crown className="w-4 h-4" />
+                    </div>
+                    <span>Panel Admin</span>
                   </Link>
                 )}
-                <div className="border-t border-gray-800/50 my-2"></div>
-                <button
-                  onClick={() => {
-                    router.push("/api/auth/signout");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-3 text-base font-medium text-red-400 hover:bg-gray-700/50 rounded-xl transition-all duration-200 flex items-center gap-3"
-                >
-                  <LogOut className="w-5 h-5" />
-                  Cerrar sesión
-                </button>
-              </>
-            ) : (
-                <button
-                  onClick={() => {
-                    router.push("/login");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full px-6 py-3 rounded-xl font-semibold bg-yellow-400 text-black hover:scale-105 transition-all duration-300 shadow-lg hover:bg-yellow-300"
-                >
-                  Iniciar sesión
-                </button>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Botón de login si no está autenticado */}
+          {!user && (
+            <div className="pt-6">
+              <button
+                onClick={() => {
+                  router.push("/login");
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full px-6 py-4 rounded-xl font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-300 hover:to-yellow-400 hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center gap-2"
+              >
+                <User className="w-5 h-5" />
+                Iniciar sesión
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>

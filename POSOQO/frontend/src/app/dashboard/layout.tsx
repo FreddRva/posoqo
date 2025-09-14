@@ -65,12 +65,14 @@ export default function DashboardLayout({
       <Navbar />
       
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out top-20 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-48'
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out top-20 ${
+        sidebarOpen ? 'w-64 translate-x-0' : 'w-16 -translate-x-0'
       }`}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-stone-200">
+          <div className={`flex items-center border-b border-stone-200 transition-all duration-300 ${
+            sidebarOpen ? 'justify-between p-6' : 'justify-center p-4'
+          }`}>
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-white" />
@@ -81,7 +83,9 @@ export default function DashboardLayout({
             </div>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
+              className={`p-2 rounded-lg hover:bg-stone-100 transition-colors ${
+                !sidebarOpen ? 'absolute right-2' : ''
+              }`}
             >
               {sidebarOpen ? (
                 <X className="w-5 h-5 text-stone-600" />
@@ -92,18 +96,23 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className={`flex-1 py-6 space-y-2 transition-all duration-300 ${
+            sidebarOpen ? 'px-4' : 'px-2'
+          }`}>
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
                 <a
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors group ${
+                  className={`flex items-center rounded-xl transition-all duration-300 group ${
+                    sidebarOpen ? 'space-x-3 px-4 py-3' : 'justify-center p-3'
+                  } ${
                     typeof window !== 'undefined' && window.location.pathname === item.href
                       ? 'bg-blue-50 text-blue-700 border border-blue-200'
                       : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900'
                   }`}
+                  title={!sidebarOpen ? item.name : undefined}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   {sidebarOpen && (
@@ -115,8 +124,12 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Info */}
-          <div className="p-4 border-t border-stone-200">
-            <div className="flex items-center space-x-3">
+          <div className={`border-t border-stone-200 transition-all duration-300 ${
+            sidebarOpen ? 'p-4' : 'p-2'
+          }`}>
+            <div className={`flex items-center ${
+              sidebarOpen ? 'space-x-3' : 'justify-center'
+            }`}>
               <div className="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center">
                 <User className="w-5 h-5 text-stone-600" />
               </div>
@@ -156,13 +169,7 @@ export default function DashboardLayout({
               </h2>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push('/api/auth/signout')}
-                className="flex items-center space-x-2 px-4 py-2 text-stone-600 hover:text-stone-900 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Cerrar Sesión</span>
-              </button>
+              {/* Botón de cerrar sesión removido */}
             </div>
           </div>
         </div>
