@@ -313,7 +313,7 @@ export default function AdminProducts() {
         name: form.name.trim(),
         description: form.description.trim(),
         price: parseFloat(form.price.toString()),
-        stock: parseInt(form.stock.toString()),
+        stock: parseInt((form.stock || 0).toString()),
         category_id: form.category_id,
         subcategory_id: form.subcategory_id || null,
         image_url: form.image_url || null,
@@ -1064,6 +1064,7 @@ export default function AdminProducts() {
                       </button>
                     </div>
               </form>
+              </div>
             </div>
           </div>
         )}
