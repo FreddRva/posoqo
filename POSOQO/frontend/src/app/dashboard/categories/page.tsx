@@ -32,6 +32,7 @@ export default function AdminCategories() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [form, setForm] = useState<Category>({ name: "" });
+  const [isSubcategory, setIsSubcategory] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -174,6 +175,7 @@ export default function AdminCategories() {
   const handleEdit = (category: Category) => {
     setForm(category);
     setEditingId(category.id || null);
+    setIsSubcategory(!!category.parent_id);
     setShowForm(true);
   };
 
@@ -258,13 +260,28 @@ export default function AdminCategories() {
                 Jerarquía
               </button>
             </div>
-            <button
-              onClick={handleAdd}
-              className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Agregar Categoría</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => {
+                  setIsSubcategory(false);
+                  handleAdd();
+                }}
+                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+              >
+                <Folder className="w-5 h-5" />
+                <span>Categoría Principal</span>
+              </button>
+              <button
+                onClick={() => {
+                  setIsSubcategory(true);
+                  handleAdd();
+                }}
+                className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-3 rounded-xl hover:bg-purple-700 transition-colors shadow-lg"
+              >
+                <FolderOpen className="w-5 h-5" />
+                <span>Subcategoría</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -516,9 +533,19 @@ export default function AdminCategories() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-stone-800">
-                  {editingId ? 'Editar Categoría' : 'Agregar Categoría'}
-                </h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-stone-800">
+                    {editingId ? 'Editar Categoría' : (isSubcategory ? 'Agregar Subcategoría' : 'Agregar Categoría Principal')}
+                  </h2>
+                  <p className="text-sm text-stone-600 mt-1">
+                    {editingId 
+                      ? 'Modifica los datos de la categoría' 
+                      : (isSubcategory 
+                          ? 'Crea una nueva subcategoría bajo una categoría principal' 
+                          : 'Crea una nueva categoría principal')
+                    }
+                  </p>
+                </div>
                 <button
                   onClick={() => setShowForm(false)}
                   className="text-stone-400 hover:text-stone-600 transition-colors"
@@ -537,6 +564,23 @@ export default function AdminCategories() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Indicador de tipo de categoría */}
+                {!editingId && (
+                  <div className="flex items-center space-x-2 p-3 bg-stone-50 rounded-lg border border-stone-200">
+                    {isSubcategory ? (
+                      <>
+                        <FolderOpen className="w-5 h-5 text-purple-600" />
+                        <span className="text-sm font-medium text-purple-600">Creando Subcategoría</span>
+                      </>
+                    ) : (
+                      <>
+                        <Folder className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-600">Creando Categoría Principal</span>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-2">
                     Nombre de la Categoría*
@@ -552,22 +596,30 @@ export default function AdminCategories() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Categoría Padre (opcional)
-                  </label>
-                  <select
-                    name="parent_id"
-                    value={form.parent_id || ""}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  >
-                    <option value="">Sin categoría padre</option>
-                    {categories.filter(c => !c.parent_id).map(cat => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
-                    ))}
-                  </select>
-                </div>
+                {(isSubcategory || editingId) && (
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-2">
+                      {isSubcategory ? 'Categoría Padre *' : 'Categoría Padre (opcional)'}
+                    </label>
+                    <select
+                      name="parent_id"
+                      value={form.parent_id || ""}
+                      onChange={handleChange}
+                      required={isSubcategory}
+                      className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    >
+                      <option value="">{isSubcategory ? 'Selecciona una categoría principal' : 'Sin categoría padre'}</option>
+                      {categories.filter(c => !c.parent_id).map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                    {isSubcategory && (
+                      <p className="text-xs text-stone-500 mt-1">
+                        La subcategoría se creará bajo la categoría principal seleccionada
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-stone-700 mb-2">
