@@ -328,7 +328,7 @@ export default function AdminProducts() {
       const dataToSend = {
         name: form.name.trim(),
         description: form.description.trim(),
-        price: parseFloat(form.price.toString()),
+        price: parseFloat((form.price || 0).toString()),
         stock: parseInt((form.stock || 0).toString()),
         category_id: form.category_id,
         subcategory_id: form.subcategory_id || null,
