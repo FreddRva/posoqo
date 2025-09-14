@@ -120,7 +120,7 @@ export default function DashboardLayout({
           </div>
 
           {/* Navigation */}
-          <nav className={`flex-1 py-6 space-y-2 transition-all duration-300 overflow-y-auto ${
+          <nav className={`flex-1 py-6 space-y-2 transition-all duration-300 overflow-y-auto sidebar-scroll ${
             sidebarOpen ? 'px-4' : 'px-2'
           }`}>
             {menuItems.map((item) => {
