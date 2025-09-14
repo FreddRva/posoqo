@@ -83,8 +83,8 @@ export default function DashboardLayout({
       
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out top-20 ${
-        sidebarOpen ? 'w-64 translate-x-0' : 'w-16 -translate-x-0'
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transform transition-all duration-300 ease-in-out ${
+        sidebarOpen ? 'w-64 translate-x-0 top-16' : 'w-16 -translate-x-0 top-20'
       }`}>
         {/* Botón de flecha para abrir cuando está cerrado */}
         {!sidebarOpen && (
@@ -173,8 +173,8 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <div className={`transition-all duration-300 ease-in-out pt-20 ${
-        sidebarOpen ? 'ml-64' : 'ml-16'
+      <div className={`transition-all duration-300 ease-in-out ${
+        sidebarOpen ? 'ml-64 pt-16' : 'ml-16 pt-20'
       }`}>
         {/* Top Bar */}
         <div className="bg-white shadow-sm border-b border-stone-200 px-6 py-4">
