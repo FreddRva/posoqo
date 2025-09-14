@@ -79,65 +79,55 @@ export default function HomePage() {
     // Cargar productos
   useEffect(() => {
     // Una sola llamada a la API para cargar todos los productos
-    fetch("http://localhost:4000/api/products")
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+    fetch(`${apiUrl}/api/products`)
       .then(res => res.json())
       .then(res => {
         // Cargar todos los productos para el fallback
         setProducts(res.data);
         
-        // SOLO productos destacados de cerveza (con subcategoría cerveza)
-        const cervezasDestacadas = res.data.filter((p: any) => 
-          p.is_featured && p.subcategory_id === '762eec2b-0753-41cc-af8a-9763d82a43db'
-        ).slice(0, 4);
-        setFeaturedCervezas(cervezasDestacadas);
-        
-        // SOLO productos destacados de comida
-        const comidasDestacadas = res.data.filter((p: any) => 
-          p.is_featured && p.category_id === 'e5692d7c-565a-47a6-8dbe-aabf11f8eac7'
-        ).slice(0, 4);
-        setFeaturedComidas(comidasDestacadas);
+        // Buscar la categoría "Cervezas" por nombre
+        fetch(`${apiUrl}/api/categories`)
+          .then(catRes => catRes.json())
+          .then(catData => {
+            const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
+            if (cervezaCategory) {
+              // Productos de la categoría Cervezas
+              const cervezasDestacadas = res.data.filter((p: any) => 
+                p.category_id === cervezaCategory.id
+              ).slice(0, 4);
+              setFeaturedCervezas(cervezasDestacadas);
+            }
+            
+            // Para comidas, buscar otras categorías (Vinos, Cocteles, Licores)
+            const comidasDestacadas = res.data.filter((p: any) => 
+              p.category_id !== cervezaCategory?.id && p.is_featured
+            ).slice(0, 4);
+            setFeaturedComidas(comidasDestacadas);
+          })
+          .catch(catError => {
+            console.error('Error cargando categorías:', catError);
+            // Fallback: mostrar todos los productos destacados
+            setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
+            setFeaturedComidas([]);
+          });
         
         // Cargar servicios reales desde la API
-        fetch("http://localhost:4000/api/services")
+        fetch(`${apiUrl}/api/services`)
           .then(servicesRes => servicesRes.json())
           .then(servicesData => {
             if (servicesData.success && servicesData.data) {
               setServices(servicesData.data);
             } else {
-              // Fallback: usar productos destacados que NO sean cerveza ni comida
-              let serviciosTemporales = res.data.filter((p: any) => 
-                p.is_featured && 
-                p.category_id !== 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && // No bebidas
-                p.category_id !== 'e5692d7c-565a-47a6-8dbe-aabf11f8eac7'    // No comida
-              );
-              
-              if (serviciosTemporales.length === 0) {
-                serviciosTemporales = res.data.filter((p: any) => 
-                  p.category_id === 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && // Solo bebidas
-                  !p.is_featured // No destacados
-                ).slice(0, 4);
-              }
-              
-              serviciosTemporales = serviciosTemporales.slice(0, 4);
+              // Fallback: usar productos no destacados como servicios
+              const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
               setServices(serviciosTemporales);
             }
           })
           .catch(servicesError => {
-            // Fallback: usar productos destacados que NO sean cerveza ni comida
-            let serviciosTemporales = res.data.filter((p: any) => 
-              p.is_featured && 
-              p.category_id !== 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && // No bebidas
-              p.category_id !== 'e5692d7c-565a-47a6-8dbe-aabf11f8eac7'    // No comida
-            );
-            
-            if (serviciosTemporales.length === 0) {
-              serviciosTemporales = res.data.filter((p: any) => 
-                p.category_id === 'ba2359b7-6fcb-4c38-8b97-0961637ef032' && // Solo bebidas
-                !p.is_featured // No destacados
-              ).slice(0, 4);
-            }
-            
-            serviciosTemporales = serviciosTemporales.slice(0, 4);
+            console.error('Error cargando servicios:', servicesError);
+            // Fallback: usar productos no destacados como servicios
+            const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
             setServices(serviciosTemporales);
           });
       })
