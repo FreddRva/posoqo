@@ -647,9 +647,6 @@ export default function HomePage() {
             <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
           </div>
 
-          {/* Sección de Comidas Destacadas */}
-          <FeaturedFoods />
-
           {/* Sección de Gastronomía */}
           <motion.div 
             className="text-center mb-20"
@@ -714,6 +711,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* Sección de Comidas Destacadas */}
+      <FeaturedFoods />
 
       {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
