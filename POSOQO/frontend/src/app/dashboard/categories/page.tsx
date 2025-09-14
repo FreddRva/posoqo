@@ -134,24 +134,41 @@ export default function AdminCategories() {
     setIsSubmitting(true);
 
     try {
+      // Validar que si es subcategoría, tenga parent_id
+      if (isSubcategory && !form.parent_id) {
+        setError('Las subcategorías deben tener una categoría padre');
+        setIsSubmitting(false);
+        return;
+      }
+
       const method = editingId ? "PUT" : "POST";
       const url = editingId ? `/admin/categories/${editingId}` : "/admin/categories";
       
+      // Preparar los datos a enviar
+      const dataToSend = {
+        name: form.name,
+        parent_id: form.parent_id || null,
+        image_url: form.image_url || null
+      };
+
+      console.log('📤 [CATEGORIES] Enviando datos:', dataToSend);
+      
       const response = await apiFetch(url, {
         method,
-        body: JSON.stringify(form)
+        body: JSON.stringify(dataToSend)
       });
 
       if (response) {
         console.log(`✅ [CATEGORIES] Categoría ${editingId ? 'actualizada' : 'creada'} exitosamente`);
         setForm({ name: "" });
         setEditingId(null);
+        setIsSubcategory(false);
         setShowForm(false);
         loadCategories();
       }
     } catch (error) {
       console.error('❌ [CATEGORIES] Error:', error);
-      setError(`Error al ${editingId ? 'actualizar' : 'crear'} categoría`);
+      setError(`Error al ${editingId ? 'actualizar' : 'crear'} categoría: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -588,10 +605,10 @@ export default function AdminCategories() {
                   <input
                     type="text"
                     name="name"
-                    value={form.name}
+                    value={form.name || ""}
                     onChange={handleChange}
                     placeholder="Nombre de la categoría"
-                    className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-stone-900"
                     required
                   />
                 </div>
@@ -635,9 +652,11 @@ export default function AdminCategories() {
                         accept="image/*"
                         disabled={isUploadingImage}
                         className="hidden"
+                        id="image-upload"
                       />
                       <label
                         htmlFor="image-upload"
+                        onClick={() => fileInputRef.current?.click()}
                         className={`block w-full border border-stone-300 rounded-lg py-2 px-3 text-center cursor-pointer text-sm transition-colors ${
                           isUploadingImage 
                             ? 'bg-stone-100 cursor-not-allowed' 
