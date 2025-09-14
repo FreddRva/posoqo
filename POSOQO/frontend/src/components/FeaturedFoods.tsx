@@ -17,7 +17,9 @@ export default function FeaturedFoods() {
   useEffect(() => {
     async function fetchFoods() {
       try {
-        const categories = await apiFetch<any[]>("/categories");
+        const categoriesResponse = await apiFetch<any>("/categories");
+        console.log("🍽️ [DEBUG] Respuesta de categorías:", categoriesResponse);
+        const categories = categoriesResponse.data || categoriesResponse;
         console.log("🍽️ [DEBUG] Categorías disponibles:", categories);
         
         // Buscar categoría "Comidas" (con diferentes variaciones)
