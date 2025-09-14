@@ -18,20 +18,46 @@ export default function FeaturedFoods() {
     async function fetchFoods() {
       try {
         const categories = await apiFetch<any[]>("/categories");
-        const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
+        console.log("🍽️ [DEBUG] Categorías disponibles:", categories);
+        
+        // Buscar categoría "Comidas" (con diferentes variaciones)
+        const comidasCategory = categories.find((c: any) => 
+          c.name.toLowerCase() === "comidas" || 
+          c.name.toLowerCase() === "comida" ||
+          c.name.toLowerCase() === "food" ||
+          c.name.toLowerCase() === "gastronomía"
+        );
+        
+        console.log("🍽️ [DEBUG] Categoría Comidas encontrada:", comidasCategory);
         
         const res = await apiFetch<{ success: boolean; data: Product[] }>("/products");
+        console.log("🍽️ [DEBUG] Todos los productos:", res.data);
         
-        // Filtrar productos destacados que NO sean cervezas (misma lógica que la página principal)
-        const comidasDestacadas = res.data.filter((p: any) => {
-          const isCervezaByCategory = p.category_id === cervezaCategory?.id;
-          const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
-          const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-          return !isCerveza && p.is_featured;
-        }).slice(0, 4);
+        let comidasDestacadas = [];
         
+        if (comidasCategory) {
+          // Si encontramos categoría "Comidas", filtrar por esa categoría
+          comidasDestacadas = res.data.filter((p: any) => {
+            const isComida = p.category_id === comidasCategory.id || p.subcategory === comidasCategory.id;
+            const isFeatured = p.is_featured;
+            console.log(`🍽️ [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isComida=${isComida}`);
+            return isComida && isFeatured;
+          }).slice(0, 4);
+        } else {
+          // Fallback: usar la lógica anterior (productos destacados que NO sean cervezas)
+          const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
+          comidasDestacadas = res.data.filter((p: any) => {
+            const isCervezaByCategory = p.category_id === cervezaCategory?.id;
+            const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
+            const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
+            return !isCerveza && p.is_featured;
+          }).slice(0, 4);
+        }
+        
+        console.log("🍽️ [DEBUG] Comidas destacadas encontradas:", comidasDestacadas);
         setFoods(comidasDestacadas);
-      } catch {
+      } catch (error) {
+        console.error("🍽️ [DEBUG] Error cargando comidas:", error);
         setFoods([]);
       } finally {
         setLoading(false);
