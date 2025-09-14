@@ -388,8 +388,8 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 
 	products := []fiber.Map{}
 	for rows.Next() {
-		var id, name, description, categoryID, subcategory, estilo, abv, ibu, color string
-		var imageURL sql.NullString
+		var id, name, description, categoryID, estilo, abv, ibu, color string
+		var imageURL, subcategory sql.NullString
 		var price float64
 		var isActive, isFeatured bool
 		var createdAt, updatedAt time.Time
@@ -410,7 +410,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 			"price":          price,
 			"image_url":      imageURL.String,
 			"category_id":    categoryID,
-			"subcategory_id": subcategory, // Usar subcategory en lugar de subcategory_id
+			"subcategory_id": subcategory.String, // Usar subcategory.String para manejar NULL
 			"is_active":      isActive,
 			"is_featured":    isFeatured,
 			"stock":          0, // Valor por defecto ya que no existe la columna
