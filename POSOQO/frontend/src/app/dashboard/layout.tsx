@@ -90,10 +90,10 @@ export default function DashboardLayout({
         {!sidebarOpen && (
           <button
             onClick={() => setSidebarOpen(true)}
-            className="absolute top-1/2 -right-6 transform -translate-y-1/2 z-10 p-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-200 hover:scale-110"
+            className="absolute top-1/2 -right-6 transform -translate-y-1/2 z-10 p-1 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:scale-110"
             title="Abrir menú"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-6 h-6" />
           </button>
         )}
         <div className="flex flex-col h-full">
