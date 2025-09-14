@@ -134,9 +134,27 @@ export default function AdminCategories() {
     setIsSubmitting(true);
 
     try {
-      // Validar que si es subcategoría, tenga parent_id
+      // Validaciones del lado del cliente
+      if (!form.name || form.name.trim() === '') {
+        setError('⚠️ El nombre de la categoría es obligatorio');
+        setIsSubmitting(false);
+        return;
+      }
+
       if (isSubcategory && !form.parent_id) {
-        setError('Las subcategorías deben tener una categoría padre');
+        setError('⚠️ Las subcategorías deben tener una categoría padre');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Verificar si ya existe una categoría con el mismo nombre
+      const existingCategory = categories.find(cat => 
+        cat.name.toLowerCase() === form.name.toLowerCase().trim() && 
+        cat.id !== editingId
+      );
+
+      if (existingCategory) {
+        setError('⚠️ Ya existe una categoría con este nombre. Por favor, elige un nombre diferente');
         setIsSubmitting(false);
         return;
       }
@@ -146,7 +164,7 @@ export default function AdminCategories() {
       
       // Preparar los datos a enviar
       const dataToSend = {
-        name: form.name,
+        name: form.name.trim(),
         parent_id: form.parent_id || null,
         image_url: form.image_url || null
       };
@@ -166,9 +184,33 @@ export default function AdminCategories() {
         setShowForm(false);
         loadCategories();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ [CATEGORIES] Error:', error);
-      setError(`Error al ${editingId ? 'actualizar' : 'crear'} categoría: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      
+      // Manejo de errores más específico y profesional
+      let errorMessage = '❌ Error inesperado al procesar la solicitud';
+      
+      if (error?.message) {
+        if (error.message.includes('duplicate') || error.message.includes('unique')) {
+          errorMessage = '⚠️ Ya existe una categoría con este nombre. Por favor, elige un nombre diferente';
+        } else if (error.message.includes('validation')) {
+          errorMessage = '⚠️ Los datos ingresados no son válidos. Por favor, revisa la información';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = '🌐 Error de conexión. Por favor, verifica tu internet e intenta nuevamente';
+        } else if (error.message.includes('unauthorized') || error.message.includes('401')) {
+          errorMessage = '🔒 Sesión expirada. Por favor, inicia sesión nuevamente';
+        } else if (error.message.includes('forbidden') || error.message.includes('403')) {
+          errorMessage = '🚫 No tienes permisos para realizar esta acción';
+        } else if (error.message.includes('not found') || error.message.includes('404')) {
+          errorMessage = '🔍 Recurso no encontrado. Por favor, recarga la página';
+        } else if (error.message.includes('server') || error.message.includes('500')) {
+          errorMessage = '🛠️ Error del servidor. Por favor, intenta más tarde';
+        } else {
+          errorMessage = `⚠️ ${error.message}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -657,7 +699,7 @@ export default function AdminCategories() {
                       <label
                         htmlFor="image-upload"
                         onClick={() => fileInputRef.current?.click()}
-                        className={`block w-full border border-stone-300 rounded-lg py-2 px-3 text-center cursor-pointer text-sm transition-colors ${
+                        className={`block w-full border border-stone-300 rounded-lg py-2 px-3 text-center cursor-pointer text-sm transition-colors text-stone-900 ${
                           isUploadingImage 
                             ? 'bg-stone-100 cursor-not-allowed' 
                             : 'bg-white hover:bg-stone-50'
