@@ -16,6 +16,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import ProductCard from "@/components/ui/ProductCard";
 import SectionHeader from "@/components/ui/SectionHeader";
+import FeaturedFoods from "@/components/FeaturedFoods";
 
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -101,17 +102,12 @@ export default function HomePage() {
             
             if (cervezaCategory) {
               // Productos destacados de la categoría Cervezas
-              console.log("📦 [DEBUG] Buscando productos destacados de categoría:", cervezaCategory.id);
-              console.log("📦 [DEBUG] Todos los productos:", res.data);
-              const cervezasDestacadas = res.data.filter((p: any) => {
-                const isCervezaByCategory = p.category_id === cervezaCategory.id;
-                const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
-                const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-                const isFeatured = p.is_featured;
-                console.log(`📦 [DEBUG] Producto ${p.name}: category_id=${p.category_id}, subcategory=${p.subcategory}, is_featured=${isFeatured}, isCervezaByCategory=${isCervezaByCategory}, isCervezaBySubcategory=${isCervezaBySubcategory}, isCerveza=${isCerveza}`);
-                return isCerveza && isFeatured;
-              }).slice(0, 4);
-              console.log("📦 [DEBUG] Cervezas destacadas encontradas:", cervezasDestacadas);
+            const cervezasDestacadas = res.data.filter((p: any) => {
+              const isCervezaByCategory = p.category_id === cervezaCategory.id;
+              const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
+              const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
+              return isCerveza && p.is_featured;
+            }).slice(0, 4);
               setFeaturedCervezas(cervezasDestacadas);
             } else {
               console.log("📦 [DEBUG] No se encontró categoría Cervezas, mostrando productos destacados");
@@ -650,6 +646,9 @@ export default function HomePage() {
             <div className="mx-4 w-2 h-2 bg-[#D4AF37] rounded-full"></div>
             <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
           </div>
+
+          {/* Sección de Comidas Destacadas */}
+          <FeaturedFoods />
 
           {/* Sección de Gastronomía */}
           <motion.div 
