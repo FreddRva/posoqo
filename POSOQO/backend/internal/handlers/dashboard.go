@@ -373,7 +373,7 @@ func GetAdminProductsListPublic(c *fiber.Ctx) error {
 	// Consultar productos reales de la base de datos
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, subcategory, 
-		       is_active, is_featured, COALESCE(stock, 0) as stock, estilo, abv, ibu, color, created_at, updated_at
+		       is_active, is_featured, stock, estilo, abv, ibu, color, created_at, updated_at
 		FROM products
 		ORDER BY name ASC
 	`)
