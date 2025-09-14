@@ -69,11 +69,16 @@ func GetProducts(c *fiber.Ctx) error {
 
 	var products []ProductResponse
 	for rows.Next() {
-		var p Product
+		var id, name, description, categoryID string
+		var imageURL, subcategory, estilo, abv, ibu, color sql.NullString
+		var price float64
+		var isActive, isFeatured bool
+		var createdAt, updatedAt time.Time
+		
 		err := rows.Scan(
-			&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
-			&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
-			&p.Estilo, &p.ABV, &p.IBU, &p.Color,
+			&id, &name, &description, &price, &imageURL,
+			&categoryID, &isActive, &isFeatured, &createdAt, &updatedAt, &subcategory,
+			&estilo, &abv, &ibu, &color,
 		)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{
@@ -82,22 +87,22 @@ func GetProducts(c *fiber.Ctx) error {
 			})
 		}
 		products = append(products, ProductResponse{
-			ID:          p.ID,
-			Name:        p.Name,
-			Description: p.Description,
-			Price:       p.Price,
-			ImageURL:    nullableToString(p.Image),
-			CategoryID:  nullableToString(p.CategoryID),
-			IsActive:    p.IsActive,
-			IsFeatured:  p.IsFeatured,
+			ID:          id,
+			Name:        name,
+			Description: description,
+			Price:       price,
+			ImageURL:    imageURL.String,
+			CategoryID:  categoryID,
+			IsActive:    isActive,
+			IsFeatured:  isFeatured,
 			Stock:       0, // Valor por defecto ya que no existe en la base de datos
-			CreatedAt:   p.CreatedAt,
-			UpdatedAt:   p.UpdatedAt,
-			Subcategory: nullableToString(p.Subcategory),
-			Estilo:      nullableToString(p.Estilo),
-			ABV:         nullableToString(p.ABV),
-			IBU:         nullableToString(p.IBU),
-			Color:       nullableToString(p.Color),
+			CreatedAt:   createdAt,
+			UpdatedAt:   updatedAt,
+			Subcategory: subcategory.String,
+			Estilo:      estilo.String,
+			ABV:         abv.String,
+			IBU:         ibu.String,
+			Color:       color.String,
 		})
 	}
 
