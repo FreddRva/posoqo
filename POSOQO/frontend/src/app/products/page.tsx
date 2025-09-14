@@ -326,6 +326,17 @@ function ProductsContent() {
             // Filtrar por category_id o subcategory
             categoryMatch = product.category_id === selectedCategory.id ||
                            product.subcategory_id === selectedCategory.id;
+            
+            // Si es filtro de cervezas y no coincide por categoría, intentar por texto
+            if (!categoryMatch && (filter === "cerveza" || filter === "cervezas")) {
+              const productText = `${product.name} ${product.description}`.toLowerCase();
+              categoryMatch = productText.includes('cerveza') || 
+                             productText.includes('beer') ||
+                             product.name.toLowerCase().includes('cerveza') ||
+                             product.description.toLowerCase().includes('cerveza');
+              console.log(`🔍 [FILTER] Producto ${product.name}: fallback por texto, categoryMatch=${categoryMatch}`);
+            }
+            
             console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory_id=${product.subcategory_id}, selectedCategory.id=${selectedCategory.id}`);
           } else {
             // Si no encuentra la categoría en BD, usar filtro por texto como fallback
@@ -1000,7 +1011,18 @@ function ProductsContent() {
                         cat.name.toLowerCase() === 'cerveza'
                       );
                       if (cervezaCategory) {
-                        return p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id;
+                        const categoryMatch = p.category_id === cervezaCategory.id || p.subcategory_id === cervezaCategory.id;
+                        
+                        // Si no coincide por categoría, intentar por texto
+                        if (!categoryMatch) {
+                          const productText = `${p.name} ${p.description}`.toLowerCase();
+                          return productText.includes('cerveza') || 
+                                 productText.includes('beer') ||
+                                 p.name.toLowerCase().includes('cerveza') ||
+                                 p.description.toLowerCase().includes('cerveza');
+                        }
+                        
+                        return categoryMatch;
                       }
                     }
                     // Fallback por texto
