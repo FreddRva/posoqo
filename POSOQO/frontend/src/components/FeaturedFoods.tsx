@@ -18,11 +18,19 @@ export default function FeaturedFoods() {
     async function fetchFoods() {
       try {
         const categories = await apiFetch<any[]>("/categories");
-        const comidasCat = categories.find(cat => cat.name.toLowerCase() === "comidas" || cat.name.toLowerCase() === "comida");
-        if (!comidasCat) return setFoods([]);
+        const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
+        
         const res = await apiFetch<{ success: boolean; data: Product[] }>("/products");
-        const filtered = res.data.filter(p => p.category_id === comidasCat.id).slice(0, 4);
-        setFoods(filtered);
+        
+        // Filtrar productos destacados que NO sean cervezas (misma lógica que la página principal)
+        const comidasDestacadas = res.data.filter((p: any) => {
+          const isCervezaByCategory = p.category_id === cervezaCategory?.id;
+          const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
+          const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
+          return !isCerveza && p.is_featured;
+        }).slice(0, 4);
+        
+        setFoods(comidasDestacadas);
       } catch {
         setFoods([]);
       } finally {
