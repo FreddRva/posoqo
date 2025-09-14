@@ -285,8 +285,8 @@ export function useNotifications() {
     if (session) {
       loadNotifications();
       
-      // Polling cada 5 segundos para actualizaciones más rápidas
-      const interval = setInterval(loadNotifications, 5000);
+      // Polling cada 30 segundos para reducir recargues (era cada 5 segundos)
+      const interval = setInterval(loadNotifications, 30000);
       
       // Escuchar eventos de actualización de notificaciones
       const handleNotificationUpdate = () => {
