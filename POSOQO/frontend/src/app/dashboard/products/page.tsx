@@ -55,7 +55,7 @@ export default function AdminProducts() {
   const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [allSubcategories, setAllSubcategories] = useState<Category[]>([]);
-  const [form, setForm] = useState<Product>({ name: "", description: "", price: 0, image_url: "", is_active: true, is_featured: false, stock: 0 });
+  const [form, setForm] = useState<Product>({ name: "", description: "", price: undefined, image_url: "", is_active: true, is_featured: false, stock: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,12 +69,16 @@ export default function AdminProducts() {
 
   // Función para recargar productos desde el backend
   const reloadProducts = () => {
+    console.log('🔄 [PRODUCTS] Recargando productos...');
     apiFetch("/admin/products/list")
       .then((data: any) => {
+        console.log('📦 [PRODUCTS] Respuesta completa:', data);
+        console.log('📦 [PRODUCTS] Productos recibidos:', data.data || []);
         setProducts(data.data || []);
         setLoading(false);
       })
       .catch((error) => {
+        console.error('❌ [PRODUCTS] Error cargando productos:', error);
         setError("Error al cargar productos");
         setLoading(false);
       });
@@ -238,7 +242,7 @@ export default function AdminProducts() {
     }
 
     // Validar precio
-    if (!form.price || form.price <= 0) {
+    if (form.price === undefined || form.price === null || form.price <= 0) {
       errors.price = '⚠️ El precio debe ser mayor a 0';
     } else if (form.price > 9999.99) {
       errors.price = '⚠️ El precio no puede exceder S/ 9,999.99';
@@ -421,7 +425,7 @@ export default function AdminProducts() {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setForm({ name: "", description: "", price: 0, image_url: "", is_active: true, is_featured: false, stock: 0 });
+    setForm({ name: "", description: "", price: undefined, image_url: "", is_active: true, is_featured: false, stock: 0 });
     setEditingId(null);
     setValidationErrors({});
     setError(null);
@@ -438,6 +442,12 @@ export default function AdminProducts() {
     
     return matchesSearch && matchesFilter;
   });
+
+  // Debug: Log de productos y filtros
+  console.log('🔍 [PRODUCTS] Total productos:', products.length);
+  console.log('🔍 [PRODUCTS] Productos filtrados:', filteredProducts.length);
+  console.log('🔍 [PRODUCTS] Filtro actual:', filter);
+  console.log('🔍 [PRODUCTS] Búsqueda actual:', searchQuery);
 
   const getProductStats = () => {
     return {
