@@ -606,11 +606,11 @@ export default function AdminCategories() {
                       value={form.parent_id || ""}
                       onChange={handleChange}
                       required={isSubcategory}
-                      className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-stone-900"
                     >
-                      <option value="">{isSubcategory ? 'Selecciona una categoría principal' : 'Sin categoría padre'}</option>
+                      <option value="" className="text-stone-900">{isSubcategory ? 'Selecciona una categoría principal' : 'Sin categoría padre'}</option>
                       {categories.filter(c => !c.parent_id).map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        <option key={cat.id} value={cat.id} className="text-stone-900">{cat.name}</option>
                       ))}
                     </select>
                     {isSubcategory && (
@@ -621,10 +621,11 @@ export default function AdminCategories() {
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Imagen (opcional)
-                  </label>
+                {(isSubcategory || !isSubcategory) && (
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-2">
+                      Imagen (opcional)
+                    </label>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
                       <input
@@ -679,6 +680,7 @@ export default function AdminCategories() {
                     )}
                   </div>
                 </div>
+                )}
 
                 <div className="flex justify-between gap-3 pt-4 border-t border-stone-200">
                   <button
