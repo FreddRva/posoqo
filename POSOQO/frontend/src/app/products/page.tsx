@@ -332,6 +332,7 @@ function ProductsContent() {
           
           if (selectedCategory) {
             // Filtrar por category_id o subcategory (usando la misma lógica que la página principal)
+            
             categoryMatch = product.category_id === selectedCategory.id ||
                            product.subcategory === selectedCategory.id;
             
