@@ -108,6 +108,19 @@ func TestCartTables(c *fiber.Ctx) error {
 	})
 }
 
+// TestStripeConfig verifica si Stripe está configurado
+func TestStripeConfig(c *fiber.Ctx) error {
+	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
+	stripePublishableKey := os.Getenv("STRIPE_PUBLISHABLE_KEY")
+	
+	return c.JSON(fiber.Map{
+		"stripe_secret_key_configured": stripeKey != "",
+		"stripe_publishable_key_configured": stripePublishableKey != "",
+		"stripe_secret_key_length": len(stripeKey),
+		"stripe_publishable_key_length": len(stripePublishableKey),
+	})
+}
+
 // Endpoint temporal para debug de categorías y productos
 func DebugCategoriesAndProducts(c *fiber.Ctx) error {
 	// Obtener todas las categorías
