@@ -52,12 +52,12 @@ export function useNotifications() {
         
         if ((statsResponse as any).success) {
           setStats({
-            total: (statsResponse as any).stats.total || 0,
-            unread: (statsResponse as any).stats.unread || 0,
-            orders: (statsResponse as any).stats.orders || 0,
-            users: (statsResponse as any).stats.users || 0,
-            products: (statsResponse as any).stats.products || 0,
-            system: (statsResponse as any).stats.system || 0,
+            total: (statsResponse as any).data.total || 0,
+            unread: (statsResponse as any).data.unread || 0,
+            orders: (statsResponse as any).data.orders || 0,
+            users: (statsResponse as any).data.users || 0,
+            products: (statsResponse as any).data.products || 0,
+            system: (statsResponse as any).data.system || 0,
           });
           
           // Cargar notificaciones del backend
@@ -131,12 +131,12 @@ export function useNotifications() {
         
         if ((statsResponse as any).success) {
           setStats({
-            total: (statsResponse as any).stats.total || 0,
-            unread: (statsResponse as any).stats.unread || 0,
-            orders: (statsResponse as any).stats.orders || 0,
-            users: (statsResponse as any).stats.users || 0,
-            products: (statsResponse as any).stats.products || 0,
-            system: (statsResponse as any).stats.system || 0,
+            total: (statsResponse as any).data.total || 0,
+            unread: (statsResponse as any).data.unread || 0,
+            orders: (statsResponse as any).data.orders || 0,
+            users: (statsResponse as any).data.users || 0,
+            products: (statsResponse as any).data.products || 0,
+            system: (statsResponse as any).data.system || 0,
           });
         }
       } catch (error) {
@@ -201,12 +201,12 @@ export function useNotifications() {
         
         if ((statsResponse as any).success) {
           setStats({
-            total: (statsResponse as any).stats.total || 0,
+            total: (statsResponse as any).data.total || 0,
             unread: 0, // Todas marcadas como leídas
-            orders: (statsResponse as any).stats.orders || 0,
-            users: (statsResponse as any).stats.users || 0,
-            products: (statsResponse as any).stats.products || 0,
-            system: (statsResponse as any).stats.system || 0,
+            orders: (statsResponse as any).data.orders || 0,
+            users: (statsResponse as any).data.users || 0,
+            products: (statsResponse as any).data.products || 0,
+            system: (statsResponse as any).data.system || 0,
           });
         }
       } catch (error) {
