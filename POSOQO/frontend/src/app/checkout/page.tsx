@@ -9,6 +9,7 @@ import { useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, CreditCard, Package, MapPin, User, Phone, FileText, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 interface CartItem {
   id: string;
@@ -34,8 +35,8 @@ const CheckoutMap = dynamic(() => import("@/components/CheckoutMap"), { ssr: fal
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
+  const { cart, total, loading: cartLoading, clearCart } = useCart();
 
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,9 +128,6 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!isClient) return;
-    
-    const stored = localStorage.getItem("cart");
-    setCart(stored ? JSON.parse(stored) : []);
     
     // Cargar datos de dirección desde localStorage
     const storedAddress = localStorage.getItem("userAddress");
@@ -517,7 +515,7 @@ export default function CheckoutPage() {
         }),
         authToken: session?.accessToken,
       });
-      localStorage.removeItem("cart");
+      clearCart();
       router.push("/profile");
     } catch (err: any) {
       setError(err?.error || "Error al crear pedido");
@@ -598,7 +596,6 @@ export default function CheckoutPage() {
     }
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-24 pb-16 px-4 sm:px-6">
