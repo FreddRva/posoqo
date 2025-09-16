@@ -217,8 +217,9 @@ export default function CheckoutPage() {
 
   async function updateAddressFromCoords(lat: number, lng: number) {
     try {
-      // Usar nuestro proxy del backend para reverse geocoding
-      const res = await fetch(`http://localhost:4000/api/geocoding/reverse?lat=${lat}&lon=${lng}`);
+      // Usar el endpoint de geocoding del backend desplegado
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      const res = await fetch(`${backendUrl}/api/geocoding/reverse?lat=${lat}&lon=${lng}`);
       if (!res.ok) {
         console.error('Error en reverse geocoding:', res.status);
         return;
