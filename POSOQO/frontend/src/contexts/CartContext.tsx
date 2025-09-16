@@ -125,7 +125,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return updatedCart;
     });
 
-    // Sincronizar con backend si está autenticado
+    // Sincronizar con backend si está autenticado (temporalmente deshabilitado)
     if (session?.accessToken) {
       try {
         await apiFetch('/protected/cart/add', {
@@ -137,11 +137,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.error('Error sincronizando con backend:', err);
-        // Recargar carrito desde localStorage si falla el backend
-        const stored = localStorage.getItem("cart");
-        const localCart = stored ? JSON.parse(stored) : [];
-        setCart(localCart);
+        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
+        // El carrito ya se actualizó localmente, no necesitamos recargar
       }
     }
 
@@ -179,7 +176,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.error('Error sincronizando cantidad:', err);
+        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
       }
     }
 
@@ -211,7 +208,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.error('Error sincronizando eliminación:', err);
+        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
       }
     }
 
