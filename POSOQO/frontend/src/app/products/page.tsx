@@ -191,14 +191,23 @@ function ProductsContent() {
     const product = products.find(p => p.id === productId);
     const isFavorite = favorites.includes(productId);
 
+    console.log('🔍 [FAVORITES] toggleFavorite llamado:', {
+      productId,
+      productName: product?.name,
+      isFavorite,
+      currentFavorites: favorites
+    });
+
     try {
       if (isFavorite) {
         // Remover de favoritos
+        console.log('🔍 [FAVORITES] Removiendo de favoritos...');
         if (session?.accessToken) {
-          await apiFetch(`/protected/favorites/${productId}`, { 
+          const response = await apiFetch(`/protected/favorites/${productId}`, { 
             method: "DELETE", 
             authToken: session.accessToken 
           });
+          console.log('🔍 [FAVORITES] Respuesta DELETE:', response);
         }
         
         // Solo actualizar estado local si la operación del backend fue exitosa
@@ -206,14 +215,17 @@ function ProductsContent() {
         setFavorites(newFavorites);
         localStorage.setItem("favorites", JSON.stringify(newFavorites));
         manager.userRemovedFromFavorites(product?.name || 'Producto');
+        console.log('🔍 [FAVORITES] Favorito removido localmente:', newFavorites);
       } else {
         // Agregar a favoritos
+        console.log('🔍 [FAVORITES] Agregando a favoritos...');
         if (session?.accessToken) {
-          await apiFetch(`/protected/favorites`, { 
+          const response = await apiFetch(`/protected/favorites`, { 
             method: "POST", 
             authToken: session.accessToken,
             body: JSON.stringify({ product_id: productId })
-          } as any);
+          });
+          console.log('🔍 [FAVORITES] Respuesta POST:', response);
         }
         
         // Solo actualizar estado local si la operación del backend fue exitosa
@@ -221,6 +233,7 @@ function ProductsContent() {
         setFavorites(newFavorites);
         localStorage.setItem("favorites", JSON.stringify(newFavorites));
         manager.userAddedToFavorites(product?.name || 'Producto');
+        console.log('🔍 [FAVORITES] Favorito agregado localmente:', newFavorites);
       }
     } catch (error) {
       console.error('Error en toggleFavorite:', error);
