@@ -222,6 +222,10 @@ export default function CheckoutPage() {
       const res = await fetch(`${backendUrl}/api/geocoding/reverse?lat=${lat}&lon=${lng}`);
       if (!res.ok) {
         console.error('Error en reverse geocoding:', res.status);
+        // Fallback: usar coordenadas como dirección
+        const fallbackAddress = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+        setAddress(fallbackAddress);
+        setLocation(fallbackAddress);
         return;
       }
       const data = await res.json();
@@ -229,9 +233,18 @@ export default function CheckoutPage() {
         setAddress(data.display_name);
         // Actualizar también el estado de location
         setLocation(data.display_name);
+      } else {
+        // Fallback si no hay display_name
+        const fallbackAddress = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+        setAddress(fallbackAddress);
+        setLocation(fallbackAddress);
       }
     } catch (error) {
       console.error('Error al obtener dirección desde coordenadas:', error);
+      // Fallback en caso de error
+      const fallbackAddress = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+      setAddress(fallbackAddress);
+      setLocation(fallbackAddress);
     }
   }
 
