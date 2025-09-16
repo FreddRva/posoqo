@@ -129,6 +129,7 @@ func main() {
 	// Rutas de carrito persistente
 	protected.Get("/cart", handlers.GetCart)
 	protected.Post("/cart", handlers.SaveCart)
+	protected.Post("/cart/add", handlers.AddToCart)
 
 	// Rutas de favoritos (protegidas)
 	protected.Get("/favorites", handlers.ListFavorites)
