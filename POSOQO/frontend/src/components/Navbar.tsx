@@ -148,6 +148,20 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   // Debug: Log para verificar itemCount en Navbar
   console.log('🧭 [Navbar] itemCount:', itemCount);
   
+  // Escuchar cambios en el carrito
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      console.log('🔄 [Navbar] Carrito actualizado');
+      // El hook useCart debería actualizarse automáticamente
+    };
+    
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []);
+  
   // Referencias
   const navbarRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
