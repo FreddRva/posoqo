@@ -90,26 +90,23 @@ export function useCart() {
     // Actualizar estado local inmediatamente
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
+      let updatedCart;
+      
       if (existingItem) {
-        return prevCart.map(item =>
+        updatedCart = prevCart.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prevCart, newItem];
+        updatedCart = [...prevCart, newItem];
       }
+      
+      // Actualizar localStorage con el carrito actualizado
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      
+      return updatedCart;
     });
-
-    // Actualizar localStorage
-    const updatedCart = cart.find(item => item.id === product.id)
-      ? cart.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      : [...cart, newItem];
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
 
     // Sincronizar con backend si está autenticado
     if (session?.accessToken) {
@@ -124,15 +121,16 @@ export function useCart() {
         });
       } catch (err) {
         console.error('Error sincronizando con backend:', err);
-        // Revertir cambios locales si falla el backend
-        setCart(cart);
-        localStorage.setItem("cart", JSON.stringify(cart));
+        // Recargar carrito desde localStorage si falla el backend
+        const stored = localStorage.getItem("cart");
+        const localCart = stored ? JSON.parse(stored) : [];
+        setCart(localCart);
       }
     }
 
     // Disparar evento para actualizar contador en navbar
     window.dispatchEvent(new Event("cartUpdated"));
-  }, [cart, session?.accessToken]);
+  }, [session?.accessToken]);
 
   // Actualizar cantidad de un producto
   const updateQuantity = useCallback(async (productId: string, newQuantity: number) => {
@@ -218,6 +216,9 @@ export function useCart() {
 
   // Calcular cantidad total de items
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  
+  // Debug: Log para verificar itemCount
+  console.log('🛒 [useCart] itemCount:', itemCount, 'cart:', cart);
 
   // Cargar carrito al montar el componente
   useEffect(() => {

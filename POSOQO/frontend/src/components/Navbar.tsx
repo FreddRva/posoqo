@@ -145,6 +145,9 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   // Hook del carrito
   const { itemCount } = useCart();
   
+  // Debug: Log para verificar itemCount en Navbar
+  console.log('🧭 [Navbar] itemCount:', itemCount);
+  
   // Referencias
   const navbarRef = useRef<HTMLElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
