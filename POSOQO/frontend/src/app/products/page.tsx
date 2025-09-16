@@ -85,10 +85,6 @@ function ProductsContent() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   
-  // Log del estado de favoritos para debug
-  useEffect(() => {
-    console.log('🔍 [FAVORITES] Estado actual de favoritos:', favorites);
-  }, [favorites]);
   const [showFilters, setShowFilters] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -173,22 +169,13 @@ function ProductsContent() {
     const loadFavoritesFromBackend = async () => {
       if (session?.accessToken) {
         try {
-          console.log('🔍 [FAVORITES] Cargando favoritos del backend...');
           const res = await apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken });
-          console.log('🔍 [FAVORITES] Respuesta del backend al cargar:', res);
-          console.log('🔍 [FAVORITES] Tipo de res.data:', typeof res.data, Array.isArray(res.data));
-          console.log('🔍 [FAVORITES] Contenido de res.data:', res.data);
           
           // Los productos vienen directamente en res.data, no en res.data.product_id
-          const backendFavs = res.data?.map((product: any) => {
-            console.log('🔍 [FAVORITES] Procesando producto:', product);
-            return product.id;
-          }) || [];
-          console.log('🔍 [FAVORITES] IDs extraídos del backend:', backendFavs);
+          const backendFavs = res.data?.map((product: any) => product.id) || [];
           
           setFavorites(backendFavs);
           localStorage.setItem("favorites", JSON.stringify(backendFavs));
-          console.log('🔍 [FAVORITES] Estado local actualizado:', backendFavs);
         } catch (error) {
           console.error('Error cargando favoritos del backend:', error);
           // Si falla, limpiar favoritos locales para evitar desincronización
@@ -210,23 +197,14 @@ function ProductsContent() {
     const product = products.find(p => p.id === productId);
     const isFavorite = favorites.includes(productId);
 
-    console.log('🔍 [FAVORITES] toggleFavorite llamado:', {
-      productId,
-      productName: product?.name,
-      isFavorite,
-      currentFavorites: favorites
-    });
-
     try {
       if (isFavorite) {
         // Remover de favoritos
-        console.log('🔍 [FAVORITES] Removiendo de favoritos...');
         if (session?.accessToken) {
-          const response = await apiFetch(`/protected/favorites/${productId}`, { 
+          await apiFetch(`/protected/favorites/${productId}`, { 
             method: "DELETE", 
             authToken: session.accessToken 
           });
-          console.log('🔍 [FAVORITES] Respuesta DELETE:', response);
         }
         
         // Solo actualizar estado local si la operación del backend fue exitosa
@@ -234,17 +212,14 @@ function ProductsContent() {
         setFavorites(newFavorites);
         localStorage.setItem("favorites", JSON.stringify(newFavorites));
         manager.userRemovedFromFavorites(product?.name || 'Producto');
-        console.log('🔍 [FAVORITES] Favorito removido localmente:', newFavorites);
       } else {
         // Agregar a favoritos
-        console.log('🔍 [FAVORITES] Agregando a favoritos...');
         if (session?.accessToken) {
-          const response = await apiFetch(`/protected/favorites`, { 
+          await apiFetch(`/protected/favorites`, { 
             method: "POST", 
             authToken: session.accessToken,
             body: JSON.stringify({ product_id: productId })
           });
-          console.log('🔍 [FAVORITES] Respuesta POST:', response);
         }
         
         // Solo actualizar estado local si la operación del backend fue exitosa
@@ -252,7 +227,6 @@ function ProductsContent() {
         setFavorites(newFavorites);
         localStorage.setItem("favorites", JSON.stringify(newFavorites));
         manager.userAddedToFavorites(product?.name || 'Producto');
-        console.log('🔍 [FAVORITES] Favorito agregado localmente:', newFavorites);
       }
     } catch (error) {
       console.error('Error en toggleFavorite:', error);
