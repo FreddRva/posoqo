@@ -227,6 +227,7 @@ func main() {
 	// Ruta de prueba para dashboard
 	api.Get("/dashboard-test", handlers.TestDashboardEndpoint)
 	api.Get("/debug-categories-products", handlers.DebugCategoriesAndProducts)
+	api.Get("/test-notifications-table", handlers.TestNotificationsTable)
 
 	// Endpoints temporales para dashboard (sin autenticación)
 	api.Get("/admin/products", handlers.GetAdminProductsPublic)

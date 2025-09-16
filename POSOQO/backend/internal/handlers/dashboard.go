@@ -19,6 +19,33 @@ func TestDashboardEndpoint(c *fiber.Ctx) error {
 	})
 }
 
+// Endpoint para verificar estructura de tabla notifications
+func TestNotificationsTable(c *fiber.Ctx) error {
+	rows, err := db.DB.Query(context.Background(), 
+		"SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'notifications' ORDER BY ordinal_position")
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener estructura de tabla notifications"})
+	}
+	defer rows.Close()
+
+	var columns []fiber.Map
+	for rows.Next() {
+		var columnName, dataType, isNullable string
+		rows.Scan(&columnName, &dataType, &isNullable)
+		columns = append(columns, fiber.Map{
+			"column_name": columnName,
+			"data_type":   dataType,
+			"is_nullable": isNullable,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"table_name": "notifications",
+		"columns":    columns,
+		"count":      len(columns),
+	})
+}
+
 // Endpoint temporal para debug de categorías y productos
 func DebugCategoriesAndProducts(c *fiber.Ctx) error {
 	// Obtener todas las categorías
