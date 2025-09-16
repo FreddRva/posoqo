@@ -38,6 +38,10 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         }),
       });
 
+      if (!data.clientSecret) {
+        throw new Error("No se pudo crear el PaymentIntent. El sistema de pagos no está disponible.");
+      }
+
       const result = await stripe?.confirmCardPayment((data as any).clientSecret, {
         payment_method: {
           card: elements?.getElement(CardNumberElement)!,
@@ -136,7 +140,14 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ocurrió un error desconocido");
+      const errorMessage = err instanceof Error ? err.message : "Ocurrió un error desconocido";
+      
+      // Mensaje más específico para errores de Stripe
+      if (errorMessage.includes("PaymentIntent") || errorMessage.includes("pagos no está disponible")) {
+        setError("El sistema de pagos no está disponible en este momento. Por favor, intenta más tarde o contacta con soporte.");
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setProcessing(false);
     }
