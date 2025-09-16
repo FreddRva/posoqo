@@ -67,6 +67,7 @@ func runMigrations() error {
 		"012_add_user_active_field.sql",
 		"016_add_order_id_to_notifications.sql",
 		"017_create_cart_tables.sql",
+		"018_create_payments_table.sql",
 	}
 
 	for _, migration := range migrations {

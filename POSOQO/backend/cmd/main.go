@@ -312,6 +312,13 @@ func main() {
 	api.Get("/geocoding/search", handlers.SearchAddress)
 	api.Get("/geocoding/reverse", handlers.ReverseAddress)
 
+	// Endpoints de pago
+	api.Post("/pay", handlers.CreateStripeCheckout)
+	api.Post("/create-payment-intent", handlers.CreateStripePaymentIntent)
+	api.Get("/payments", handlers.GetPaymentHistory)
+	api.Post("/refund", handlers.CreateRefund)
+	api.Post("/stripe/webhook", handlers.StripeWebhook)
+
 	// Obtener puerto de variable de entorno
 	port := os.Getenv("PORT")
 	if port == "" {
