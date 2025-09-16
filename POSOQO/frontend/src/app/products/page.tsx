@@ -14,6 +14,7 @@ import {
 import { useNotifications } from "@/components/NotificationSystem";
 import { useCombinedNotifications } from "@/lib/notificationUtils";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
+import { useCart } from "@/hooks/useCart";
 
 // Componentes dinámicos
 const Map = dynamic(() => import("@/components/ProductsMap"), { 
@@ -84,6 +85,9 @@ function ProductsContent() {
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
+  // Hook del carrito
+  const { addToCart: addToCartHook } = useCart();
   
   const [showFilters, setShowFilters] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -252,35 +256,44 @@ function ProductsContent() {
   };
 
   // Manejar carrito
-  const addToCart = (product: Product) => {
+  const addToCart = async (product: Product) => {
     if (!product || !product.id) {
       console.error('Product is invalid:', product);
       return;
     }
 
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existingItem = cart.find((item: any) => item.id === product.id);
+    try {
+      // Construir la URL de la imagen correctamente
+      let imageUrl = "";
+      if (product.image_url || product.image) {
+        const img = product.image_url || product.image || "";
+        imageUrl = img.startsWith('http')
+          ? img
+          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${img}`;
+      } else {
+        imageUrl = "/file.svg";
+      }
 
-    const updatedCart = existingItem
-      ? cart.map((item: any) => 
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        )
-      : [
-          ...cart, 
-          {
-            ...product,
-            quantity: 1,
-            image_url: product.image_url || product.image || "/file.svg",
-          }
-        ];
+      await addToCartHook({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: imageUrl,
+      });
 
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    window.dispatchEvent(new Event("cartUpdated"));
-    setAddedToCart(product.id);
-    
-    // Notificaciones
-    manager.userAddedToCart(product.name);
-    setTimeout(() => setAddedToCart(null), 1500);
+      setAddedToCart(product.id);
+      
+      // Notificaciones
+      manager.userAddedToCart(product.name);
+      setTimeout(() => setAddedToCart(null), 1500);
+    } catch (error) {
+      console.error('Error agregando al carrito:', error);
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "No se pudo agregar el producto al carrito"
+      });
+    }
   };
 
   // Filtrado y ordenamiento de productos

@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useCart } from "@/hooks/useCart";
 
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] });
@@ -136,11 +137,13 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   const user = session?.user as UserWithRole;
   
   // Estados
-  const [cartCount, setCartCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  // Hook del carrito
+  const { itemCount } = useCart();
   
   // Referencias
   const navbarRef = useRef<HTMLElement>(null);
@@ -151,25 +154,6 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
   // Notificaciones
   const { notifications, stats, markAsRead, markAllAsRead, loading, loadNotifications } = useNotifications();
 
-  // Actualizar contador del carrito
-  useEffect(() => {
-    const updateCartCount = () => {
-      const stored = localStorage.getItem("cart");
-      const cart = stored ? JSON.parse(stored) : [];
-      const count = cart.reduce((acc: number, item: { quantity?: number }) => 
-        acc + (item.quantity || 1), 0);
-      setCartCount(count);
-    };
-    
-    updateCartCount();
-    window.addEventListener("storage", updateCartCount);
-    window.addEventListener("cartUpdated", updateCartCount);
-
-    return () => {
-      window.removeEventListener("storage", updateCartCount);
-      window.removeEventListener("cartUpdated", updateCartCount);
-    };
-  }, []);
 
   // Cerrar menús al cambiar de ruta
   useEffect(() => {
@@ -544,9 +528,9 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 aria-label="Carrito"
               >
                 <ShoppingCart className="w-5 h-5 text-white" />
-                {cartCount > 0 && (
+                {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-black shadow-lg">
-                    {cartCount}
+                    {itemCount}
                   </span>
                 )}
               </button>
@@ -785,9 +769,9 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                 aria-label="Carrito"
               >
                 <ShoppingCart className="w-5 h-5 text-yellow-400" />
-                {cartCount > 0 && (
+                {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-gradient-to-r from-posoqo-gold to-posoqo-gold-accent text-posoqo-black text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center border border-posoqo-black shadow-lg">
-                    {cartCount}
+                    {itemCount}
                   </span>
                 )}
               </button>

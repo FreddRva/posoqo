@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useNotifications } from "@/components/NotificationSystem";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
+import { useCart } from "@/hooks/useCart";
 
 interface CartItem {
   id: string;
@@ -33,10 +34,6 @@ interface Product {
 }
 
 export default function CartPage() {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
   const { recentlyViewed, updateRecentlyViewed } = useRecentlyViewed();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
@@ -46,179 +43,36 @@ export default function CartPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { addNotification } = useNotifications();
-  const isInitialized = useRef(false);
+  
+  // Hook del carrito
+  const { 
+    cart, 
+    loading, 
+    total, 
+    updateQuantity, 
+    removeFromCart, 
+    clearCart,
+    addToCart: addToCartHook
+  } = useCart();
 
-  // Cargar datos iniciales
+  // Cargar favoritos
   useEffect(() => {
-    const loadData = async () => {
-      if (isInitialized.current) return;
-      setLoading(true);
+    const loadFavorites = async () => {
+      if (!session?.accessToken) return;
+      
       try {
-        let cartItems: CartItem[] = [];
-        if (session?.accessToken) {
-          try {
-            const res = await apiFetch<{ items: {product_id: string; quantity: number}[] }>('/cart', {
-              authToken: session.accessToken,
-            });
-            if (res.items?.length > 0) {
-              const itemsWithDetails = await Promise.all(
-                res.items.map(async (item) => {
-                  try {
-                    const productRes = await apiFetch<any>(`/products/${item.product_id}`, {
-                      authToken: session.accessToken,
-                    });
-                    let imageUrl = "";
-                    if (productRes.data?.image_url) {
-                      imageUrl = productRes.data.image_url.startsWith('http')
-                        ? productRes.data.image_url
-                        : `http://localhost:4000${productRes.data.image_url}`;
-                    }
-                    return {
-                      id: item.product_id,
-                      name: productRes.data?.name || "Producto",
-                      price: productRes.data?.price || 0,
-                      image_url: imageUrl,
-                      quantity: item.quantity,
-                    };
-                  } catch {
-                    return {
-                      id: item.product_id,
-                      name: "Producto no disponible",
-                      price: 0,
-                      image_url: "",
-                      quantity: item.quantity,
-                    };
-                  }
-                })
-              );
-              cartItems = itemsWithDetails;
-            }
-          } catch (error) {
-            console.error("Error al cargar carrito del backend:", error);
-          }
-        }
-        if (cartItems.length === 0) {
-          // Cargar desde localStorage directamente aquí en lugar de llamar a la función
-          const stored = localStorage.getItem("cart");
-          const localItems = stored ? JSON.parse(stored) : [];
-          const filteredItems = localItems.filter((item: any) => item?.id && item?.name && item?.price);
-          const processedItems = filteredItems.map((item: any) => {
-            let imageUrl = "";
-            if (item.image_url) {
-              imageUrl = item.image_url.startsWith('http')
-                ? item.image_url
-                : `http://localhost:4000${item.image_url}`;
-            }
-            return {
-              id: String(item.id),
-              name: item.name,
-              price: Number(item.price),
-              image_url: imageUrl,
-              quantity: Math.max(1, Number(item.quantity) || 1),
-            };
-          });
-          setCart(processedItems);
-          
-          // Limpiar localStorage si hay datos antiguos con 'image' en lugar de 'image_url'
-          const hasOldData = localItems.some((item: any) => item.image && !item.image_url);
-          if (hasOldData) {
-            console.log("🔄 [CART] Limpiando datos antiguos del carrito...");
-            localStorage.removeItem("cart");
-          }
-        } else {
-          setCart(cartItems);
-        }
-      } catch (error) {
-        addNotification({
-          type: "error",
-          title: "Error",
-          message: "No se pudo cargar el carrito"
+        const res = await apiFetch<{ data: any[] }>("/protected/favorites", { 
+          authToken: session.accessToken 
         });
-      } finally {
-        setLoading(false);
-        setInitialized(true);
-        isInitialized.current = true;
+        const favIds = res.data?.map((product: any) => product.id) || [];
+        setFavorites(favIds);
+      } catch (error) {
+        console.error('Error cargando favoritos:', error);
       }
     };
-    loadData();
-  }, [session, addNotification]);
 
-  // Listener para actualizar el carrito cuando se agregue un producto
-  useEffect(() => {
-    const handleCartUpdated = () => {
-      const stored = localStorage.getItem("cart");
-      const localItems = stored ? JSON.parse(stored) : [];
-      const filteredItems = localItems.filter((item: any) => item?.id && item?.name && item?.price);
-      const processedItems = filteredItems.map((item: any) => {
-        let imageUrl = "";
-        if (item.image_url) {
-          imageUrl = item.image_url.startsWith('http')
-            ? item.image_url
-            : `http://localhost:4000${item.image_url}`;
-        }
-        return {
-          id: String(item.id),
-          name: item.name,
-          price: Number(item.price),
-          image_url: imageUrl,
-          quantity: Math.max(1, Number(item.quantity) || 1),
-        };
-      });
-      setCart(processedItems);
-    };
-    window.addEventListener("cartUpdated", handleCartUpdated);
-    return () => {
-      window.removeEventListener("cartUpdated", handleCartUpdated);
-    };
-  }, []);
-
-  // Calcular total cuando cambia el carrito
-  useEffect(() => {
-    if (!initialized) return;
-    
-    const newTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    setTotal(newTotal);
-    
-    // Actualizar localStorage si el carrito está vacío
-    if (cart.length === 0 && initialized) {
-      localStorage.removeItem("cart");
-      // No disparar el evento aquí para evitar bucle infinito
-    }
-  }, [cart, initialized]);
-
-  // Actualizar cantidad de un producto
-  const updateQuantity = async (id: string, newQuantity: number) => {
-    const quantity = Math.max(1, newQuantity);
-    const updatedCart = cart.map(item => 
-      item.id === id ? { ...item, quantity } : item
-    );
-    
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    // No disparar el evento aquí para evitar bucle infinito
-
-    // Sincronizar con backend si está autenticado
-    if (session?.accessToken) {
-      try {
-        await apiFetch("/cart", {
-          method: "POST",
-          body: JSON.stringify({
-            items: updatedCart.map(i => ({
-              product_id: i.id,
-              quantity: i.quantity
-            }))
-          }),
-          authToken: session.accessToken,
-        });
-      } catch (error) {
-        addNotification({
-          type: "error",
-          title: "Error",
-          message: "No se pudo actualizar la cantidad"
-        });
-      }
-    }
-  };
+    loadFavorites();
+  }, [session]);
 
   // Abrir modal de confirmación de eliminación
   const openDeleteModal = (id: string) => {
@@ -228,37 +82,19 @@ export default function CartPage() {
 
   // Eliminar producto del carrito
   const removeItem = async (id: string) => {
-    const updatedCart = cart.filter(item => item.id !== id);
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    // No disparar el evento aquí para evitar bucle infinito
-
-    addNotification({
-      type: "success",
-      title: "Eliminado",
-      message: "Producto removido del carrito"
-    });
-
-    // Sincronizar con backend si está autenticado
-    if (session?.accessToken) {
-      try {
-        await apiFetch("/cart", {
-          method: "POST",
-          body: JSON.stringify({
-            items: updatedCart.map(i => ({
-              product_id: i.id,
-              quantity: i.quantity
-            }))
-          }),
-          authToken: session.accessToken,
-        });
-      } catch (error) {
-        addNotification({
-          type: "error",
-          title: "Error",
-          message: "No se pudo eliminar el producto"
-        });
-      }
+    try {
+      await removeFromCart(id);
+      addNotification({
+        type: "success",
+        title: "Eliminado",
+        message: "Producto removido del carrito"
+      });
+    } catch (error) {
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "No se pudo eliminar el producto"
+      });
     }
     
     // Cerrar modal
@@ -306,6 +142,42 @@ export default function CartPage() {
         type: "error",
         title: "Error",
         message: "No se pudo actualizar favoritos"
+      });
+    }
+  };
+
+  // Agregar al carrito
+  const addToCart = async (product: Product) => {
+    try {
+      // Construir la URL de la imagen correctamente
+      let imageUrl = "";
+      if (product.image_url || product.image) {
+        const img = product.image_url || product.image || "";
+        imageUrl = img.startsWith('http')
+          ? img
+          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${img}`;
+      } else {
+        imageUrl = "/file.svg";
+      }
+
+      await addToCartHook({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: imageUrl,
+      });
+      
+      addNotification({
+        type: "success",
+        title: "Agregado al carrito",
+        message: `${product.name} agregado al carrito`
+      });
+    } catch (error) {
+      console.error('Error agregando al carrito:', error);
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "No se pudo agregar al carrito"
       });
     }
   };
