@@ -577,14 +577,14 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-56 premium-gradient border border-yellow-400/20 rounded-2xl shadow-2xl py-3 z-50 gold-glow">
+                    <div className="absolute right-0 mt-3 w-56 bg-gradient-to-br from-gray-900 via-black to-gray-900 border border-yellow-400/20 rounded-2xl shadow-2xl py-3 z-[9999] backdrop-blur-sm">
                       {user?.role === 'admin' && (
                         <button
                           onClick={() => {
                             router.push("/dashboard");
                             setUserMenuOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-semibold transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                          className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-semibold transition-all duration-300 flex items-center gap-3"
                         >
                           <Crown className="w-4 h-4" />
                           Panel Admin
@@ -595,7 +595,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3"
                       >
                         <User className="w-4 h-4" />
                         Mi Perfil
@@ -605,7 +605,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/profile/payments");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3"
                       >
                         <CreditCard className="w-4 h-4" />
                         Mis Pagos
@@ -615,7 +615,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/favorites");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3"
                       >
                         <Heart className="w-4 h-4" />
                         Favoritos
@@ -625,12 +625,23 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           router.push("/orders");
                           setUserMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3 hover:bg-yellow-400/10"
+                        className="block w-full text-left px-4 py-3 text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all duration-300 flex items-center gap-3"
                       >
                         <Package className="w-4 h-4" />
                         Mis Pedidos
                       </button>
                       <div className="border-t border-gray-800/50 my-2"></div>
+                      <button
+                        onClick={() => {
+                          // Cerrar sesión
+                          router.push("/api/auth/signout");
+                          setUserMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 flex items-center gap-3"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Cerrar sesión
+                      </button>
                     </div>
                   )}
                 </div>
@@ -894,6 +905,19 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                     <span>Panel Admin</span>
                   </Link>
                 )}
+                <div className="border-t border-gray-800/50 my-2"></div>
+                <button
+                  onClick={() => {
+                    router.push("/api/auth/signout");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block w-full px-4 py-3 text-base font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-300 flex items-center gap-3"
+                >
+                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <LogOut className="w-4 h-4" />
+                  </div>
+                  <span>Cerrar sesión</span>
+                </button>
               </div>
             </div>
           )}
