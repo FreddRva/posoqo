@@ -103,7 +103,7 @@ export default function HomePage() {
               const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
               return isCerveza && p.is_featured;
             }).slice(0, 4);
-              setFeaturedCervezas(cervezasDestacadas);
+        setFeaturedCervezas(cervezasDestacadas);
             } else {
               setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
             }
@@ -117,7 +117,7 @@ export default function HomePage() {
               const isFeatured = p.is_featured;
               return isNotCerveza && isFeatured;
             }).slice(0, 4);
-            setFeaturedComidas(comidasDestacadas);
+        setFeaturedComidas(comidasDestacadas);
           })
           .catch(catError => {
             console.error('Error cargando categorías:', catError);
@@ -604,7 +604,7 @@ export default function HomePage() {
                 ))}
               </motion.div>
             )}
-
+            
             {/* Botón de acción principal */}
             <motion.div 
               className="mt-8"
@@ -964,7 +964,7 @@ export default function HomePage() {
           >
             Conviértete en miembro del Club POSOQO y accede a lanzamientos exclusivos, descuentos especiales y eventos privados.
           </motion.p>
-
+          
           {/* Estadísticas del club */}
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto"

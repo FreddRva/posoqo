@@ -253,24 +253,24 @@ export default function Footer() {
             <h4 className="font-bold text-[#D4AF37] mb-4 text-lg">Newsletter</h4>
             <p className="text-sm mb-4 text-gray-300">Suscríbete para recibir noticias y promociones exclusivas.</p>
             <form className="space-y-3">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="email"
-                  placeholder="Tu email"
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    placeholder="Tu email"
                   className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-800 border border-[#D4AF37]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent text-gray-200 placeholder-gray-400"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
                 className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-2 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] flex items-center justify-center space-x-2 transition-all duration-300"
-              >
-                <Send className="w-4 h-4" />
-                <span>Suscribirse</span>
-              </button>
-            </form>
-          </div>
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Suscribirse</span>
+                </button>
+              </form>
+            </div>
 
           {/* Horarios y Ubicaciones */}
           <div>
@@ -280,12 +280,12 @@ export default function Footer() {
                 <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Histórico</h5>
                 <p className="text-xs text-gray-400 mb-1">Portal Independencia Nº65</p>
                 <p className="text-xs text-gray-400">Lun-Dom: 12:00 - 23:00</p>
-              </div>
-              <div>
+            </div>
+            <div>
                 <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Rockero</h5>
                 <p className="text-xs text-gray-400 mb-1">Jr. Asamblea Nº310</p>
                 <p className="text-xs text-gray-400">Lun-Dom: 18:00 - 02:00</p>
-              </div>
+                </div>
               <div>
                 <h5 className="font-semibold text-[#D4AF37] mb-2 text-sm">Taproom Planta</h5>
                 <p className="text-xs text-gray-400 mb-1">Sector Público Mz Y</p>
