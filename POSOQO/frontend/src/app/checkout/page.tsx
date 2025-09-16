@@ -124,7 +124,15 @@ export default function CheckoutPage() {
     }
   }, [profile]);
 
-  // Eliminar el efecto que lee localStorage para la ubicación
+  // Actualizar location cuando cambien los campos de dirección
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const fullAddress = `${address || ''}${address && (addressRef || streetNumber) ? ', ' : ''}${addressRef || ''}${addressRef && streetNumber ? ' ' : ''}${streetNumber || ''}`.trim();
+    if (fullAddress) {
+      setLocation(fullAddress);
+    }
+  }, [address, addressRef, streetNumber, isClient]);
 
   useEffect(() => {
     if (!isClient) return;
@@ -218,6 +226,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (data && data.display_name) {
         setAddress(data.display_name);
+        // Actualizar también el estado de location
+        setLocation(data.display_name);
       }
     } catch (error) {
       console.error('Error al obtener dirección desde coordenadas:', error);
@@ -405,6 +415,12 @@ export default function CheckoutPage() {
         lng: markerPosition[1]
       };
       localStorage.setItem('userAddress', JSON.stringify(addressData));
+      
+      // Actualizar el estado de location con la dirección completa
+      const fullAddress = `${address || ''}${address && (addressRef || streetNumber) ? ', ' : ''}${addressRef || ''}${addressRef && streetNumber ? ' ' : ''}${streetNumber || ''}`.trim();
+      if (fullAddress) {
+        setLocation(fullAddress);
+      }
       
       // Recargar el perfil desde la API para asegurar que los datos estén actualizados
       try {
