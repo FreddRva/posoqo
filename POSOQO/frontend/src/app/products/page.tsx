@@ -168,7 +168,8 @@ function ProductsContent() {
     if (session?.accessToken) {
       apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken })
         .then(res => {
-          const backendFavs = res.data?.map((fav: any) => fav.product_id) || [];
+          // Los productos vienen directamente en res.data, no en res.data.product_id
+          const backendFavs = res.data?.map((product: any) => product.id) || [];
           setFavorites(backendFavs);
           localStorage.setItem("favorites", JSON.stringify(backendFavs));
         })
@@ -228,7 +229,7 @@ function ProductsContent() {
       if (session?.accessToken) {
         try {
           const res = await apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken });
-          const backendFavs = res.data?.map((fav: any) => fav.product_id) || [];
+          const backendFavs = res.data?.map((product: any) => product.id) || [];
           setFavorites(backendFavs);
           localStorage.setItem("favorites", JSON.stringify(backendFavs));
         } catch (syncError) {
