@@ -556,37 +556,10 @@ export default function CartPage() {
                     {/* Botones de acción */}
                     <div className="flex gap-4 pt-6">
                       <motion.button
-                        onClick={() => {
-                          // Agregar al carrito
-                          const existingItem = cart.find(item => item.id === selectedProduct.id);
-                          if (existingItem) {
-                            updateQuantity(selectedProduct.id, existingItem.quantity + 1);
-                          } else {
-                            // Construir la URL de la imagen correctamente
-                            let imageUrl = "";
-                            if (selectedProduct.image_url) {
-                              imageUrl = selectedProduct.image_url.startsWith('http')
-                                ? selectedProduct.image_url
-                                : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "http://localhost:4000"}${selectedProduct.image_url}`;
-                            }
-
-                            const newItem: CartItem = {
-                              id: selectedProduct.id,
-                              name: selectedProduct.name,
-                              price: selectedProduct.price,
-                              image_url: imageUrl,
-                              quantity: 1
-                            };
-                            setCart([...cart, newItem]);
-                            localStorage.setItem("cart", JSON.stringify([...cart, newItem]));
-                            window.dispatchEvent(new Event("cartUpdated"));
-                          }
+                        onClick={async () => {
+                          // Agregar al carrito usando el hook
+                          await addToCart(selectedProduct);
                           closeProductModal();
-                          addNotification({
-                            type: "success",
-                            title: "Agregado al carrito",
-                            message: `${selectedProduct.name} agregado al carrito`
-                          });
                         }}
                         className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-900 font-bold px-6 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-amber-400/25"
                         whileHover={{ scale: 1.02 }}
