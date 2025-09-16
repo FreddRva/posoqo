@@ -34,11 +34,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito desde el backend
   const loadCart = useCallback(async () => {
+    // Siempre cargar desde localStorage primero para tener datos inmediatos
+    const stored = localStorage.getItem("cart");
+    const localCart = stored ? JSON.parse(stored) : [];
+    setCart(localCart);
+
     if (!session?.accessToken) {
-      // Si no hay sesión, cargar desde localStorage
-      const stored = localStorage.getItem("cart");
-      const localCart = stored ? JSON.parse(stored) : [];
-      setCart(localCart);
+      // Si no hay sesión, usar solo localStorage
       return;
     }
 
@@ -60,7 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
               if (productRes.image_url) {
                 imageUrl = productRes.image_url.startsWith('http')
                   ? productRes.image_url
-                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${productRes.image_url}`;
+                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${productRes.image_url}`;
               }
               return {
                 id: item.product_id,
@@ -82,16 +84,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           })
         );
         setCart(itemsWithDetails);
+        // Actualizar localStorage con los datos del backend
+        localStorage.setItem("cart", JSON.stringify(itemsWithDetails));
       } else {
-        setCart([]);
+        // Si el backend está vacío, mantener localStorage
+        console.log('Backend carrito vacío, manteniendo localStorage');
       }
     } catch (err) {
-      console.error("Error al cargar carrito del backend:", err);
-      setError("Error al cargar carrito");
-      // Fallback a localStorage
-      const stored = localStorage.getItem("cart");
-      const localCart = stored ? JSON.parse(stored) : [];
-      setCart(localCart);
+      console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
+      // Mantener el carrito de localStorage que ya se cargó
     } finally {
       setLoading(false);
     }
