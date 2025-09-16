@@ -234,8 +234,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Calcular cantidad total de items
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   
-  // Debug: Log para verificar itemCount
-  console.log('🛒 [CartContext] itemCount:', itemCount, 'cart:', cart);
 
   // Cargar carrito al montar el componente
   useEffect(() => {
