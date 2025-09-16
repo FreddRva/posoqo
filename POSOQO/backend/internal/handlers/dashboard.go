@@ -21,7 +21,7 @@ func TestDashboardEndpoint(c *fiber.Ctx) error {
 
 // Endpoint para verificar estructura de tabla notifications
 func TestNotificationsTable(c *fiber.Ctx) error {
-	rows, err := db.DB.Query(context.Background(), 
+	rows, err := db.DB.Query(context.Background(),
 		"SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'notifications' ORDER BY ordinal_position")
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener estructura de tabla notifications"})
@@ -43,6 +43,68 @@ func TestNotificationsTable(c *fiber.Ctx) error {
 		"table_name": "notifications",
 		"columns":    columns,
 		"count":      len(columns),
+	})
+}
+
+// TestCartTables verifica si las tablas de carrito existen
+func TestCartTables(c *fiber.Ctx) error {
+	// Verificar si existe la tabla carts
+	var cartsExists bool
+	err := db.DB.QueryRow(context.Background(),
+		"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'carts')").Scan(&cartsExists)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error verificando tabla carts"})
+	}
+
+	// Verificar si existe la tabla cart_items
+	var cartItemsExists bool
+	err = db.DB.QueryRow(context.Background(),
+		"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'cart_items')").Scan(&cartItemsExists)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error verificando tabla cart_items"})
+	}
+
+	// Si existen, obtener estructura
+	var cartsColumns []fiber.Map
+	var cartItemsColumns []fiber.Map
+
+	if cartsExists {
+		rows, err := db.DB.Query(context.Background(),
+			"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'carts' ORDER BY ordinal_position")
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var columnName, dataType string
+				rows.Scan(&columnName, &dataType)
+				cartsColumns = append(cartsColumns, fiber.Map{
+					"column_name": columnName,
+					"data_type":   dataType,
+				})
+			}
+		}
+	}
+
+	if cartItemsExists {
+		rows, err := db.DB.Query(context.Background(),
+			"SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'cart_items' ORDER BY ordinal_position")
+		if err == nil {
+			defer rows.Close()
+			for rows.Next() {
+				var columnName, dataType string
+				rows.Scan(&columnName, &dataType)
+				cartItemsColumns = append(cartItemsColumns, fiber.Map{
+					"column_name": columnName,
+					"data_type":   dataType,
+				})
+			}
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"carts_exists":     cartsExists,
+		"cart_items_exists": cartItemsExists,
+		"carts_columns":    cartsColumns,
+		"cart_items_columns": cartItemsColumns,
 	})
 }
 
