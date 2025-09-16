@@ -121,8 +121,8 @@ func CreateNotification(c *fiber.Ctx) error {
 	// Respuesta inmediata sin esperar la base de datos
 	go func() {
 		_, err := db.DB.Exec(context.Background(),
-			`INSERT INTO notifications (user_id, type, title, message, order_id, is_read, created_at)
-			 VALUES ($1, $2, $3, $4, $5, false, NOW())`,
+			`INSERT INTO notifications (user_id, type, title, message, order_id, created_at)
+			 VALUES ($1, $2, $3, $4, $5, NOW())`,
 			userID, req.Type, req.Title, req.Message, req.OrderID)
 
 		if err != nil {
