@@ -677,7 +677,7 @@ export default function CheckoutPage() {
                       item.image_url
                         ? (item.image_url.startsWith('http')
                             ? item.image_url
-                            : `http://localhost:4000${item.image_url}`)
+                            : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${item.image_url}`)
                         : "/file.svg"
                     }
                     alt={item.name}
