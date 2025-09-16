@@ -137,7 +137,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
+        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
         // El carrito ya se actualizó localmente, no necesitamos recargar
       }
     }
@@ -176,7 +176,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
+        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -208,7 +208,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
       } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err.message);
+        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
       }
     }
 
