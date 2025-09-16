@@ -132,6 +132,7 @@ func main() {
 
 	// Rutas de favoritos (protegidas)
 	protected.Get("/favorites", handlers.ListFavorites)
+	protected.Post("/favorites", handlers.AddFavorite)
 	protected.Post("/favorites/:product_id", handlers.AddFavorite)
 	protected.Delete("/favorites/:product_id", handlers.RemoveFavorite)
 

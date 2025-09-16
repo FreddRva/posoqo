@@ -13,10 +13,25 @@ import (
 func AddFavorite(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
 	userID := int64(claims["id"].(float64))
-	productID := c.Params("product_id")
+	
+	// Obtener product_id del body o de los parámetros
+	var requestBody struct {
+		ProductID string `json:"product_id"`
+	}
+	
+	// Intentar obtener del body primero
+	if err := c.BodyParser(&requestBody); err != nil {
+		// Si no hay body, intentar obtener de los parámetros
+		requestBody.ProductID = c.Params("product_id")
+	}
+	
+	if requestBody.ProductID == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "product_id es requerido"})
+	}
+	
 	_, err := db.DB.Exec(context.Background(),
 		"INSERT INTO favorites (user_id, product_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-		userID, productID)
+		userID, requestBody.ProductID)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo agregar a favoritos"})
 	}
@@ -28,6 +43,11 @@ func RemoveFavorite(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
 	userID := int64(claims["id"].(float64))
 	productID := c.Params("product_id")
+	
+	if productID == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "product_id es requerido"})
+	}
+	
 	_, err := db.DB.Exec(context.Background(),
 		"DELETE FROM favorites WHERE user_id=$1 AND product_id=$2",
 		userID, productID)
@@ -73,7 +93,12 @@ func ListFavorites(c *fiber.Ctx) error {
 			"updated_at":  updatedAt,
 		})
 	}
-	return c.JSON(products)
+	
+	// Devolver en el formato esperado por el frontend
+	return c.JSON(fiber.Map{
+		"data": products,
+		"message": "Favoritos obtenidos correctamente",
+	})
 }
 
 // ListFavoritesPublic versión pública que devuelve favoritos vacíos si no hay usuario autenticado

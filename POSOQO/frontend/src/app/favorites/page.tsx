@@ -28,13 +28,13 @@ export default function FavoritesPage() {
     
     try {
       setLoading(true);
-      const response = await apiFetch<{ data: any[] }>('/protected/favorites');
+      const response = await apiFetch<{ data: any[] }>('/protected/favorites', {
+        authToken: session.accessToken
+      });
       console.log('🔍 [FAVORITES] Respuesta del backend:', response);
       if (response.data) {
-        // Extraer los productos de la respuesta del backend
-        const products = response.data.map((favorite: any) => favorite.product);
-        console.log('🔍 [FAVORITES] Productos extraídos:', products);
-        setFavorites(products);
+        // Los productos ya vienen directamente en response.data
+        setFavorites(response.data);
       }
     } catch (error) {
       console.error('Error cargando favoritos:', error);
@@ -50,7 +50,8 @@ export default function FavoritesPage() {
   const removeFromFavorites = async (productId: string) => {
     try {
       await apiFetch(`/protected/favorites/${productId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        authToken: session?.accessToken
       });
       
       // Actualizar lista local
@@ -64,6 +65,7 @@ export default function FavoritesPage() {
     try {
       await apiFetch('/protected/cart/add', {
         method: 'POST',
+        authToken: session?.accessToken,
         body: JSON.stringify({
           product_id: product.id,
           quantity: 1
@@ -173,7 +175,7 @@ export default function FavoritesPage() {
                       (product.imageURL || product.image_url)
                         ? ((product.imageURL || product.image_url || '').startsWith('http')
                             ? (product.imageURL || product.image_url || '')
-                            : `http://localhost:4000${product.imageURL || product.image_url || ''}`)
+                            : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${product.imageURL || product.image_url || ''}`)
                         : "/file.svg"
                     }
                     alt={product.name}
