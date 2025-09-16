@@ -24,7 +24,15 @@ export default function FavoritesPage() {
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
 
   const loadFavorites = async () => {
-    if (!session) return;
+    if (!session) {
+      console.log('🔍 [FAVORITES] No hay sesión, no se cargan favoritos');
+      return;
+    }
+    
+    console.log('🔍 [FAVORITES] Cargando favoritos...', {
+      hasAccessToken: !!session.accessToken,
+      session: session
+    });
     
     try {
       setLoading(true);
@@ -34,10 +42,15 @@ export default function FavoritesPage() {
       console.log('🔍 [FAVORITES] Respuesta del backend:', response);
       if (response.data) {
         // Los productos ya vienen directamente en response.data
+        console.log('🔍 [FAVORITES] Productos encontrados:', response.data.length);
         setFavorites(response.data);
+      } else {
+        console.log('🔍 [FAVORITES] No hay data en la respuesta');
+        setFavorites([]);
       }
     } catch (error) {
       console.error('Error cargando favoritos:', error);
+      setFavorites([]);
     } finally {
       setLoading(false);
     }

@@ -165,25 +165,33 @@ function ProductsContent() {
 
   // Sincronizar favoritos con backend si está autenticado
   useEffect(() => {
-    if (session?.accessToken) {
-      apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken })
-        .then(res => {
+    const loadFavoritesFromBackend = async () => {
+      if (session?.accessToken) {
+        try {
+          console.log('🔍 [FAVORITES] Cargando favoritos del backend...');
+          const res = await apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken });
+          console.log('🔍 [FAVORITES] Respuesta del backend al cargar:', res);
+          
           // Los productos vienen directamente en res.data, no en res.data.product_id
           const backendFavs = res.data?.map((product: any) => product.id) || [];
+          console.log('🔍 [FAVORITES] IDs extraídos del backend:', backendFavs);
+          
           setFavorites(backendFavs);
           localStorage.setItem("favorites", JSON.stringify(backendFavs));
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error('Error cargando favoritos del backend:', error);
           // Si falla, limpiar favoritos locales para evitar desincronización
           setFavorites([]);
           localStorage.setItem("favorites", JSON.stringify([]));
-        });
-    } else {
-      // Si no está autenticado, usar favoritos locales
-      const localFavs = JSON.parse(localStorage.getItem("favorites") || "[]");
-      setFavorites(localFavs);
-    }
+        }
+      } else {
+        // Si no está autenticado, usar favoritos locales
+        const localFavs = JSON.parse(localStorage.getItem("favorites") || "[]");
+        setFavorites(localFavs);
+      }
+    };
+
+    loadFavoritesFromBackend();
   }, [session]);
 
   // Manejar favoritos
