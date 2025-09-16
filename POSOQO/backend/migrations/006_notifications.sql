@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     action_url VARCHAR(500),
     action_label VARCHAR(100),
     metadata JSONB DEFAULT '{}',
-    priority INTEGER DEFAULT 0 CHECK (priority >= 0 AND priority <= 5),
-    order_id VARCHAR(255)
+    priority INTEGER DEFAULT 0 CHECK (priority >= 0 AND priority <= 5)
 );
 
 -- Crear índices para mejor rendimiento
@@ -27,7 +26,6 @@ CREATE INDEX IF NOT EXISTS idx_notifications_read_at ON notifications(read_at);
 CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at);
 CREATE INDEX IF NOT EXISTS idx_notifications_expires_at ON notifications(expires_at);
 CREATE INDEX IF NOT EXISTS idx_notifications_priority ON notifications(priority);
-CREATE INDEX IF NOT EXISTS idx_notifications_order_id ON notifications(order_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, read_at) WHERE read_at IS NULL;
 
 -- Crear trigger para actualizar updated_at
@@ -128,7 +126,6 @@ COMMENT ON COLUMN notifications.action_url IS 'URL opcional para acción asociad
 COMMENT ON COLUMN notifications.action_label IS 'Etiqueta del botón de acción';
 COMMENT ON COLUMN notifications.metadata IS 'Datos adicionales en formato JSON';
 COMMENT ON COLUMN notifications.priority IS 'Prioridad de la notificación (0-5, donde 5 es más alta)';
-COMMENT ON COLUMN notifications.order_id IS 'ID del pedido asociado a la notificación (opcional)';
 
 -- Insertar datos de ejemplo (solo para desarrollo)
 -- INSERT INTO notifications (user_id, title, message, type, priority) VALUES 
