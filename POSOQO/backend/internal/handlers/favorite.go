@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -89,7 +90,7 @@ func ListFavorites(c *fiber.Ctx) error {
 		var id, name, description, imageURL, categoryID string
 		var price float64
 		var isActive bool
-		var createdAt, updatedAt string
+		var createdAt, updatedAt time.Time
 		if err := rows.Scan(&id, &name, &description, &price, &imageURL, &categoryID, &isActive, &createdAt, &updatedAt); err != nil {
 			fmt.Printf("🔍 [BACKEND] Error scanning row: %v\n", err)
 			continue
@@ -104,8 +105,8 @@ func ListFavorites(c *fiber.Ctx) error {
 			"image_url":   imageURL,
 			"category_id": categoryID,
 			"is_active":   isActive,
-			"created_at":  createdAt,
-			"updated_at":  updatedAt,
+			"created_at":  createdAt.Format("2006-01-02T15:04:05Z07:00"),
+			"updated_at":  updatedAt.Format("2006-01-02T15:04:05Z07:00"),
 		})
 	}
 	
