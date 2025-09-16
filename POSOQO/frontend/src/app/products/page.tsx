@@ -727,8 +727,20 @@ function ProductsContent() {
                      <option value="bebidas">Bebidas</option>
                    </>
                  ) : (
-                   // Si hay categorías en BD, mostrar solo esas
-                   categories.map((cat) => (
+                   // Si hay categorías en BD, mostrar solo las que NO tienen subcategorías o son subcategorías
+                   categories.filter(cat => {
+                     // Si es "Bebidas" y hay subcategorías como "Cervezas", no mostrar
+                     if (cat.name.toLowerCase() === 'bebidas' || cat.name.toLowerCase() === 'bebida') {
+                       const hasSubcategories = categories.some(subcat => 
+                         subcat.name.toLowerCase() === 'cervezas' ||
+                         subcat.name.toLowerCase() === 'cerveza' ||
+                         subcat.name.toLowerCase() === 'refrescos' ||
+                         subcat.name.toLowerCase() === 'refresco'
+                       );
+                       return !hasSubcategories;
+                     }
+                     return true;
+                   }).map((cat) => (
                      <option key={cat.id} value={cat.name.toLowerCase()}>
                        {CATEGORY_LABELS[cat.name.toLowerCase()] || cat.name}
                      </option>
@@ -890,8 +902,20 @@ function ProductsContent() {
                            <option value="bebidas">Bebidas</option>
                          </>
                        ) : (
-                         // Si hay categorías en BD, mostrar solo esas
-                         categories.map((cat) => (
+                         // Si hay categorías en BD, mostrar solo las que NO tienen subcategorías o son subcategorías
+                         categories.filter(cat => {
+                           // Si es "Bebidas" y hay subcategorías como "Cervezas", no mostrar
+                           if (cat.name.toLowerCase() === 'bebidas' || cat.name.toLowerCase() === 'bebida') {
+                             const hasSubcategories = categories.some(subcat => 
+                               subcat.name.toLowerCase() === 'cervezas' ||
+                               subcat.name.toLowerCase() === 'cerveza' ||
+                               subcat.name.toLowerCase() === 'refrescos' ||
+                               subcat.name.toLowerCase() === 'refresco'
+                             );
+                             return !hasSubcategories;
+                           }
+                           return true;
+                         }).map((cat) => (
                            <option key={cat.id} value={cat.name.toLowerCase()}>
                              {CATEGORY_LABELS[cat.name.toLowerCase()] || cat.name}
                            </option>
