@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react';
 import { MapPin, ExternalLink } from 'lucide-react';
 
 interface OrderMapProps {
-  lat?: number;
-  lng?: number;
+  lat?: number | string;
+  lng?: number | string;
   location?: string;
   orderId: string;
 }
@@ -14,16 +14,24 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
+  // Convertir coordenadas a números y validar
+  const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
+  const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
+  const hasValidCoords = latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum);
+
+  // Debug: mostrar valores recibidos
+  console.log('🗺️ [OrderMap] Props recibidos:', { lat, lng, latNum, lngNum, hasValidCoords });
+
   // Función para abrir Google Maps
   const openInGoogleMaps = () => {
-    if (!lat || !lng) return;
+    if (!hasValidCoords) return;
     
-    const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+    const googleMapsUrl = `https://www.google.com/maps?q=${latNum},${lngNum}`;
     window.open(googleMapsUrl, '_blank');
   };
 
   useEffect(() => {
-    if (!mapRef.current || !lat || !lng) return;
+    if (!mapRef.current || !hasValidCoords) return;
 
     // Cargar Leaflet dinámicamente
     const loadLeaflet = async () => {
@@ -47,7 +55,7 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
     };
 
     const createMap = () => {
-      if (!mapRef.current || !lat || !lng) return;
+      if (!mapRef.current || !hasValidCoords) return;
 
       const L = (window as any).L;
       if (!L) return;
@@ -58,7 +66,7 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
       }
 
       // Crear nuevo mapa
-      const map = L.map(mapRef.current).setView([lat, lng], 15);
+      const map = L.map(mapRef.current).setView([latNum, lngNum], 15);
       mapInstance.current = map;
 
       // Agregar capa de OpenStreetMap
@@ -67,7 +75,7 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
       }).addTo(map);
 
       // Agregar marcador
-      const marker = L.marker([lat, lng]).addTo(map);
+      const marker = L.marker([latNum, lngNum]).addTo(map);
       marker.bindPopup(`
         <div class="text-center">
           <strong>Pedido #${orderId.slice(-8)}</strong><br>
@@ -87,12 +95,12 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
         mapInstance.current.remove();
       }
     };
-  }, [lat, lng, location, orderId]);
+  }, [latNum, lngNum, location, orderId, hasValidCoords]);
 
   // Mostrar dirección de texto siempre que esté disponible
   const displayLocation = location || 'Ubicación no especificada';
 
-  if (!lat || !lng) {
+  if (!hasValidCoords) {
     return (
       <div className="bg-stone-50 rounded-lg p-4 border border-stone-200">
         <div className="flex items-center justify-between">
