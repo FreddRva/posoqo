@@ -23,6 +23,8 @@ type OrderItemRequest struct {
 type CreateOrderRequest struct {
 	Items    []OrderItemRequest `json:"items"`
 	Location string             `json:"location"`
+	Lat      *float64           `json:"lat,omitempty"`
+	Lng      *float64           `json:"lng,omitempty"`
 }
 
 type UpdateOrderStatusRequest struct {
@@ -92,8 +94,11 @@ func CreateOrder(c *fiber.Ctx) error {
 	// Variables para coordenadas
 	var orderLat, orderLng interface{}
 
-	// Si no hay ubicación válida, intentar obtener la dirección del usuario
-	if orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente" {
+	// Primero verificar si el frontend envió coordenadas
+	if req.Lat != nil && req.Lng != nil && *req.Lat != 0 && *req.Lng != 0 {
+		orderLat = *req.Lat
+		orderLng = *req.Lng
+	} else if orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente" {
 		var userAddress, userAddressRef, userStreetNumber sql.NullString
 		var userLat, userLng sql.NullFloat64
 
@@ -135,9 +140,11 @@ func CreateOrder(c *fiber.Ctx) error {
 			orderLng = nil
 		}
 	} else {
-		// Si hay ubicación válida del frontend, usar coordenadas por defecto
-		orderLat = nil
-		orderLng = nil
+		// Si hay ubicación válida del frontend pero no coordenadas, mantener nil
+		if orderLat == nil {
+			orderLat = nil
+			orderLng = nil
+		}
 	}
 
 	err = tx.QueryRow(context.Background(),

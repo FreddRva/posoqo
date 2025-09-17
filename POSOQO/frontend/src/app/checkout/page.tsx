@@ -536,12 +536,15 @@ export default function CheckoutPage() {
       }
       
       console.log("📍 [ORDER] Ubicación para el pedido:", currentLocation);
+      console.log("📍 [ORDER] Coordenadas para el pedido:", { lat: markerPosition[0], lng: markerPosition[1] });
       
       await apiFetch("/protected/orders", {
         method: "POST",
         body: JSON.stringify({
           items: cart.map(item => ({ product_id: item.id, quantity: item.quantity })),
           location: currentLocation,
+          lat: markerPosition[0],
+          lng: markerPosition[1],
         }),
         authToken: session?.accessToken,
       });
@@ -596,6 +599,7 @@ export default function CheckoutPage() {
       }
       
       console.log("📍 [STRIPE] Ubicación para el pedido:", currentLocation);
+      console.log("📍 [STRIPE] Coordenadas para el pedido:", { lat: markerPosition[0], lng: markerPosition[1] });
       
       // 1. Crear el pedido y obtener el order_id
       const orderRes = await apiFetch<{ message: string; order_id: string }>("/protected/orders", {
@@ -603,6 +607,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items: cart.map(item => ({ product_id: item.id, quantity: item.quantity })),
           location: currentLocation,
+          lat: markerPosition[0],
+          lng: markerPosition[1],
         }),
         authToken: session?.accessToken,
       });
