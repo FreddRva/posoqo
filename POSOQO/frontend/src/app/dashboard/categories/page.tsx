@@ -358,7 +358,7 @@ export default function AdminCategories() {
                 <Folder className="w-5 h-5" />
                 <span>Categoría Principal</span>
               </button>
-              <button
+            <button
                 onClick={() => {
                   setIsSubcategory(true);
                   handleAdd();
@@ -367,7 +367,7 @@ export default function AdminCategories() {
               >
                 <FolderOpen className="w-5 h-5" />
                 <span>Subcategoría</span>
-              </button>
+            </button>
             </div>
           </div>
         </div>
@@ -627,9 +627,9 @@ export default function AdminCategories() {
             <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-stone-800">
+                <h2 className="text-2xl font-bold text-stone-800">
                     {editingId ? 'Editar Categoría' : (isSubcategory ? 'Agregar Subcategoría' : 'Agregar Categoría Principal')}
-                  </h2>
+                </h2>
                   <p className="text-sm text-stone-600 mt-1">
                     {editingId 
                       ? 'Modifica los datos de la categoría' 
@@ -690,35 +690,35 @@ export default function AdminCategories() {
                 </div>
 
                 {(isSubcategory || editingId) && (
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 mb-2">
                       {isSubcategory ? 'Categoría Padre *' : 'Categoría Padre (opcional)'}
-                    </label>
-                    <select
-                      name="parent_id"
-                      value={form.parent_id || ""}
-                      onChange={handleChange}
+                  </label>
+                  <select
+                    name="parent_id"
+                    value={form.parent_id || ""}
+                    onChange={handleChange}
                       required={isSubcategory}
                       className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-stone-900"
-                    >
+                  >
                       <option value="" className="text-stone-900">{isSubcategory ? 'Selecciona una categoría principal' : 'Sin categoría padre'}</option>
-                      {categories.filter(c => !c.parent_id).map(cat => (
+                    {categories.filter(c => !c.parent_id).map(cat => (
                         <option key={cat.id} value={cat.id} className="text-stone-900">{cat.name}</option>
-                      ))}
-                    </select>
+                    ))}
+                  </select>
                     {isSubcategory && (
                       <p className="text-xs text-stone-500 mt-1">
                         La subcategoría se creará bajo la categoría principal seleccionada
                       </p>
                     )}
-                  </div>
+                </div>
                 )}
 
                 {(isSubcategory || !isSubcategory) && (
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      Imagen (opcional)
-                    </label>
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 mb-2">
+                    Imagen (opcional)
+                  </label>
                   <div className="flex items-center gap-3">
                     <div className="flex-1">
                       <input

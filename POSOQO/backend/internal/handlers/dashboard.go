@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -102,9 +101,9 @@ func TestCartTables(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"carts_exists":     cartsExists,
-		"cart_items_exists": cartItemsExists,
-		"carts_columns":    cartsColumns,
+		"carts_exists":       cartsExists,
+		"cart_items_exists":  cartItemsExists,
+		"carts_columns":      cartsColumns,
 		"cart_items_columns": cartItemsColumns,
 	})
 }
@@ -113,12 +112,12 @@ func TestCartTables(c *fiber.Ctx) error {
 func TestStripeConfig(c *fiber.Ctx) error {
 	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripePublishableKey := os.Getenv("STRIPE_PUBLISHABLE_KEY")
-	
+
 	return c.JSON(fiber.Map{
-		"stripe_secret_key_configured": stripeKey != "",
+		"stripe_secret_key_configured":      stripeKey != "",
 		"stripe_publishable_key_configured": stripePublishableKey != "",
-		"stripe_secret_key_length": len(stripeKey),
-		"stripe_publishable_key_length": len(stripePublishableKey),
+		"stripe_secret_key_length":          len(stripeKey),
+		"stripe_publishable_key_length":     len(stripePublishableKey),
 	})
 }
 
@@ -142,7 +141,7 @@ func DebugCategoriesAndProducts(c *fiber.Ctx) error {
 	}
 
 	// Obtener todos los productos
-	productsRows, err := db.DB.Query(context.Background(), 
+	productsRows, err := db.DB.Query(context.Background(),
 		"SELECT id, name, category_id, is_featured FROM products ORDER BY name")
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener productos"})

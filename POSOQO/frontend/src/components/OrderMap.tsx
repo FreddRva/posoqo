@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
 
 interface OrderMapProps {
   lat?: number;
@@ -13,6 +13,14 @@ interface OrderMapProps {
 export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
+
+  // Función para abrir Google Maps
+  const openInGoogleMaps = () => {
+    if (!lat || !lng) return;
+    
+    const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+    window.open(googleMapsUrl, '_blank');
+  };
 
   useEffect(() => {
     if (!mapRef.current || !lat || !lng) return;
@@ -87,10 +95,15 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   if (!lat || !lng) {
     return (
       <div className="bg-stone-50 rounded-lg p-4 border border-stone-200">
-        <div className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4 text-stone-400" />
-          <div className="text-stone-600 text-sm font-medium">
-            {displayLocation}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <MapPin className="w-4 h-4 text-stone-400" />
+            <div className="text-stone-600 text-sm font-medium">
+              {displayLocation}
+            </div>
+          </div>
+          <div className="text-stone-400 text-xs">
+            Sin coordenadas
           </div>
         </div>
       </div>
@@ -99,16 +112,28 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center space-x-2">
-        <MapPin className="w-4 h-4 text-stone-400" />
-        <div className="text-stone-600 text-sm font-medium">
-          {displayLocation}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <MapPin className="w-4 h-4 text-stone-400" />
+          <div className="text-stone-600 text-sm font-medium">
+            {displayLocation}
+          </div>
         </div>
+        <button
+          onClick={openInGoogleMaps}
+          className="flex items-center space-x-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded-lg transition-colors duration-200 shadow-sm"
+          title="Abrir en Google Maps"
+        >
+          <ExternalLink className="w-3 h-3" />
+          <span>Ver en Maps</span>
+        </button>
       </div>
       <div 
         ref={mapRef} 
-        className="w-full h-32 rounded-lg border border-stone-200 shadow-sm"
+        className="w-full h-32 rounded-lg border border-stone-200 shadow-sm cursor-pointer"
         style={{ minHeight: '128px' }}
+        onClick={openInGoogleMaps}
+        title="Hacer clic para abrir en Google Maps"
       />
     </div>
   );

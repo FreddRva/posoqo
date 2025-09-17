@@ -173,7 +173,7 @@ function ProductsContent() {
   // Sincronizar favoritos con backend si está autenticado
   useEffect(() => {
     const loadFavoritesFromBackend = async () => {
-      if (session?.accessToken) {
+    if (session?.accessToken) {
         try {
           const res = await apiFetch<{ data: any[] }>("/protected/favorites", { authToken: session.accessToken });
           
@@ -188,11 +188,11 @@ function ProductsContent() {
           setFavorites([]);
           localStorage.setItem("favorites", JSON.stringify([]));
         }
-      } else {
-        // Si no está autenticado, usar favoritos locales
-        const localFavs = JSON.parse(localStorage.getItem("favorites") || "[]");
-        setFavorites(localFavs);
-      }
+    } else {
+      // Si no está autenticado, usar favoritos locales
+      const localFavs = JSON.parse(localStorage.getItem("favorites") || "[]");
+      setFavorites(localFavs);
+    }
     };
 
     loadFavoritesFromBackend();
@@ -283,11 +283,11 @@ function ProductsContent() {
         image_url: imageUrl,
       });
 
-      setAddedToCart(product.id);
-      
-      // Notificaciones
-      manager.userAddedToCart(product.name);
-      setTimeout(() => setAddedToCart(null), 1500);
+    setAddedToCart(product.id);
+    
+    // Notificaciones
+    manager.userAddedToCart(product.name);
+    setTimeout(() => setAddedToCart(null), 1500);
     } catch (error) {
       console.error('Error agregando al carrito:', error);
       addNotification({
