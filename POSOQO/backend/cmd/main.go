@@ -231,6 +231,7 @@ func main() {
 	api.Get("/test-notifications-table", handlers.TestNotificationsTable)
 	api.Get("/test-cart-tables", handlers.TestCartTables)
 	api.Get("/test-stripe-config", handlers.TestStripeConfig)
+	api.Get("/debug-order-coordinates", handlers.DebugOrderCoordinates)
 
 	// Endpoints temporales para dashboard (sin autenticación)
 	api.Get("/admin/products", handlers.GetAdminProductsPublic)

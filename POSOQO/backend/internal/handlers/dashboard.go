@@ -112,12 +112,60 @@ func TestCartTables(c *fiber.Ctx) error {
 func TestStripeConfig(c *fiber.Ctx) error {
 	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripePublishableKey := os.Getenv("STRIPE_PUBLISHABLE_KEY")
-
+	
 	return c.JSON(fiber.Map{
 		"stripe_secret_key_configured":      stripeKey != "",
 		"stripe_publishable_key_configured": stripePublishableKey != "",
 		"stripe_secret_key_length":          len(stripeKey),
 		"stripe_publishable_key_length":     len(stripePublishableKey),
+	})
+}
+
+// DebugOrderCoordinates verifica las coordenadas específicas de un pedido
+func DebugOrderCoordinates(c *fiber.Ctx) error {
+	rows, err := db.DB.Query(context.Background(), `
+		SELECT 
+			o.id,
+			o.lat,
+			o.lng,
+			o.location,
+			o.created_at
+		FROM orders o
+		ORDER BY o.created_at DESC
+		LIMIT 5
+	`)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener pedidos"})
+	}
+	defer rows.Close()
+
+	orders := []fiber.Map{}
+	for rows.Next() {
+		var id string
+		var lat, lng sql.NullFloat64
+		var location sql.NullString
+		var createdAt time.Time
+
+		err := rows.Scan(&id, &lat, &lng, &location, &createdAt)
+		if err != nil {
+			continue
+		}
+
+		order := fiber.Map{
+			"id":         id,
+			"lat":        lat.Float64,
+			"lng":        lng.Float64,
+			"lat_valid":  lat.Valid,
+			"lng_valid":  lng.Valid,
+			"location":   location.String,
+			"created_at": createdAt,
+		}
+		orders = append(orders, order)
+	}
+
+	return c.JSON(fiber.Map{
+		"orders": orders,
+		"count":  len(orders),
 	})
 }
 
