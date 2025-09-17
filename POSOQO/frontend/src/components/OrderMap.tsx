@@ -20,7 +20,17 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   const hasValidCoords = latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum);
 
   // Debug: mostrar valores recibidos
-  console.log('🗺️ [OrderMap] Props recibidos:', { lat, lng, latNum, lngNum, hasValidCoords });
+  console.log('🗺️ [OrderMap] Props recibidos:', { 
+    lat, 
+    lng, 
+    latType: typeof lat, 
+    lngType: typeof lng,
+    latNum, 
+    lngNum, 
+    hasValidCoords,
+    latIsNaN: isNaN(latNum),
+    lngIsNaN: isNaN(lngNum)
+  });
 
   // Función para abrir Google Maps
   const openInGoogleMaps = () => {
