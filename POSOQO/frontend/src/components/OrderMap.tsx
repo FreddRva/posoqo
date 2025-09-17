@@ -17,7 +17,10 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   // Convertir coordenadas a números y validar
   const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
   const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
-  const hasValidCoords = latNum && lngNum && !isNaN(latNum) && !isNaN(lngNum);
+  const hasValidCoords = latNum !== undefined && lngNum !== undefined && 
+                        latNum !== null && lngNum !== null &&
+                        !isNaN(latNum) && !isNaN(lngNum) &&
+                        latNum !== 0 && lngNum !== 0;
 
   // Debug: mostrar valores recibidos
   console.log('🗺️ [OrderMap] Props recibidos:', { 
@@ -28,8 +31,8 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
     latNum, 
     lngNum, 
     hasValidCoords,
-    latIsNaN: isNaN(latNum),
-    lngIsNaN: isNaN(lngNum)
+    latIsNaN: latNum ? isNaN(latNum) : true,
+    lngIsNaN: lngNum ? isNaN(lngNum) : true
   });
 
   // Función para abrir Google Maps
