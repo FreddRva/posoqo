@@ -62,22 +62,8 @@ export default function OrdersPage() {
     try {
       setLoading(true);
       const response = await apiFetch<{ data: any[] }>('/admin/orders/list');
-      console.log('🔍 [ADMIN ORDERS] Respuesta del backend:', JSON.stringify(response, null, 2));
-      
       if ((response as any).data) {
-        const orders = (response as any).data;
-        console.log('🔍 [ADMIN ORDERS] Primer pedido:', JSON.stringify(orders[0], null, 2));
-        if (orders[0]) {
-          console.log('🔍 [ADMIN ORDERS] Coordenadas del primer pedido:', {
-            lat: orders[0].lat,
-            lng: orders[0].lng,
-            latType: typeof orders[0].lat,
-            lngType: typeof orders[0].lng,
-            latValue: `"${orders[0].lat}"`,
-            lngValue: `"${orders[0].lng}"`
-          });
-        }
-        setOrders(orders);
+        setOrders((response as any).data);
       }
     } catch (error) {
       console.error('Error cargando pedidos:', error);

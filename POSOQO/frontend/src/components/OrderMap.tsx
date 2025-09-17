@@ -22,18 +22,6 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
                         !isNaN(latNum) && !isNaN(lngNum) &&
                         latNum !== 0 && lngNum !== 0;
 
-  // Debug: mostrar valores recibidos
-  console.log('🗺️ [OrderMap] Props recibidos:', { 
-    lat, 
-    lng, 
-    latType: typeof lat, 
-    lngType: typeof lng,
-    latNum, 
-    lngNum, 
-    hasValidCoords,
-    latIsNaN: latNum ? isNaN(latNum) : true,
-    lngIsNaN: lngNum ? isNaN(lngNum) : true
-  });
 
   // Función para abrir Google Maps
   const openInGoogleMaps = () => {
