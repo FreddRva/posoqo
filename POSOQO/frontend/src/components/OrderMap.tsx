@@ -14,15 +14,6 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
-  // Debug: mostrar props recibidos
-  console.log('🗺️ [OrderMap] Props completos:', { lat, lng, location, orderId });
-  console.log('🗺️ [OrderMap] Tipos:', { 
-    latType: typeof lat, 
-    lngType: typeof lng,
-    latValue: lat,
-    lngValue: lng
-  });
-
   // Convertir coordenadas a números y validar
   const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
   const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
@@ -31,31 +22,12 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
                         !isNaN(latNum) && !isNaN(lngNum) &&
                         latNum !== 0 && lngNum !== 0;
 
-  console.log('🗺️ [OrderMap] Validación:', { 
-    latNum, 
-    lngNum, 
-    hasValidCoords,
-    latIsUndefined: latNum === undefined,
-    lngIsUndefined: lngNum === undefined,
-    latIsNull: latNum === null,
-    lngIsNull: lngNum === null,
-    latIsNaN: latNum !== undefined ? isNaN(latNum) : true,
-    lngIsNaN: lngNum !== undefined ? isNaN(lngNum) : true,
-    latIsZero: latNum === 0,
-    lngIsZero: lngNum === 0
-  });
-
 
   // Función para abrir Google Maps
   const openInGoogleMaps = () => {
-    console.log('🗺️ [OrderMap] Intentando abrir Google Maps:', { hasValidCoords, latNum, lngNum });
-    if (!hasValidCoords) {
-      console.log('🚨 [OrderMap] Coordenadas no válidas, no se puede abrir Google Maps');
-      return;
-    }
+    if (!hasValidCoords) return;
     
     const googleMapsUrl = `https://www.google.com/maps?q=${latNum},${lngNum}`;
-    console.log('🗺️ [OrderMap] Abriendo URL:', googleMapsUrl);
     window.open(googleMapsUrl, '_blank');
   };
 

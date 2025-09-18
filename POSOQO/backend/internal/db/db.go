@@ -68,6 +68,7 @@ func runMigrations() error {
 		"016_add_order_id_to_notifications.sql",
 		"017_create_cart_tables.sql",
 		"018_create_payments_table.sql",
+		"019_add_is_read_to_notifications.sql",
 	}
 
 	for _, migration := range migrations {
