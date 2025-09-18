@@ -39,8 +39,8 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
     lngIsUndefined: lngNum === undefined,
     latIsNull: latNum === null,
     lngIsNull: lngNum === null,
-    latIsNaN: isNaN(latNum),
-    lngIsNaN: isNaN(lngNum),
+    latIsNaN: latNum !== undefined ? isNaN(latNum) : true,
+    lngIsNaN: lngNum !== undefined ? isNaN(lngNum) : true,
     latIsZero: latNum === 0,
     lngIsZero: lngNum === 0
   });
