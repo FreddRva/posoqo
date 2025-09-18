@@ -5,7 +5,7 @@
 -- Habilitar extensión UUID si no está habilitada
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Crear tabla de servicios
+-- Crear tabla de servicios (si no existe)
 CREATE TABLE IF NOT EXISTS services (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
@@ -15,6 +15,18 @@ CREATE TABLE IF NOT EXISTS services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Si la tabla ya existe con columna price, agregar precio por defecto a los inserts
+-- Verificar si existe la columna price y eliminarla si es necesario
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'services' AND column_name = 'price'
+    ) THEN
+        ALTER TABLE services DROP COLUMN price;
+    END IF;
+END $$;
 
 -- Crear índices para mejor rendimiento
 CREATE INDEX IF NOT EXISTS idx_services_is_active ON services(is_active);
