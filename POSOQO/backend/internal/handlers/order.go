@@ -94,8 +94,22 @@ func CreateOrder(c *fiber.Ctx) error {
 	// Variables para coordenadas
 	var orderLat, orderLng interface{}
 
+	// Debug: mostrar datos recibidos del frontend
+	fmt.Printf("🔍 [ORDER] Request recibido: lat=%v, lng=%v, location=%s\n", req.Lat, req.Lng, req.Location)
+	if req.Lat != nil {
+		fmt.Printf("🔍 [ORDER] Lat no es nil: %f\n", *req.Lat)
+	} else {
+		fmt.Printf("🔍 [ORDER] Lat es nil\n")
+	}
+	if req.Lng != nil {
+		fmt.Printf("🔍 [ORDER] Lng no es nil: %f\n", *req.Lng)
+	} else {
+		fmt.Printf("🔍 [ORDER] Lng es nil\n")
+	}
+
 	// Primero verificar si el frontend envió coordenadas
 	if req.Lat != nil && req.Lng != nil && *req.Lat != 0 && *req.Lng != 0 {
+		fmt.Printf("🔍 [ORDER] Usando coordenadas del frontend: lat=%f, lng=%f\n", *req.Lat, *req.Lng)
 		orderLat = *req.Lat
 		orderLng = *req.Lng
 	} else if orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente" {
@@ -147,6 +161,8 @@ func CreateOrder(c *fiber.Ctx) error {
 		}
 	}
 
+	fmt.Printf("🔍 [ORDER] Guardando en BD: location=%s, lat=%v, lng=%v\n", orderLocation, orderLat, orderLng)
+	
 	err = tx.QueryRow(context.Background(),
 		"INSERT INTO orders (user_id, status, total, location, lat, lng) VALUES ($1, 'recibido', $2, $3, $4, $5) RETURNING id",
 		userID, total, orderLocation, orderLat, orderLng).Scan(&orderID)
