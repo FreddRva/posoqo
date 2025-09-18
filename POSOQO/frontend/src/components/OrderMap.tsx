@@ -14,18 +14,23 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
-  // Debug temporal para diagnosticar problema
-  console.log(`🔍 [OrderMap ${orderId.slice(-8)}] Props:`, { lat, lng, location });
+  // Convertir coordenadas a números
+  let latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
+  let lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
   
-  // Convertir coordenadas a números y validar
-  const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
-  const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
+  // Si las coordenadas son 0,0 pero la location contiene coordenadas, extraerlas
+  if ((latNum === 0 && lngNum === 0) && location) {
+    const coordMatch = location.match(/Lat:\s*(-?\d+\.?\d*),\s*Lng:\s*(-?\d+\.?\d*)/i);
+    if (coordMatch) {
+      latNum = parseFloat(coordMatch[1]);
+      lngNum = parseFloat(coordMatch[2]);
+    }
+  }
+  
   const hasValidCoords = latNum !== undefined && lngNum !== undefined && 
                         latNum !== null && lngNum !== null &&
                         !isNaN(latNum) && !isNaN(lngNum) &&
                         latNum !== 0 && lngNum !== 0;
-  
-  console.log(`🔍 [OrderMap ${orderId.slice(-8)}] Validación:`, { latNum, lngNum, hasValidCoords });
 
 
   // Función para abrir Google Maps

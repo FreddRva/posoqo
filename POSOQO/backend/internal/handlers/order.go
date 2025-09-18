@@ -94,15 +94,28 @@ func CreateOrder(c *fiber.Ctx) error {
 	// Variables para coordenadas
 	var orderLat, orderLng interface{}
 
-	// Debug temporal
-	fmt.Printf("🔍 [ORDER] Request: lat=%v, lng=%v, location=%s\n", req.Lat, req.Lng, req.Location)
+	// Primero verificar si el frontend envió coordenadas válidas
+	if req.Lat != nil && req.Lng != nil {
+		lat := *req.Lat
+		lng := *req.Lng
+		
+		// Validar que las coordenadas sean válidas (no 0,0 y dentro de rangos razonables)
+		if lat != 0 && lng != 0 && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 {
+			orderLat = lat
+			orderLng = lng
+		} else {
+			// Si las coordenadas no son válidas, establecer como nil
+			orderLat = nil
+			orderLng = nil
+		}
+	} else {
+		// Si no hay coordenadas del frontend, establecer como nil
+		orderLat = nil
+		orderLng = nil
+	}
 	
-	// Primero verificar si el frontend envió coordenadas
-	if req.Lat != nil && req.Lng != nil && *req.Lat != 0 && *req.Lng != 0 {
-		fmt.Printf("🔍 [ORDER] Usando coordenadas del frontend: lat=%f, lng=%f\n", *req.Lat, *req.Lng)
-		orderLat = *req.Lat
-		orderLng = *req.Lng
-	} else if orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente" {
+	// Si no tenemos coordenadas válidas y no hay ubicación, intentar obtener del usuario
+	if (orderLat == nil || orderLng == nil) && (orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente") {
 		var userAddress, userAddressRef, userStreetNumber sql.NullString
 		var userLat, userLng sql.NullFloat64
 
@@ -151,8 +164,6 @@ func CreateOrder(c *fiber.Ctx) error {
 		}
 	}
 
-	fmt.Printf("🔍 [ORDER] Final: location=%s, lat=%v, lng=%v\n", orderLocation, orderLat, orderLng)
-	
 	err = tx.QueryRow(context.Background(),
 		"INSERT INTO orders (user_id, status, total, location, lat, lng) VALUES ($1, 'recibido', $2, $3, $4, $5) RETURNING id",
 		userID, total, orderLocation, orderLat, orderLng).Scan(&orderID)
