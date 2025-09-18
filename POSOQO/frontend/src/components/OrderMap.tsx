@@ -14,6 +14,15 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
 
+  // Debug: mostrar props recibidos
+  console.log('🗺️ [OrderMap] Props completos:', { lat, lng, location, orderId });
+  console.log('🗺️ [OrderMap] Tipos:', { 
+    latType: typeof lat, 
+    lngType: typeof lng,
+    latValue: lat,
+    lngValue: lng
+  });
+
   // Convertir coordenadas a números y validar
   const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
   const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
@@ -21,6 +30,20 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
                         latNum !== null && lngNum !== null &&
                         !isNaN(latNum) && !isNaN(lngNum) &&
                         latNum !== 0 && lngNum !== 0;
+
+  console.log('🗺️ [OrderMap] Validación:', { 
+    latNum, 
+    lngNum, 
+    hasValidCoords,
+    latIsUndefined: latNum === undefined,
+    lngIsUndefined: lngNum === undefined,
+    latIsNull: latNum === null,
+    lngIsNull: lngNum === null,
+    latIsNaN: isNaN(latNum),
+    lngIsNaN: isNaN(lngNum),
+    latIsZero: latNum === 0,
+    lngIsZero: lngNum === 0
+  });
 
 
   // Función para abrir Google Maps
