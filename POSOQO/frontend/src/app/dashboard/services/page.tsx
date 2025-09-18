@@ -76,27 +76,49 @@ export default function ServicesPage() {
     try {
       console.log('Guardando servicio:', updatedService);
       
-      // Llamar al endpoint de actualización
-      const response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${updatedService.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          name: updatedService.name,
-          description: updatedService.description,
-          image_url: updatedService.image_url,
-          is_active: updatedService.is_active
-        })
-      });
+      const isNewService = !updatedService.id || updatedService.id === '';
+      
+      let response;
+      if (isNewService) {
+        // Crear nuevo servicio
+        response = await apiFetch<{ success: boolean; error?: string; id?: string }>(`/protected/admin/services`, {
+          method: 'POST',
+          body: JSON.stringify({
+            name: updatedService.name,
+            description: updatedService.description,
+            image_url: updatedService.image_url,
+            is_active: updatedService.is_active
+          })
+        });
+      } else {
+        // Actualizar servicio existente
+        response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${updatedService.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            name: updatedService.name,
+            description: updatedService.description,
+            image_url: updatedService.image_url,
+            is_active: updatedService.is_active
+          })
+        });
+      }
       
       if (response.success) {
-        // Actualizar en el estado local
-        setServices(prev => 
-          prev.map(s => s.id === updatedService.id ? updatedService : s)
-        );
+        if (isNewService) {
+          // Recargar servicios para obtener el nuevo servicio con su ID
+          await loadServices();
+          alert('Servicio creado correctamente');
+        } else {
+          // Actualizar en el estado local
+          setServices(prev => 
+            prev.map(s => s.id === updatedService.id ? updatedService : s)
+          );
+          alert('Servicio actualizado correctamente');
+        }
         
         handleCloseModal();
-        alert('Servicio actualizado correctamente');
       } else {
-        throw new Error(response.error || 'Error al actualizar');
+        throw new Error(response.error || 'Error al guardar');
       }
     } catch (error) {
       console.error('Error guardando servicio:', error);
