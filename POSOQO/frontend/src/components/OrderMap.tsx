@@ -25,9 +25,14 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
 
   // Función para abrir Google Maps
   const openInGoogleMaps = () => {
-    if (!hasValidCoords) return;
+    console.log('🗺️ [OrderMap] Intentando abrir Google Maps:', { hasValidCoords, latNum, lngNum });
+    if (!hasValidCoords) {
+      console.log('🚨 [OrderMap] Coordenadas no válidas, no se puede abrir Google Maps');
+      return;
+    }
     
     const googleMapsUrl = `https://www.google.com/maps?q=${latNum},${lngNum}`;
+    console.log('🗺️ [OrderMap] Abriendo URL:', googleMapsUrl);
     window.open(googleMapsUrl, '_blank');
   };
 
@@ -80,12 +85,23 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
       marker.bindPopup(`
         <div class="text-center">
           <strong>Pedido #${orderId.slice(-8)}</strong><br>
-          <small>${location || 'Ubicación seleccionada'}</small>
+          <small>${location || 'Ubicación seleccionada'}</small><br>
+          <button onclick="window.open('https://www.google.com/maps?q=${latNum},${lngNum}', '_blank')" style="background: #3b82f6; color: white; padding: 4px 8px; border: none; border-radius: 4px; font-size: 12px; margin-top: 4px; cursor: pointer;">Ver en Google Maps</button>
         </div>
       `);
 
+      // Agregar evento de clic al mapa completo
+      map.on('click', () => {
+        openInGoogleMaps();
+      });
+
+      // Agregar evento de clic al marcador
+      marker.on('click', () => {
+        openInGoogleMaps();
+      });
+
       // Ajustar vista para mostrar el marcador
-      map.fitBounds(marker.getLatLng().toBounds(100));
+      map.setView([latNum, lngNum], 15);
     };
 
     loadLeaflet();
@@ -139,11 +155,17 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
       </div>
       <div 
         ref={mapRef} 
-        className="w-full h-32 rounded-lg border border-stone-200 shadow-sm cursor-pointer"
+        className="w-full h-32 rounded-lg border-2 border-stone-300 hover:border-blue-400 shadow-sm cursor-pointer transition-all duration-200 relative group"
         style={{ minHeight: '128px' }}
         onClick={openInGoogleMaps}
         title="Hacer clic para abrir en Google Maps"
-      />
+      >
+        <div className="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg pointer-events-none flex items-center justify-center">
+          <div className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm font-medium shadow-lg">
+            Clic para abrir en Google Maps
+          </div>
+        </div>
+      </div>
     </div>
   );
 } 
