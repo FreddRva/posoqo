@@ -15,7 +15,6 @@ import {
   AlertCircle,
   CheckCircle,
   X,
-  DollarSign,
   Eye,
   EyeOff,
   Calendar,
@@ -26,7 +25,6 @@ interface Service {
   id: string;
   name: string;
   description: string;
-  price: number;
   image_url?: string;
   is_active: boolean;
   created_at: string;
@@ -134,12 +132,6 @@ export default function ServicesPage() {
       : 'bg-red-100 text-red-800 border-red-200';
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-PE', {
-      style: 'currency',
-      currency: 'PEN'
-    }).format(amount);
-  };
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -274,9 +266,6 @@ export default function ServicesPage() {
                     Servicio
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Precio
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
                     Estado
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
@@ -313,15 +302,7 @@ export default function ServicesPage() {
                         </div>
                         <div>
                           <div className="text-sm font-semibold text-stone-900">{service.name}</div>
-                          <div className="text-sm text-stone-500">{service.description}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        <div className="text-sm font-semibold text-stone-900">
-                          {formatCurrency(service.price)}
+                          <div className="text-sm text-stone-500 whitespace-pre-line">{service.description}</div>
                         </div>
                       </div>
                     </td>
@@ -402,7 +383,6 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
     id: '',
     name: '',
     description: '',
-    price: 0,
     image_url: '',
     is_active: true,
     created_at: '',
@@ -418,7 +398,6 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
         id: '',
         name: '',
         description: '',
-        price: 0,
         image_url: '',
         is_active: true,
         created_at: '',
@@ -507,31 +486,19 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
             <label className="block text-sm font-medium text-stone-700 mb-2">
               Descripción*
             </label>
+            <div className="text-xs text-stone-500 mb-2">
+              Usa viñetas (•) para separar características del servicio
+            </div>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              rows={3}
+              rows={5}
+              placeholder="• Característica 1&#10;• Característica 2&#10;• Característica 3"
               className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-2">
-              Precio*
-            </label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
-              <input
-                type="number"
-                step="0.01"
-                value={formData.price}
-                onChange={(e) => handleInputChange('price', parseFloat(e.target.value))}
-                className="w-full pl-10 pr-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                required
-              />
-            </div>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-2">

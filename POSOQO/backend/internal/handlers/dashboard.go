@@ -652,7 +652,6 @@ func GetAdminServicesListPublic(c *fiber.Ctx) error {
 			"id":          id,
 			"name":        name,
 			"description": description,
-			"price":       0.0, // Valor por defecto ya que no existe la columna
 			"image_url":   imageURL.String,
 			"is_active":   isActive,
 			"created_at":  createdAt.Format("2006-01-02 15:04:05"),
