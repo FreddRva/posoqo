@@ -614,9 +614,7 @@ export default function AdminProducts() {
                               src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
                               alt={product.name}
                               onError={(e) => {
-                                console.error('❌ [TABLE] Error cargando imagen en tabla:', product.image_url);
-                                const constructedUrl = product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
-                                console.error('  - URL construida:', constructedUrl);
+                                console.error('❌ [TABLE] Error cargando imagen en tabla');
                                 e.currentTarget.style.display = 'none';
                                 // Mostrar placeholder cuando hay error
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
@@ -1044,10 +1042,7 @@ export default function AdminProducts() {
                                    onError={(e) => {
                                      const backendUrl = process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com';
                                      const fullUrl = `${backendUrl}${form.image_url}`;
-                                     console.error('❌ [MODAL] Error cargando imagen en modal:');
-                                     console.error('  - URL relativa:', form.image_url);
-                                     console.error('  - URL completa construida:', fullUrl);
-                                     console.error('  - Backend URL:', backendUrl);
+                                     console.error('❌ [MODAL] Error cargando imagen en modal');
                                      e.currentTarget.style.display = 'none';
                                    }}
                                  />

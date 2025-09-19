@@ -118,10 +118,9 @@ export async function apiFetch<T>(
     token = sessionToken || authTokenResult || undefined;
   }
 
-  // DEBUG: Log del token que se está enviando
+  // DEBUG: Log básico (sin datos sensibles)
   console.log("🔍 [API] Endpoint:", endpoint);
-  console.log("🔍 [API] Token:", token ? `${token.substring(0, 20)}...` : "NO TOKEN");
-  console.log("🔍 [API] Token completo:", token || "NO TOKEN");
+  console.log("🔍 [API] Token:", token ? "PRESENTE" : "NO TOKEN");
   console.log("🔍 [API] URL completa:", `${API_URL}${endpoint}`);
 
   const res = await fetch(`${API_URL}${endpoint}`, {
