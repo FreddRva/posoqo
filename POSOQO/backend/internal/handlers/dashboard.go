@@ -170,6 +170,72 @@ func DebugOrderCoordinates(c *fiber.Ctx) error {
 	})
 }
 
+// DebugUsersTable verifica la estructura de la tabla users
+func DebugUsersTable(c *fiber.Ctx) error {
+	// Verificar estructura de la tabla
+	rows, err := db.DB.Query(context.Background(), `
+		SELECT column_name, data_type, is_nullable 
+		FROM information_schema.columns 
+		WHERE table_name = 'users' 
+		ORDER BY ordinal_position
+	`)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error verificando estructura de tabla users",
+			"details": err.Error(),
+		})
+	}
+	defer rows.Close()
+
+	columns := []fiber.Map{}
+	for rows.Next() {
+		var columnName, dataType, isNullable string
+		rows.Scan(&columnName, &dataType, &isNullable)
+		columns = append(columns, fiber.Map{
+			"column_name": columnName,
+			"data_type":   dataType,
+			"is_nullable": isNullable,
+		})
+	}
+
+	// Contar usuarios
+	var userCount int
+	err = db.DB.QueryRow(context.Background(), "SELECT COUNT(*) FROM users").Scan(&userCount)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error contando usuarios",
+			"details": err.Error(),
+			"table_structure": columns,
+		})
+	}
+
+	// Intentar obtener un usuario de ejemplo
+	var sampleUser fiber.Map
+	userRow := db.DB.QueryRow(context.Background(), "SELECT id, name, email, role FROM users LIMIT 1")
+	var id int64
+	var name, email, role string
+	if err := userRow.Scan(&id, &name, &email, &role); err != nil {
+		sampleUser = fiber.Map{
+			"error": "No se pudo obtener usuario de ejemplo",
+			"details": err.Error(),
+		}
+	} else {
+		sampleUser = fiber.Map{
+			"id": id,
+			"name": name,
+			"email": email,
+			"role": role,
+		}
+	}
+
+	return c.JSON(fiber.Map{
+		"table_structure": columns,
+		"user_count": userCount,
+		"sample_user": sampleUser,
+		"debug": true,
+	})
+}
+
 // Endpoint temporal para debug de categorías y productos
 func DebugCategoriesAndProducts(c *fiber.Ctx) error {
 	// Obtener todas las categorías
