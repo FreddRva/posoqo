@@ -739,7 +739,7 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, email, role, email_verified, created_at, updated_at
+		SELECT id, name, last_name, email, role, email_verified, created_at, updated_at
 		FROM users
 		ORDER BY created_at DESC
 	`)
@@ -751,31 +751,35 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	users := []fiber.Map{}
 	for rows.Next() {
 		var id int64
-		var name, email, role string
+		var name, lastName, email, role string
 		var emailVerified bool
 		var createdAt, updatedAt time.Time
 
-		err := rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
+		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
 			continue
 		}
 
+		// Concatenar nombre completo
+		fullName := name
+		if lastName != "" {
+			fullName = name + " " + lastName
+		}
+
 		user := fiber.Map{
 			"id":             id,
-			"name":           name,
+			"name":           fullName,
 			"email":          email,
 			"role":           role,
 			"email_verified": emailVerified,
-			"created_at":     createdAt,
-			"updated_at":     updatedAt,
+			"created_at":     createdAt.Format("2006-01-02 15:04:05"),
+			"updated_at":     updatedAt.Format("2006-01-02 15:04:05"),
 		}
 		users = append(users, user)
 	}
 
 	return c.JSON(fiber.Map{
-		"success": true,
-		"data":    users,
-		"total":   len(users),
+		"data": users,
 	})
 }
 
