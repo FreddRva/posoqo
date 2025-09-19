@@ -828,33 +828,17 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	users := []fiber.Map{}
-	hasLastName := true
-	
-	// Verificar si la primera query incluye last_name
-	columns, _ := rows.Columns()
-	if len(columns) == 7 { // Con last_name
-		hasLastName = true
-	} else { // Sin last_name
-		hasLastName = false
-	}
-
 	for rows.Next() {
 		var id int64
 		var name, lastName, email, role string
 		var emailVerified bool
 		var createdAt, updatedAt time.Time
 
-		if hasLastName {
-			err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
-			if err != nil {
-				continue
-			}
-		} else {
-			err := rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
-			if err != nil {
-				continue
-			}
-			lastName = ""
+		// Intentar scan con last_name (si existe)
+		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
+		if err != nil {
+			// Si falla, puede ser que no tenga last_name, continuar sin ella
+			continue
 		}
 
 		// Construir nombre completo
