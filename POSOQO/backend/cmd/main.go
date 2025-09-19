@@ -251,7 +251,7 @@ func main() {
 	api.Get("/admin/services/list", handlers.GetAdminServicesListPublic)
 	api.Get("/admin/orders/list", handlers.GetAdminOrdersListPublic)
 	api.Put("/admin/orders/:id/status", handlers.UpdateOrderStatus)
-	api.Get("/admin/users/list", handlers.GetAdminUsersListPublic)
+	api.Get("/admin/users/list", handlers.DebugUsersTable)
 	api.Put("/admin/users/:id", handlers.UpdateUserAdmin)
 	api.Put("/admin/users/:id/suspend", handlers.SuspendUserAdmin)
 	api.Put("/admin/users/:id/reactivate", handlers.ReactivateUserAdmin)

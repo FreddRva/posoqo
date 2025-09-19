@@ -229,11 +229,56 @@ func DebugUsersTable(c *fiber.Ctx) error {
 		}
 	}
 
+	// Obtener todos los usuarios para el frontend
+	userRows, err := db.DB.Query(context.Background(), `
+		SELECT id, name, last_name, email, role, 
+			   COALESCE(email_verified, false) as email_verified,
+			   COALESCE(created_at, NOW()) as created_at,
+			   COALESCE(updated_at, NOW()) as updated_at
+		FROM users 
+		ORDER BY id DESC
+	`)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error obteniendo usuarios",
+			"details": err.Error(),
+		})
+	}
+	defer userRows.Close()
+
+	users := []fiber.Map{}
+	for userRows.Next() {
+		var id int64
+		var name, lastName, email, role string
+		var emailVerified bool
+		var createdAt, updatedAt time.Time
+
+		err := userRows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
+		if err != nil {
+			fmt.Printf("Error escaneando usuario: %v\n", err)
+			continue
+		}
+
+		// Construir nombre completo
+		fullName := strings.TrimSpace(name + " " + lastName)
+		if fullName == "" {
+			fullName = name
+		}
+
+		user := fiber.Map{
+			"id":             id,
+			"name":           fullName,
+			"email":          email,
+			"role":           role,
+			"email_verified": emailVerified,
+			"created_at":     createdAt.Format("2006-01-02T15:04:05Z"),
+			"updated_at":     updatedAt.Format("2006-01-02T15:04:05Z"),
+		}
+		users = append(users, user)
+	}
+
 	return c.JSON(fiber.Map{
-		"table_structure": columns,
-		"user_count": userCount,
-		"sample_user": sampleUser,
-		"debug": true,
+		"data": users,
 	})
 }
 
