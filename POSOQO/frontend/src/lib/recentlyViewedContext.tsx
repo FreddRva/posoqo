@@ -52,7 +52,7 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
           console.log('🧹 [RECENT] URLs de localhost limpiadas');
         }
         
-        console.log('📋 [RECENT] Productos cargados:', normalized.map(p => ({ name: p.name, image_url: p.image_url })));
+        console.log('📋 [RECENT] Productos cargados:', normalized.map((p: any) => ({ name: p.name, image_url: p.image_url })));
         setRecentlyViewed(normalized);
       } catch (error) {
         console.error('Error parsing recently viewed products:', error);
