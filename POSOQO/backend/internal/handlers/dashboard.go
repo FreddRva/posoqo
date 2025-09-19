@@ -805,25 +805,25 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
-	// Query para obtener usuarios con información completa
+	// Intentar query con COALESCE para manejar valores NULL
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, last_name, email, role, email_verified, created_at, updated_at
+		SELECT 
+			id, 
+			COALESCE(name, '') as name,
+			COALESCE(last_name, '') as last_name,
+			COALESCE(email, '') as email,
+			COALESCE(role, 'user') as role,
+			COALESCE(email_verified, false) as email_verified,
+			created_at,
+			updated_at
 		FROM users
 		ORDER BY created_at DESC
 	`)
 	if err != nil {
-		// Fallback: intentar sin last_name si la columna no existe
-		rows, err = db.DB.Query(context.Background(), `
-			SELECT id, name, email, role, email_verified, created_at, updated_at
-			FROM users
-			ORDER BY created_at DESC
-		`)
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": "Error al obtener usuarios",
-				"details": err.Error(),
-			})
-		}
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al obtener usuarios",
+			"details": err.Error(),
+		})
 	}
 	defer rows.Close()
 
@@ -834,21 +834,17 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		var emailVerified bool
 		var createdAt, updatedAt time.Time
 
-		// Intentar scan completo primero
 		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
-			// Si falla, intentar scan sin last_name
-			err = rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
-			if err != nil {
-				continue
-			}
-			lastName = ""
+			// Log el error específico para debug
+			fmt.Printf("Error escaneando usuario: %v\n", err)
+			continue
 		}
 
 		// Construir nombre completo
-		fullName := name
-		if lastName != "" {
-			fullName = name + " " + lastName
+		fullName := strings.TrimSpace(name + " " + lastName)
+		if fullName == "" {
+			fullName = "Usuario"
 		}
 
 		user := fiber.Map{

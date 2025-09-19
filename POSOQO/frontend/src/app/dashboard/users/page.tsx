@@ -77,47 +77,9 @@ export default function UsersPage() {
         console.log('Debug endpoint no disponible:', debugError);
       }
       
-      try {
-        const response = await apiFetch<{ data: any[] }>('/admin/users/list');
-        if ((response as any).data) {
-          setUsers((response as any).data);
-        }
-      } catch (apiError) {
-        console.error('Error en API, usando datos de ejemplo:', apiError);
-        
-        // Usar datos de ejemplo mientras se soluciona el backend
-        const mockUsers = [
-          {
-            id: 1,
-            name: "Admin Principal",
-            email: "admin@posoqo.com",
-            role: "admin",
-            email_verified: true,
-            created_at: "2024-01-01T00:00:00Z",
-            updated_at: "2024-01-01T00:00:00Z"
-          },
-          {
-            id: 2,
-            name: "Usuario Ejemplo",
-            email: "usuario@example.com",
-            role: "user",
-            email_verified: true,
-            created_at: "2024-01-02T00:00:00Z",
-            updated_at: "2024-01-02T00:00:00Z"
-          },
-          {
-            id: 3,
-            name: "Usuario Suspendido",
-            email: "suspendido@example.com",
-            role: "suspended",
-            email_verified: false,
-            created_at: "2024-01-03T00:00:00Z",
-            updated_at: "2024-01-03T00:00:00Z"
-          }
-        ];
-        
-        setUsers(mockUsers);
-        showErrorAlert('Modo de ejemplo', 'Mostrando datos de ejemplo. El backend será corregido pronto.');
+      const response = await apiFetch<{ data: any[] }>('/admin/users/list');
+      if ((response as any).data) {
+        setUsers((response as any).data);
       }
     } catch (error) {
       console.error('Error cargando usuarios:', error);
