@@ -39,13 +39,10 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
         const needsImageUpdate = parsed.some((product: any) => !product.image_url || product.image_url === "");
         
         if (needsImageUpdate) {
-          console.log('🔄 [RECENT] Productos sin imagen detectados, actualizando desde API...');
-          
           try {
             // Obtener productos actuales de la API
             const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
             const apiUrl = baseUrl.endsWith('/api') ? `${baseUrl}/products` : `${baseUrl}/api/products`;
-            console.log(`🔗 [RECENT] Consultando API: ${apiUrl}`);
             const response = await fetch(apiUrl);
             const productsData = await response.json();
             const allProducts = productsData.data || productsData;
@@ -62,11 +59,10 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
             
             // Guardar productos actualizados
             localStorage.setItem('recentlyViewed', JSON.stringify(updated));
-            console.log('✅ [RECENT] Productos actualizados con imágenes correctas');
             setRecentlyViewed(updated);
             return;
           } catch (apiError) {
-            console.error('❌ [RECENT] Error obteniendo productos de API:', apiError);
+            console.error('Error obteniendo productos de API:', apiError);
           }
         }
         
@@ -87,10 +83,8 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
         // Actualizar localStorage si hubo cambios
         if (JSON.stringify(normalized) !== JSON.stringify(parsed)) {
           localStorage.setItem('recentlyViewed', JSON.stringify(normalized));
-          console.log('🧹 [RECENT] URLs de localhost limpiadas');
         }
         
-        console.log('📋 [RECENT] Productos cargados:', normalized.map((p: any) => ({ name: p.name, image_url: p.image_url })));
         setRecentlyViewed(normalized);
       } catch (error) {
         console.error('Error parsing recently viewed products:', error);
@@ -118,8 +112,6 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
       image_url: product.image_url || product.image || "",
       image: undefined // Remover el campo image para evitar confusión
     };
-
-    console.log(`📝 [RECENT] Agregando producto: ${normalizedProduct.name} con image_url: ${normalizedProduct.image_url}`);
 
     setRecentlyViewed(prev => {
       // Filtrar el producto si ya existe

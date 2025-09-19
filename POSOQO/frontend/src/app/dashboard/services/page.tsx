@@ -350,14 +350,9 @@ export default function ServicesPage() {
                           {service.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={(() => {
-                                const finalUrl = service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`;
-                                console.log(`🖼️ [SERVICE] ${service.name}: image_url="${service.image_url}" → finalUrl="${finalUrl}"`);
-                                return finalUrl;
-                              })()}
+                              src={service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`}
                               alt={service.name}
                               onError={(e) => {
-                                console.error('❌ [SERVICE] Error cargando imagen de servicio en tabla:', service.image_url);
                                 e.currentTarget.style.display = 'none';
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
                                 if (placeholder) {
@@ -521,8 +516,6 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
     setIsUploading(true);
     
     try {
-      console.log('📤 [SERVICE] Iniciando carga de imagen:', file.name, 'Tamaño:', file.size);
-      
       const formData = new FormData();
       formData.append('image', file);
       
@@ -530,26 +523,21 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
       const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
       const uploadUrl = `${apiUrl}/upload`;
       
-      console.log('🔗 [SERVICE] URL de carga:', uploadUrl);
-      
       const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
       });
       
-      console.log('📡 [SERVICE] Respuesta del servidor:', response.status, response.statusText);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('✅ [SERVICE] Imagen cargada exitosamente:', data.url);
         handleInputChange('image_url', data.url);
       } else {
         const errorText = await response.text();
-        console.error('❌ [SERVICE] Error del servidor:', response.status, errorText);
+        console.error('Error del servidor:', response.status, errorText);
         throw new Error(`Error al subir imagen: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ [SERVICE] Error uploading image:', error);
+      console.error('Error uploading image:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       alert('Error al subir la imagen: ' + errorMessage);
     } finally {
@@ -650,15 +638,10 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
               {formData.image_url && (
                 <div className="relative">
                   <img
-                    src={(() => {
-                      const finalUrl = formData.image_url.startsWith('http') ? formData.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${formData.image_url}`;
-                      console.log(`🖼️ [SERVICE] Vista previa: image_url="${formData.image_url}" → finalUrl="${finalUrl}"`);
-                      return finalUrl;
-                    })()}
+                    src={formData.image_url.startsWith('http') ? formData.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${formData.image_url}`}
                     alt="Vista previa"
                     className="h-12 w-12 rounded object-cover border border-stone-200"
                     onError={(e) => {
-                      console.error('❌ [SERVICE] Error cargando imagen de servicio en vista previa:', formData.image_url);
                       e.currentTarget.style.display = 'none';
                     }}
                   />
