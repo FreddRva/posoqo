@@ -66,9 +66,31 @@ export default function ReservationsPage() {
       }
     } catch (error) {
       console.error('Error cargando reservas:', error);
+      showErrorAlert('Error de carga', 'No se pudieron cargar las reservas. Intenta recargar la página.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
   };
 
   useEffect(() => {
@@ -120,23 +142,28 @@ export default function ReservationsPage() {
   const updateReservationStatus = async (reservationId: string, newStatus: string) => {
     try {
       setUpdatingStatus(reservationId);
-      await apiFetch(`/admin/reservations/${reservationId}/status`, {
+      const response = await apiFetch<{ success: boolean; error?: string }>(`/admin/reservations/${reservationId}/status`, {
         method: 'PUT',
         body: JSON.stringify({ status: newStatus })
       });
       
-      // Actualizar el estado local
-      setReservations(prev => prev.map(reservation => 
-        reservation.id === reservationId 
-          ? { ...reservation, status: newStatus }
-          : reservation
-      ));
-      
-      // Mostrar notificación de éxito
-      alert('Estado de reserva actualizado correctamente');
+      if (response.success) {
+        // Actualizar el estado local
+        setReservations(prev => prev.map(reservation => 
+          reservation.id === reservationId 
+            ? { ...reservation, status: newStatus }
+            : reservation
+        ));
+        
+        // Mostrar notificación de éxito
+        const statusText = newStatus === 'confirmada' ? 'confirmada' : newStatus === 'cancelada' ? 'cancelada' : newStatus === 'completada' ? 'completada' : 'actualizada';
+        showSuccessAlert('Estado actualizado', `La reserva ha sido marcada como ${statusText}`);
+      } else {
+        throw new Error(response.error || 'Error al actualizar estado');
+      }
     } catch (error) {
       console.error('Error actualizando estado:', error);
-      alert('Error al actualizar el estado de la reserva');
+      showErrorAlert('Error al actualizar', 'No se pudo actualizar el estado de la reserva. Intenta de nuevo.');
     } finally {
       setUpdatingStatus(null);
     }
@@ -537,6 +564,33 @@ export default function ReservationsPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}

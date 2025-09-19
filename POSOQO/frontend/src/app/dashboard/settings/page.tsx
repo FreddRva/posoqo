@@ -18,7 +18,10 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  CheckCircle2,
+  XCircle,
+  X
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -47,6 +50,38 @@ export default function SettingsPage() {
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
+
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
 
   const handleSave = async () => {
     try {
@@ -58,9 +93,11 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSaved(true);
+      showSuccessAlert('Configuración guardada', 'Los cambios han sido guardados correctamente');
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Error guardando configuración:', error);
+      showErrorAlert('Error al guardar', 'No se pudo guardar la configuración. Intenta de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -383,6 +420,33 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

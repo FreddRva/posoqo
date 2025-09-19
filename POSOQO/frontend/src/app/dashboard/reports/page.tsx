@@ -16,7 +16,10 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  CheckCircle2,
+  XCircle,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -38,6 +41,17 @@ export default function ReportsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
   const loadStats = async () => {
     if (!session) return;
@@ -63,10 +77,31 @@ export default function ReportsPage() {
     loadStats();
   }, [session]);
 
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
   const downloadReport = async (type: string, format: string) => {
     try {
       setDownloading(`${type}_${format}`);
-      const url = `http://127.0.0.1:4000/api/admin/reports/${type}/${format}`;
+      const url = `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/api/admin/reports/${type}/${format}`;
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${session?.accessToken}`
@@ -78,17 +113,19 @@ export default function ReportsPage() {
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `${type}_${format}.${format}`;
+        a.download = `${type}_report.${format}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(downloadUrl);
         document.body.removeChild(a);
+        
+        showSuccessAlert('Descarga exitosa', `Reporte de ${type} descargado correctamente`);
       } else {
-        alert('Error al descargar el reporte');
+        throw new Error('Error en la respuesta del servidor');
       }
     } catch (error) {
       console.error('Error descargando reporte:', error);
-      alert('Error al descargar el reporte');
+      showErrorAlert('Error de descarga', 'No se pudo descargar el reporte. Intenta de nuevo.');
     } finally {
       setDownloading(null);
     }
@@ -360,6 +397,33 @@ export default function ReportsPage() {
             </li>
           </ul>
         </motion.div>
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
