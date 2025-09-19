@@ -231,7 +231,13 @@ export default function HomePage() {
           {/* Imagen con efecto flotante premium */}
           <div className="relative transform group-hover:translate-y-[-4px] md:group-hover:translate-y-[-6px] group-hover:scale-105 transition-all duration-700">
             <img
-              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+              src={(() => {
+                const finalUrl = product.image_url?.startsWith('http') 
+                  ? product.image_url 
+                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
+                console.log('🖼️ [HOME-CERVEZA] Cargando imagen:', finalUrl);
+                return finalUrl;
+              })()}
           alt={product.name}
               className="object-contain w-full h-full rounded-lg"
           loading="lazy"
@@ -580,8 +586,21 @@ export default function HomePage() {
                     className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 transition-all duration-300 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
                   >
                     <div className="text-center">
-                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center">
-                        <Beer className="w-10 h-10 text-black" />
+                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center overflow-hidden">
+                        <img
+                          src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                          alt={product.name}
+                          className="w-full h-full object-contain p-2"
+                          onError={(e) => {
+                            // Si falla la imagen, mostrar el icono como fallback
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<svg class="w-10 h-10 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg>';
+                            }
+                          }}
+                        />
                       </div>
                       <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">
                         {product.name}
