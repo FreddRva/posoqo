@@ -804,80 +804,78 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
-	// Primero verificar si la tabla users existe y su estructura
+	// Query simplificada para evitar problemas
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT column_name, data_type, is_nullable 
-		FROM information_schema.columns 
-		WHERE table_name = 'users' 
-		ORDER BY ordinal_position
+		SELECT id, name, last_name, email, role, email_verified, created_at, updated_at
+		FROM users
+		ORDER BY created_at DESC
 	`)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error verificando estructura de tabla users",
-			"details": err.Error(),
-		})
+		// Si falla, intentar sin last_name
+		rows, err = db.DB.Query(context.Background(), `
+			SELECT id, name, email, role, email_verified, created_at, updated_at
+			FROM users
+			ORDER BY created_at DESC
+		`)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error al obtener usuarios",
+				"details": err.Error(),
+			})
+		}
 	}
 	defer rows.Close()
 
-	columns := []fiber.Map{}
-	for rows.Next() {
-		var columnName, dataType, isNullable string
-		rows.Scan(&columnName, &dataType, &isNullable)
-		columns = append(columns, fiber.Map{
-			"column_name": columnName,
-			"data_type":   dataType,
-			"is_nullable": isNullable,
-		})
-	}
-
-	// Intentar una query simple primero
-	userRows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, email, role, email_verified, created_at, updated_at
-		FROM users
-		ORDER BY created_at DESC
-		LIMIT 5
-	`)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error al obtener usuarios",
-			"details": err.Error(),
-			"table_structure": columns,
-		})
-	}
-	defer userRows.Close()
-
 	users := []fiber.Map{}
-	for userRows.Next() {
+	hasLastName := true
+	
+	// Verificar si la primera query incluye last_name
+	columns, _ := rows.Columns()
+	if len(columns) == 7 { // Con last_name
+		hasLastName = true
+	} else { // Sin last_name
+		hasLastName = false
+	}
+
+	for rows.Next() {
 		var id int64
-		var name, email, role string
+		var name, lastName, email, role string
 		var emailVerified bool
 		var createdAt, updatedAt time.Time
 
-		err := userRows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"error": "Error escaneando usuarios",
-				"details": err.Error(),
-				"table_structure": columns,
-			})
+		if hasLastName {
+			err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
+			if err != nil {
+				continue
+			}
+		} else {
+			err := rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
+			if err != nil {
+				continue
+			}
+			lastName = ""
+		}
+
+		// Construir nombre completo
+		fullName := name
+		if lastName != "" {
+			fullName = name + " " + lastName
 		}
 
 		user := fiber.Map{
 			"id":             id,
-			"name":           name,
+			"name":           fullName,
 			"email":          email,
 			"role":           role,
 			"email_verified": emailVerified,
-			"created_at":     createdAt.Format("2006-01-02 15:04:05"),
-			"updated_at":     updatedAt.Format("2006-01-02 15:04:05"),
+			"created_at":     createdAt.Format("2006-01-02T15:04:05Z"),
+			"updated_at":     updatedAt.Format("2006-01-02T15:04:05Z"),
 		}
 		users = append(users, user)
 	}
 
 	return c.JSON(fiber.Map{
 		"data": users,
-		"table_structure": columns,
-		"debug": true,
 	})
 }
 
