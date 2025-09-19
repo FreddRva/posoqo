@@ -477,16 +477,19 @@ export default function CartPage() {
                   {/* Imagen */}
                   <div className="bg-gradient-to-br from-slate-700 to-slate-800 border-b border-slate-600/30 flex items-center justify-center overflow-hidden aspect-square p-4">
                     <img
-                      src={
-                        product.image_url
+                      src={(() => {
+                        const finalUrl = product.image_url
                           ? (product.image_url.startsWith('http')
                               ? product.image_url
                               : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "https://posoqo-backend.onrender.com"}${product.image_url}`)
-                          : "/file.svg"
-                      }
+                          : "/file.svg";
+                        console.log(`🖼️ [RECENT] ${product.name}: image_url="${product.image_url}" → finalUrl="${finalUrl}"`);
+                        return finalUrl;
+                      })()}
                       alt={product.name}
                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => { 
+                        console.error(`❌ [RECENT] Error cargando imagen para ${product.name}: ${(e.target as HTMLImageElement).src}`);
                         (e.target as HTMLImageElement).src = '/file.svg'; 
                       }}
                     />
