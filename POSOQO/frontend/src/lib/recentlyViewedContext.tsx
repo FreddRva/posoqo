@@ -43,7 +43,10 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
           
           try {
             // Obtener productos actuales de la API
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/api/products`);
+            const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+            const apiUrl = baseUrl.endsWith('/api') ? `${baseUrl}/products` : `${baseUrl}/api/products`;
+            console.log(`🔗 [RECENT] Consultando API: ${apiUrl}`);
+            const response = await fetch(apiUrl);
             const productsData = await response.json();
             const allProducts = productsData.data || productsData;
             
