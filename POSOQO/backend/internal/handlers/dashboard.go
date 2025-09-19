@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -954,9 +955,17 @@ func UpdateUserAdmin(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Rol no válido"})
 	}
 
+	// Separar nombre y apellido si es necesario
+	nameParts := strings.Fields(req.Name)
+	firstName := nameParts[0]
+	lastName := ""
+	if len(nameParts) > 1 {
+		lastName = strings.Join(nameParts[1:], " ")
+	}
+
 	_, err := db.DB.Exec(context.Background(),
-		`UPDATE users SET name=$1, email=$2, role=$3, email_verified=$4, updated_at=NOW() WHERE id=$5`,
-		req.Name, req.Email, req.Role, req.EmailVerified, userID)
+		`UPDATE users SET name=$1, last_name=$2, email=$3, role=$4, email_verified=$5, updated_at=NOW() WHERE id=$6`,
+		firstName, lastName, req.Email, req.Role, req.EmailVerified, userID)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al actualizar usuario"})
@@ -966,9 +975,9 @@ func UpdateUserAdmin(c *fiber.Ctx) error {
 	title := "Usuario actualizado"
 	message := fmt.Sprintf("El usuario %s ha sido actualizado", req.Name)
 	_, err = db.DB.Exec(context.Background(),
-		`INSERT INTO notifications (title, message, type, is_read, created_at)
-		 VALUES ($1, $2, $3, false, NOW())`,
-		title, message, "user")
+		`INSERT INTO notifications (title, message, type, created_at)
+		 VALUES ($1, $2, $3, NOW())`,
+		title, message, "info")
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)
