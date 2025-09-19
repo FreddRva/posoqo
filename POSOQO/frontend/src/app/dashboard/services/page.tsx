@@ -550,7 +550,8 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
       }
     } catch (error) {
       console.error('❌ [SERVICE] Error uploading image:', error);
-      alert('Error al subir la imagen: ' + error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert('Error al subir la imagen: ' + errorMessage);
     } finally {
       setIsUploading(false);
     }
