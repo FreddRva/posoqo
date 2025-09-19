@@ -18,7 +18,9 @@ import {
   X,
   AlertCircle,
   Check,
-  Ban
+  Ban,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 interface Complaint {
@@ -39,6 +41,17 @@ export default function ComplaintsPage() {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
   const loadComplaints = async () => {
     try {
@@ -49,9 +62,31 @@ export default function ComplaintsPage() {
       }
     } catch (error) {
       console.error('Error cargando reclamos:', error);
+      showErrorAlert('Error de carga', 'No se pudieron cargar los reclamos. Intenta recargar la página.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
   };
 
   useEffect(() => {
@@ -61,23 +96,28 @@ export default function ComplaintsPage() {
   const updateComplaintStatus = async (complaintId: string, newStatus: string) => {
     try {
       setUpdatingStatus(complaintId);
-      await apiFetch(`/admin/complaints/${complaintId}/status`, {
+      const response = await apiFetch<{ success: boolean; error?: string }>(`/admin/complaints/${complaintId}/status`, {
         method: 'PUT',
         body: JSON.stringify({ status: newStatus })
       });
       
-      // Actualizar el estado local
-      setComplaints(prev => prev.map(complaint => 
-        complaint.id === complaintId 
-          ? { ...complaint, status: newStatus }
-          : complaint
-      ));
-      
-      // Mostrar notificación de éxito
-      alert('Estado de reclamo actualizado correctamente');
+      if (response.success) {
+        // Actualizar el estado local
+        setComplaints(prev => prev.map(complaint => 
+          complaint.id === complaintId 
+            ? { ...complaint, status: newStatus }
+            : complaint
+        ));
+        
+        // Mostrar notificación de éxito
+        const statusText = newStatus === 'atendido' ? 'atendido' : newStatus === 'archivado' ? 'archivado' : 'actualizado';
+        showSuccessAlert('Estado actualizado', `El reclamo ha sido marcado como ${statusText}`);
+      } else {
+        throw new Error(response.error || 'Error al actualizar estado');
+      }
     } catch (error) {
       console.error('Error actualizando estado:', error);
-      alert('Error al actualizar el estado del reclamo');
+      showErrorAlert('Error al actualizar', 'No se pudo actualizar el estado del reclamo. Intenta de nuevo.');
     } finally {
       setUpdatingStatus(null);
     }
@@ -455,6 +495,33 @@ export default function ComplaintsPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}

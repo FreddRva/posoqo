@@ -20,7 +20,8 @@ import {
   X,
   AlertCircle,
   Ban,
-  CheckSquare
+  CheckSquare,
+  CheckCircle2
 } from 'lucide-react';
 
 interface Reservation {
@@ -44,6 +45,17 @@ export default function ReservationsPage() {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
   const loadReservations = async () => {
     try {
