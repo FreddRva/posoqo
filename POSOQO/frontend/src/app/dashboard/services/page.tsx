@@ -519,7 +519,7 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
       const formData = new FormData();
       formData.append('image', file);
       
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/api/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -631,7 +631,7 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
               {formData.image_url && (
                 <div className="relative">
                   <img
-                    src={formData.image_url.startsWith('http') ? formData.image_url : `http://localhost:4000${formData.image_url}`}
+                    src={formData.image_url.startsWith('http') ? formData.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${formData.image_url}`}
                     alt="Vista previa"
                     className="h-12 w-12 rounded object-cover border border-stone-200"
                     onError={(e) => {
