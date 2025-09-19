@@ -195,7 +195,9 @@ export default function AdminProducts() {
     formData.append('image', file);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/api/upload`, {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+      const response = await fetch(`${apiUrl}/upload`, {
         method: 'POST',
         body: formData,
       });

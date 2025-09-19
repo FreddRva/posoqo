@@ -218,8 +218,9 @@ export default function CheckoutPage() {
   async function updateAddressFromCoords(lat: number, lng: number) {
     try {
       // Usar el endpoint de geocoding del backend desplegado
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com/api';
-      const res = await fetch(`${backendUrl}/geocoding/reverse?lat=${lat}&lon=${lng}`);
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
+      const res = await fetch(`${apiUrl}/geocoding/reverse?lat=${lat}&lon=${lng}`);
       if (!res.ok) {
         console.error('Error en reverse geocoding:', res.status);
         // Fallback: usar coordenadas como dirección
