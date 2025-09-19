@@ -22,7 +22,9 @@ import {
   Loader2,
   X,
   Ban,
-  RotateCcw
+  RotateCcw,
+  CheckCircle2,
+  XCircle as XCircleIcon
 } from 'lucide-react';
 
 interface User {
@@ -51,6 +53,17 @@ export default function UsersPage() {
     role: '',
     email_verified: false
   });
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
   const loadUsers = async () => {
     try {
@@ -61,9 +74,31 @@ export default function UsersPage() {
       }
     } catch (error) {
       console.error('Error cargando usuarios:', error);
+      showErrorAlert('Error de carga', 'No se pudieron cargar los usuarios. Intenta recargar la página.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
   };
 
   useEffect(() => {
@@ -118,6 +153,7 @@ export default function UsersPage() {
       total: users.length,
       admin: users.filter(u => u.role === 'admin').length,
       user: users.filter(u => u.role === 'user').length,
+      suspended: users.filter(u => u.role === 'suspended').length,
       verified: users.filter(u => u.email_verified).length,
       unverified: users.filter(u => !u.email_verified).length,
     };
@@ -164,13 +200,13 @@ export default function UsersPage() {
       if (response.success) {
         await loadUsers();
         setShowEditModal(false);
-        alert('Usuario actualizado correctamente');
+        showSuccessAlert('Usuario actualizado', 'Los cambios han sido guardados correctamente');
       } else {
         throw new Error(response.error || 'Error al actualizar usuario');
       }
     } catch (error) {
       console.error('Error actualizando usuario:', error);
-      alert('Error al actualizar usuario: ' + (error as Error).message);
+      showErrorAlert('Error al actualizar', 'No se pudo actualizar el usuario. Intenta de nuevo.');
     }
   };
 
@@ -185,13 +221,13 @@ export default function UsersPage() {
       if (response.success) {
         await loadUsers();
         setShowSuspendModal(false);
-        alert('Usuario suspendido correctamente');
+        showSuccessAlert('Usuario suspendido', `${selectedUser.name} ha sido suspendido correctamente`);
       } else {
         throw new Error(response.error || 'Error al suspender usuario');
       }
     } catch (error) {
       console.error('Error suspendiendo usuario:', error);
-      alert('Error al suspender usuario: ' + (error as Error).message);
+      showErrorAlert('Error al suspender', 'No se pudo suspender el usuario. Intenta de nuevo.');
     }
   };
 
@@ -206,13 +242,13 @@ export default function UsersPage() {
       if (response.success) {
         await loadUsers();
         setShowReactivateModal(false);
-        alert('Usuario reactivado correctamente');
+        showSuccessAlert('Usuario reactivado', `${selectedUser.name} ha sido reactivado correctamente`);
       } else {
         throw new Error(response.error || 'Error al reactivar usuario');
       }
     } catch (error) {
       console.error('Error reactivando usuario:', error);
-      alert('Error al reactivar usuario: ' + (error as Error).message);
+      showErrorAlert('Error al reactivar', 'No se pudo reactivar el usuario. Intenta de nuevo.');
     }
   };
 
@@ -256,7 +292,7 @@ export default function UsersPage() {
         </div>
 
         {/* Estadísticas */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
           <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -287,6 +323,17 @@ export default function UsersPage() {
               </div>
               <div className="text-blue-600">
                 <User className="w-8 h-8" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-orange-600">{stats.suspended}</div>
+                <div className="text-stone-600 text-sm font-medium">Suspendidos</div>
+              </div>
+              <div className="text-orange-600">
+                <Ban className="w-8 h-8" />
               </div>
             </div>
           </div>
@@ -702,6 +749,33 @@ export default function UsersPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircleIcon className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}
