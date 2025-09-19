@@ -805,7 +805,7 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
-	// Intentar query con COALESCE para manejar valores NULL
+	// Query con COALESCE para manejar valores NULL
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT 
 			id, 
@@ -814,10 +814,10 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 			COALESCE(email, '') as email,
 			COALESCE(role, 'user') as role,
 			COALESCE(email_verified, false) as email_verified,
-			created_at,
-			updated_at
+			COALESCE(created_at, NOW()) as created_at,
+			COALESCE(updated_at, NOW()) as updated_at
 		FROM users
-		ORDER BY created_at DESC
+		ORDER BY id DESC
 	`)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
