@@ -1031,7 +1031,11 @@ export default function AdminProducts() {
                                                          {form.image_url && (
                                <div className="relative">
                                  <img
-                                   src={form.image_url.startsWith('http') ? form.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${form.image_url}`}
+                                   src={(() => {
+                                     if (form.image_url.startsWith('http')) return form.image_url;
+                                     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+                                     return `${backendUrl}${form.image_url}`;
+                                   })()}
                                    alt="Vista previa"
                                    className="h-12 w-12 rounded object-cover border border-stone-200 dark:border-stone-600"
                                    onError={(e) => {
