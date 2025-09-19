@@ -68,6 +68,15 @@ export default function UsersPage() {
   const loadUsers = async () => {
     try {
       setLoading(true);
+      
+      // Intentar endpoint de debug primero para diagnosticar
+      try {
+        const debugResponse = await apiFetch<any>('/debug-users-table');
+        console.log('🔍 Debug users table:', debugResponse);
+      } catch (debugError) {
+        console.log('Debug endpoint no disponible:', debugError);
+      }
+      
       const response = await apiFetch<{ data: any[] }>('/admin/users/list');
       if ((response as any).data) {
         setUsers((response as any).data);
