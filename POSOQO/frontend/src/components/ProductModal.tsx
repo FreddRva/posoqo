@@ -75,7 +75,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   {/* Contenedor de imagen */}
                   <div className="relative h-full bg-gradient-to-br from-amber-100/40 to-stone-200/60 rounded-2xl p-6 border border-amber-300/30 shadow-lg">
                     <img
-                      src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
+                      src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
                       alt={product.name}
                       className="w-full h-full object-contain"
                     />

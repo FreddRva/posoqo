@@ -70,7 +70,7 @@ export default function FeaturedFoods() {
         {foods.map(food => (
           <div key={food.id} className="bg-stone-900/80 rounded-2xl shadow-xl p-4 flex flex-col items-center border border-yellow-400/20">
             <img
-              src={food.image_url && !food.image_url.startsWith('http') ? `http://localhost:4000${food.image_url}` : (food.image_url || "/file.svg")}
+              src={food.image_url && !food.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${food.image_url}` : (food.image_url || "/file.svg")}
               alt={food.name}
               width={120}
               height={120}
