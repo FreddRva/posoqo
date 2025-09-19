@@ -32,12 +32,26 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        // Normalizar los datos antiguos para usar image_url
+        // Normalizar y limpiar URLs incorrectas
         const normalized = parsed.map((product: any) => ({
           ...product,
-          image_url: product.image_url || product.image || "",
+          image_url: (() => {
+            let imageUrl = product.image_url || product.image || "";
+            // TEMPORAL: Limpiar URLs de localhost
+            if (imageUrl?.includes('localhost:4000')) {
+              imageUrl = imageUrl.replace('http://localhost:4000', 'https://posoqo-backend.onrender.com');
+            }
+            return imageUrl;
+          })(),
           image: undefined // Remover el campo image para evitar confusión
         }));
+        
+        // Actualizar localStorage si hubo cambios
+        if (JSON.stringify(normalized) !== JSON.stringify(parsed)) {
+          localStorage.setItem('recentlyViewed', JSON.stringify(normalized));
+          console.log('🧹 [RECENT] URLs de localhost limpiadas');
+        }
+        
         setRecentlyViewed(normalized);
       } catch (error) {
         console.error('Error parsing recently viewed products:', error);

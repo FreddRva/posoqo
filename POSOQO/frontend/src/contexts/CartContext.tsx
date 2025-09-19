@@ -34,9 +34,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito desde el backend
   const loadCart = useCallback(async () => {
-    // Siempre cargar desde localStorage primero para tener datos inmediatos
+    // TEMPORAL: Limpiar URLs incorrectas del localStorage
     const stored = localStorage.getItem("cart");
-    const localCart = stored ? JSON.parse(stored) : [];
+    let localCart = [];
+    
+    if (stored) {
+      try {
+        const parsedCart = JSON.parse(stored);
+        localCart = parsedCart.map((item: CartItem) => ({
+          ...item,
+          image_url: item.image_url?.includes('localhost:4000')
+            ? item.image_url.replace('http://localhost:4000', 'https://posoqo-backend.onrender.com')
+            : item.image_url
+        }));
+        
+        // Actualizar localStorage con URLs limpias
+        if (JSON.stringify(localCart) !== JSON.stringify(parsedCart)) {
+          localStorage.setItem("cart", JSON.stringify(localCart));
+          console.log('🧹 [CART] URLs de localhost limpiadas en contexto');
+        }
+      } catch (error) {
+        console.error("Error parsing stored cart:", error);
+        localStorage.removeItem("cart");
+        localCart = [];
+      }
+    }
+    
     setCart(localCart);
 
     if (!session?.accessToken) {

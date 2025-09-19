@@ -55,6 +55,43 @@ export default function CartPage() {
     addToCart: addToCartHook
   } = useCart();
 
+  // TEMPORAL: Limpiar URLs incorrectas del localStorage
+  useEffect(() => {
+    const cleanLocalStorage = () => {
+      try {
+        // Limpiar carrito con URLs incorrectas
+        const cartData = localStorage.getItem('cart');
+        if (cartData) {
+          const cart = JSON.parse(cartData);
+          const cleanedCart = cart.map((item: any) => ({
+            ...item,
+            image_url: item.image_url?.includes('localhost:4000') 
+              ? item.image_url.replace('http://localhost:4000', 'https://posoqo-backend.onrender.com')
+              : item.image_url
+          }));
+          localStorage.setItem('cart', JSON.stringify(cleanedCart));
+        }
+
+        // Limpiar productos recientes con URLs incorrectas
+        const recentData = localStorage.getItem('recentlyViewed');
+        if (recentData) {
+          const recent = JSON.parse(recentData);
+          const cleanedRecent = recent.map((item: any) => ({
+            ...item,
+            image_url: item.image_url?.includes('localhost:4000')
+              ? item.image_url.replace('http://localhost:4000', 'https://posoqo-backend.onrender.com')
+              : item.image_url
+          }));
+          localStorage.setItem('recentlyViewed', JSON.stringify(cleanedRecent));
+        }
+      } catch (error) {
+        console.log('Error cleaning localStorage:', error);
+      }
+    };
+    
+    cleanLocalStorage();
+  }, []);
+
   // Cargar favoritos
   useEffect(() => {
     const loadFavorites = async () => {
