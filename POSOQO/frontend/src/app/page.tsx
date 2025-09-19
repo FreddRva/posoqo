@@ -231,7 +231,7 @@ export default function HomePage() {
           {/* Imagen con efecto flotante premium */}
           <div className="relative transform group-hover:translate-y-[-4px] md:group-hover:translate-y-[-6px] group-hover:scale-105 transition-all duration-700">
             <img
-              src={product.image_url?.startsWith('http') ? product.image_url : `http://localhost:4000${product.image_url}`}
+              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
           alt={product.name}
               className="object-contain w-full h-full rounded-lg"
           loading="lazy"

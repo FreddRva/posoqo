@@ -155,7 +155,7 @@ export default function CartPage() {
         const img = product.image_url || product.image || "";
         imageUrl = img.startsWith('http')
           ? img
-          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${img}`;
+          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${img}`;
       } else {
         imageUrl = "/file.svg";
       }
@@ -444,7 +444,7 @@ export default function CartPage() {
                         product.image_url
                           ? (product.image_url.startsWith('http')
                               ? product.image_url
-                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "http://localhost:4000"}${product.image_url}`)
+                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "https://posoqo-backend.onrender.com"}${product.image_url}`)
                           : "/file.svg"
                       }
                       alt={product.name}
@@ -512,7 +512,7 @@ export default function CartPage() {
                         selectedProduct.image_url
                           ? (selectedProduct.image_url.startsWith('http')
                               ? selectedProduct.image_url
-                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "http://localhost:4000"}${selectedProduct.image_url}`)
+                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || "https://posoqo-backend.onrender.com"}${selectedProduct.image_url}`)
                           : "/file.svg"
                       }
                       alt={selectedProduct.name}

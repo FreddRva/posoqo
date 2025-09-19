@@ -48,7 +48,7 @@ interface Category {
 }
 
 // Configuración
-const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL || "http://localhost:4000";
+const UPLOADS_URL = process.env.NEXT_PUBLIC_UPLOADS_URL || "https://posoqo-backend.onrender.com";
 const DEFAULT_PRICE_RANGE: [number, number] = [0, 1000];
 const DEBOUNCE_DELAY = 300;
 
