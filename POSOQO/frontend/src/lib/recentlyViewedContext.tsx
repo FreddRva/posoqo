@@ -28,11 +28,46 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
 
   // Cargar desde localStorage al inicializar
   useEffect(() => {
-    const stored = localStorage.getItem('recentlyViewed');
-    if (stored) {
+    const loadRecentlyViewed = async () => {
+      const stored = localStorage.getItem('recentlyViewed');
+      if (!stored) return;
+
       try {
         const parsed = JSON.parse(stored);
-        // Normalizar y limpiar URLs incorrectas
+        
+        // Verificar si hay productos sin imagen
+        const needsImageUpdate = parsed.some((product: any) => !product.image_url || product.image_url === "");
+        
+        if (needsImageUpdate) {
+          console.log('🔄 [RECENT] Productos sin imagen detectados, actualizando desde API...');
+          
+          try {
+            // Obtener productos actuales de la API
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}/api/products`);
+            const productsData = await response.json();
+            const allProducts = productsData.data || productsData;
+            
+            // Actualizar productos recientes con imágenes correctas
+            const updated = parsed.map((recentProduct: any) => {
+              const currentProduct = allProducts.find((p: any) => p.id === recentProduct.id);
+              return {
+                ...recentProduct,
+                image_url: currentProduct?.image_url || recentProduct.image_url || "",
+                image: undefined
+              };
+            });
+            
+            // Guardar productos actualizados
+            localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+            console.log('✅ [RECENT] Productos actualizados con imágenes correctas');
+            setRecentlyViewed(updated);
+            return;
+          } catch (apiError) {
+            console.error('❌ [RECENT] Error obteniendo productos de API:', apiError);
+          }
+        }
+        
+        // Normalizar y limpiar URLs incorrectas (código original)
         const normalized = parsed.map((product: any) => ({
           ...product,
           image_url: (() => {
@@ -58,7 +93,9 @@ export function RecentlyViewedProvider({ children }: { children: React.ReactNode
         console.error('Error parsing recently viewed products:', error);
         localStorage.removeItem('recentlyViewed');
       }
-    }
+    };
+
+    loadRecentlyViewed();
   }, []);
 
   // Guardar en localStorage cuando cambie
