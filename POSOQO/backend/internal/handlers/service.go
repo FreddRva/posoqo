@@ -162,7 +162,7 @@ func DeleteService(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo eliminar el servicio"})
 	}
-	return c.JSON(fiber.Map{"message": "Servicio eliminado"})
+	return c.JSON(fiber.Map{"success": true, "message": "Servicio eliminado"})
 }
 
 func nullableString(ns sql.NullString) string {

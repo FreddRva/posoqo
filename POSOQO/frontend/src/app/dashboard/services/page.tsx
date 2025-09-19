@@ -18,7 +18,9 @@ import {
   Eye,
   EyeOff,
   Calendar,
-  Clock
+  Clock,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 interface Service {
@@ -43,6 +45,17 @@ export default function ServicesPage() {
     isOpen: false,
     service: null
   });
+  const [alert, setAlert] = useState<{
+    show: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: 'success',
+    title: '',
+    message: ''
+  });
 
   const loadServices = async () => {
     try {
@@ -56,6 +69,27 @@ export default function ServicesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Funciones de alerta
+  const showSuccessAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'success',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
+  };
+
+  const showErrorAlert = (title: string, message: string) => {
+    setAlert({
+      show: true,
+      type: 'error',
+      title,
+      message
+    });
+    setTimeout(() => setAlert(prev => ({ ...prev, show: false })), 5000);
   };
 
   const handleEdit = (service: Service) => {
@@ -93,27 +127,27 @@ export default function ServicesPage() {
       } else {
         // Actualizar servicio existente
         response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${updatedService.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            name: updatedService.name,
-            description: updatedService.description,
-            image_url: updatedService.image_url,
-            is_active: updatedService.is_active
-          })
-        });
+        method: 'PUT',
+        body: JSON.stringify({
+          name: updatedService.name,
+          description: updatedService.description,
+          image_url: updatedService.image_url,
+          is_active: updatedService.is_active
+        })
+      });
       }
       
       if (response.success) {
         if (isNewService) {
           // Recargar servicios para obtener el nuevo servicio con su ID
           await loadServices();
-          alert('Servicio creado correctamente');
+          showSuccessAlert('Servicio creado', 'El nuevo servicio ha sido creado correctamente');
         } else {
-          // Actualizar en el estado local
-          setServices(prev => 
-            prev.map(s => s.id === updatedService.id ? updatedService : s)
-          );
-          alert('Servicio actualizado correctamente');
+        // Actualizar en el estado local
+        setServices(prev => 
+          prev.map(s => s.id === updatedService.id ? updatedService : s)
+        );
+          showSuccessAlert('Servicio actualizado', 'Los cambios han sido guardados correctamente');
         }
         
         handleCloseModal();
@@ -122,7 +156,7 @@ export default function ServicesPage() {
       }
     } catch (error) {
       console.error('Error guardando servicio:', error);
-      alert('Error al guardar el servicio: ' + (error as Error).message);
+      showErrorAlert('Error al guardar', 'No se pudo guardar el servicio. Intenta de nuevo.');
     }
   };
 
@@ -132,15 +166,24 @@ export default function ServicesPage() {
     }
     
     try {
-      // TODO: Implementar eliminación
       console.log('Eliminando servicio:', serviceId);
-      alert(`Eliminando servicio con ID: ${serviceId}`);
       
-      // Recargar servicios después de eliminar
-      await loadServices();
+      const response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${serviceId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.success) {
+        // Remover del estado local
+        setServices(prev => prev.filter(s => s.id !== serviceId));
+        
+        // Mostrar notificación de éxito
+        showSuccessAlert('Servicio eliminado', 'El servicio ha sido eliminado correctamente');
+      } else {
+        throw new Error(response.error || 'Error al eliminar');
+      }
     } catch (error) {
       console.error('Error eliminando servicio:', error);
-      alert('Error al eliminar el servicio');
+      showErrorAlert('Error al eliminar', 'No se pudo eliminar el servicio. Intenta de nuevo.');
     }
   };
 
@@ -389,6 +432,33 @@ export default function ServicesPage() {
             onClose={handleCloseModal}
             onSave={handleSaveService}
           />
+        )}
+
+        {/* Alerta de notificaciones */}
+        {alert.show && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-lg shadow-lg border max-w-md ${
+              alert.type === 'success' 
+                ? 'bg-green-50 border-green-200 text-green-800' 
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {alert.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm">{alert.title}</h4>
+                <p className="text-sm opacity-90">{alert.message}</p>
+              </div>
+              <button
+                onClick={() => setAlert(prev => ({ ...prev, show: false }))}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
