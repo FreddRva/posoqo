@@ -738,37 +738,67 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
+	// Primero verificar si la tabla users existe y su estructura
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, last_name, email, role, email_verified, created_at, updated_at
-		FROM users
-		ORDER BY created_at DESC
+		SELECT column_name, data_type, is_nullable 
+		FROM information_schema.columns 
+		WHERE table_name = 'users' 
+		ORDER BY ordinal_position
 	`)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener usuarios"})
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error verificando estructura de tabla users",
+			"details": err.Error(),
+		})
 	}
 	defer rows.Close()
 
-	users := []fiber.Map{}
+	columns := []fiber.Map{}
 	for rows.Next() {
+		var columnName, dataType, isNullable string
+		rows.Scan(&columnName, &dataType, &isNullable)
+		columns = append(columns, fiber.Map{
+			"column_name": columnName,
+			"data_type":   dataType,
+			"is_nullable": isNullable,
+		})
+	}
+
+	// Intentar una query simple primero
+	userRows, err := db.DB.Query(context.Background(), `
+		SELECT id, name, email, role, email_verified, created_at, updated_at
+		FROM users
+		ORDER BY created_at DESC
+		LIMIT 5
+	`)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al obtener usuarios",
+			"details": err.Error(),
+			"table_structure": columns,
+		})
+	}
+	defer userRows.Close()
+
+	users := []fiber.Map{}
+	for userRows.Next() {
 		var id int64
-		var name, lastName, email, role string
+		var name, email, role string
 		var emailVerified bool
 		var createdAt, updatedAt time.Time
 
-		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
+		err := userRows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
-			continue
-		}
-
-		// Concatenar nombre completo
-		fullName := name
-		if lastName != "" {
-			fullName = name + " " + lastName
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error escaneando usuarios",
+				"details": err.Error(),
+				"table_structure": columns,
+			})
 		}
 
 		user := fiber.Map{
 			"id":             id,
-			"name":           fullName,
+			"name":           name,
 			"email":          email,
 			"role":           role,
 			"email_verified": emailVerified,
@@ -780,6 +810,8 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"data": users,
+		"table_structure": columns,
+		"debug": true,
 	})
 }
 
