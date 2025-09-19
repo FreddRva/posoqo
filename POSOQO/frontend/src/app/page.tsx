@@ -128,19 +128,26 @@ export default function HomePage() {
         
         // Cargar servicios reales desde la API
         const servicesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/services` : `${apiUrl}/api/services`;
+        console.log('🔗 [HOME] Cargando servicios desde:', servicesUrl);
         fetch(servicesUrl)
-          .then(servicesRes => servicesRes.json())
+          .then(servicesRes => {
+            console.log('📡 [HOME] Respuesta servicios:', servicesRes.status, servicesRes.statusText);
+            return servicesRes.json();
+          })
           .then(servicesData => {
+            console.log('📋 [HOME] Datos de servicios:', servicesData);
             if (servicesData.success && servicesData.data) {
+              console.log('✅ [HOME] Servicios cargados exitosamente:', servicesData.data.length);
               setServices(servicesData.data);
             } else {
+              console.log('⚠️ [HOME] Usando fallback de productos como servicios');
               // Fallback: usar productos no destacados como servicios
               const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
               setServices(serviciosTemporales);
             }
           })
           .catch(servicesError => {
-            console.error('Error cargando servicios:', servicesError);
+            console.error('❌ [HOME] Error cargando servicios:', servicesError);
             // Fallback: usar productos no destacados como servicios
             const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
             setServices(serviciosTemporales);
@@ -901,11 +908,25 @@ export default function HomePage() {
                   <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden mb-6 md:mb-8 group-hover:scale-105 transition-transform duration-500">
                     {service.image_url ? (
                       <Image 
-                        src={service.image_url.startsWith('http') ? service.image_url : `http://127.0.0.1:4000${service.image_url}`} 
+                        src={(() => {
+                          const finalUrl = service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`;
+                          console.log(`🖼️ [HOME] Servicio ${service.name}: image_url="${service.image_url}" → finalUrl="${finalUrl}"`);
+                          return finalUrl;
+                        })()}
                         alt={service.name} 
                         fill
                         className="object-cover"
                         loading="lazy"
+                        onError={(e) => {
+                          console.error('❌ [HOME] Error cargando imagen de servicio:', service.image_url);
+                          // Fallback a emoji si falla la imagen
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center"><span class="text-4xl md:text-6xl">🍺</span></div>';
+                          }
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center">
