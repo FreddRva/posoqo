@@ -210,24 +210,6 @@ func DebugUsersTable(c *fiber.Ctx) error {
 		})
 	}
 
-	// Intentar obtener un usuario de ejemplo
-	var sampleUser fiber.Map
-	userRow := db.DB.QueryRow(context.Background(), "SELECT id, name, email, role FROM users LIMIT 1")
-	var id int64
-	var name, email, role string
-	if err := userRow.Scan(&id, &name, &email, &role); err != nil {
-		sampleUser = fiber.Map{
-			"error": "No se pudo obtener usuario de ejemplo",
-			"details": err.Error(),
-		}
-	} else {
-		sampleUser = fiber.Map{
-			"id": id,
-			"name": name,
-			"email": email,
-			"role": role,
-		}
-	}
 
 	// Obtener todos los usuarios para el frontend
 	userRows, err := db.DB.Query(context.Background(), `
