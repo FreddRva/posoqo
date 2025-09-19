@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -289,11 +290,22 @@ func main() {
 
 	// Health check endpoint para verificar que el servidor esté funcionando
 	app.Get("/health", func(c *fiber.Ctx) error {
+		// Verificar conexión a base de datos
+		if err := db.DB.Ping(context.Background()); err != nil {
+			return c.Status(503).JSON(fiber.Map{
+				"status":    "error",
+				"message":   "Base de datos no disponible",
+				"timestamp": time.Now(),
+				"error":     err.Error(),
+			})
+		}
+
 		return c.JSON(fiber.Map{
 			"status":    "ok",
 			"message":   "POSOQO Backend funcionando correctamente",
 			"timestamp": time.Now(),
 			"version":   "1.0.0",
+			"database":  "connected",
 		})
 	})
 
