@@ -805,71 +805,63 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
-	fmt.Printf("🔍 [USERS] Iniciando GetAdminUsersListPublic\n")
-	
-	// Primero verificar si la tabla existe
-	var tableExists bool
-	err := db.DB.QueryRow(context.Background(), 
-		"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users')").Scan(&tableExists)
-	if err != nil || !tableExists {
-		fmt.Printf("🔍 [USERS] Tabla users no existe o error: %v\n", err)
-		return c.JSON(fiber.Map{
-			"data": []fiber.Map{},
-			"error": "Tabla users no existe",
-		})
-	}
-	fmt.Printf("🔍 [USERS] Tabla users existe: %v\n", tableExists)
-
-	// Intentar query más simple posible
-	fmt.Printf("🔍 [USERS] Ejecutando query simple\n")
+	// Query para obtener usuarios con información completa
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, email, role
+		SELECT id, name, last_name, email, role, email_verified, created_at, updated_at
 		FROM users
-		ORDER BY id DESC
-		LIMIT 10
+		ORDER BY created_at DESC
 	`)
 	if err != nil {
-		fmt.Printf("🔍 [USERS] Error en query: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error al obtener usuarios",
-			"details": err.Error(),
-		})
+		// Fallback: intentar sin last_name si la columna no existe
+		rows, err = db.DB.Query(context.Background(), `
+			SELECT id, name, email, role, email_verified, created_at, updated_at
+			FROM users
+			ORDER BY created_at DESC
+		`)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error al obtener usuarios",
+				"details": err.Error(),
+			})
+		}
 	}
 	defer rows.Close()
-	fmt.Printf("🔍 [USERS] Query ejecutada, procesando filas\n")
 
 	users := []fiber.Map{}
-	rowCount := 0
 	for rows.Next() {
-		rowCount++
-		fmt.Printf("🔍 [USERS] Procesando fila %d\n", rowCount)
-		
 		var id int64
-		var name, email, role string
+		var name, lastName, email, role string
+		var emailVerified bool
+		var createdAt, updatedAt time.Time
 
-		err := rows.Scan(&id, &name, &email, &role)
+		// Intentar scan completo primero
+		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
-			fmt.Printf("🔍 [USERS] Error en scan fila %d: %v\n", rowCount, err)
-			continue
+			// Si falla, intentar scan sin last_name
+			err = rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt)
+			if err != nil {
+				continue
+			}
+			lastName = ""
 		}
 
-		fmt.Printf("🔍 [USERS] Fila %d escaneada: id=%d, name=%s, email=%s, role=%s\n", 
-			rowCount, id, name, email, role)
+		// Construir nombre completo
+		fullName := name
+		if lastName != "" {
+			fullName = name + " " + lastName
+		}
 
 		user := fiber.Map{
 			"id":             id,
-			"name":           name,
+			"name":           fullName,
 			"email":          email,
 			"role":           role,
-			"email_verified": true, // Default value
-			"created_at":     "2024-01-01T00:00:00Z",
-			"updated_at":     "2024-01-01T00:00:00Z",
+			"email_verified": emailVerified,
+			"created_at":     createdAt.Format("2006-01-02T15:04:05Z"),
+			"updated_at":     updatedAt.Format("2006-01-02T15:04:05Z"),
 		}
 		users = append(users, user)
 	}
-	
-	fmt.Printf("🔍 [USERS] Total filas procesadas: %d\n", rowCount)
-	fmt.Printf("🔍 [USERS] Total usuarios en array: %d\n", len(users))
 
 	return c.JSON(fiber.Map{
 		"data": users,
