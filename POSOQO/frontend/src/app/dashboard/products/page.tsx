@@ -611,11 +611,12 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}`}
+                              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
                               alt={product.name}
                               onError={(e) => {
                                 console.error('❌ [TABLE] Error cargando imagen en tabla:', product.image_url);
-                                console.error('  - URL construida:', product.image_url.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}`);
+                                const constructedUrl = product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
+                                console.error('  - URL construida:', constructedUrl);
                                 e.currentTarget.style.display = 'none';
                                 // Mostrar placeholder cuando hay error
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
