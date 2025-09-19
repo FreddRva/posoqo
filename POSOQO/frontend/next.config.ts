@@ -21,9 +21,16 @@ const nextConfig: NextConfig = {
         port: '4000',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'posoqo-backend.onrender.com',
+        port: '',
+        pathname: '/uploads/**',
+      },
     ],
     domains: [
       'lh3.googleusercontent.com',
+      'posoqo-backend.onrender.com',
     ],
   },
   
