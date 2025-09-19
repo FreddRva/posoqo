@@ -271,7 +271,7 @@ function ProductsContent() {
         const img = product.image_url || product.image || "";
         imageUrl = img.startsWith('http')
           ? img
-          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${img}`;
+          : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${img}`;
       } else {
         imageUrl = "/file.svg";
       }
