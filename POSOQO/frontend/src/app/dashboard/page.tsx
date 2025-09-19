@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { useNotifications } from '@/hooks/useNotifications';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 import Link from 'next/link';
 import { 
   BarChart3, 
@@ -27,7 +28,8 @@ import {
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { stats, loading, refreshNotifications } = useNotifications();
+  const { stats: notificationStats, loading: notificationsLoading, refreshNotifications } = useNotifications();
+  const { stats: dashboardStats, loading: statsLoading, refreshStats } = useDashboardStats();
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -46,11 +48,11 @@ export default function DashboardPage() {
   const alerts = useMemo(() => {
     const newAlerts = [];
 
-    // Solo mostrar alertas para números significativos
-    if (stats.orders > 5) {
+    // Alertas basadas en estadísticas reales
+    if (dashboardStats.pendingOrders > 0) {
       newAlerts.push({
         type: 'orders',
-        message: `¡Nuevos pedidos! Tienes ${stats.orders} pedidos pendientes de revisión`,
+        message: `¡Pedidos pendientes! Tienes ${dashboardStats.pendingOrders} pedidos esperando procesamiento`,
         color: 'bg-gradient-to-r from-orange-500 to-red-500',
         icon: <ShoppingCart className="w-6 h-6" />,
         priority: 'high',
@@ -58,10 +60,10 @@ export default function DashboardPage() {
       });
     }
 
-    if (stats.users > 3) {
+    if (dashboardStats.users > 0) {
       newAlerts.push({
         type: 'users',
-        message: `¡Nuevos usuarios! ${stats.users} usuarios se han registrado recientemente`,
+        message: `¡Usuarios activos! ${dashboardStats.activeUsers} de ${dashboardStats.users} usuarios están activos`,
         color: 'bg-gradient-to-r from-blue-500 to-purple-500',
         icon: <Users className="w-6 h-6" />,
         priority: 'medium',
@@ -69,10 +71,10 @@ export default function DashboardPage() {
       });
     }
 
-    if (stats.products > 5) {
+    if (dashboardStats.products > 0) {
       newAlerts.push({
         type: 'products',
-        message: `¡Nuevos productos! ${stats.products} productos han sido agregados`,
+        message: `¡Catálogo actualizado! Tienes ${dashboardStats.products} productos disponibles`,
         color: 'bg-gradient-to-r from-green-500 to-emerald-500',
         icon: <Package className="w-6 h-6" />,
         priority: 'medium',
@@ -80,63 +82,67 @@ export default function DashboardPage() {
       });
     }
 
-    if (stats.system > 3) {
+    if (dashboardStats.services > 0) {
       newAlerts.push({
-        type: 'system',
-        message: `¡Alertas del sistema! ${stats.system} eventos requieren atención`,
+        type: 'services',
+        message: `¡Servicios disponibles! ${dashboardStats.services} servicios están configurados`,
         color: 'bg-gradient-to-r from-purple-500 to-pink-500',
         icon: <Settings className="w-6 h-6" />,
         priority: 'low',
-        link: '/dashboard/settings'
+        link: '/dashboard/services'
       });
     }
 
     return newAlerts;
-  }, [stats]);
+  }, [dashboardStats]);
 
   // Memoizar las estadísticas para evitar recálculos
   const statsCards = useMemo(() => [
     {
       title: 'Total Pedidos',
-      value: stats.orders,
+      value: dashboardStats.orders,
+      subtitle: `${dashboardStats.pendingOrders} pendientes`,
       icon: <ShoppingCart className="w-8 h-8 text-blue-600" />,
       bgColor: 'bg-blue-100',
       textColor: 'text-blue-600',
-      trend: '+12%',
-      trendColor: 'text-green-600',
+      trend: dashboardStats.pendingOrders > 0 ? 'Pendientes' : 'Al día',
+      trendColor: dashboardStats.pendingOrders > 0 ? 'text-orange-600' : 'text-green-600',
       link: '/dashboard/orders'
     },
     {
       title: 'Usuarios Activos',
-      value: stats.users,
+      value: dashboardStats.activeUsers,
+      subtitle: `de ${dashboardStats.users} total`,
       icon: <Users className="w-8 h-8 text-green-600" />,
       bgColor: 'bg-green-100',
       textColor: 'text-green-600',
-      trend: '+8%',
+      trend: `${Math.round((dashboardStats.activeUsers / Math.max(dashboardStats.users, 1)) * 100)}% activos`,
       trendColor: 'text-green-600',
       link: '/dashboard/users'
     },
     {
       title: 'Productos',
-      value: stats.products,
+      value: dashboardStats.products,
+      subtitle: 'en catálogo',
       icon: <Package className="w-8 h-8 text-purple-600" />,
       bgColor: 'bg-purple-100',
       textColor: 'text-purple-600',
-      trend: '+15%',
+      trend: 'Disponibles',
       trendColor: 'text-green-600',
       link: '/dashboard/products'
     },
     {
-      title: 'Alertas Sistema',
-      value: stats.system,
-      icon: <AlertTriangle className="w-8 h-8 text-orange-600" />,
+      title: 'Ingresos Totales',
+      value: `S/ ${dashboardStats.totalRevenue.toFixed(2)}`,
+      subtitle: 'desde el inicio',
+      icon: <TrendingUp className="w-8 h-8 text-orange-600" />,
       bgColor: 'bg-orange-100',
       textColor: 'text-orange-600',
-      trend: 'Requiere atención',
-      trendColor: 'text-orange-600',
-      link: '/dashboard/settings'
+      trend: 'Revenue',
+      trendColor: 'text-green-600',
+      link: '/dashboard/orders'
     }
-  ], [stats]);
+  ], [dashboardStats]);
 
   const quickActions = useMemo(() => [
     {
@@ -167,10 +173,11 @@ export default function DashboardPage() {
 
   const handleRefresh = () => {
     refreshNotifications();
+    refreshStats();
     setLastUpdate(new Date());
   };
 
-  if (loading) {
+  if (statsLoading || notificationsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -257,6 +264,9 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-gray-600 text-sm font-medium">{card.title}</p>
                     <p className="text-3xl font-bold text-gray-800">{card.value}</p>
+                    {card.subtitle && (
+                      <p className="text-gray-500 text-xs mt-1">{card.subtitle}</p>
+                    )}
                     <div className="flex items-center space-x-1 mt-2">
                       <TrendingUp className="w-4 h-4 text-green-600" />
                       <span className={`text-sm ${card.trendColor}`}>{card.trend}</span>

@@ -96,20 +96,12 @@ export function useNotifications() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      console.log('🔔 Marcando notificación como leída:', notificationId);
-      console.log('👤 User ID:', userID);
-      console.log('👑 Is Admin:', isAdmin);
-      
       const endpoint = isAdmin ? `/admin/notifications/${notificationId}/read` : `/notifications/${notificationId}/read`;
       const params = isAdmin ? '' : `?user_id=${userID}`;
-      
-      console.log('🌐 Endpoint:', `${endpoint}${params}`);
       
       const response = await apiFetch(`${endpoint}${params}`, {
         method: 'PUT'
       });
-      
-      console.log('✅ Respuesta del servidor:', response);
       
       // Actualizar estado local inmediatamente
       setNotifications(prevNotifications => 
@@ -123,11 +115,7 @@ export function useNotifications() {
         const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
         const statsParams = isAdmin ? '' : `?user_id=${userID}`;
         
-        console.log('📊 Actualizando estadísticas:', `${statsEndpoint}${statsParams}`);
-        
         const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
-        
-        console.log('📊 Respuesta de estadísticas:', statsResponse);
         
         if ((statsResponse as any).success) {
           setStats({
@@ -140,7 +128,7 @@ export function useNotifications() {
           });
         }
       } catch (error) {
-        console.error('❌ Error actualizando estadísticas:', error);
+        console.error('Error actualizando estadísticas:', error);
       }
       
     } catch (error) {
@@ -158,7 +146,6 @@ export function useNotifications() {
     try {
       // Por ahora, usar markAllAsRead en lugar de markAllAsReadByType
       // para evitar errores con tipos de notificación no soportados
-      console.log(`⚠️ markAllAsReadByType('${type}') no soportado, usando markAllAsRead`);
       await markAllAsRead();
     } catch (error) {
       console.error('Error marcando notificaciones como leídas:', error);
@@ -167,21 +154,13 @@ export function useNotifications() {
 
   const markAllAsRead = async () => {
     try {
-      console.log('🔔 Marcando todas las notificaciones como leídas');
-      console.log('👤 User ID:', userID);
-      console.log('👑 Is Admin:', isAdmin);
-      
       // Marcar todas las notificaciones no leídas como leídas en el backend
       const endpoint = isAdmin ? '/admin/notifications/read-all' : '/notifications/read-all';
       const params = isAdmin ? '' : `?user_id=${userID}`;
       
-      console.log('🌐 Endpoint:', `${endpoint}${params}`);
-      
       const response = await apiFetch(`${endpoint}${params}`, {
         method: 'PUT'
       });
-      
-      console.log('✅ Respuesta del servidor:', response);
       
       // Actualizar estado local
       setNotifications(notifications.map(n =>
@@ -193,11 +172,7 @@ export function useNotifications() {
         const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
         const statsParams = isAdmin ? '' : `?user_id=${userID}`;
         
-        console.log('📊 Actualizando estadísticas:', `${statsEndpoint}${statsParams}`);
-        
         const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
-        
-        console.log('📊 Respuesta de estadísticas:', statsResponse);
         
         if ((statsResponse as any).success) {
           setStats({
@@ -213,12 +188,7 @@ export function useNotifications() {
         console.error('❌ Error actualizando estadísticas:', error);
       }
     } catch (error) {
-      console.error('❌ Error marcando todas las notificaciones como leídas:', error);
-      console.error('🔍 Detalles del error:', {
-        userID,
-        isAdmin,
-        error: error instanceof Error ? error.message : error
-      });
+      console.error('Error marcando todas las notificaciones como leídas:', error);
     }
   };
 
@@ -285,12 +255,11 @@ export function useNotifications() {
     if (session) {
       loadNotifications();
       
-      // Polling cada 30 segundos para reducir recargues (era cada 5 segundos)
-      const interval = setInterval(loadNotifications, 30000);
+      // Polling cada 5 minutos para reducir recargues
+      const interval = setInterval(loadNotifications, 300000);
       
       // Escuchar eventos de actualización de notificaciones
       const handleNotificationUpdate = () => {
-        console.log('🔄 Actualizando notificaciones por evento...');
         loadNotifications();
       };
       
