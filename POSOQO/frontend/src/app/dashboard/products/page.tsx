@@ -601,13 +601,9 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={(() => {
-                                const finalUrl = product.image_url?.startsWith('http') 
-                                  ? product.image_url 
-                                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
-                                console.log(`🖼️ [DASHBOARD] Producto ${product.name}: image_url="${product.image_url}" → finalUrl="${finalUrl}"`);
-                                return finalUrl;
-                              })()}
+                              src={product.image_url?.startsWith('http') 
+                                ? product.image_url 
+                                : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
@@ -1035,9 +1031,6 @@ export default function AdminProducts() {
                                    alt="Vista previa"
                                    className="h-12 w-12 rounded object-cover border border-stone-200 dark:border-stone-600"
                                    onError={(e) => {
-                                     const backendUrl = process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com';
-                                     const fullUrl = `${backendUrl}${form.image_url}`;
-                                     console.error('❌ [MODAL] Error cargando imagen en modal');
                                      e.currentTarget.style.display = 'none';
                                    }}
                                  />
