@@ -50,9 +50,9 @@ COMMENT ON COLUMN services.description IS 'Descripción detallada del servicio (
 COMMENT ON COLUMN services.image_url IS 'URL de la imagen del servicio';
 COMMENT ON COLUMN services.is_active IS 'Indica si el servicio está activo y disponible';
 
--- Insertar algunos servicios de ejemplo
-INSERT INTO services (name, description, is_active) VALUES 
-('Delivery Express', '• Entrega en 30 minutos o menos\n• Cobertura en toda la ciudad\n• Empaque ecológico\n• Seguimiento en tiempo real', true),
-('Servicio Premium', '• Atención personalizada\n• Productos exclusivos\n• Empaque de lujo\n• Entrega programada', true),
-('Catering Empresarial', '• Menús personalizados\n• Servicio completo\n• Personal especializado\n• Cobertura de eventos', true)
-ON CONFLICT DO NOTHING;
+-- Datos de ejemplo comentados para evitar que aparezcan automáticamente
+-- INSERT INTO services (name, description, is_active) VALUES 
+-- ('Delivery Express', '• Entrega en 30 minutos o menos\n• Cobertura en toda la ciudad\n• Empaque ecológico\n• Seguimiento en tiempo real', true),
+-- ('Servicio Premium', '• Atención personalizada\n• Productos exclusivos\n• Empaque de lujo\n• Entrega programada', true),
+-- ('Catering Empresarial', '• Menús personalizados\n• Servicio completo\n• Personal especializado\n• Cobertura de eventos', true)
+-- ON CONFLICT DO NOTHING;
