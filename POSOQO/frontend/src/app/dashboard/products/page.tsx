@@ -613,7 +613,7 @@ export default function AdminProducts() {
                                   (placeholder as HTMLElement).style.display = 'flex';
                                 }
                               }}
-                              onLoad={() => {
+                              onLoad={(e) => {
                                 // Ocultar placeholder cuando la imagen carga correctamente
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
                                 if (placeholder) {
