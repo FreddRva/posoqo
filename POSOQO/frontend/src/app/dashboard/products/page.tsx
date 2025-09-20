@@ -601,10 +601,15 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              src={(() => {
+                                const finalUrl = product.image_url?.startsWith('http') 
+                                  ? product.image_url 
+                                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
+                                console.log(`🖼️ [DASHBOARD] Producto ${product.name}: image_url="${product.image_url}" → finalUrl="${finalUrl}"`);
+                                return finalUrl;
+                              })()}
                               alt={product.name}
                               onError={(e) => {
-                                console.error('❌ [TABLE] Error cargando imagen en tabla');
                                 e.currentTarget.style.display = 'none';
                                 // Mostrar placeholder cuando hay error
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
