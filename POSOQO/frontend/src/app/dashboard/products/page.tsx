@@ -603,7 +603,7 @@ export default function AdminProducts() {
                               className="w-12 h-12 rounded-lg object-cover"
                               src={product.image_url?.startsWith('http') 
                                 ? product.image_url 
-                                : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
@@ -611,6 +611,13 @@ export default function AdminProducts() {
                                 const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
                                 if (placeholder) {
                                   (placeholder as HTMLElement).style.display = 'flex';
+                                }
+                              }}
+                              onLoad={() => {
+                                // Ocultar placeholder cuando la imagen carga correctamente
+                                const placeholder = e.currentTarget.parentElement?.querySelector('.image-placeholder');
+                                if (placeholder) {
+                                  (placeholder as HTMLElement).style.display = 'none';
                                 }
                               }}
                             />
@@ -1025,7 +1032,7 @@ export default function AdminProducts() {
                                  <img
                                    src={(() => {
                                      if (form.image_url.startsWith('http')) return form.image_url;
-                                     const backendUrl = process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com';
+                                     const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com';
                                      return `${backendUrl}${form.image_url}`;
                                    })()}
                                    alt="Vista previa"
