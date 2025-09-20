@@ -601,9 +601,13 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url?.startsWith('http') 
-                                ? product.image_url 
-                                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              src={(() => {
+                                const finalUrl = product.image_url?.startsWith('http') 
+                                  ? product.image_url 
+                                  : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`;
+                                console.log(`🖼️ [DASHBOARD] ${product.name}: "${product.image_url}" → "${finalUrl}"`);
+                                return finalUrl;
+                              })()}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
