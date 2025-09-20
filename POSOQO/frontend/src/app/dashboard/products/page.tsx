@@ -69,11 +69,8 @@ export default function AdminProducts() {
 
   // Función para recargar productos desde el backend
   const reloadProducts = () => {
-    console.log('🔄 [PRODUCTS] Recargando productos...');
     apiFetch("/admin/products/list")
       .then((data: any) => {
-        console.log('📦 [PRODUCTS] Respuesta completa:', data);
-        console.log('📦 [PRODUCTS] Productos recibidos:', data.data || []);
         setProducts(data.data || []);
         setLoading(false);
       })
@@ -298,15 +295,9 @@ export default function AdminProducts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🔍 [PRODUCTS] Iniciando envío del formulario');
-    console.log('🔍 [PRODUCTS] Datos del formulario:', form);
-    
     if (!validateForm()) {
-      console.log('❌ [PRODUCTS] Validación falló');
       return;
     }
-
-    console.log('✅ [PRODUCTS] Validación exitosa');
     setIsSubmitting(true);
     setError(null);
 
@@ -343,7 +334,6 @@ export default function AdminProducts() {
         color: form.color?.trim() || null
       };
 
-      console.log('📤 [PRODUCTS] Enviando datos:', dataToSend);
 
       const response = await apiFetch(url, {
         method,

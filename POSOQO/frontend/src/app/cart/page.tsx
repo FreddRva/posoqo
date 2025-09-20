@@ -309,11 +309,7 @@ export default function CartPage() {
                           alt={item.name}
                           className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
-                            console.log('Error loading image:', item.image_url);
                             (e.target as HTMLImageElement).src = '/file.svg';
-                          }}
-                          onLoad={() => {
-                            console.log('Image loaded successfully:', item.image_url);
                           }}
                         />
                       </div>
