@@ -100,8 +100,6 @@ func main() {
 	api.Post("/payments/refund", handlers.CreateRefund)
 
 	// Ruta de prueba para verificar conexión a base de datos (mover fuera del grupo /api)
-	// Servir archivos estáticos desde la carpeta uploads
-	app.Static("/uploads", "./uploads")
 
 	// Rutas de usuario (protegidas pero accesibles desde /api)
 	api.Get("/profile", middleware.AuthMiddleware(), handlers.Profile)
