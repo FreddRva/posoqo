@@ -115,7 +115,7 @@ export default function ServicesPage() {
       let response;
       if (isNewService) {
         // Crear nuevo servicio
-        response = await apiFetch<{ success: boolean; error?: string; id?: string }>(`/protected/admin/services`, {
+        response = await apiFetch<{ success: boolean; error?: string; id?: string }>(`/admin/services`, {
           method: 'POST',
           body: JSON.stringify({
             name: updatedService.name,
@@ -126,7 +126,7 @@ export default function ServicesPage() {
         });
       } else {
         // Actualizar servicio existente
-        response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${updatedService.id}`, {
+        response = await apiFetch<{ success: boolean; error?: string }>(`/admin/services/${updatedService.id}`, {
         method: 'PUT',
         body: JSON.stringify({
           name: updatedService.name,
@@ -168,7 +168,7 @@ export default function ServicesPage() {
     try {
       console.log('Eliminando servicio:', serviceId);
       
-      const response = await apiFetch<{ success: boolean; error?: string }>(`/protected/admin/services/${serviceId}`, {
+      const response = await apiFetch<{ success: boolean; error?: string }>(`/admin/services/${serviceId}`, {
         method: 'DELETE'
       });
       
