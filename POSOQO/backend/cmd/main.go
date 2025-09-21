@@ -175,6 +175,9 @@ func main() {
 	admin.Post("/services", handlers.CreateService)
 	admin.Put("/services/:id", handlers.UpdateService)
 	admin.Delete("/services/:id", handlers.DeleteService)
+	
+	// Ruta de prueba temporal para DELETE
+	admin.Delete("/services/test/:id", handlers.DeleteService)
 
 	// Gestión de categorías (protegidas)
 	admin.Post("/categories", handlers.CreateCategory)
@@ -203,6 +206,9 @@ func main() {
 
 	// Ruta protegida para obtener usuario por email
 	protected.Get("/users/by-email/:email", handlers.GetUserByEmail)
+	
+	// Ruta de prueba temporal para DELETE de servicios (sin middleware admin)
+	protected.Delete("/services-debug/:id", handlers.DeleteService)
 
 	// Documentación Swagger
 	app.Get("/swagger/*", swagger.HandlerDefault)
