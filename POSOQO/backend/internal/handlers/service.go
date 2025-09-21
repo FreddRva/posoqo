@@ -157,11 +157,22 @@ func UpdateService(c *fiber.Ctx) error {
 // Eliminar servicio
 func DeleteService(c *fiber.Ctx) error {
 	id := c.Params("id")
-	_, err := db.DB.Exec(context.Background(),
+	fmt.Printf("DELETE SERVICE: Intentando eliminar servicio con ID: %s\n", id)
+	
+	result, err := db.DB.Exec(context.Background(),
 		`DELETE FROM services WHERE id=$1`, id)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "No se pudo eliminar el servicio"})
+		fmt.Printf("ERROR DELETE SERVICE: %v\n", err)
+		return c.Status(500).JSON(fiber.Map{"error": "No se pudo eliminar el servicio: " + err.Error()})
 	}
+	
+	rowsAffected := result.RowsAffected()
+	fmt.Printf("DELETE SERVICE: %d filas afectadas\n", rowsAffected)
+	
+	if rowsAffected == 0 {
+		return c.Status(404).JSON(fiber.Map{"error": "Servicio no encontrado"})
+	}
+	
 	return c.JSON(fiber.Map{"success": true, "message": "Servicio eliminado"})
 }
 
