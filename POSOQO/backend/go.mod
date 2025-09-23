@@ -3,7 +3,6 @@ module github.com/posoqo/backend
 go 1.24.1
 
 require (
-	github.com/cloudinary/cloudinary-go/v2 v2.6.0
 	github.com/gofiber/fiber/v2 v2.52.8
 	github.com/gofiber/swagger v1.1.1
 	github.com/gofiber/websocket/v2 v2.2.1
@@ -24,14 +23,12 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/fasthttp/websocket v1.5.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
