@@ -109,10 +109,6 @@ export default function ServicesPage() {
 
   const handleSaveService = async (updatedService: Service) => {
     try {
-      if (isUploading) {
-        showErrorAlert('Subiendo imagen', 'Espera a que termine la subida de la imagen.');
-        return;
-      }
       console.log('Guardando servicio:', updatedService);
       
       const isNewService = !updatedService.id || updatedService.id === '';
