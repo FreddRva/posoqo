@@ -172,47 +172,26 @@ export default function AdminProducts() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tamaño del archivo (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('⚠️ La imagen no puede exceder 5MB');
-      return;
-    }
-
-    // Validar tipo de archivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      setError('⚠️ Solo se permiten archivos JPG, PNG, GIF y WebP');
-      return;
-    }
-
     setIsUploadingImage(true);
     setError(null);
-    
-    const formData = new FormData();
-    formData.append('image', file);
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
-      const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
-      const response = await fetch(`${apiUrl}/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Error al subir imagen');
-      }
-
-      const data = await response.json();
-      console.log('✅ [UPLOAD] Imagen subida exitosamente:', data);
+      // Importar la función de Cloudinary dinámicamente
+      const { uploadImageToCloudinary } = await import('@/lib/cloudinary');
       
-      setForm(prev => ({
-        ...prev,
-        image_url: data.url || data.image_url
-      }));
+      const result = await uploadImageToCloudinary(file);
+      
+      if (result.success && result.url) {
+        console.log('✅ [CLOUDINARY] Imagen subida exitosamente:', result.url);
+        setForm(prev => ({
+          ...prev,
+          image_url: result.url
+        }));
+      } else {
+        setError(`⚠️ Error al subir imagen: ${result.error || 'Error desconocido'}`);
+      }
     } catch (error: any) {
-      console.error('❌ [UPLOAD] Error subiendo imagen:', error);
+      console.error('❌ [CLOUDINARY] Error subiendo imagen:', error);
       setError(`⚠️ Error al subir imagen: ${error.message || 'Error desconocido'}`);
     } finally {
       setIsUploadingImage(false);

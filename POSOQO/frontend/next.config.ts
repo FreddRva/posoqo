@@ -27,10 +27,17 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
     domains: [
       'lh3.googleusercontent.com',
       'posoqo-backend.onrender.com',
+      'res.cloudinary.com',
     ],
   },
   

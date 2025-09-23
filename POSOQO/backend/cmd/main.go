@@ -15,6 +15,7 @@ import (
 	"github.com/posoqo/backend/internal/db"
 	"github.com/posoqo/backend/internal/handlers"
 	"github.com/posoqo/backend/internal/middleware"
+	"github.com/posoqo/backend/internal/services"
 )
 
 // @title POSOQO API
@@ -34,6 +35,11 @@ func main() {
 		log.Fatal("Error conectando a la base de datos:", err)
 	}
 	defer db.DB.Close()
+
+	// Inicializar Cloudinary
+	if err := services.InitCloudinary(); err != nil {
+		log.Printf("⚠️ Cloudinary no disponible (usando almacenamiento local): %v", err)
+	}
 
 	// Crear aplicación Fiber
 	app := fiber.New(fiber.Config{
@@ -175,7 +181,7 @@ func main() {
 	admin.Post("/services", handlers.CreateService)
 	admin.Put("/services/:id", handlers.UpdateService)
 	admin.Delete("/services/:id", handlers.DeleteService)
-	
+
 	// Ruta de prueba temporal para DELETE
 	admin.Delete("/services/test/:id", handlers.DeleteService)
 
@@ -206,7 +212,7 @@ func main() {
 
 	// Ruta protegida para obtener usuario por email
 	protected.Get("/users/by-email/:email", handlers.GetUserByEmail)
-	
+
 	// Ruta de prueba temporal para DELETE de servicios (sin middleware admin)
 	protected.Delete("/services-debug/:id", handlers.DeleteService)
 

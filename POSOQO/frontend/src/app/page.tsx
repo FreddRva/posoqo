@@ -7,6 +7,7 @@ import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsC
 import { motion, useAnimation } from "framer-motion";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { getImageUrl } from "@/lib/api";
 
 // Components
 import Navbar from "@/components/Navbar";
@@ -231,13 +232,11 @@ export default function HomePage() {
           {/* Imagen con efecto flotante premium */}
           <div className="relative transform group-hover:translate-y-[-4px] md:group-hover:translate-y-[-6px] group-hover:scale-105 transition-all duration-700">
             <img
-              src={product.image_url?.startsWith('http') 
-                ? product.image_url 
-                : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
-          alt={product.name}
+              src={getImageUrl(product.image_url)}
+              alt={product.name}
               className="object-contain w-full h-full rounded-lg"
-          loading="lazy"
-        />
+              loading="lazy"
+            />
             
             {/* Efecto de brillo premium */}
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/30 via-transparent to-transparent rounded-lg pointer-events-none"></div>

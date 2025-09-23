@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/posoqo/backend/internal/services"
 )
 
 // UploadImageHandler maneja la subida de imágenes
@@ -44,14 +46,6 @@ func UploadImageHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Crear directorio uploads si no existe
-	uploadsDir := "./uploads"
-	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error creando directorio de uploads",
-		})
-	}
-
 	// Generar nombre único para el archivo
 	ext := filepath.Ext(file.Filename)
 	if ext == "" {
@@ -74,8 +68,7 @@ func UploadImageHandler(c *fiber.Ctx) error {
 	// Generar nombre único
 	uniqueID := uuid.New().String()
 	timestamp := time.Now().Format("20060102-150405")
-	filename := fmt.Sprintf("%s-%s%s", timestamp, uniqueID[:8], strings.ToLower(ext))
-	filepath := filepath.Join(uploadsDir, filename)
+	filename := fmt.Sprintf("posoqo-%s-%s%s", timestamp, uniqueID[:8], strings.ToLower(ext))
 
 	// Abrir el archivo subido
 	src, err := file.Open()
@@ -86,32 +79,66 @@ func UploadImageHandler(c *fiber.Ctx) error {
 	}
 	defer src.Close()
 
-	// Crear el archivo de destino
-	dst, err := os.Create(filepath)
+	// Intentar subir a Cloudinary primero
+	ctx := context.Background()
+	result, err := services.UploadImage(ctx, src, filename)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error creando archivo de destino",
+		// Si Cloudinary falla, usar almacenamiento local como fallback
+		fmt.Printf("⚠️ [UPLOAD] Cloudinary falló, usando almacenamiento local: %v\n", err)
+
+		// Crear directorio uploads si no existe
+		uploadsDir := "./uploads"
+		if err := os.MkdirAll(uploadsDir, 0755); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error creando directorio de uploads",
+			})
+		}
+
+		// Resetear el reader
+		src.Seek(0, 0)
+
+		// Crear el archivo de destino local
+		localFilepath := filepath.Join(uploadsDir, filename)
+		dst, err := os.Create(localFilepath)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error creando archivo de destino",
+			})
+		}
+		defer dst.Close()
+
+		// Copiar el contenido
+		if _, err = io.Copy(dst, src); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Error guardando archivo",
+			})
+		}
+
+		// URL pública del archivo local
+		fileURL := fmt.Sprintf("/uploads/%s", filename)
+
+		fmt.Printf("✅ [UPLOAD] Imagen subida localmente: %s\n", fileURL)
+
+		return c.JSON(fiber.Map{
+			"success":   true,
+			"message":   "Imagen subida exitosamente (almacenamiento local)",
+			"url":       fileURL,
+			"image_url": fileURL,
+			"filename":  filename,
+			"storage":   "local",
 		})
 	}
-	defer dst.Close()
 
-	// Copiar el contenido
-	if _, err = io.Copy(dst, src); err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error guardando archivo",
-		})
-	}
-
-	// URL pública del archivo
-	fileURL := fmt.Sprintf("/uploads/%s", filename)
-
-	fmt.Printf("✅ [UPLOAD] Imagen subida exitosamente: %s\n", fileURL)
+	// Éxito con Cloudinary
+	fmt.Printf("✅ [UPLOAD] Imagen subida a Cloudinary: %s\n", result.SecureURL)
 
 	return c.JSON(fiber.Map{
 		"success":   true,
 		"message":   "Imagen subida exitosamente",
-		"url":       fileURL,
-		"image_url": fileURL,
+		"url":       result.SecureURL,
+		"image_url": result.SecureURL,
 		"filename":  filename,
+		"public_id": result.PublicID,
+		"storage":   "cloudinary",
 	})
 }

@@ -1,5 +1,19 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
+// Función para construir URL de imagen
+export const getImageUrl = (imageUrl: string | undefined): string => {
+  if (!imageUrl) return '/file.svg';
+  
+  // Si ya es una URL completa (Cloudinary), devolverla tal como está
+  if (imageUrl.startsWith('http')) {
+    return imageUrl;
+  }
+  
+  // Si es una ruta local, construir la URL completa
+  const baseUrl = API_URL.replace('/api', '');
+  return `${baseUrl}${imageUrl}`;
+};
+
 // Función para obtener el token de autenticación
 async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
