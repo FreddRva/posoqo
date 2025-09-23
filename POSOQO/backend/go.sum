@@ -9,8 +9,8 @@ github.com/andybalholm/brotli v1.1.0/go.mod h1:sms7XGricyQI9K10gOSf56VKKWS4oLer5
 github.com/aymerick/douceur v0.2.0 h1:Mv+mAeH1Q+n9Fr+oyamOlAkUNPWPlA8PPGR0QAaYuPk=
 github.com/aymerick/douceur v0.2.0/go.mod h1:wlT5vV2O3h55X9m7iVYN0TBM0NH/MmbLnd30/FjWUq4=
 github.com/boombuler/barcode v1.0.0/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
-github.com/cloudinary/cloudinary-go/v2 v2.7.0 h1:8Fuh/SOen6IQgqH8CLso2E+kuKi2xjbdiyXOspwXFTM=
-github.com/cloudinary/cloudinary-go/v2 v2.7.0/go.mod h1:jtSxa6xbzvu4IwChRJVDcXwVXrTRczhbvq3Z1VSoFdk=
+github.com/cloudinary/cloudinary-go/v2 v2.6.0 h1:vpbCq6qWW4hhw9aC6BXHiC2gYqT9+uxdEbC03sSeLWQ=
+github.com/cloudinary/cloudinary-go/v2 v2.6.0/go.mod h1:jtSxa6xbzvu4IwChRJVDcXwVXrTRczhbvq3Z1VSoFdk=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creasty/defaults v1.5.1 h1:j8WexcS3d/t4ZmllX4GEkl4wIB/trOr035ajcLHCISM=
 github.com/creasty/defaults v1.5.1/go.mod h1:FPZ+Y0WNrbqOVw+c6av63eyHUAl6pMHZwqLPvXUZGfY=
