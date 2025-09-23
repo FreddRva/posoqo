@@ -1,7 +1,7 @@
 // Configuración de Cloudinary para upload directo desde frontend
 export const CLOUDINARY_CONFIG = {
-  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '789811178947175',
-  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo-upload',
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
 };
 
 // Verificar que las variables estén configuradas
@@ -20,6 +20,14 @@ export const uploadImageToCloudinary = async (file: File): Promise<{
   url?: string;
   error?: string;
 }> => {
+  // Verificar que las variables de entorno estén configuradas
+  if (!CLOUDINARY_CONFIG.cloudName || !CLOUDINARY_CONFIG.uploadPreset) {
+    return {
+      success: false,
+      error: 'Configuración de Cloudinary no disponible. Contacta al administrador.'
+    };
+  }
+
   // Validar tamaño del archivo (máximo 5MB)
   if (file.size > 5 * 1024 * 1024) {
     return {
@@ -82,6 +90,12 @@ export const getCloudinaryUrl = (url: string, options: {
 } = {}): string => {
   // Si no es una URL de Cloudinary, devolverla tal como está
   if (!url.includes('cloudinary.com')) {
+    return url;
+  }
+
+  // Verificar que el cloudName esté configurado
+  if (!CLOUDINARY_CONFIG.cloudName) {
+    console.warn('⚠️ Cloud Name no configurado, devolviendo URL original');
     return url;
   }
 
