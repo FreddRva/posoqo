@@ -109,6 +109,10 @@ export default function ServicesPage() {
 
   const handleSaveService = async (updatedService: Service) => {
     try {
+      if (isUploading) {
+        showErrorAlert('Subiendo imagen', 'Espera a que termine la subida de la imagen.');
+        return;
+      }
       console.log('Guardando servicio:', updatedService);
       
       const isNewService = !updatedService.id || updatedService.id === '';
@@ -139,18 +143,9 @@ export default function ServicesPage() {
       }
       
       if (response.success) {
-        if (isNewService) {
-          // Recargar servicios para obtener el nuevo servicio con su ID
-          await loadServices();
-          showSuccessAlert('Servicio creado', 'El nuevo servicio ha sido creado correctamente');
-        } else {
-        // Actualizar en el estado local
-        setServices(prev => 
-          prev.map(s => s.id === updatedService.id ? updatedService : s)
-        );
-          showSuccessAlert('Servicio actualizado', 'Los cambios han sido guardados correctamente');
-        }
-        
+        // Recargar siempre para reflejar lo guardado en DB (y evitar estados obsoletos)
+        await loadServices();
+        showSuccessAlert(isNewService ? 'Servicio creado' : 'Servicio actualizado', 'Los cambios han sido guardados correctamente');
         handleCloseModal();
       } else {
         throw new Error(response.error || 'Error al guardar');
@@ -669,10 +664,11 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center gap-2"
+              disabled={isUploading}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg flex items-center gap-2 ${isUploading ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
             >
               {service ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              {service ? 'Actualizar' : 'Crear'}
+              {isUploading ? 'Subiendo...' : (service ? 'Actualizar' : 'Crear')}
             </button>
           </div>
         </form>
