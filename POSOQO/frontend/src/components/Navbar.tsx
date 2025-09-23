@@ -33,7 +33,7 @@ type NavItem = {
 
 // Configuración de navegación - Más limpia y organizada
 const navItems: NavItem[] = [
-  { label: "Nosotros", href: "/sobre-nostros" },
+  { label: "Nosotros", href: "/sobre-nosotros" },
   { 
     label: "Productos", 
     dropdown: true, 
