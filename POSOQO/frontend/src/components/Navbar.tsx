@@ -49,9 +49,9 @@ const navItems: NavItem[] = [
         description: "Platos que complementan nuestras cervezas"
       },
       { 
-        label: "Merchandising", 
-        href: "/products?filter=merchandising",
-        description: "Productos exclusivos POSOQO"
+        label: "Refrescos", 
+        href: "/products?filter=refrescos",
+        description: "Bebidas no alcohólicas refrescantes"
       },
     ] 
   },
@@ -438,7 +438,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
                   {/* Dropdown de notificaciones */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-3 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-gray-800/50 py-3 z-50 notifications-content">
+                    <div className="absolute right-0 mt-3 w-80 rounded-2xl border border-yellow-400/20 bg-[rgba(15,15,15,0.75)] backdrop-blur-xl shadow-[0_10px_40px_rgba(255,215,0,0.12)] py-3 z-50 notifications-content">
                       <div className="px-4 py-3 border-b border-gray-800/50">
                         <h3 className="text-[#FFD700] font-semibold text-sm flex items-center gap-2">
                           <Bell className="w-4 h-4 text-[#FFD700]" />
@@ -679,7 +679,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
 
                   {/* Dropdown de notificaciones móvil */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-2xl shadow-2xl border border-gray-800/50 py-3 z-50 notifications-dropdown notifications-content">
+                    <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-yellow-400/20 bg-[rgba(15,15,15,0.85)] backdrop-blur-xl shadow-[0_10px_40px_rgba(255,215,0,0.12)] py-3 z-50 notifications-dropdown notifications-content">
                       <div className="px-4 py-3 border-b border-gray-800/50">
                         <h3 className="text-[#FFD700] font-semibold text-sm flex items-center gap-2">
                           <Bell className="w-4 h-4 text-[#FFD700]" />
