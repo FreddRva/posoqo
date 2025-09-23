@@ -1,344 +1,313 @@
 "use client";
-import { Heart, Users, Target, Award, BookOpen, Globe, Star, Coffee, Phone, Mail } from "lucide-react";
+import { Heart, Users, Target, Award, BookOpen, Globe, Star, Coffee, Phone, Mail, ChevronRight, MapPin, Calendar, Leaf, Zap, Shield } from "lucide-react";
 
 export default function SobreNosotrosPage() {
   return (
-    <div className="max-w-5xl mx-auto pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-      <div className="bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-700/50">
-        {/* Hero Header */}
-        <div className="bg-gradient-to-r from-amber-700 via-amber-600 to-amber-500 px-8 py-8 sm:py-10 border-b border-amber-400/30">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Heart className="w-12 h-12 text-white mr-3" />
-              <h1 className="text-4xl sm:text-5xl font-bold text-white">Sobre Nosotros</h1>
-            </div>
-            <div className="bg-amber-600/20 backdrop-blur-sm rounded-xl p-4 border border-amber-400/30">
-              <p className="text-2xl font-bold text-amber-100 mb-2">
-                📖 Conoce Nuestra Historia y Filosofía
-              </p>
-              <p className="text-amber-200 font-medium">
-                Descubre la pasión que hay detrás de cada cerveza artesanal
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-amber-900/20 to-gray-900 pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+      {/* Hero Section */}
+      <div className="max-w-6xl mx-auto mb-16">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center bg-amber-500/10 px-6 py-3 rounded-full border border-amber-500/30 mb-6">
+            <Star className="w-5 h-5 text-amber-400 mr-2" />
+            <span className="text-amber-300 font-medium">Desde 2014 - Tradición y Excelencia</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            Descubre la <span className="text-amber-400">Esencia</span> de POSOQO
+          </h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Donde la tradición ayacuchana se encuentra con la innovación cervecera artesanal. 
+            Más que una cervecería, somos una familia apasionada por crear experiencias únicas.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 text-center">
+            <div className="text-3xl font-bold text-amber-400 mb-2">10+</div>
+            <div className="text-gray-300 text-sm">Años de Experiencia</div>
+          </div>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 text-center">
+            <div className="text-3xl font-bold text-amber-400 mb-2">50K+</div>
+            <div className="text-gray-300 text-sm">Clientes Satisfechos</div>
+          </div>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 text-center">
+            <div className="text-3xl font-bold text-amber-400 mb-2">15+</div>
+            <div className="text-gray-300 text-sm">Variedades Únicas</div>
+          </div>
+          <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 text-center">
+            <div className="text-3xl font-bold text-amber-400 mb-2">3</div>
+            <div className="text-gray-300 text-sm">Taprooms Activos</div>
           </div>
         </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto space-y-16">
         
-        {/* Main Content */}
-        <div className="p-8 sm:p-10 space-y-10">
-          <div className="prose prose-invert max-w-none">
-            {/* Historia y Orígenes */}
-            <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/30 p-8 rounded-2xl border-2 border-amber-500/50 text-center mb-10">
-              <div className="flex items-center justify-center mb-4">
-                <BookOpen className="w-16 h-16 text-amber-400 mr-4" />
-                <div>
-                  <h2 className="text-3xl font-bold text-amber-300 mb-2">
-                    Nuestra Historia
-                  </h2>
-                  <p className="text-xl text-amber-200">
-                    Una tradición que nació en el corazón de Ayacucho
-                  </p>
-                </div>
+        {/* Historia Section */}
+        <section className="relative">
+          <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-amber-500 to-amber-600 rounded-full"></div>
+          <div className="ml-8">
+            <div className="flex items-center mb-8">
+              <div className="bg-amber-500 p-3 rounded-2xl mr-4">
+                <BookOpen className="w-8 h-8 text-white" />
               </div>
-              <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <div className="bg-amber-800/20 p-4 rounded-xl border border-amber-600/30">
-                  <div className="text-3xl mb-2">🏔️</div>
-                  <h3 className="text-lg font-bold text-amber-300 mb-2">Orígenes</h3>
-                  <p className="text-amber-200 text-sm">Nacimos en las alturas de Ayacucho</p>
-                </div>
-                <div className="bg-amber-800/20 p-4 rounded-xl border border-amber-600/30">
-                  <div className="text-3xl mb-2">🍺</div>
-                  <h3 className="text-lg font-bold text-amber-300 mb-2">Tradición</h3>
-                  <p className="text-amber-200 text-sm">Más de 10 años de experiencia</p>
-                </div>
-                <div className="bg-amber-800/20 p-4 rounded-xl border border-amber-600/30">
-                  <div className="text-3xl mb-2">❤️</div>
-                  <h3 className="text-lg font-bold text-amber-300 mb-2">Pasión</h3>
-                  <p className="text-amber-200 text-sm">Amor por la cerveza artesanal</p>
-                </div>
+              <div>
+                <span className="text-amber-400 font-semibold text-lg">Capítulo 01</span>
+                <h2 className="text-3xl font-bold text-white">Nuestra Historia</h2>
               </div>
             </div>
-
-            {/* Section 1 - Nuestra Historia */}
-            <section className="mb-10">
-              <div className="flex items-center mb-6">
-                <div className="bg-amber-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">1</div>
-                <h2 className="text-2xl font-bold text-amber-400">El Inicio de una Pasión</h2>
+            
+            <div className="grid lg:grid-cols-2 gap-8 mb-8">
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 border border-amber-500/20">
+                <h3 className="text-xl font-bold text-amber-300 mb-4">El Comienzo de un Sueño</h3>
+                <p className="text-gray-300 leading-relaxed mb-4">
+                  En el corazón de los Andes ayacuchanos, un grupo de amigos compartía una pasión: 
+                  la cerveza artesanal. Lo que comenzó como reuniones informales en un garaje familiar 
+                  en 2014, pronto se transformó en una visión compartida de crear algo extraordinario.
+                </p>
+                <p className="text-gray-300 leading-relaxed">
+                  El nombre <span className="text-amber-400 font-semibold">POSOQO</span>, que en quechua 
+                  significa "lugar de encuentro", refleja nuestra esencia: un espacio donde la comunidad 
+                  se une alrededor de buenas cervezas y mejores momentos.
+                </p>
               </div>
-              <div className="pl-14">
-                <div className="bg-amber-900/20 p-6 rounded-lg border border-amber-800 mb-6">
-                  <h3 className="text-xl font-semibold text-amber-300 mb-3">Los Primeros Pasos</h3>
-                  <p className="text-gray-300 mb-4 leading-relaxed">
-                    POSOQO nació en el año 2014 en el corazón de Ayacucho, cuando un grupo de amigos 
-                    apasionados por la cerveza artesanal decidió combinar la tradición local con técnicas 
-                    modernas de elaboración. Lo que comenzó como un hobby en un garaje se convirtió en 
-                    una misión: llevar la auténtica cerveza ayacuchana a todos los rincones del Perú.
-                  </p>
-                  <p className="text-gray-300 leading-relaxed">
-                    Nuestro nombre "POSOQO" proviene de la palabra quechua que significa "el lugar donde 
-                    se reúnen los amigos", y eso es exactamente lo que hemos creado: un espacio donde la 
-                    comunidad se une para celebrar la vida, la tradición y, por supuesto, la excelente cerveza.
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h4 className="font-semibold text-amber-300 mb-3">🏆 Hitos Importantes</h4>
-                    <ul className="text-sm text-gray-300 space-y-2">
-                      <li>• <strong>2014:</strong> Fundación de POSOQO</li>
-                      <li>• <strong>2016:</strong> Primer taproom en Ayacucho</li>
-                      <li>• <strong>2018:</strong> Expansión a provincias</li>
-                      <li>• <strong>2020:</strong> Lanzamiento de delivery</li>
-                      <li>• <strong>2023:</strong> Club de miembros</li>
-                      <li>• <strong>2024:</strong> 10 años de excelencia</li>
-                    </ul>
-                  </div>
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h4 className="font-semibold text-amber-300 mb-3">🎯 Nuestra Misión</h4>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                      Ser la referencia en cerveza artesanal ayacuchana, preservando las tradiciones 
-                      locales mientras innovamos constantemente para brindar experiencias únicas a 
-                      nuestros clientes, contribuyendo al desarrollo de nuestra comunidad.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 2 - Nuestra Filosofía */}
-            <section className="mb-10">
-              <div className="flex items-center mb-6">
-                <div className="bg-amber-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">2</div>
-                <h2 className="text-2xl font-bold text-amber-400">Nuestra Filosofía</h2>
-              </div>
-              <div className="pl-14">
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-amber-900/20 p-6 rounded-lg border border-amber-800">
-                    <div className="flex items-center mb-4">
-                      <Heart className="w-8 h-8 text-amber-400 mr-3" />
-                      <h3 className="text-xl font-semibold text-amber-300">Valores Fundamentales</h3>
+              
+              <div className="bg-gradient-to-br from-amber-900/40 to-amber-800/30 rounded-2xl p-8 border border-amber-500/30">
+                <h3 className="text-xl font-bold text-amber-300 mb-6">Línea de Tiempo</h3>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="bg-amber-500 rounded-full p-2 mr-4 mt-1">
+                      <Calendar className="w-4 h-4 text-white" />
                     </div>
-                    <div className="space-y-3">
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">❤️ Pasión</h4>
-                        <p className="text-sm text-gray-300">Amor por la cerveza y la tradición</p>
-                      </div>
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">🌟 Calidad</h4>
-                        <p className="text-sm text-gray-300">Excelencia en cada producto</p>
-                      </div>
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">🤝 Comunidad</h4>
-                        <p className="text-sm text-gray-300">Unión y apoyo mutuo</p>
-                      </div>
+                    <div>
+                      <h4 className="font-bold text-white">2014 - Fundación</h4>
+                      <p className="text-gray-300 text-sm">Nacimos en un garaje familiar en Ayacucho</p>
                     </div>
                   </div>
-                  <div className="bg-amber-900/20 p-6 rounded-lg border border-amber-800">
-                    <div className="flex items-center mb-4">
-                      <Target className="w-8 h-8 text-amber-400 mr-3" />
-                      <h3 className="text-xl font-semibold text-amber-300">Principios de Trabajo</h3>
+                  <div className="flex items-start">
+                    <div className="bg-amber-500 rounded-full p-2 mr-4 mt-1">
+                      <Calendar className="w-4 h-4 text-white" />
                     </div>
-                    <div className="space-y-3">
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">🌱 Sostenibilidad</h4>
-                        <p className="text-sm text-gray-300">Respeto por el medio ambiente</p>
-                      </div>
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">🔬 Innovación</h4>
-                        <p className="text-sm text-gray-300">Mejora continua</p>
-                      </div>
-                      <div className="bg-amber-800/20 p-3 rounded-lg">
-                        <h4 className="font-semibold text-amber-300 mb-1">🎨 Artesanía</h4>
-                        <p className="text-sm text-gray-300">Trabajo manual y dedicado</p>
-                      </div>
+                    <div>
+                      <h4 className="font-bold text-white">2016 - Primer Taproom</h4>
+                      <p className="text-gray-300 text-sm">Inauguramos nuestro primer espacio oficial</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="bg-amber-500 rounded-full p-2 mr-4 mt-1">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white">2020 - Expansión Digital</h4>
+                      <p className="text-gray-300 text-sm">Lanzamos servicio de delivery nacional</p>
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/30 p-6 rounded-xl border border-amber-700 text-center">
-                  <h3 className="text-xl font-bold text-amber-300 mb-3">
-                    🎯 Nuestra Visión
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    Ser reconocidos como la marca líder en cerveza artesanal ayacuchana, expandiendo 
-                    nuestra presencia a nivel nacional e internacional, siempre manteniendo la autenticidad 
-                    y calidad que nos caracteriza.
-                  </p>
-                  <div className="bg-amber-800/20 p-4 rounded-lg inline-block">
-                    <p className="text-2xl font-bold text-amber-400">
-                      "Tradición, Calidad y Pasión en Cada Sorbo"
-                    </p>
-                  </div>
-                </div>
               </div>
-            </section>
-
-            {/* Section 3 - Nuestro Equipo */}
-            <section className="mb-10">
-              <div className="flex items-center mb-6">
-                <div className="bg-amber-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">3</div>
-                <h2 className="text-2xl font-bold text-amber-400">Nuestro Equipo</h2>
-              </div>
-              <div className="pl-14">
-                <div className="bg-amber-900/20 p-6 rounded-lg border border-amber-800 mb-6">
-                  <h3 className="text-xl font-semibold text-amber-300 mb-3">El Corazón de POSOQO</h3>
-                  <p className="text-gray-300 mb-4 leading-relaxed">
-                    Nuestro equipo está compuesto por profesionales apasionados, maestros cerveceros 
-                    certificados, y personal comprometido con la excelencia. Cada miembro aporta su 
-                    experiencia única para crear la experiencia POSOQO que nuestros clientes conocen y aman.
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6 mb-6">
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800 text-center">
-                    <div className="bg-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Coffee className="w-8 h-8 text-white" />
-                    </div>
-                    <h4 className="font-semibold text-amber-300 mb-2">Maestros Cerveceros</h4>
-                    <p className="text-xs text-gray-300">Expertos en el arte de la elaboración</p>
-                  </div>
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800 text-center">
-                    <div className="bg-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Users className="w-8 h-8 text-white" />
-                    </div>
-                    <h4 className="font-semibold text-amber-300 mb-2">Servicio al Cliente</h4>
-                    <p className="text-xs text-gray-300">Atención personalizada 24/7</p>
-                  </div>
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800 text-center">
-                    <div className="bg-amber-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Award className="w-8 h-8 text-white" />
-                    </div>
-                    <h4 className="font-semibold text-amber-300 mb-2">Gestión de Calidad</h4>
-                    <p className="text-xs text-gray-300">Control riguroso de procesos</p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 4 - Nuestros Logros */}
-            <section className="mb-10">
-              <div className="flex items-center mb-6">
-                <div className="bg-amber-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">4</div>
-                <h2 className="text-2xl font-bold text-amber-400">Logros y Reconocimientos</h2>
-              </div>
-              <div className="pl-14">
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h3 className="text-xl font-semibold text-amber-300 mb-3">🏆 Premios y Certificaciones</h3>
-                    <ul className="text-sm text-gray-300 space-y-2">
-                      <li>• <strong>2018:</strong> Mejor Cerveza Artesanal de Ayacucho</li>
-                      <li>• <strong>2019:</strong> Certificación de Calidad ISO 9001</li>
-                      <li>• <strong>2020:</strong> Premio a la Innovación Gastronómica</li>
-                      <li>• <strong>2022:</strong> Mejor Taproom del Sur del Perú</li>
-                      <li>• <strong>2023:</strong> Reconocimiento por Sostenibilidad</li>
-                    </ul>
-                  </div>
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h3 className="text-xl font-semibold text-amber-300 mb-3">📊 Cifras Importantes</h3>
-                    <ul className="text-sm text-gray-300 space-y-2">
-                      <li>• <strong>10+ años</strong> de experiencia</li>
-                      <li>• <strong>50+ empleados</strong> comprometidos</li>
-                      <li>• <strong>100,000+</strong> clientes satisfechos</li>
-                      <li>• <strong>15+ variedades</strong> de cerveza</li>
-                      <li>• <strong>3 taprooms</strong> en operación</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Section 5 - Compromiso Social */}
-            <section className="mb-10">
-              <div className="flex items-center mb-6">
-                <div className="bg-amber-600 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center mr-4">5</div>
-                <h2 className="text-2xl font-bold text-amber-400">Compromiso Social</h2>
-              </div>
-              <div className="pl-14">
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h3 className="text-xl font-semibold text-amber-300 mb-3">🌱 Sostenibilidad</h3>
-                    <ul className="text-sm text-gray-300 space-y-2">
-                      <li>• Uso de ingredientes locales y orgánicos</li>
-                      <li>• Reducción de residuos y reciclaje</li>
-                      <li>• Energía renovable en nuestros procesos</li>
-                      <li>• Empaques biodegradables</li>
-                      <li>• Conservación del agua</li>
-                    </ul>
-                  </div>
-                  <div className="bg-amber-900/20 p-5 rounded-lg border border-amber-800">
-                    <h3 className="text-xl font-semibold text-amber-300 mb-3">🤝 Comunidad</h3>
-                    <ul className="text-sm text-gray-300 space-y-2">
-                      <li>• Apoyo a productores locales</li>
-                      <li>• Programas de capacitación</li>
-                      <li>• Eventos culturales y educativos</li>
-                      <li>• Donaciones a organizaciones locales</li>
-                      <li>• Promoción del turismo local</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/30 p-6 rounded-xl border border-amber-700 text-center">
-                  <h3 className="text-xl font-bold text-amber-300 mb-3">
-                    🌍 Nuestro Impacto
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    En POSOQO, creemos que el éxito empresarial debe ir de la mano con el desarrollo 
-                    sostenible y el bienestar de nuestra comunidad. Cada decisión que tomamos está 
-                    guiada por nuestro compromiso con el futuro.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Contact Section */}
-            <div className="bg-gradient-to-r from-amber-900/30 to-amber-800/30 p-8 rounded-xl border border-amber-700 text-center">
-              <h3 className="text-2xl font-bold text-amber-300 mb-4">
-                ¿Quieres Conocer Más de Nosotros?
-              </h3>
-              <p className="text-gray-300 mb-6 text-lg">
-                Visítanos en cualquiera de nuestros taprooms o contáctanos para conocer más sobre 
-                nuestra historia, filosofía y pasión por la cerveza artesanal.
-              </p>
-              <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                <div className="bg-amber-800/20 p-4 rounded-lg border border-amber-600/30">
-                  <div className="flex items-center justify-center space-x-3 text-amber-300 mb-2">
-                    <Globe className="w-5 h-5" />
-                    <span className="font-semibold">Visítanos</span>
-                  </div>
-                  <p className="text-amber-200 font-medium">Taproom Principal</p>
-                  <p className="text-xs text-amber-300">Plaza de Armas, Ayacucho</p>
-                </div>
-                <div className="bg-amber-800/20 p-4 rounded-lg border border-amber-600/30">
-                  <div className="flex items-center justify-center space-x-3 text-amber-300 mb-2">
-                    <Phone className="w-5 h-5" />
-                    <span className="font-semibold">Llámanos</span>
-                  </div>
-                  <p className="text-amber-200 font-medium">+51 966 123 456</p>
-                  <p className="text-xs text-amber-300">24/7 disponible</p>
-                </div>
-                <div className="bg-amber-800/20 p-4 rounded-lg border border-amber-600/30">
-                  <div className="flex items-center justify-center space-x-3 text-amber-300 mb-2">
-                    <Mail className="w-5 h-5" />
-                    <span className="font-semibold">Escríbenos</span>
-                  </div>
-                  <p className="text-amber-200 font-medium">info@posoqo.com</p>
-                  <p className="text-xs text-amber-300">Respuesta en 2-4h</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Final Note */}
-            <div className="bg-gray-700/50 p-6 rounded-xl border-2 border-amber-500/50 text-center">
-              <p className="text-lg font-bold text-amber-400 mb-2">
-                📖 Nuestra Historia Continúa Escribiéndose
-              </p>
-              <p className="text-gray-300">
-                En POSOQO, cada día es una nueva oportunidad para crear experiencias únicas, 
-                preservar nuestras tradiciones y compartir nuestra pasión por la cerveza artesanal 
-                con el mundo. Gracias por ser parte de esta increíble historia que estamos construyendo juntos.
-              </p>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Filosofía Section */}
+        <section className="relative">
+          <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-amber-500 to-amber-600 rounded-full"></div>
+          <div className="ml-8">
+            <div className="flex items-center mb-8">
+              <div className="bg-amber-500 p-3 rounded-2xl mr-4">
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <span className="text-amber-400 font-semibold text-lg">Capítulo 02</span>
+                <h2 className="text-3xl font-bold text-white">Nuestra Filosofía</h2>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
+                <div className="bg-amber-500/20 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                  <Heart className="w-6 h-6 text-amber-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-3">Pasión Artesanal</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Cada cerveza es una obra maestra creada con dedicación y amor por el arte cervecero tradicional.
+                </p>
+              </div>
+              
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
+                <div className="bg-amber-500/20 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                  <Leaf className="w-6 h-6 text-amber-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-3">Sostenibilidad</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Comprometidos con el medio ambiente y el desarrollo sostenible de nuestra comunidad.
+                </p>
+              </div>
+              
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300">
+                <div className="bg-amber-500/20 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                  <Users className="w-6 h-6 text-amber-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-3">Comunidad</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  Creamos espacios donde las personas se conectan, comparten y crean recuerdos juntos.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-amber-900/40 to-amber-800/30 rounded-2xl p-8 border border-amber-500/30">
+              <div className="text-center max-w-2xl mx-auto">
+                <h3 className="text-2xl font-bold text-amber-300 mb-4">Nuestra Promesa</h3>
+                <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                  "En cada sorbo de POSOQO, encontrarás no solo una cerveza excepcional, 
+                  sino una historia de tradición, innovación y el espíritu vibrante de Ayacucho."
+                </p>
+                <div className="text-amber-400 font-semibold">
+                  — Fundadores de POSOQO
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Equipo Section */}
+        <section className="relative">
+          <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-amber-500 to-amber-600 rounded-full"></div>
+          <div className="ml-8">
+            <div className="flex items-center mb-8">
+              <div className="bg-amber-500 p-3 rounded-2xl mr-4">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <span className="text-amber-400 font-semibold text-lg">Capítulo 03</span>
+                <h2 className="text-3xl font-bold text-white">Nuestro Equipo</h2>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="text-center">
+                <div className="bg-gradient-to-br from-amber-500 to-amber-600 w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Coffee className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-white mb-2">Maestros Cerveceros</h3>
+                <p className="text-gray-300 text-sm">Expertos en el arte de la elaboración tradicional</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-gradient-to-br from-amber-500 to-amber-600 w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-white mb-2">Control de Calidad</h3>
+                <p className="text-gray-300 text-sm">Garantía de excelencia en cada lote</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-gradient-to-br from-amber-500 to-amber-600 w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-white mb-2">Innovación</h3>
+                <p className="text-gray-300 text-sm">Desarrollo de nuevas recetas y técnicas</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-gradient-to-br from-amber-500 to-amber-600 w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-white mb-2">Sostenibilidad</h3>
+                <p className="text-gray-300 text-sm">Compromiso con prácticas responsables</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Compromiso Section */}
+        <section className="relative">
+          <div className="absolute -left-4 top-0 w-1 h-full bg-gradient-to-b from-amber-500 to-amber-600 rounded-full"></div>
+          <div className="ml-8">
+            <div className="flex items-center mb-8">
+              <div className="bg-amber-500 p-3 rounded-2xl mr-4">
+                <Leaf className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <span className="text-amber-400 font-semibold text-lg">Capítulo 04</span>
+                <h2 className="text-3xl font-bold text-white">Compromiso Social</h2>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 border border-amber-500/20">
+                <h3 className="text-xl font-bold text-amber-300 mb-6">🌱 Nuestro Impacto Ambiental</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="bg-green-500/20 p-2 rounded-lg mr-4">
+                      <Leaf className="w-5 h-5 text-green-400" />
+                    </div>
+                    <span className="text-gray-300">100% energía renovable en nuestros procesos</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-green-500/20 p-2 rounded-lg mr-4">
+                      <Leaf className="w-5 h-5 text-green-400" />
+                    </div>
+                    <span className="text-gray-300">Embalajes 100% biodegradables</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-green-500/20 p-2 rounded-lg mr-4">
+                      <Leaf className="w-5 h-5 text-green-400" />
+                    </div>
+                    <span className="text-gray-300">Programa de reciclaje de botellas</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl p-8 border border-amber-500/20">
+                <h3 className="text-xl font-bold text-amber-300 mb-6">🤝 Apoyo a la Comunidad</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="bg-blue-500/20 p-2 rounded-lg mr-4">
+                      <Users className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-gray-300">Capacitación a productores locales</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-blue-500/20 p-2 rounded-lg mr-4">
+                      <Users className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-gray-300">Eventos culturales gratuitos</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="bg-blue-500/20 p-2 rounded-lg mr-4">
+                      <Users className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="text-gray-300">Apoyo a emprendimientos locales</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="text-center py-16">
+          <div className="bg-gradient-to-br from-amber-900/40 to-amber-800/30 rounded-3xl p-12 border border-amber-500/30">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              ¿Listo para Experimentar la Diferencia POSOQO?
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Visita nuestros taprooms y descubre por qué somos la elección preferida 
+              de los amantes de la cerveza artesanal en Ayacucho.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center">
+                <MapPin className="w-5 h-5 mr-2" />
+                Encuentra tu Taproom Más Cercano
+              </button>
+              <button className="border border-amber-500 text-amber-400 hover:bg-amber-500/10 font-semibold px-8 py-3 rounded-xl transition-all duration-300 flex items-center justify-center">
+                <Phone className="w-5 h-5 mr-2" />
+                Contáctanos
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   );
