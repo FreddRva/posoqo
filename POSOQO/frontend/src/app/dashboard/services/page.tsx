@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
+import { uploadImageToCloudinary } from '@/lib/cloudinary';
 import { 
   Wrench, 
   Plus, 
@@ -514,28 +515,13 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
 
   const handleUploadImage = async (file: File) => {
     setIsUploading(true);
-    
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
-      const apiUrl = backendUrl.endsWith('/api') ? backendUrl : `${backendUrl}/api`;
-      const uploadUrl = `${apiUrl}/upload`;
-      
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ [UPLOAD] Imagen subida exitosamente:', data);
-        handleInputChange('image_url', data.url || data.image_url);
+      const result = await uploadImageToCloudinary(file);
+      if (result.success && result.url) {
+        console.log('✅ [CLOUDINARY] Imagen subida exitosamente:', result.url);
+        handleInputChange('image_url', result.url);
       } else {
-        const errorText = await response.text();
-        console.error('Error del servidor:', response.status, errorText);
-        throw new Error(`Error al subir imagen: ${response.status}`);
+        throw new Error(result.error || 'Error al subir a Cloudinary');
       }
     } catch (error) {
       console.error('Error uploading image:', error);
