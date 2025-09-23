@@ -99,27 +99,40 @@ const DropdownMenu = ({
       className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "fixed left-1/2 transform -translate-x-1/2 top-20 w-80 bg-gradient-to-br from-neutral-900 via-black to-neutral-900 border-2 border-yellow-400/30 rounded-2xl shadow-2xl shadow-yellow-500/30 py-4 z-[9999] animate-fade-in backdrop-blur-sm"}
+        : "fixed left-1/2 -translate-x-1/2 top-20 w-[22rem] p-3 z-[9999] animate-fade-in"}
     `}>
-      {items.map((item, index) => (
+      {!isMobile && (
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-400/10 via-yellow-300/5 to-transparent blur-xl" />
+          <div className="relative rounded-2xl border border-yellow-400/20 bg-[rgba(15,15,15,0.75)] backdrop-blur-xl shadow-[0_10px_40px_rgba(255,215,0,0.12)] divide-y divide-yellow-400/10">
+            {items.map((item, index) => (
+              <Link
+                key={`${item.label}-${item.href}`}
+                href={item.href}
+                className={`block px-4 py-3 transition-colors duration-200 hover:bg-yellow-400/10`}
+                onClick={() => {
+                  onItemClick?.();
+                  setTimeout(() => { onClose(); }, 100);
+                }}
+              >
+                <div className="font-semibold text-sm text-yellow-300">{item.label}</div>
+                {item.description && (
+                  <div className="text-xs text-gray-300/90 mt-1">{item.description}</div>
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {isMobile && items.map((item) => (
         <Link
           key={`${item.label}-${item.href}`}
           href={item.href}
-          className={`
-            block px-4 py-3 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/20 transition-all duration-300 rounded-xl mx-3 font-semibold
-            ${isMobile ? "text-base" : ""}
-            ${index === 0 ? "rounded-t-xl" : ""} 
-            ${index === items.length - 1 ? "rounded-b-xl" : ""}
-          `}
-          onClick={() => {
-            onItemClick?.();
-            // Cerrar el dropdown después de navegar
-            setTimeout(() => {
-              onClose();
-            }, 100);
-          }}
+          className="block px-4 py-3 text-yellow-300 hover:text-yellow-200 transition-colors duration-200 rounded-xl"
+          onClick={() => { onItemClick?.(); setTimeout(() => onClose(), 100); }}
         >
-          <div className="font-bold text-sm text-yellow-400">{item.label}</div>
+          <div className="font-semibold text-base">{item.label}</div>
           {item.description && (
             <div className="text-xs text-gray-300 mt-1">{item.description}</div>
           )}
@@ -800,18 +813,19 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
         </div>
       </nav>
 
-      {/* Menú móvil - Más limpio y organizado */}
-      <div 
-        ref={mobileMenuRef}
-        className={`
-          lg:hidden fixed inset-0 z-40 bg-gradient-to-r from-black via-neutral-700 to-black transition-all duration-300 ease-in-out
-          ${mobileMenuOpen 
-            ? "opacity-100 translate-y-0 mt-16" 
-            : "opacity-0 -translate-y-full pointer-events-none"}
-        `}
-        style={{ top: mobileMenuOpen ? '64px' : '-100vh' }}
-      >
-        <div className="px-6 py-8 space-y-6 overflow-y-auto h-full">
+      {/* Menú móvil - Drawer profesional */}
+      <div ref={mobileMenuRef} className={`lg:hidden fixed inset-0 z-40 pointer-events-none`}>
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        {/* Drawer */}
+        <div
+          className={`absolute right-0 top-0 h-full w-[88%] max-w-[380px] bg-[#0b0b0b] border-l border-yellow-400/20 shadow-[0_10px_40px_rgba(255,215,0,0.12)] transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} pointer-events-auto`}
+          style={{ marginTop: '64px' }}
+        >
+        <div className="px-6 py-6 space-y-6 overflow-y-auto h-[calc(100%-64px)]">
           
           {/* Header del menú móvil */}
           <div className="flex items-center justify-between pt-4">
@@ -927,6 +941,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </>
