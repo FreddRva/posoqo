@@ -1,7 +1,7 @@
 // Configuración de Cloudinary para upload directo desde frontend
 export const CLOUDINARY_CONFIG = {
   cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || '789811178947175',
-  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo-preset',
+  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo-upload',
 };
 
 // Verificar que las variables estén configuradas
