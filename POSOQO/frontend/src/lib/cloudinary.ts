@@ -4,8 +4,11 @@ export const CLOUDINARY_CONFIG = {
   uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
 };
 
-// Verificar que las variables estén configuradas
+// Debug: Verificar que las variables estén configuradas
 if (typeof window !== 'undefined') {
+  console.log('🔍 [DEBUG] Cloud Name:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME);
+  console.log('🔍 [DEBUG] Upload Preset:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET);
+  
   if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
     console.warn('⚠️ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME no está configurado');
   }
