@@ -1,7 +1,7 @@
 // Configuración de Cloudinary para upload directo desde frontend
 export const CLOUDINARY_CONFIG = {
   cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
+  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo-test',
 };
 
 // Debug: Verificar que las variables estén configuradas
@@ -67,9 +67,16 @@ export const uploadImageToCloudinary = async (file: File): Promise<{
 
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
-  formData.append('folder', 'posoqo/products');
-  formData.append('public_id', publicId);
+  
+  // Solo agregar upload_preset si está configurado
+  if (CLOUDINARY_CONFIG.uploadPreset) {
+    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    console.log('🔍 [DEBUG] Usando upload_preset:', CLOUDINARY_CONFIG.uploadPreset);
+  } else {
+    console.log('🔍 [DEBUG] No hay upload_preset configurado, usando parámetros manuales');
+    formData.append('folder', 'posoqo/products');
+    formData.append('public_id', publicId);
+  }
 
   console.log('🔍 [DEBUG] FormData preparado, enviando request...');
 
