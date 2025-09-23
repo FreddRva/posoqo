@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/posoqo/backend/internal/db"
+	"github.com/posoqo/backend/internal/services"
 )
 
 // Service representa un servicio de POSOQO
@@ -158,22 +160,74 @@ func UpdateService(c *fiber.Ctx) error {
 func DeleteService(c *fiber.Ctx) error {
 	id := c.Params("id")
 	fmt.Printf("DELETE SERVICE: Intentando eliminar servicio con ID: %s\n", id)
-	
+
+	// Obtener image_url antes de eliminar
+	var imageURL sql.NullString
+	_ = db.DB.QueryRow(context.Background(), `SELECT image_url FROM services WHERE id=$1`, id).Scan(&imageURL)
+
+	// Si es URL de Cloudinary, intentar eliminar el recurso
+	if imageURL.Valid && imageURL.String != "" {
+		if isCloudinaryURL(imageURL.String) {
+			// extraer public_id si es posible
+			if publicID, ok := extractCloudinaryPublicID(imageURL.String); ok {
+				_ = services.DeleteImage(context.Background(), publicID)
+			}
+		}
+	}
+
 	result, err := db.DB.Exec(context.Background(),
 		`DELETE FROM services WHERE id=$1`, id)
 	if err != nil {
 		fmt.Printf("ERROR DELETE SERVICE: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo eliminar el servicio: " + err.Error()})
 	}
-	
+
 	rowsAffected := result.RowsAffected()
 	fmt.Printf("DELETE SERVICE: %d filas afectadas\n", rowsAffected)
-	
+
 	if rowsAffected == 0 {
 		return c.Status(404).JSON(fiber.Map{"error": "Servicio no encontrado"})
 	}
-	
+
 	return c.JSON(fiber.Map{"success": true, "message": "Servicio eliminado"})
+}
+
+func isCloudinaryURL(raw string) bool {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return false
+	}
+	return u.Host == "res.cloudinary.com" || u.Host == "cloudinary.com"
+}
+
+func extractCloudinaryPublicID(raw string) (string, bool) {
+	// URL típica: https://res.cloudinary.com/<cloud>/image/upload/v12345/<public_id>.<ext>
+	u, err := url.Parse(raw)
+	if err != nil {
+		return "", false
+	}
+	// u.Path tiene formato /<cloudinary-path>/...; tomamos el último segmento sin extensión
+	path := u.Path
+	if path == "" {
+		return "", false
+	}
+	// último segmento
+	idx := len(path) - 1
+	for idx >= 0 && path[idx] != '/' {
+		idx--
+	}
+	last := path[idx+1:]
+	if last == "" {
+		return "", false
+	}
+	// quitar extensión
+	for i := len(last) - 1; i >= 0; i-- {
+		if last[i] == '.' {
+			last = last[:i]
+			break
+		}
+	}
+	return last, true
 }
 
 func nullableString(ns sql.NullString) string {
