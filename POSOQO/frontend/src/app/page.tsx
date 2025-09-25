@@ -199,104 +199,104 @@ export default function HomePage() {
   // Debug: mostrar qué productos se están cargando
   
   
-  // Renderizado condicional para mobile/desktop
+  // Renderizado condicional para mobile/desktop - ProductCard mejorado
   const ProductCard = ({ product }: { product: Product }) => (
     <motion.div
-      className="group relative premium-gradient backdrop-blur-sm p-6 rounded-3xl gold-border hover:gold-glow transition-all duration-500 hover:shadow-2xl w-full h-auto min-h-[320px] premium-hover"
+      className="group relative bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm p-6 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2 w-full h-auto min-h-[380px] cursor-pointer"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => openProductModal(product)}
     >
-      {/* Fondo con efecto premium mejorado */}
-      <div className="absolute inset-0 premium-gradient rounded-2xl shadow-xl gold-border group-hover:gold-glow transition-all duration-500">
-        {/* Efecto de profundidad premium */}
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 via-transparent to-black/20 rounded-2xl"></div>
-        
-        {/* Efecto de brillo superior elegante */}
-        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-yellow-300/15 via-transparent to-transparent rounded-t-2xl"></div>
-        
-        {/* Efecto de sombra inferior sofisticada */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-b-2xl"></div>
-        
-        {/* Efecto de terminal premium */}
-        <div className="absolute inset-0 border border-transparent group-hover:border-yellow-400/40 rounded-2xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
-      </div>
+      {/* Efecto de brillo en hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
       {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col items-center p-4 h-full">
-        {/* Imagen con efectos premium */}
-        <div className="relative w-24 h-32 flex-shrink-0 mb-4 group">
+      <div className="relative z-10 flex flex-col items-center h-full">
+        {/* Imagen mejorada con efectos premium */}
+        <div className="relative w-28 h-36 flex-shrink-0 mb-6 group">
           {/* Efecto de resplandor premium */}
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/30 via-yellow-300/20 to-yellow-500/10 rounded-xl blur-lg scale-110 group-hover:bg-yellow-400/40 transition-all duration-700"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
           
-          {/* Imagen con efecto flotante premium */}
-          <div className="relative transform group-hover:translate-y-[-4px] md:group-hover:translate-y-[-6px] group-hover:scale-105 transition-all duration-700">
+          {/* Contenedor de imagen con gradiente */}
+          <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
             <img
               src={getImageUrl(product.image_url)}
               alt={product.name}
               className="object-contain w-full h-full rounded-lg"
               loading="lazy"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-12 h-12 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
+                }
+              }}
             />
-            
-            {/* Efecto de brillo premium */}
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/30 via-transparent to-transparent rounded-lg pointer-events-none"></div>
-            
-            {/* Efecto de reflejo premium */}
-            <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/30 via-transparent to-transparent rounded-t-lg"></div>
-      </div>
+          </div>
           
-          {/* Efecto de terminal premium cerca de la imagen */}
-          <div className="absolute inset-0 border-2 border-transparent group-hover:border-yellow-400/60 rounded-xl transition-all duration-700 blur-sm group-hover:blur-0 opacity-0 group-hover:opacity-100"></div>
+          {/* Efecto de resplandor en la imagen */}
+          <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
 
-        {/* Información del producto premium */}
-        <div className="flex flex-col items-center text-center w-full space-y-3">
-          {/* Nombre del producto con tipografía premium */}
-          <h2 className="text-lg font-black gold-text tracking-[0.05em] premium-text-shadow group-hover:scale-105 transition-all duration-500 uppercase letter-spacing-wider line-clamp-2">
-          {product.name}
-        </h2>
+        {/* Información del producto mejorada */}
+        <div className="flex flex-col items-center text-center w-full space-y-4 flex-grow">
+          {/* Nombre del producto */}
+          <h2 className="text-xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 line-clamp-2">
+            {product.name}
+          </h2>
           
-          {/* Descripción con tipografía elegante */}
-          <p className="text-sm text-gray-300 leading-relaxed font-light italic line-clamp-2">
-          {product.description}
-        </p>
+          {/* Descripción */}
+          <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">
+            {product.description}
+          </p>
           
           {/* Especificaciones técnicas mejoradas */}
-          <div className="flex flex-wrap gap-2 mt-3 justify-center">
-          {/* ABV */}
-        {product.abv && (
-            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
-              <div className="text-xs font-semibold gold-text">ABV</div>
-              <div className="text-sm font-bold gold-text">{product.abv}</div>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {product.abv && (
+              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
+                <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
+              </div>
+            )}
+            {product.ibu && (
+              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
+                <span className="text-xs font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
+              </div>
+            )}
+            {product.color && (
+              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
+                <span className="text-xs font-semibold text-[#D4AF37]">{product.color}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Precio */}
+          {product.price && (
+            <div className="text-2xl font-bold text-[#D4AF37] mt-2">
+              S/ {product.price.toFixed(2)}
             </div>
           )}
-          
-          {/* IBU */}
-          {product.ibu && (
-            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
-              <div className="text-xs font-semibold gold-text">IBU</div>
-              <div className="text-sm font-bold gold-text">{product.ibu}</div>
-      </div>
-          )}
-          
-          {/* COLOR */}
-          {product.color && (
-            <div className="text-center gold-glass rounded-lg px-3 py-2 gold-border">
-              <div className="text-xs font-semibold gold-text">COLOR</div>
-              <div className="text-sm font-bold gold-text">{product.color}</div>
-    </div>
-          )}
-          </div>
+        </div>
+
+        {/* Botón de acción mejorado */}
+        <div className="mt-4 w-full">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+          >
+            Ver Detalles
+          </motion.button>
         </div>
       </div>
 
       {/* Efecto de resplandor premium en hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-400/15 to-yellow-400/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-1000 pointer-events-none blur-sm group-hover:blur-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
       
-      {/* Indicador de click premium mejorado */}
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
-        <div className="w-8 h-8 md:w-10 md:h-10 gold-gradient rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm gold-border">
-          <svg className="w-4 h-4 md:w-5 md:h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {/* Indicador de click premium */}
+      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500">
+        <div className="w-8 h-8 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-xl">
+          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -323,8 +323,10 @@ export default function HomePage() {
       
       {/* Hero Section - Fondo con imagen */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/70"></div>
+        {/* Overlay más oscuro para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/85"></div>
+        {/* Gradiente adicional para profundidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -562,10 +564,10 @@ export default function HomePage() {
               <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
             
-            {/* Grid de productos destacados */}
+            {/* Grid de productos destacados mejorado */}
             {featuredCervezas.length > 0 && (
               <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -578,38 +580,66 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-[#D4AF37]/20 hover:border-[#D4AF37]/50 transition-all duration-300 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
+                    className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-3xl p-6 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2"
                   >
-                    <div className="text-center">
-                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center overflow-hidden">
-                        <img
-                          src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
-                          alt={product.name}
-                          className="w-full h-full object-contain p-2"
-                          onError={(e) => {
-                            // Si falla la imagen, mostrar el icono como fallback
-                            const target = e.currentTarget;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<svg class="w-10 h-10 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg>';
-                            }
-                          }}
-                        />
+                    {/* Efecto de brillo en hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div className="relative z-10 text-center">
+                      {/* Imagen mejorada */}
+                      <div className="relative w-24 h-32 mx-auto mb-6 group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                        <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
+                          <img
+                            src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                            alt={product.name}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-12 h-12 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
+                              }
+                            }}
+                          />
+                        </div>
+                        {/* Efecto de resplandor */}
+                        <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#D4AF37] transition-colors">
+                      
+                      {/* Información del producto */}
+                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#D4AF37] transition-colors duration-300">
                         {product.name}
                       </h3>
-                      <p className="text-sm text-gray-400 mb-4 line-clamp-2">
+                      <p className="text-sm text-gray-300 mb-4 line-clamp-2 leading-relaxed">
                         {product.description}
                       </p>
-                      <div className="text-2xl font-bold text-[#D4AF37] mb-4">
+                      
+                      {/* Especificaciones técnicas */}
+                      <div className="flex justify-center gap-2 mb-4">
+                        {product.abv && (
+                          <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
+                            <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
+                          </div>
+                        )}
+                        {product.ibu && (
+                          <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
+                            <span className="text-xs font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Precio */}
+                      <div className="text-2xl font-bold text-[#D4AF37] mb-6">
                         S/ {product.price?.toFixed(2) || '0.00'}
                       </div>
+                      
+                      {/* Botón mejorado */}
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-300"
+                        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
                       >
                         Ver Detalles
                       </motion.button>
@@ -721,8 +751,10 @@ export default function HomePage() {
 
       {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/85"></div>
+        {/* Overlay más oscuro para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/90"></div>
+        {/* Gradiente adicional para profundidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -873,7 +905,7 @@ export default function HomePage() {
           </motion.div>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -881,19 +913,19 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-gray-50 via-white to-gray-100 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-gray-200 hover:border-[#D4AF37]/50 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/20"
+                className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                {/* Fondo con gradiente elegante */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 via-[#FFD700]/5 to-[#D4AF37]/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 {/* Contenido principal */}
-                <div className="relative">
-                  {/* Imagen */}
-                  <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden mb-6 md:mb-8 group-hover:scale-105 transition-transform duration-500">
+                <div className="relative z-10">
+                  {/* Imagen mejorada */}
+                  <div className="relative w-full h-48 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-500">
                     {service.image_url ? (
                       <Image 
                         src={service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`}
@@ -902,44 +934,53 @@ export default function HomePage() {
                         className="object-cover"
                         loading="lazy"
                         onError={(e) => {
-                          // Fallback a emoji si falla la imagen
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                           const parent = target.parentElement;
                           if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center"><span class="text-4xl md:text-6xl">🍺</span></div>';
+                            parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center"><span class="text-6xl">🍺</span></div>';
                           }
                         }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center">
-                        <span className="text-4xl md:text-6xl">🍺</span>
+                        <span className="text-6xl">🍺</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+                    {/* Overlay mejorado */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    {/* Efecto de resplandor en la imagen */}
+                    <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
                   
-                  {/* Título */}
-                  <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors duration-300">
+                  {/* Título mejorado */}
+                  <h3 className="text-xl font-bold mb-4 text-white group-hover:text-[#D4AF37] transition-colors duration-300">
                     {service.name}
                   </h3>
                   
-                  {/* Descripción */}
-                  <p className="text-slate-300 leading-relaxed mb-6 md:mb-8 font-light text-sm md:text-base">
+                  {/* Descripción mejorada */}
+                  <p className="text-gray-300 leading-relaxed mb-6 font-light text-sm">
                     {service.description}
                   </p>
                   
-                  {/* Botones */}
-                  <div className="flex justify-center">
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                      className="px-8 py-3 rounded-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-sm hover:bg-[#D4AF37]/10 transition-all shadow-lg"
-                        >
-                          Contáctanos
-                        </motion.button>
-                      </div>
+                  {/* Precio si existe */}
+                  {service.price && (
+                    <div className="text-2xl font-bold text-[#D4AF37] mb-6">
+                      S/ {service.price.toFixed(2)}
                     </div>
+                  )}
+                  
+                  {/* Botón mejorado */}
+                  <div className="flex justify-center">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="px-8 py-3 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold text-sm hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                    >
+                      Contáctanos
+                    </motion.button>
+                  </div>
+                </div>
                 
                 {/* Efecto de resplandor en hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
@@ -951,8 +992,10 @@ export default function HomePage() {
 
       {/* Club de miembros - Diseño premium con fondo de imagen */}
       <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay semi-transparente para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        {/* Overlay más oscuro para mejor legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/80"></div>
+        {/* Gradiente adicional para profundidad */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
