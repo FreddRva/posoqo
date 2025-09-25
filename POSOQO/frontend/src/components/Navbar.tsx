@@ -862,8 +862,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <User className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
                   </div>
                   <span>Mi Perfil</span>
                 </Link>
@@ -872,8 +872,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <CreditCard className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <CreditCard className="w-4 h-4 text-white" />
                   </div>
                   <span>Mis Pagos</span>
                 </Link>
@@ -882,8 +882,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                    <Heart className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-white" />
                   </div>
                   <span>Favoritos</span>
                 </Link>
@@ -892,8 +892,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <Package className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <Package className="w-4 h-4 text-white" />
                   </div>
                   <span>Mis Pedidos</span>
                 </Link>
@@ -903,8 +903,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                     className="block px-4 py-3 text-base font-medium text-white hover:text-yellow-400 hover:bg-yellow-400/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                      <Crown className="w-4 h-4" />
+                    <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                      <Crown className="w-4 h-4 text-white" />
                     </div>
                     <span>Panel Admin</span>
                   </Link>
@@ -917,8 +917,8 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   }}
                   className="block w-full px-4 py-3 text-base font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all duration-300 flex items-center gap-3"
                 >
-                  <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                    <LogOut className="w-4 h-4" />
+                  <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                    <LogOut className="w-4 h-4 text-white" />
                   </div>
                   <span>Cerrar sesión</span>
                 </button>
