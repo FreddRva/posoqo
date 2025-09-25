@@ -206,35 +206,28 @@ export default function RegisterPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,215,0,0.03),transparent_60%)]"></div>
       
       {/* Contenedor principal del formulario */}
-      <div className="w-full max-w-2xl relative z-10">
+      <div className="w-full max-w-lg relative z-10">
         {/* Card del formulario profesional */}
-        <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+        <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
           {/* Efecto de brillo sutil */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-[#FFD700]/5 opacity-30"></div>
           
-          {/* Header profesional */}
-          <div className="text-center mb-8 relative z-10">
-            {/* Logo POSOQO con efecto */}
-            <div className="mb-6 relative">
-              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden">
+          {/* Header compacto */}
+          <div className="text-center mb-6 relative z-10">
+            {/* Logo POSOQO */}
+            <div className="mb-4 relative">
+              <div className="w-12 h-12 mx-auto bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
                 <img 
                   src="/Logo.png" 
                   alt="POSOQO" 
-                  className="w-10 h-10"
+                  className="w-8 h-8"
                 />
-                {/* Efecto de brillo */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
               </div>
             </div>
             
-            {/* Título principal */}
-            <h1 className="text-3xl font-bold text-white mb-2 tracking-wide">
-              Crear Cuenta
-            </h1>
-            <p className="text-gray-400 text-sm font-medium">Únete a POSOQO Cervezas Artesanales</p>
-            
-            {/* Línea decorativa */}
-            <div className="w-20 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full mx-auto mt-4"></div>
+            <h1 className="text-2xl font-bold text-white mb-1">Crear Cuenta</h1>
+            <p className="text-gray-400 text-xs">Únete a POSOQO</p>
           </div>
 
           {/* Mensaje de éxito */}
@@ -247,99 +240,81 @@ export default function RegisterPage() {
           )}
 
           {/* Formulario de registro */}
-          <form onSubmit={handleRegister} className="space-y-6 relative z-10">
+          <form onSubmit={handleRegister} className="space-y-4 relative z-10">
             
             {/* Nombre y Apellido */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-200">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300">
                   Nombre
                 </label>
-                <div className="relative group">
-                  <input
-                    id="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
-                      errors.name 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 group-hover:border-gray-500"
-                    } text-white placeholder-gray-400 focus:outline-none focus:ring-4 backdrop-blur-sm`}
-                    placeholder="Tu nombre"
-                    disabled={loading}
-                  />
-                  {/* Efecto de brillo en focus */}
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                    errors.name 
+                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                  placeholder="Nombre"
+                  disabled={loading}
+                />
                 {errors.name && (
-                  <p className="text-red-400 text-sm flex items-center font-medium">
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {errors.name}
-                  </p>
+                  <p className="text-red-400 text-xs">{errors.name}</p>
                 )}
               </div>
               
-              <div className="space-y-3">
-                <label htmlFor="lastName" className="block text-sm font-semibold text-gray-200">
+              <div className="space-y-2">
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">
                   Apellido
                 </label>
-                <div className="relative group">
-                  <input
-                    id="lastName"
-                    type="text"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange("lastName", e.target.value)}
-                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
-                      errors.lastName 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 group-hover:border-gray-500"
-                    } text-white placeholder-gray-400 focus:outline-none focus:ring-4 backdrop-blur-sm`}
-                    placeholder="Tu apellido"
-                    disabled={loading}
-                  />
-                  {/* Efecto de brillo en focus */}
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                </div>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                    errors.lastName 
+                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                  placeholder="Apellido"
+                  disabled={loading}
+                />
                 {errors.lastName && (
-                  <p className="text-red-400 text-sm flex items-center font-medium">
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {errors.lastName}
-                  </p>
+                  <p className="text-red-400 text-xs">{errors.lastName}</p>
                 )}
               </div>
             </div>
 
             {/* DNI y Teléfono */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="dni" className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label htmlFor="dni" className="block text-sm font-medium text-gray-300">
                   DNI
                 </label>
-      <input
+                <input
                   id="dni"
-        type="text"
+                  type="text"
                   value={formData.dni}
                   onChange={(e) => handleInputChange("dni", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-colors ${
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
                     errors.dni 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
+                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
                   placeholder="12345678"
                   disabled={loading}
                 />
                 {errors.dni && (
-                  <p className="text-red-400 text-xs mt-1">{errors.dni}</p>
+                  <p className="text-red-400 text-xs">{errors.dni}</p>
                 )}
               </div>
               
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
+              <div className="space-y-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-300">
                   Teléfono
                 </label>
                 <input
@@ -347,117 +322,116 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-colors ${
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
                     errors.phone 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
+                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
                   placeholder="999888777"
                   disabled={loading}
                 />
                 {errors.phone && (
-                  <p className="text-red-400 text-xs mt-1">{errors.phone}</p>
+                  <p className="text-red-400 text-xs">{errors.phone}</p>
                 )}
               </div>
             </div>
 
             {/* Email */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                 Email
               </label>
-      <input
+              <input
                 id="email"
-        type="email"
+                type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                className={`w-full px-3 py-2 rounded-lg border transition-colors ${
+                className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
                   errors.email 
-                    ? "border-red-500 bg-red-500/10" 
-                    : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
+                    ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                    : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
                 placeholder="tu@email.com"
                 disabled={loading}
               />
               {errors.email && (
-                <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+                <p className="text-red-400 text-xs">{errors.email}</p>
               )}
             </div>
 
-            {/* Contraseña */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Contraseña
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                  className={`w-full px-3 py-2 pr-12 rounded-lg border transition-colors ${
-                    errors.password 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
-                  placeholder="••••••••"
-                  disabled={loading}
-                />
-                {/* Botón para mostrar/ocultar contraseña */}
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  disabled={loading}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="w-4 h-4" />
-                  ) : (
-                    <EyeIcon className="w-4 h-4" />
-                  )}
-                </button>
+            {/* Contraseñas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                  Contraseña
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    className={`w-full px-3 py-2 pr-10 rounded-lg border transition-all duration-200 ${
+                      errors.password 
+                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                    } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                    placeholder="••••••••"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    disabled={loading}
+                  >
+                    {showPassword ? (
+                      <EyeSlashIcon className="w-4 h-4" />
+                    ) : (
+                      <EyeIcon className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-400 text-xs">{errors.password}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-red-400 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
 
-            {/* Confirmar Contraseña */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                Confirmar Contraseña
-              </label>
-              <div className="relative">
-      <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                  className={`w-full px-3 py-2 pr-12 rounded-lg border transition-colors ${
-                    errors.confirmPassword 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
-                  placeholder="••••••••"
-                  disabled={loading}
-                />
-                {/* Botón para mostrar/ocultar confirmación de contraseña */}
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                  disabled={loading}
-                >
-                  {showConfirmPassword ? (
-                    <EyeSlashIcon className="w-4 h-4" />
-                  ) : (
-                    <EyeIcon className="w-4 h-4" />
-                  )}
-                </button>
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
+                  Confirmar
+                </label>
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                    className={`w-full px-3 py-2 pr-10 rounded-lg border transition-all duration-200 ${
+                      errors.confirmPassword 
+                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                    } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                    placeholder="••••••••"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    disabled={loading}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeSlashIcon className="w-4 h-4" />
+                    ) : (
+                      <EyeIcon className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-red-400 text-xs">{errors.confirmPassword}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>
-              )}
             </div>
 
             {/* Error general */}
@@ -471,11 +445,11 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#FFD700] to-[#D4AF37] text-black font-bold py-3 px-4 rounded-lg hover:from-[#D4AF37] hover:to-[#FFD700] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-4 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
                   Creando cuenta...
                 </div>
               ) : (
