@@ -200,16 +200,41 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0714] to-[#18151f] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 relative overflow-hidden">
+      {/* Efectos de fondo sutiles */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.05),transparent_60%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,215,0,0.03),transparent_60%)]"></div>
+      
       {/* Contenedor principal del formulario */}
-      <div className="w-full max-w-md">
-        {/* Card del formulario */}
-        <div className="bg-[#18151f]/80 backdrop-blur-xl border border-[#FFD700]/20 rounded-2xl p-8 shadow-2xl">
+      <div className="w-full max-w-2xl relative z-10">
+        {/* Card del formulario profesional */}
+        <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+          {/* Efecto de brillo sutil */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-[#FFD700]/5 opacity-30"></div>
           
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
-            <p className="text-gray-400">Únete a POSOQO</p>
+          {/* Header profesional */}
+          <div className="text-center mb-8 relative z-10">
+            {/* Logo POSOQO con efecto */}
+            <div className="mb-6 relative">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden">
+                <img 
+                  src="/Logo.png" 
+                  alt="POSOQO" 
+                  className="w-10 h-10"
+                />
+                {/* Efecto de brillo */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+              </div>
+            </div>
+            
+            {/* Título principal */}
+            <h1 className="text-3xl font-bold text-white mb-2 tracking-wide">
+              Crear Cuenta
+            </h1>
+            <p className="text-gray-400 text-sm font-medium">Únete a POSOQO Cervezas Artesanales</p>
+            
+            {/* Línea decorativa */}
+            <div className="w-20 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full mx-auto mt-4"></div>
           </div>
 
           {/* Mensaje de éxito */}
@@ -222,51 +247,69 @@ export default function RegisterPage() {
           )}
 
           {/* Formulario de registro */}
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-6 relative z-10">
             
             {/* Nombre y Apellido */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-200">
                   Nombre
                 </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-colors ${
-                    errors.name 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
-                  placeholder="Tu nombre"
-                  disabled={loading}
-                />
+                <div className="relative group">
+                  <input
+                    id="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
+                      errors.name 
+                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 group-hover:border-gray-500"
+                    } text-white placeholder-gray-400 focus:outline-none focus:ring-4 backdrop-blur-sm`}
+                    placeholder="Tu nombre"
+                    disabled={loading}
+                  />
+                  {/* Efecto de brillo en focus */}
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
                 {errors.name && (
-                  <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+                  <p className="text-red-400 text-sm flex items-center font-medium">
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.name}
+                  </p>
                 )}
               </div>
               
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
+              <div className="space-y-3">
+                <label htmlFor="lastName" className="block text-sm font-semibold text-gray-200">
                   Apellido
                 </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-colors ${
-                    errors.lastName 
-                      ? "border-red-500 bg-red-500/10" 
-                      : "border-gray-600 bg-gray-800/50 focus:border-[#FFD700] focus:bg-gray-800"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FFD700]/20`}
-                  placeholder="Tu apellido"
-                  disabled={loading}
-                />
+                <div className="relative group">
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange("lastName", e.target.value)}
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ${
+                      errors.lastName 
+                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
+                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20 group-hover:border-gray-500"
+                    } text-white placeholder-gray-400 focus:outline-none focus:ring-4 backdrop-blur-sm`}
+                    placeholder="Tu apellido"
+                    disabled={loading}
+                  />
+                  {/* Efecto de brillo en focus */}
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/5 to-[#D4AF37]/0 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
                 {errors.lastName && (
-                  <p className="text-red-400 text-xs mt-1">{errors.lastName}</p>
+                  <p className="text-red-400 text-sm flex items-center font-medium">
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.lastName}
+                  </p>
                 )}
               </div>
             </div>
