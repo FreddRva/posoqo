@@ -3,6 +3,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { UtensilsCrossed, Calendar, ArrowRight } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import ProductModal from "./ProductModal";
 
 interface Product {
   id: string;
@@ -16,6 +17,18 @@ interface Product {
 export default function FeaturedFoods() {
   const [foods, setFoods] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openProductModal = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeProductModal = () => {
+    setSelectedProduct(null);
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     async function fetchFoods() {
@@ -125,8 +138,6 @@ export default function FeaturedFoods() {
                   />
                 </div>
                 
-                {/* Borde dorado sutil en hover */}
-                <div className="absolute inset-0 border-2 border-[#D4AF37]/30 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
               
               {/* Información de la comida */}
@@ -144,17 +155,14 @@ export default function FeaturedFoods() {
                 )}
                 
                 {/* Botón de acción elegante */}
-                <motion.div
+                <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => openProductModal(food)}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
                 >
-                  <Link 
-                    href={`/products/${food.id}`} 
-                    className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37] inline-block text-center"
-                  >
-                    Ver Detalles
-                  </Link>
-                </motion.div>
+                  Ver Detalles
+                </motion.button>
               </div>
             </div>
             
@@ -199,6 +207,13 @@ export default function FeaturedFoods() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </motion.a>
       </motion.div>
+
+      {/* Modal de producto */}
+      <ProductModal 
+        product={selectedProduct} 
+        isOpen={isModalOpen} 
+        onClose={closeProductModal} 
+      />
     </section>
   );
 } 
