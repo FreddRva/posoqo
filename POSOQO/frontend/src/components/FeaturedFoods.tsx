@@ -8,10 +8,15 @@ import ProductModal from "./ProductModal";
 interface Product {
   id: string;
   name: string;
-  price: number;
+  description: string;
+  price?: number;
+  image?: string;
+  category?: string;
+  style?: string;
+  abv?: string;
+  ibu?: string;
+  color?: string;
   image_url?: string;
-  category_id?: string;
-  description?: string;
 }
 
 export default function FeaturedFoods() {
