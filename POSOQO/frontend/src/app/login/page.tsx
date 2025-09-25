@@ -194,45 +194,33 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4 relative overflow-hidden">
-      {/* Fondo oscuro elegante con gradientes sutiles */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.03),transparent_60%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,215,0,0.02),transparent_60%)]"></div>
-      
-      {/* Efectos de luz sutil */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent"></div>
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       
       {/* Contenedor principal del formulario */}
-      <div className="w-full max-w-md relative z-10">
-        {/* Card del formulario elegante */}
-        <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800/50 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-          {/* Efecto de brillo sutil */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-[#FFD700]/5 opacity-30"></div>
-          <div className="relative z-10">
+      <div className="w-full max-w-sm">
+        {/* Card del formulario compacto */}
+        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-xl">
           
-          {/* Header elegante */}
-          <div className="text-center mb-8">
-            {/* Logo POSOQO */}
-            <div className="relative mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center mx-auto shadow-lg relative overflow-hidden">
-                <span className="text-2xl font-bold text-black">P</span>
-              </div>
+          {/* Header compacto */}
+          <div className="text-center mb-6">
+            {/* Logo POSOQO con trigo */}
+            <div className="mb-4">
+              <img 
+                src="/Logo.png" 
+                alt="POSOQO" 
+                className="w-12 h-12 mx-auto"
+              />
             </div>
             
             {/* Título principal */}
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-white mb-1">
               POSOQO
             </h1>
-            <p className="text-gray-400 text-sm mb-6">Cervezas Artesanales Ayacuchanas</p>
-            
-            {/* Línea decorativa */}
-            <div className="w-16 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full mx-auto"></div>
+            <p className="text-gray-400 text-xs">Cervezas Artesanales</p>
           </div>
 
           {/* Formulario de email/password */}
-          <form onSubmit={handleEmailLogin} className="space-y-6">
+          <form onSubmit={handleEmailLogin} className="space-y-4">
             
             {/* Campo Email elegante */}
             <div className="space-y-2">
@@ -245,10 +233,10 @@ export default function LoginPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
                     errors.email 
                       ? "border-red-500 bg-red-500/5 focus:ring-red-500/20" 
-                      : "border-gray-700 bg-gray-800/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                      : "border-gray-700 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
                   } text-white placeholder-gray-500 focus:outline-none focus:ring-2`}
                   placeholder="tu@email.com"
                   disabled={loading}
@@ -275,10 +263,10 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
                     errors.password 
                       ? "border-red-500 bg-red-500/5 focus:ring-red-500/20" 
-                      : "border-gray-700 bg-gray-800/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
+                      : "border-gray-700 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
                   } text-white placeholder-gray-500 focus:outline-none focus:ring-2`}
                   placeholder="••••••••"
                   disabled={loading}
@@ -334,16 +322,16 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Botón de login elegante */}
+            {/* Botón de login compacto */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold py-3 px-4 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold py-2 px-4 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black mr-2"></div>
-                  <span>Iniciando sesión...</span>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
+                  <span className="text-sm">Iniciando...</span>
                 </div>
               ) : (
                 "Iniciar sesión"
