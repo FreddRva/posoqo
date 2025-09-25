@@ -200,10 +200,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4 relative overflow-hidden">
-      {/* Efectos de fondo sutiles */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(212,175,55,0.05),transparent_60%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(255,215,0,0.03),transparent_60%)]"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       
       {/* Contenedor principal del formulario */}
       <div className="w-full max-w-lg relative z-10">
