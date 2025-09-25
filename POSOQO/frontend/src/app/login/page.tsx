@@ -370,6 +370,17 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* Separador elegante */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <div className="bg-gray-800 px-4 py-2 rounded-full border border-gray-600/50">
+                <span className="text-gray-400 font-medium text-sm">o continúa con</span>
+              </div>
+            </div>
+          </div>
 
           {/* Botón de Google profesional */}
           <button
