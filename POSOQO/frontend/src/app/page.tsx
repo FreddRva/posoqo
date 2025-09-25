@@ -564,7 +564,7 @@ export default function HomePage() {
               <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
             
-            {/* Grid de productos destacados en 3 columnas */}
+            {/* Grid de productos destacados con imagen flotante y descripción al costado */}
             {featuredCervezas.length > 0 && (
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8"
@@ -585,47 +585,46 @@ export default function HomePage() {
                     {/* Efecto de brillo en hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
-                    <div className="relative z-10 text-center">
-                      {/* Imagen grande centrada */}
-                      <div className="relative w-full h-64 mb-6 group">
-                        {/* Efecto de resplandor premium */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
-                        
-                        {/* Contenedor de imagen con gradiente */}
-                        <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-4 h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                          <img
-                            src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
-                            alt={product.name}
-                            className="max-w-full max-h-full object-contain"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-16 h-16 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
-                              }
-                            }}
-                          />
+                    <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6">
+                      {/* Imagen flotante sin fondo */}
+                      <div className="flex-shrink-0 w-full lg:w-48">
+                        <div className="relative h-80 group">
+                          {/* Solo efecto de resplandor sutil */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 rounded-2xl blur-xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                          
+                          {/* Imagen flotante sin contenedor de fondo */}
+                          <div className="relative h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                            <img
+                              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              alt={product.name}
+                              className="max-w-full max-h-full object-contain drop-shadow-2xl"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-20 h-20 text-[#D4AF37]" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
+                                }
+                              }}
+                            />
+                          </div>
                         </div>
-                        
-                        {/* Efecto de resplandor en la imagen */}
-                        <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
                       
-                      {/* Información del producto */}
-                      <div className="space-y-4">
+                      {/* Información del producto al costado */}
+                      <div className="flex-1 text-center lg:text-left">
                         {/* Título principal */}
-                        <h3 className="text-2xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 line-clamp-2">
+                        <h3 className="text-2xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 mb-4">
                           {product.name}
                         </h3>
                         
                         {/* Descripción */}
-                        <p className="text-gray-300 leading-relaxed line-clamp-3">
+                        <p className="text-gray-300 leading-relaxed mb-4">
                           {product.description}
                         </p>
                         
                         {/* Especificaciones técnicas */}
-                        <div className="flex flex-wrap gap-2 justify-center">
+                        <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-4">
                           {product.abv && (
                             <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full border border-[#D4AF37]/40">
                               <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
@@ -644,27 +643,18 @@ export default function HomePage() {
                         </div>
                         
                         {/* Precio destacado */}
-                        <div className="text-3xl font-bold text-[#D4AF37]">
+                        <div className="text-3xl font-bold text-[#D4AF37] mb-6">
                           S/ {product.price?.toFixed(2) || '0.00'}
                         </div>
                         
-                        {/* Botones de acción */}
-                        <div className="flex flex-col gap-3 pt-2">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
-                          >
-                            Ver Detalles
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="w-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-3 px-6 rounded-xl hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
-                          >
-                            Agregar al Carrito
-                          </motion.button>
-                        </div>
+                        {/* Solo botón Ver Detalles */}
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                        >
+                          Ver Detalles
+                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
