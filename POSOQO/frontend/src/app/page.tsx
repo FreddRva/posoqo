@@ -564,10 +564,10 @@ export default function HomePage() {
               <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
             </div>
             
-            {/* Grid de productos destacados mejorado */}
+            {/* Grid de productos destacados con diseño horizontal profesional */}
             {featuredCervezas.length > 0 && (
               <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8"
+                className="space-y-8 mb-8"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
@@ -580,69 +580,94 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm rounded-3xl p-6 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2"
+                    className="group relative bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-3xl p-8 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 overflow-hidden"
                   >
                     {/* Efecto de brillo en hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
-                    <div className="relative z-10 text-center">
-                      {/* Imagen mejorada */}
-                      <div className="relative w-24 h-32 mx-auto mb-6 group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
-                        <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
-                          <img
-                            src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
-                            alt={product.name}
-                            className="w-full h-full object-contain"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-12 h-12 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
-                              }
-                            }}
-                          />
+                    <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
+                      {/* Imagen grande al lado izquierdo */}
+                      <div className="flex-shrink-0 w-full lg:w-80">
+                        <div className="relative h-80 lg:h-96 group">
+                          {/* Efecto de resplandor premium */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-3xl blur-2xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                          
+                          {/* Contenedor de imagen con gradiente */}
+                          <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-3xl p-6 h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                            <img
+                              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              alt={product.name}
+                              className="max-w-full max-h-full object-contain"
+                              onError={(e) => {
+                                const target = e.currentTarget;
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-24 h-24 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
+                                }
+                              }}
+                            />
+                          </div>
+                          
+                          {/* Efecto de resplandor en la imagen */}
+                          <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         </div>
-                        {/* Efecto de resplandor */}
-                        <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       </div>
                       
-                      {/* Información del producto */}
-                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#D4AF37] transition-colors duration-300">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-gray-300 mb-4 line-clamp-2 leading-relaxed">
-                        {product.description}
-                      </p>
-                      
-                      {/* Especificaciones técnicas */}
-                      <div className="flex justify-center gap-2 mb-4">
-                        {product.abv && (
-                          <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
-                            <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
-                          </div>
-                        )}
-                        {product.ibu && (
-                          <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
-                            <span className="text-xs font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
-                          </div>
-                        )}
+                      {/* Información del producto al lado derecho */}
+                      <div className="flex-1 text-center lg:text-left">
+                        {/* Título principal */}
+                        <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 group-hover:text-[#D4AF37] transition-colors duration-300">
+                          {product.name}
+                        </h3>
+                        
+                        {/* Descripción */}
+                        <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                          {product.description}
+                        </p>
+                        
+                        {/* Especificaciones técnicas mejoradas */}
+                        <div className="flex flex-wrap gap-3 mb-6 justify-center lg:justify-start">
+                          {product.abv && (
+                            <div className="bg-[#D4AF37]/20 px-4 py-2 rounded-full border border-[#D4AF37]/40">
+                              <span className="text-sm font-semibold text-[#D4AF37]">ABV {product.abv}</span>
+                            </div>
+                          )}
+                          {product.ibu && (
+                            <div className="bg-[#D4AF37]/20 px-4 py-2 rounded-full border border-[#D4AF37]/40">
+                              <span className="text-sm font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
+                            </div>
+                          )}
+                          {product.color && (
+                            <div className="bg-[#D4AF37]/20 px-4 py-2 rounded-full border border-[#D4AF37]/40">
+                              <span className="text-sm font-semibold text-[#D4AF37]">{product.color}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Precio destacado */}
+                        <div className="text-4xl font-bold text-[#D4AF37] mb-8">
+                          S/ {product.price?.toFixed(2) || '0.00'}
+                        </div>
+                        
+                        {/* Botones de acción */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-4 px-8 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                          >
+                            Ver Detalles
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-4 px-8 rounded-xl hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
+                          >
+                            Agregar al Carrito
+                          </motion.button>
+                        </div>
                       </div>
-                      
-                      {/* Precio */}
-                      <div className="text-2xl font-bold text-[#D4AF37] mb-6">
-                        S/ {product.price?.toFixed(2) || '0.00'}
-                      </div>
-                      
-                      {/* Botón mejorado */}
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
-                      >
-                        Ver Detalles
-                      </motion.button>
                     </div>
                   </motion.div>
                 ))}
@@ -905,7 +930,7 @@ export default function HomePage() {
           </motion.div>
           
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="space-y-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -913,72 +938,97 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-gray-900/90 to-gray-800/90 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2"
+                className="group relative bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-3xl p-8 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 overflow-hidden"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
                 {/* Efecto de brillo en hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                {/* Contenido principal */}
-                <div className="relative z-10">
-                  {/* Imagen mejorada */}
-                  <div className="relative w-full h-48 rounded-2xl overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-500">
-                    {service.image_url ? (
-                      <Image 
-                        src={service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`}
-                        alt={service.name} 
-                        fill
-                        className="object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center"><span class="text-6xl">🍺</span></div>';
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#D4AF37]/20 to-gray-700/50 flex items-center justify-center">
-                        <span className="text-6xl">🍺</span>
+                <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
+                  {/* Imagen grande al lado izquierdo */}
+                  <div className="flex-shrink-0 w-full lg:w-80">
+                    <div className="relative h-80 lg:h-96 group">
+                      {/* Efecto de resplandor premium */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-3xl blur-2xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                      
+                      {/* Contenedor de imagen con gradiente */}
+                      <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-3xl p-6 h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                        {service.image_url ? (
+                          <Image 
+                            src={service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`}
+                            alt={service.name} 
+                            width={300}
+                            height={300}
+                            className="max-w-full max-h-full object-contain"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><span class="text-8xl">🍺</span></div>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-8xl">🍺</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    {/* Overlay mejorado */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    {/* Efecto de resplandor en la imagen */}
-                    <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Efecto de resplandor en la imagen */}
+                      <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
                   </div>
                   
-                  {/* Título mejorado */}
-                  <h3 className="text-xl font-bold mb-4 text-white group-hover:text-[#D4AF37] transition-colors duration-300">
-                    {service.name}
-                  </h3>
-                  
-                  {/* Descripción mejorada */}
-                  <p className="text-gray-300 leading-relaxed mb-6 font-light text-sm">
-                    {service.description}
-                  </p>
-                  
-                  {/* Precio si existe */}
-                  {service.price && (
-                    <div className="text-2xl font-bold text-[#D4AF37] mb-6">
-                      S/ {service.price.toFixed(2)}
+                  {/* Información del servicio al lado derecho */}
+                  <div className="flex-1 text-center lg:text-left">
+                    {/* Título principal */}
+                    <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4 group-hover:text-[#D4AF37] transition-colors duration-300">
+                      {service.name}
+                    </h3>
+                    
+                    {/* Descripción */}
+                    <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                      {service.description}
+                    </p>
+                    
+                    {/* Precio si existe */}
+                    {service.price && (
+                      <div className="text-4xl font-bold text-[#D4AF37] mb-8">
+                        S/ {service.price.toFixed(2)}
+                      </div>
+                    )}
+                    
+                    {/* Estado del servicio */}
+                    <div className="flex items-center gap-2 mb-6 justify-center lg:justify-start">
+                      <div className={`w-3 h-3 rounded-full ${service.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <span className="text-sm text-gray-300">
+                        {service.is_active ? 'Disponible' : 'No disponible'}
+                      </span>
                     </div>
-                  )}
-                  
-                  {/* Botón mejorado */}
-                  <div className="flex justify-center">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-8 py-3 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold text-sm hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
-                    >
-                      Contáctanos
-                    </motion.button>
+                    
+                    {/* Botones de acción */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-4 px-8 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                      >
+                        Contáctanos
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-4 px-8 rounded-xl hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
+                      >
+                        Más Información
+                      </motion.button>
+                    </div>
                   </div>
                 </div>
                 
