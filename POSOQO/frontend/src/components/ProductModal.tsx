@@ -1,7 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, StarIcon } from "@heroicons/react/24/outline";
+import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
+import { useState } from "react";
 
 interface Product {
   id: string;
@@ -23,7 +25,41 @@ interface ProductModalProps {
   onClose: () => void;
 }
 
+// Datos de reseñas de ejemplo
+const sampleReviews = [
+  {
+    id: 1,
+    name: "María González",
+    rating: 5,
+    comment: "¡Increíble sabor! La mejor cerveza artesanal que he probado. Definitivamente la recomiendo.",
+    date: "2024-01-15"
+  },
+  {
+    id: 2,
+    name: "Carlos Mendoza",
+    rating: 4,
+    comment: "Muy buena calidad, sabor auténtico y fresco. Perfecta para acompañar una buena comida.",
+    date: "2024-01-10"
+  },
+  {
+    id: 3,
+    name: "Ana Rodríguez",
+    rating: 5,
+    comment: "Excelente producto, superó mis expectativas. El servicio también fue muy bueno.",
+    date: "2024-01-08"
+  },
+  {
+    id: 4,
+    name: "Luis Pérez",
+    rating: 4,
+    comment: "Buena relación calidad-precio. La recomiendo para ocasiones especiales.",
+    date: "2024-01-05"
+  }
+];
+
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
+  const [activeTab, setActiveTab] = useState('descripcion');
+  
   if (!product) return null;
 
   return (
@@ -105,48 +141,116 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
                   {/* Pestañas */}
                   <div className="flex space-x-4 mb-4 border-b border-stone-300">
-                    <button className="text-stone-800 font-semibold border-b-2 border-amber-500 pb-2">
+                    <button 
+                      onClick={() => setActiveTab('descripcion')}
+                      className={`font-semibold pb-2 transition-colors ${
+                        activeTab === 'descripcion' 
+                          ? 'text-stone-800 border-b-2 border-amber-500' 
+                          : 'text-stone-600 hover:text-stone-800'
+                      }`}
+                    >
                       DESCRIPCIÓN
                     </button>
-                    <button className="text-stone-600 hover:text-stone-800 transition-colors">
+                    <button 
+                      onClick={() => setActiveTab('detalles')}
+                      className={`font-semibold pb-2 transition-colors ${
+                        activeTab === 'detalles' 
+                          ? 'text-stone-800 border-b-2 border-amber-500' 
+                          : 'text-stone-600 hover:text-stone-800'
+                      }`}
+                    >
                       DETALLES
                     </button>
-                    <button className="text-stone-600 hover:text-stone-800 transition-colors">
+                    <button 
+                      onClick={() => setActiveTab('resenas')}
+                      className={`font-semibold pb-2 transition-colors ${
+                        activeTab === 'resenas' 
+                          ? 'text-stone-800 border-b-2 border-amber-500' 
+                          : 'text-stone-600 hover:text-stone-800'
+                      }`}
+                    >
                       RESEÑAS
                     </button>
                   </div>
 
-                  {/* Descripción */}
-                  <div className="mb-6">
-                    <p className="text-stone-700 leading-relaxed text-base">
-                      {product.description}
-                    </p>
-                  </div>
+                  {/* Contenido de pestañas */}
+                  <div className="mb-6 min-h-[200px]">
+                    {activeTab === 'descripcion' && (
+                      <div>
+                        <p className="text-stone-700 leading-relaxed text-base">
+                          {product.description}
+                        </p>
+                      </div>
+                    )}
 
-                  {/* Especificaciones */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    {product.abv && (
-                      <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                        <span className="text-xs font-semibold text-stone-600">ABV</span>
-                        <div className="text-lg font-bold text-amber-700">{product.abv}</div>
+                    {activeTab === 'detalles' && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {product.abv && (
+                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
+                            <span className="text-xs font-semibold text-stone-600">ABV</span>
+                            <div className="text-lg font-bold text-amber-700">{product.abv}</div>
+                          </div>
+                        )}
+                        {product.ibu && (
+                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
+                            <span className="text-xs font-semibold text-stone-600">IBU</span>
+                            <div className="text-lg font-bold text-amber-700">{product.ibu}</div>
+                          </div>
+                        )}
+                        {product.style && (
+                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
+                            <span className="text-xs font-semibold text-stone-600">ESTILO</span>
+                            <div className="text-lg font-bold text-amber-700">{product.style}</div>
+                          </div>
+                        )}
+                        {product.color && (
+                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
+                            <span className="text-xs font-semibold text-stone-600">COLOR</span>
+                            <div className="text-lg font-bold text-amber-700">{product.color}</div>
+                          </div>
+                        )}
+                        {product.category && (
+                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
+                            <span className="text-xs font-semibold text-stone-600">CATEGORÍA</span>
+                            <div className="text-lg font-bold text-amber-700">{product.category}</div>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {product.ibu && (
-                      <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                        <span className="text-xs font-semibold text-stone-600">IBU</span>
-                        <div className="text-lg font-bold text-amber-700">{product.ibu}</div>
-                      </div>
-                    )}
-                    {product.style && (
-                      <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                        <span className="text-xs font-semibold text-stone-600">ESTILO</span>
-                        <div className="text-lg font-bold text-amber-700">{product.style}</div>
-                      </div>
-                    )}
-                    {product.color && (
-                      <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                        <span className="text-xs font-semibold text-stone-600">COLOR</span>
-                        <div className="text-lg font-bold text-amber-700">{product.color}</div>
+
+                    {activeTab === 'resenas' && (
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <StarSolid key={star} className="w-5 h-5 text-amber-400" />
+                            ))}
+                          </div>
+                          <span className="text-stone-600 font-medium">4.5 de 5 estrellas</span>
+                          <span className="text-stone-500 text-sm">({sampleReviews.length} reseñas)</span>
+                        </div>
+                        
+                        <div className="space-y-3 max-h-48 overflow-y-auto">
+                          {sampleReviews.map((review) => (
+                            <div key={review.id} className="bg-stone-50 rounded-lg p-4 border border-stone-200">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-stone-800">{review.name}</h4>
+                                <div className="flex">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <StarSolid 
+                                      key={star} 
+                                      className={`w-4 h-4 ${
+                                        star <= review.rating ? 'text-amber-400' : 'text-stone-300'
+                                      }`} 
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-stone-700 text-sm mb-2">{review.comment}</p>
+                              <span className="text-stone-500 text-xs">{review.date}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
