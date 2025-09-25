@@ -580,7 +580,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900 border border-[#D4AF37]/30 rounded-2xl shadow-2xl py-3 z-[9999] backdrop-blur-sm">
+                    <div className="absolute right-0 mt-3 w-56 sm:w-64 rounded-2xl border border-yellow-400/20 bg-[rgba(15,15,15,0.75)] backdrop-blur-xl shadow-[0_10px_40px_rgba(255,215,0,0.12)] py-3 z-[9999]">
                       {user?.role === 'admin' && (
                         <button
                           onClick={() => {
