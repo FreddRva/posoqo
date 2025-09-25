@@ -720,35 +720,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Botones de navegación premium */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.a
-                href="/products?filter=comidas"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  <UtensilsCrossed className="w-5 h-5" />
-                  ¡Quiero comer!
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-gold-accent to-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </motion.a>
-              
-              <motion.a
-                href="/reservas"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-lg hover:bg-[#D4AF37] hover:text-black transition-all duration-300 shadow-xl premium-hover overflow-hidden"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  <Calendar className="w-5 h-5" />
-                  Reservar Mesa
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </motion.a>
-            </div>
           </motion.div>
 
           {/* Sección de Comidas Destacadas integrada */}
