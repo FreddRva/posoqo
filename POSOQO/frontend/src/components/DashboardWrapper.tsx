@@ -6,12 +6,13 @@ import WhatsappButton from "./WhatsappButton";
 export default function DashboardWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith("/dashboard");
+  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/forgot-password");
 
   return (
     <>
-      {!isDashboard && <Navbar />}
+      {!isDashboard && !isAuthPage && <Navbar />}
       {children}
-      {!isDashboard && <WhatsappButton />}
+      {!isDashboard && !isAuthPage && <WhatsappButton />}
     </>
   );
 } 
