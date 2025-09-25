@@ -217,7 +217,8 @@ export default function FeaturedFoods() {
       <ProductModal 
         product={selectedProduct} 
         isOpen={isModalOpen} 
-        onClose={closeProductModal} 
+        onClose={closeProductModal}
+        productType="comida"
       />
     </section>
   );

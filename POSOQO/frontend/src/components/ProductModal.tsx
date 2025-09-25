@@ -23,6 +23,7 @@ interface ProductModalProps {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
+  productType?: 'cerveza' | 'comida';
 }
 
 // Datos de reseñas de ejemplo
@@ -57,7 +58,7 @@ const sampleReviews = [
   }
 ];
 
-export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
+export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
   const [activeTab, setActiveTab] = useState('descripcion');
   
   if (!product) return null;
@@ -130,14 +131,6 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     {product.name}
                   </h2>
 
-                  {/* Precio */}
-                  {product.price && (
-                    <div className="mb-4">
-                      <span className="text-xl lg:text-2xl font-bold text-amber-600">
-                        S/ {product.price.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
 
                   {/* Pestañas */}
                   <div className="flex space-x-4 mb-4 border-b border-stone-300">
@@ -151,16 +144,18 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     >
                       DESCRIPCIÓN
                     </button>
-                    <button 
-                      onClick={() => setActiveTab('detalles')}
-                      className={`font-semibold pb-2 transition-colors ${
-                        activeTab === 'detalles' 
-                          ? 'text-stone-800 border-b-2 border-amber-500' 
-                          : 'text-stone-600 hover:text-stone-800'
-                      }`}
-                    >
-                      DETALLES
-                    </button>
+                    {productType === 'cerveza' && (
+                      <button 
+                        onClick={() => setActiveTab('detalles')}
+                        className={`font-semibold pb-2 transition-colors ${
+                          activeTab === 'detalles' 
+                            ? 'text-stone-800 border-b-2 border-amber-500' 
+                            : 'text-stone-600 hover:text-stone-800'
+                        }`}
+                      >
+                        DETALLES
+                      </button>
+                    )}
                     <button 
                       onClick={() => setActiveTab('resenas')}
                       className={`font-semibold pb-2 transition-colors ${
@@ -183,7 +178,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                       </div>
                     )}
 
-                    {activeTab === 'detalles' && (
+                    {activeTab === 'detalles' && productType === 'cerveza' && (
                       <div className="grid grid-cols-2 gap-3">
                         {product.abv && (
                           <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">

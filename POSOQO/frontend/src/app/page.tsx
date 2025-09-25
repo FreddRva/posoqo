@@ -1314,6 +1314,7 @@ export default function HomePage() {
         product={selectedProduct}
         isOpen={isModalOpen}
         onClose={closeProductModal}
+        productType="cerveza"
       />
 
     </div>
