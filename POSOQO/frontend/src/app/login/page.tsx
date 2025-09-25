@@ -338,6 +338,39 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Separador */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-3 bg-gray-800 text-gray-400">O</span>
+            </div>
+          </div>
+
+          {/* Botón de Google */}
+          <button
+            onClick={() => signIn("google")}
+            disabled={loading}
+            className="w-full flex items-center justify-center px-4 py-2 border border-gray-700 rounded-lg shadow-sm text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <img src="/google-icon.svg" alt="Google" className="h-4 w-4 mr-3" />
+            Continuar con Google
+          </button>
+
+          {/* Enlaces de registro y recuperación */}
+          <div className="mt-6 text-center text-sm text-gray-400">
+            ¿No tienes una cuenta?{" "}
+            <Link href="/register" className="font-medium text-[#D4AF37] hover:text-[#FFD700] transition-colors">
+              Regístrate
+            </Link>
+          </div>
+          <div className="mt-2 text-center text-sm text-gray-400">
+            <Link href="/forgot-password" className="font-medium text-[#D4AF37] hover:text-[#FFD700] transition-colors">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
         </div>
       </div>
     </div>
