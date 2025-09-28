@@ -402,7 +402,7 @@ export default function HomePage() {
                           {/* Imagen flotante sin contenedor de fondo */}
                           <div className="relative h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                             <img
-                              src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              src={product.image_url && !product.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}` : (product.image_url || "/file.svg")}
                               alt={product.name}
                               className="max-w-full max-h-full object-contain drop-shadow-2xl"
                               onError={(e) => {
