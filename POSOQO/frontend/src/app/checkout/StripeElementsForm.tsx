@@ -15,11 +15,56 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [cardholderName, setCardholderName] = useState("");
+  const [documentType, setDocumentType] = useState("DNI");
+  const [documentNumber, setDocumentNumber] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [subtotal, setSubtotal] = useState(amount);
   const [tax, setTax] = useState(0);
+
+  // Validar DNI peruano
+  const validateDNI = (dni: string) => {
+    // Remover espacios y puntos
+    const cleanDNI = dni.replace(/[\s.]/g, '');
+    
+    // Verificar que sea numérico y tenga 8 dígitos
+    if (!/^\d{8}$/.test(cleanDNI)) {
+      return false;
+    }
+    
+    // Algoritmo de validación DNI peruano
+    const digits = cleanDNI.split('').map(Number);
+    const weights = [3, 2, 7, 6, 5, 4, 3, 2];
+    
+    let sum = 0;
+    for (let i = 0; i < 8; i++) {
+      sum += digits[i] * weights[i];
+    }
+    
+    const remainder = sum % 11;
+    const checkDigit = remainder < 2 ? remainder : 11 - remainder;
+    
+    return checkDigit === digits[7];
+  };
+
+  // Validar otros tipos de documento
+  const validateDocument = (type: string, number: string) => {
+    const cleanNumber = number.replace(/[\s.-]/g, '');
+    
+    switch (type) {
+      case 'DNI':
+        return validateDNI(cleanNumber);
+      case 'CE':
+        // Cédula de extranjería: 9 dígitos
+        return /^\d{9}$/.test(cleanNumber);
+      case 'PAS':
+        // Pasaporte: alfanumérico, 6-12 caracteres
+        return /^[A-Z0-9]{6,12}$/.test(cleanNumber.toUpperCase());
+      default:
+        return false;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +72,19 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
     setProcessing(true);
     
     try {
+      // Validar campos requeridos
+      if (!cardholderName.trim()) {
+        throw new Error("El nombre del titular es requerido");
+      }
+      
+      if (!documentNumber.trim()) {
+        throw new Error("El número de documento es requerido");
+      }
+      
+      if (!validateDocument(documentType, documentNumber)) {
+        throw new Error(`El ${documentType} ingresado no es válido`);
+      }
+
       if (!stripe || !elements) {
         throw new Error("Stripe no está inicializado");
       }
@@ -35,7 +93,12 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         method: "POST",
         body: JSON.stringify({ 
           amount,
-          currency: "pen"
+          currency: "pen",
+          metadata: {
+            document_type: documentType,
+            document_number: documentNumber.replace(/[\s.-]/g, ''),
+            cardholder_name: cardholderName.trim()
+          }
         }),
       });
 
@@ -46,7 +109,9 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
       const result = await stripe?.confirmCardPayment((data as any).clientSecret, {
         payment_method: {
           card: elements?.getElement(CardNumberElement)!,
-          billing_details: { name: cardholderName },
+          billing_details: { 
+            name: cardholderName.trim(),
+          },
         },
       });
 
@@ -171,17 +236,30 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                 <div className="space-y-2">
                   <label className="text-gray-700 text-sm font-medium">Documento del titular</label>
                   <div className="flex gap-2">
-                    <select className="border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200">
+                    <select 
+                      value={documentType}
+                      onChange={(e) => setDocumentType(e.target.value)}
+                      className="border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200"
+                    >
                       <option value="DNI">DNI</option>
                       <option value="CE">CE</option>
                       <option value="PAS">PAS</option>
                     </select>
                     <input
                       type="text"
-                      placeholder="99.999.999"
+                      value={documentNumber}
+                      onChange={(e) => setDocumentNumber(e.target.value)}
+                      placeholder={documentType === 'DNI' ? '12345678' : documentType === 'CE' ? '123456789' : 'ABC123456'}
                       className="flex-1 border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200"
+                      required
                     />
                   </div>
+                  {documentNumber && !validateDocument(documentType, documentNumber) && (
+                    <p className="text-red-500 text-sm flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1" />
+                      El {documentType} ingresado no es válido
+                    </p>
+                  )}
                 </div>
 
                 {/* Botón de pago */}
