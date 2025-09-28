@@ -454,7 +454,7 @@ export default function HomePage() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => openProductModal(product)}
-                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300 group-hover:from-amber-600 group-hover:to-amber-500"
+                          className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-8 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
                         >
                           Ver Detalles
                         </motion.button>
