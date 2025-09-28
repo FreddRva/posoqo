@@ -144,7 +144,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen bg-gray-900 text-white ${montserrat.className}`}>
+    <div className={`min-h-screen bg-neutral-900 text-white ${montserrat.className}`}>
       {/* Hero Section - Con imagen de fondo */}
       <section 
         className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" 
@@ -156,7 +156,7 @@ export default function HomePage() {
         }}
       >
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-gray-900/60"></div>
+        <div className="absolute inset-0 bg-neutral-900/60"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -196,7 +196,7 @@ export default function HomePage() {
               <p className={`text-lg md:text-xl lg:text-2xl leading-relaxed ${inter.className} font-light text-white`}>
                 Posoqo viene del quechua <span className="font-medium text-amber-400">pusuqu</span>, que significa <span className="font-medium text-amber-400">espuma</span>.
               </p>
-              <p className={`text-base md:text-lg lg:text-xl mt-4 leading-relaxed ${inter.className} font-light text-gray-300`}>
+              <p className={`text-base md:text-lg lg:text-xl mt-4 leading-relaxed ${inter.className} font-light text-neutral-300`}>
                 Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function HomePage() {
       </section>
 
       {/* Raíces Ayacuchanas - Fondo elegante */}
-      <section className="py-20 bg-zinc-800">
+      <section className="py-20 bg-neutral-800">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -285,10 +285,10 @@ export default function HomePage() {
             
             {/* Descripción elegante */}
             <div className="max-w-4xl mx-auto">
-              <p className={`text-lg md:text-xl text-gray-200 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-neutral-200 leading-relaxed ${inter.className} font-light`}>
                 Posoqo viene del quechua <span className="font-medium text-amber-400">pusuqu</span>, que significa <span className="font-medium text-amber-400">espuma</span>. 
               </p>
-              <p className={`text-base md:text-lg mt-4 text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-base md:text-lg mt-4 text-neutral-300 leading-relaxed ${inter.className} font-light`}>
                 Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica que conecta nuestras raíces ayacuchanas con cada sorbo.
               </p>
             </div>
@@ -325,7 +325,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <div className="relative bg-gray-900/95 backdrop-blur-sm p-8 rounded-3xl border border-amber-400/40 hover:border-amber-400/60 transition-all duration-500 h-full">
+                <div className="relative bg-neutral-900/95 backdrop-blur-sm p-8 rounded-3xl border border-amber-400/40 hover:border-amber-400/60 transition-all duration-500 h-full">
                   <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
                   </div>
@@ -334,7 +334,7 @@ export default function HomePage() {
                     {item.title}
                   </h3>
                   
-                  <p className="text-gray-200 leading-relaxed text-center font-light text-sm md:text-base">
+                  <p className="text-neutral-200 leading-relaxed text-center font-light text-sm md:text-base">
                     {item.text}
                   </p>
                 </div>
@@ -387,7 +387,7 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="group relative bg-gradient-to-br from-gray-800/95 to-gray-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
+                    className="group relative bg-gradient-to-br from-neutral-800/95 to-neutral-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
                   >
                     {/* Efecto de brillo en hover */}
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -426,7 +426,7 @@ export default function HomePage() {
                         </h3>
                         
                         {/* Descripción */}
-                        <p className="text-gray-300 leading-relaxed mb-4">
+                        <p className="text-neutral-300 leading-relaxed mb-4">
                           {product.description}
                         </p>
                         
@@ -520,7 +520,7 @@ export default function HomePage() {
             
             {/* Descripción elegante */}
             <div className="max-w-3xl mx-auto mb-8">
-              <p className={`text-lg md:text-xl text-gray-300 leading-relaxed ${inter.className} font-light`}>
+              <p className={`text-lg md:text-xl text-neutral-300 leading-relaxed ${inter.className} font-light`}>
                 Descubre los sabores auténticos de Ayacucho, donde cada plato cuenta una historia de tradición y pasión culinaria.
               </p>
             </div>
@@ -535,9 +535,9 @@ export default function HomePage() {
       </section>
 
       {/* Taprooms y experiencias - Diseño premium con fondo elegante */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-stone-900">
+      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-neutral-900">
         {/* Overlay elegante */}
-        <div className="absolute inset-0 bg-gray-900/70"></div>
+        <div className="absolute inset-0 bg-neutral-900/70"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -561,7 +561,7 @@ export default function HomePage() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
+            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-neutral-300 leading-relaxed ${inter.className} font-light`}>
               Descubre nuestros espacios únicos donde la tradición se encuentra con la innovación cervecera.
             </p>
           </motion.div>
@@ -655,7 +655,7 @@ export default function HomePage() {
       
 
       {/* Servicios - Fondo elegante */}
-      <section id="servicios" className="py-20 bg-zinc-700">
+      <section id="servicios" className="py-20 bg-neutral-700">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-16"
@@ -678,7 +678,7 @@ export default function HomePage() {
             <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             
             {/* Descripción elegante */}
-            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
+            <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-neutral-300 leading-relaxed ${inter.className} font-light`}>
               Llevamos la experiencia POSOQO a tu evento con servicios personalizados y profesionales.
             </p>
           </motion.div>
@@ -692,7 +692,7 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-gray-800/95 to-gray-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
+                className="group relative bg-gradient-to-br from-neutral-800/95 to-neutral-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
@@ -745,7 +745,7 @@ export default function HomePage() {
                     </h3>
                     
                     {/* Descripción */}
-                    <p className="text-gray-300 leading-relaxed line-clamp-3">
+                    <p className="text-neutral-300 leading-relaxed line-clamp-3">
                       {service.description}
                     </p>
                     
@@ -759,7 +759,7 @@ export default function HomePage() {
                     {/* Estado del servicio */}
                     <div className="flex items-center gap-2 justify-center">
                       <div className={`w-3 h-3 rounded-full ${service.is_active ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      <span className="text-sm text-gray-300">
+                      <span className="text-sm text-neutral-300">
                         {service.is_active ? 'Disponible' : 'No disponible'}
                       </span>
                     </div>
@@ -795,7 +795,7 @@ export default function HomePage() {
       {/* Club de miembros - Diseño premium con fondo de imagen */}
       <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-gray-900/70"></div>
+        <div className="absolute inset-0 bg-neutral-900/70"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
@@ -822,7 +822,7 @@ export default function HomePage() {
           </motion.h2>
           
           <motion.p 
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-200 leading-relaxed"
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-neutral-200 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -841,15 +841,15 @@ export default function HomePage() {
           >
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">500+</div>
-              <div className="text-gray-300 text-sm">Miembros activos</div>
+              <div className="text-neutral-300 text-sm">Miembros activos</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">50+</div>
-              <div className="text-gray-300 text-sm">Eventos exclusivos</div>
+              <div className="text-neutral-300 text-sm">Eventos exclusivos</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-[#D4AF37] mb-2">15+</div>
-              <div className="text-gray-300 text-sm">Cervezas exclusivas</div>
+              <div className="text-neutral-300 text-sm">Cervezas exclusivas</div>
             </div>
           </motion.div>
 
@@ -870,10 +870,10 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-bold text-[#D4AF37]">María González</div>
-                    <div className="text-gray-400 text-sm">Miembro desde 2023</div>
+                    <div className="text-neutral-400 text-sm">Miembro desde 2023</div>
                   </div>
                 </div>
-                <p className="text-gray-200 italic">"Las cervezas exclusivas del club son increíbles. El acceso anticipado a nuevos lanzamientos es una experiencia única."</p>
+                <p className="text-neutral-200 italic">"Las cervezas exclusivas del club son increíbles. El acceso anticipado a nuevos lanzamientos es una experiencia única."</p>
               </div>
               <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-[#D4AF37]/30">
                 <div className="flex items-center mb-4">
@@ -882,10 +882,10 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="font-bold text-[#D4AF37]">Carlos Mendoza</div>
-                    <div className="text-gray-400 text-sm">Miembro desde 2022</div>
+                    <div className="text-neutral-400 text-sm">Miembro desde 2022</div>
                   </div>
                 </div>
-                <p className="text-gray-200 italic">"Los eventos VIP son espectaculares. Conocer al maestro cervecero y probar recetas experimentales es una pasión."</p>
+                <p className="text-neutral-200 italic">"Los eventos VIP son espectaculares. Conocer al maestro cervecero y probar recetas experimentales es una pasión."</p>
               </div>
             </div>
           </motion.div>
@@ -922,7 +922,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-[#D4AF37] text-lg">{item.title}</h3>
-                    <p className="text-gray-200 text-sm leading-relaxed">{item.text}</p>
+                    <p className="text-neutral-200 text-sm leading-relaxed">{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -954,7 +954,7 @@ export default function HomePage() {
                   </svg>
                 </div>
                 <h4 className="font-bold text-[#D4AF37] mb-2">Acceso 24/7</h4>
-                <p className="text-gray-300 text-sm">Portal exclusivo siempre disponible</p>
+                <p className="text-neutral-300 text-sm">Portal exclusivo siempre disponible</p>
               </div>
               <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-lg border border-[#D4AF37]/20">
                 <div className="w-12 h-12 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-3">
