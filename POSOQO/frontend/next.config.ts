@@ -6,21 +6,9 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   },
   
-  // Configuración de imágenes
+  // Configuración de imágenes optimizada
   images: {
     remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '4000',
-        pathname: '/uploads/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-        port: '4000',
-        pathname: '/uploads/**',
-      },
       {
         protocol: 'https',
         hostname: 'posoqo-backend.onrender.com',
@@ -33,16 +21,55 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
-    domains: [
-      'lh3.googleusercontent.com',
-      'posoqo-backend.onrender.com',
-      'res.cloudinary.com',
-    ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Configuración de compresión
+  // Configuración de compresión y optimización
   compress: true,
+  
+  // Configuración de seguridad
+  poweredByHeader: false,
+  
+  // Configuración de producción
+  ...(process.env.NODE_ENV === 'production' && {
+    output: 'standalone',
+    experimental: {
+      optimizeCss: true,
+    },
+  }),
+  
+  // Headers de seguridad
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

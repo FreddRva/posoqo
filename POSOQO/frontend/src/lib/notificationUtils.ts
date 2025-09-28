@@ -252,22 +252,16 @@ export class NotificationManager {
 
   // Método privado para crear notificaciones del sistema
   private async createSystemNotification(notification: SystemNotification) {
-    console.log('createSystemNotification called with:', notification);
-    
     if (this.useNotificationsHook?.createNotification) {
-      console.log('Creating system notification via hook');
       try {
         await this.useNotificationsHook.createNotification({
           type: notification.type,
           title: notification.title,
           message: notification.message || '',
         });
-        console.log('System notification created successfully');
       } catch (error) {
-        console.error('Error creating system notification:', error);
+        // Error silencioso para evitar logs innecesarios en producción
       }
-    } else {
-      console.log('useNotificationsHook.createNotification is not available');
     }
   }
 

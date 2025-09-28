@@ -21,11 +21,20 @@ const handler = NextAuth({
           return null;
         }
 
+        // Validar formato de email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(credentials.email)) {
+          return null;
+        }
+
         try {
           // Llamar al backend para autenticar
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "User-Agent": "POSOQO-Frontend/1.0"
+            },
             body: JSON.stringify({
               email: credentials.email.toLowerCase().trim(),
               password: credentials.password
@@ -38,10 +47,15 @@ const handler = NextAuth({
 
           const data = await res.json();
           
+          // Validar respuesta del backend
+          if (!data.user || !data.tokens) {
+            return null;
+          }
+          
           // Guardar tokens en el usuario para el callback jwt
           return {
             id: data.user?.id?.toString(),
-            name: data.user?.name,
+            name: data.user?.name?.substring(0, 100), // Limitar longitud
             email: data.user?.email,
             role: data.user?.role,
             accessToken: data.tokens?.access_token,
@@ -49,13 +63,16 @@ const handler = NextAuth({
             accessTokenExpires: Date.now() + (data.tokens?.expires_in || 900) * 1000,
           };
         } catch (error) {
-          console.error("Error en autenticación:", error);
+          // Error silencioso para evitar logs innecesarios
           return null;
         }
       }
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 horas
+  },
   pages: {
     signIn: "/login", // Usar nuestra página personalizada
   },

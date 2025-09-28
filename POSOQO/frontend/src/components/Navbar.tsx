@@ -225,8 +225,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Obtener icono de notificación
+  // Obtener icono de notificación de forma segura
   const getNotificationIcon = (type: string) => {
+    // Validar que el tipo sea una string válida
+    if (!type || typeof type !== 'string') return '📢';
+    
     const icons: { [key: string]: string } = {
       success: '✅',
       error: '❌',
@@ -240,7 +243,10 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
       order_status: '🛒',
       service: '🔧',
     };
-    return icons[type] || '📢';
+    
+    // Sanitizar el tipo para evitar inyección
+    const sanitizedType = type.toLowerCase().replace(/[^a-z_]/g, '');
+    return icons[sanitizedType] || '📢';
   };
 
   // Toggle dropdown
@@ -248,8 +254,11 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
     setActiveDropdown(activeDropdown === label ? null : label);
   };
 
-  // Renderizar elemento de navegación
+  // Renderizar elemento de navegación de forma segura
   const renderNavItem = (item: NavItem, isMobile = false) => {
+    // Validar que el item sea válido
+    if (!item || !item.label) return null;
+    
     const baseClasses = "text-base font-medium px-4 py-2 transition-all duration-300 relative group rounded-xl hover:bg-yellow-400/20 hover:shadow-lg";
     const isActive = item.href ? pathname?.startsWith(item.href.split('?')[0]) : false;
     const textClasses = item.highlight
@@ -308,13 +317,21 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           className={`${baseClasses} ${textClasses}`}
           onClick={e => {
             e.preventDefault();
-            if (window.location.pathname === "/") {
-              const el = document.getElementById("taprooms");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            } else {
+            try {
+              if (window.location.pathname === "/") {
+                const el = document.getElementById("taprooms");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              } else {
+                router.push("/#taprooms");
+              }
+              if (isMobile) setMobileMenuOpen(false);
+            } catch (error) {
+              // Fallback en caso de error
               router.push("/#taprooms");
+              if (isMobile) setMobileMenuOpen(false);
             }
-            if (isMobile) setMobileMenuOpen(false);
           }}
         >
           {item.label}
@@ -336,13 +353,21 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
           className={`${baseClasses} ${textClasses}`}
           onClick={e => {
             e.preventDefault();
-            if (window.location.pathname === "/") {
-              const el = document.getElementById("contacto");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            } else {
+            try {
+              if (window.location.pathname === "/") {
+                const el = document.getElementById("contacto");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              } else {
+                router.push("/#contacto");
+              }
+              if (isMobile) setMobileMenuOpen(false);
+            } catch (error) {
+              // Fallback en caso de error
               router.push("/#contacto");
+              if (isMobile) setMobileMenuOpen(false);
             }
-            if (isMobile) setMobileMenuOpen(false);
           }}
         >
           {item.label}
@@ -490,22 +515,22 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   <span className="text-lg flex-shrink-0 mt-0.5">{getNotificationIcon(notification.type)}</span>
                                   <div className="flex-1 min-w-0">
                                                                           <div className="text-[#FFD700] text-sm font-medium leading-tight">
-                                      {notification.title}
+                                      {notification.title ? notification.title.substring(0, 100) : 'Sin título'}
                                     </div>
                                     {notification.message && notification.message !== notification.title && (
                                       <div className="text-gray-400 text-xs mt-1 leading-relaxed">
-                                        {notification.message}
+                                        {notification.message.substring(0, 150)}
                                       </div>
                                     )}
                                     <div className="text-gray-400 text-xs mt-2 flex items-center">
                                       <span className="mr-2">🕒</span>
-                                      {new Date(notification.created_at).toLocaleString('es-ES', {
+                                      {notification.created_at ? new Date(notification.created_at).toLocaleString('es-ES', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                      })}
+                                      }) : 'Fecha no disponible'}
                                     </div>
                                   </div>
                                   {!notification.is_read && (
@@ -526,7 +551,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Ver todas las notificaciones');
+                              // TODO: Implementar vista completa de notificaciones
                             }}
                             className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center gap-2"
                           >
@@ -575,7 +600,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                       <User className="w-7 h-7 text-white" />
                     )}
                     <span className="text-white font-medium text-sm max-w-[120px] truncate">
-                      {user.name || "Mi cuenta"}
+                      {user.name ? user.name.substring(0, 20) : "Mi cuenta"}
                     </span>
                   </button>
 
@@ -731,22 +756,22 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                                   <span className="text-lg flex-shrink-0 mt-0.5">{getNotificationIcon(notification.type)}</span>
                                   <div className="flex-1 min-w-0">
                                                                           <div className="text-[#FFD700] text-sm font-medium leading-tight">
-                                      {notification.title}
+                                      {notification.title ? notification.title.substring(0, 100) : 'Sin título'}
                                     </div>
                                     {notification.message && notification.message !== notification.title && (
                                       <div className="text-gray-400 text-xs mt-1 leading-relaxed">
-                                        {notification.message}
+                                        {notification.message.substring(0, 150)}
                                       </div>
                                     )}
                                     <div className="text-gray-400 text-xs mt-2 flex items-center">
                                       <span className="mr-2">🕒</span>
-                                      {new Date(notification.created_at).toLocaleString('es-ES', {
+                                      {notification.created_at ? new Date(notification.created_at).toLocaleString('es-ES', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric',
                                         hour: '2-digit',
                                         minute: '2-digit'
-                                      })}
+                                      }) : 'Fecha no disponible'}
                                     </div>
                                   </div>
                                   {!notification.is_read && (
@@ -767,7 +792,7 @@ export default function Navbar({ scrolled }: { scrolled?: boolean }) {
                           <button 
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('Ver todas las notificaciones (móvil)');
+                              // TODO: Implementar vista completa de notificaciones
                             }}
                             className="w-full text-center text-[#FFD700] text-sm hover:text-[#FFA500] py-2 px-3 rounded-xl hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center gap-2"
                           >

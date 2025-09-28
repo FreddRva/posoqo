@@ -30,7 +30,7 @@ async function getAuthToken(): Promise<string | null> {
       return token;
     }
   } catch (err) {
-    console.error('Error obteniendo token de autenticación:', err);
+    // Error silencioso para evitar logs innecesarios en producción
   }
   return null;
 }
@@ -45,7 +45,7 @@ async function getSessionToken(): Promise<string | null> {
     const session = await getSession();
     return (session as any)?.accessToken || null;
   } catch (err) {
-    console.error('Error obteniendo token de sesión:', err);
+    // Error silencioso para evitar logs innecesarios en producción
     return null;
   }
 }
@@ -88,7 +88,7 @@ async function refreshAccessToken(): Promise<string | null> {
       }
     }
   } catch (err) {
-    console.error('Error renovando token:', err);
+    // Error silencioso para evitar logs innecesarios en producción
   }
   return null;
 }
@@ -132,11 +132,6 @@ export async function apiFetch<T>(
     token = sessionToken || authTokenResult || undefined;
   }
 
-  // DEBUG: Log básico (sin datos sensibles)
-  console.log("🔍 [API] Endpoint:", endpoint);
-  console.log("🔍 [API] Token:", token ? "PRESENTE" : "NO TOKEN");
-  console.log("🔍 [API] URL completa:", `${API_URL}${endpoint}`);
-
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...fetchOptions,
     headers: {
@@ -145,10 +140,6 @@ export async function apiFetch<T>(
       ...fetchOptions.headers,
     },
   });
-
-  // DEBUG: Log de la respuesta del servidor
-  console.log("🔍 [API] Status:", res.status);
-  console.log("🔍 [API] Status Text:", res.statusText);
   
   // Si el token expiró, intentar renovarlo y repetir la petición
   if (res.status === 401 && token) {
@@ -202,6 +193,6 @@ export const syncTokensWithLocalStorage = (session: any) => {
       localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
     }
   } catch (err) {
-    console.error('Error sincronizando tokens:', err);
+    // Error silencioso para evitar logs innecesarios en producción
   }
 }; 

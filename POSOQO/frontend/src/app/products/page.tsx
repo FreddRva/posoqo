@@ -145,8 +145,7 @@ function ProductsContent() {
         ]);
 
 
-        console.log("🔍 [LOAD] Productos cargados:", productsRes.data?.length || 0);
-        console.log("🔍 [LOAD] Categorías cargadas:", categoriesRes.data?.length || 0);
+        // Productos y categorías cargados exitosamente
         setProducts(productsRes.data);
         setCategories(categoriesRes.data);
         
