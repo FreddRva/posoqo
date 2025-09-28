@@ -609,9 +609,7 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url?.startsWith('http') 
-                                ? product.image_url 
-                                : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                              src={product.image_url && !product.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}` : (product.image_url || "/file.svg")}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
@@ -1038,11 +1036,7 @@ export default function AdminProducts() {
                                                          {form.image_url && (
                                <div className="relative">
                                  <img
-                                   src={(() => {
-                                     if (form.image_url.startsWith('http')) return form.image_url;
-                                     const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'https://posoqo-backend.onrender.com';
-                                     return `${backendUrl}${form.image_url}`;
-                                   })()}
+                                   src={form.image_url && !form.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${form.image_url}` : (form.image_url || "/file.svg")}
                                    alt="Vista previa"
                                    className="h-12 w-12 rounded object-cover border border-stone-200 dark:border-stone-600"
                                    onError={(e) => {
