@@ -326,10 +326,10 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                 <h3 className="font-semibold text-yellow-300 mb-4">Métodos de Pago Aceptados</h3>
                 <div className="grid grid-cols-4 gap-3">
                   {/* Visa */}
-                  <div className="w-14 h-9 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                    <svg viewBox="0 0 38 24" className="w-10 h-6">
-                      <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#172B85"></path>
-                      <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path>
+                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                    <svg viewBox="0 0 38 24" className="w-12 h-7">
+                      <rect width="38" height="24" rx="4" fill="#1A1F71"/>
+                      <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
                       <path d="M8.9 6.2c0-.1.1-.1.1-.2h3.2c.1 0 .2 0 .2.1.1.1.1.2.1.3v11.3c0 .2 0 .3-.1.4 0 .1-.1.1-.2.1H9c-.1 0-.2 0-.2-.1-.1-.1-.1-.2-.1-.4V6.4c0-.1 0-.2.1-.2z" fill="#FF5F00"></path>
                       <path d="M15.7 6.2c0-.1.1-.1.1-.2h3.2c.1 0 .2 0 .2.1.1.1.1.2.1.3v11.3c0 .2 0 .3-.1.4 0 .1-.1.1-.2.1h-3.2c-.1 0-.2 0-.2-.1-.1-.1-.1-.2-.1-.4V6.4c0-.1 0-.2.1-.2z" fill="#EB001B"></path>
                       <path d="M12.3 12.7c-.7-1-1.7-1.7-2.8-2v4c1.1-.3 2.1-1 2.8-2z" fill="#FF5F00"></path>
@@ -338,58 +338,71 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                   </div>
                   
                   {/* Mastercard */}
-                  <div className="w-14 h-9 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                    <svg viewBox="0 0 38 24" className="w-10 h-6">
-                      <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#172B85"></path>
-                      <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path>
-                      <path d="M11.3 15.5c0-1.2.7-1.9 1.8-2.2.8-.2 1.5-.3 1.5-.8 0-.4-.4-.7-1-.7-.6 0-1 .3-1.2.8l-1.5-.6c.3-1.2 1.4-1.9 2.8-1.9 1.6 0 2.8.8 2.8 2.1 0 1.1-.7 1.7-1.7 2.1-.8.3-1.4.4-1.4.8 0 .4.4.8 1.1.8.7 0 1.2-.3 1.4-1l1.5.5c-.4 1.3-1.4 2-3 2-1.7 0-3-.8-3-2.4zm7.8.1c0-.6.5-1 1.2-1 .7 0 1.2.4 1.2 1s-.5 1-1.2 1c-.7 0-1.2-.4-1.2-1zm5.5 0c0-1.7 1.2-3 3.2-3s3.2 1.3 3.2 3-1.2 3-3.2 3-3.2-1.3-3.2-3zm1.6 0c0 .9.6 1.6 1.6 1.6 1 0 1.6-.7 1.6-1.6 0-.9-.6-1.6-1.6-1.6-1 0-1.6.7-1.6 1.6z" fill="#142688"></path>
+                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                    <svg viewBox="0 0 38 24" className="w-12 h-7">
+                      <rect width="38" height="24" rx="4" fill="#EB001B"/>
+                      <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
+                      <circle cx="15" cy="12" r="6" fill="#EB001B"/>
+                      <circle cx="23" cy="12" r="6" fill="#F79E1B"/>
+                      <path d="M19 6c-1.7 0-3 1.3-3 3v6c0 1.7 1.3 3 3 3s3-1.3 3-3V9c0-1.7-1.3-3-3-3z" fill="#FF5F00"/>
                     </svg>
                   </div>
                   
                   {/* American Express */}
-                  <div className="w-14 h-9 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                    <svg viewBox="0 0 38 24" className="w-10 h-6">
-                      <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#172B85"></path>
-                      <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path>
-                      <path d="M30.1 12.9c0-1.2-.4-2.3-1.1-3.1-.7-.8-1.7-1.2-2.9-1.2h-4.2c-.3 0-.5.2-.5.5v8.2c0 .3.2.5.5.5h4.2c1.2 0 2.2-.4 2.9-1.2.7-.8 1.1-1.9 1.1-3.1v-.6c0-.1 0-.2-.1-.3l.1-.3v-.6zm-1.7 0c0 .8-.2 1.5-.6 2-.4.5-.9.8-1.6.8h-1.6v-5.6h1.6c.7 0 1.3.3 1.6.8.4.5.6 1.2.6 2v.1-.1z" fill="#259CD4"></path>
-                      <path d="M15.7 8.6c0-.3-.2-.5-.5-.5h-4.2c-1.2 0-2.2.4-2.9 1.2-.7.8-1.1 1.9-1.1 3.1v.6c0 .1 0 .2.1.3l-.1.3v.6c0 1.2.4 2.3 1.1 3.1.7.8 1.7 1.2 2.9 1.2h4.2c.3 0 .5-.2.5-.5V8.6zm-1.7 5.7c0 .8-.2 1.5-.6 2-.4.5-.9.8-1.6.8h-1.6v-5.6h1.6c.7 0 1.3.3 1.6.8.4.5.6 1.2.6 2v.1-.1z" fill="#259CD4"></path>
-                      <path d="M21.4 8.6c0-.3-.2-.5-.5-.5h-2.6c-.3 0-.5.2-.5.5v8.2c0 .3.2.5.5.5h2.6c.3 0 .5-.2.5-.5V8.6z" fill="#259CD4"></path>
+                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                    <svg viewBox="0 0 38 24" className="w-12 h-7">
+                      <rect width="38" height="24" rx="4" fill="#006FCF"/>
+                      <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
+                      <path d="M8 8h22v8H8V8zm1 1v6h20V9H9z" fill="#006FCF"/>
+                      <path d="M12 10h2v4h-2v-4zm4 0h2v4h-2v-4zm4 0h2v4h-2v-4zm4 0h2v4h-2v-4z" fill="#006FCF"/>
                     </svg>
                   </div>
                   
                   {/* Diners Club */}
-                  <div className="w-14 h-9 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                    <svg viewBox="0 0 38 24" className="w-10 h-6">
-                      <path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#172B85"></path>
-                      <path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path>
-                      <path d="M12 6.5c-1.7 0-3 1.3-3 3v9c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3v-9c0-1.7-1.3-3-3-3H12zm0 1h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H12c-1.1 0-2-.9-2-2v-9c0-1.1.9-2 2-2z" fill="#0079BE"></path>
-                      <path d="M19 8.5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2h-4zm0 1h4c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1h-4c-.6 0-1-.4-1-1v-7c0-.6.4-1 1-1z" fill="#0079BE"></path>
+                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                    <svg viewBox="0 0 38 24" className="w-12 h-7">
+                      <rect width="38" height="24" rx="4" fill="#0079BE"/>
+                      <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
+                      <path d="M12 6.5c-1.7 0-3 1.3-3 3v9c0 1.7 1.3 3 3 3h14c1.7 0 3-1.3 3-3v-9c0-1.7-1.3-3-3-3H12zm0 1h14c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H12c-1.1 0-2-.9-2-2v-9c0-1.1.9-2 2-2z" fill="#0079BE"/>
+                      <path d="M19 8.5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2h-4zm0 1h4c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1h-4c-.6 0-1-.4-1-1v-7c0-.6.4-1 1-1z" fill="#0079BE"/>
                     </svg>
                   </div>
                 </div>
                 
                 {/* Bancos peruanos */}
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium text-yellow-300 mb-3">Bancos peruanos compatibles:</h4>
-                  <div className="grid grid-cols-4 gap-2">
+                <div className="mt-6">
+                  <h4 className="text-sm font-medium text-yellow-300 mb-4">Bancos peruanos compatibles:</h4>
+                  <div className="grid grid-cols-4 gap-3">
                     {/* BCP */}
-                    <div className="w-12 h-8 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-blue-600">BCP</span>
+                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
+                        <rect width="120" height="30" rx="4" fill="#1E3A8A"/>
+                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-sm">BCP</text>
+                      </svg>
                     </div>
                     
                     {/* BBVA */}
-                    <div className="w-12 h-8 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-red-600">BBVA</span>
+                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
+                        <rect width="120" height="30" rx="4" fill="#DC2626"/>
+                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-sm">BBVA</text>
+                      </svg>
                     </div>
                     
                     {/* Interbank */}
-                    <div className="w-12 h-8 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-green-600">Interbank</span>
+                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
+                        <rect width="120" height="30" rx="4" fill="#059669"/>
+                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-xs">Interbank</text>
+                      </svg>
                     </div>
                     
                     {/* Scotiabank */}
-                    <div className="w-12 h-8 bg-white border border-yellow-400/30 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-red-700">Scotiabank</span>
+                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
+                        <rect width="120" height="30" rx="4" fill="#B91C1C"/>
+                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-xs">Scotiabank</text>
+                      </svg>
                     </div>
                   </div>
                 </div>
