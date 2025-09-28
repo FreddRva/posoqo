@@ -53,10 +53,14 @@ export default function HomePage() {
   const { data: session } = useSession();
   const controls = useAnimation();
 
-  // Scroll suave a secciones
+  // Scroll suave a secciones con validación
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
+    try {
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (error) {
+      // Fallback silencioso en caso de error
     }
   };
 
@@ -78,81 +82,81 @@ export default function HomePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-    // Cargar productos
+  // Cargar productos de forma optimizada
   useEffect(() => {
-    // Una sola llamada a la API para cargar todos los productos
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
-    const productsUrl = apiUrl.endsWith('/api') ? `${apiUrl}/products` : `${apiUrl}/api/products`;
-    fetch(productsUrl)
-      .then(res => res.json())
-      .then(res => {
-        // Cargar todos los productos para el fallback
-        setProducts(res.data);
+    const loadData = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
+        const productsUrl = apiUrl.endsWith('/api') ? `${apiUrl}/products` : `${apiUrl}/api/products`;
+
+        // Cargar productos principales
+        const productsResponse = await fetch(productsUrl);
+        if (!productsResponse.ok) throw new Error('Error cargando productos');
         
-        // Buscar la categoría "Cervezas" por nombre
-        const categoriesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/categories` : `${apiUrl}/api/categories`;
-        fetch(categoriesUrl)
-          .then(catRes => catRes.json())
-          .then(catData => {
-            const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
-            
-            if (cervezaCategory) {
-              // Productos destacados de la categoría Cervezas
-            const cervezasDestacadas = res.data.filter((p: any) => {
+        const productsData = await productsResponse.json();
+        setProducts(productsData.data || []);
+
+        // Cargar categorías y servicios en paralelo
+        const [categoriesResponse, servicesResponse] = await Promise.allSettled([
+          fetch(apiUrl.endsWith('/api') ? `${apiUrl}/categories` : `${apiUrl}/api/categories`),
+          fetch(apiUrl.endsWith('/api') ? `${apiUrl}/services` : `${apiUrl}/api/services`)
+        ]);
+
+        // Procesar categorías
+        if (categoriesResponse.status === 'fulfilled') {
+          const catData = await categoriesResponse.value.json();
+          const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
+          
+          if (cervezaCategory) {
+            // Filtrar cervezas destacadas
+            const cervezasDestacadas = productsData.data.filter((p: any) => {
+              const isCervezaByCategory = p.category_id === cervezaCategory.id;
+              const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
+              return (isCervezaByCategory || isCervezaBySubcategory) && p.is_featured;
+            }).slice(0, 4);
+            setFeaturedCervezas(cervezasDestacadas);
+
+            // Filtrar comidas destacadas
+            const comidasDestacadas = productsData.data.filter((p: any) => {
               const isCervezaByCategory = p.category_id === cervezaCategory.id;
               const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
               const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-              return isCerveza && p.is_featured;
+              return !isCerveza && p.is_featured;
             }).slice(0, 4);
-        setFeaturedCervezas(cervezasDestacadas);
-            } else {
-              setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
-            }
-            
-            // Para comidas, buscar otras categorías destacadas (Vinos, Cocteles, Licores)
-            const comidasDestacadas = res.data.filter((p: any) => {
-              const isCervezaByCategory = p.category_id === cervezaCategory?.id;
-              const isCervezaBySubcategory = p.subcategory === cervezaCategory?.id;
-              const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-              const isNotCerveza = !isCerveza;
-              const isFeatured = p.is_featured;
-              return isNotCerveza && isFeatured;
-            }).slice(0, 4);
-        setFeaturedComidas(comidasDestacadas);
-          })
-          .catch(catError => {
-            console.error('Error cargando categorías:', catError);
-            // Fallback: mostrar todos los productos destacados
-            setFeaturedCervezas(res.data.filter((p: any) => p.is_featured).slice(0, 4));
+            setFeaturedComidas(comidasDestacadas);
+          } else {
+            setFeaturedCervezas(productsData.data.filter((p: any) => p.is_featured).slice(0, 4));
             setFeaturedComidas([]);
-          });
-        
-        // Cargar servicios reales desde la API
-        const servicesUrl = apiUrl.endsWith('/api') ? `${apiUrl}/services` : `${apiUrl}/api/services`;
-        fetch(servicesUrl)
-          .then(servicesRes => servicesRes.json())
-          .then(servicesData => {
-            if (servicesData.success && servicesData.data) {
-              setServices(servicesData.data);
-            } else {
-              // Fallback: usar productos no destacados como servicios
-              const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
-              setServices(serviciosTemporales);
-            }
-          })
-          .catch(servicesError => {
-            console.error('Error cargando servicios:', servicesError);
-            // Fallback: usar productos no destacados como servicios
-            const serviciosTemporales = res.data.filter((p: any) => !p.is_featured).slice(0, 4);
-            setServices(serviciosTemporales);
-          });
-      })
-      .catch((error) => {
+          }
+        } else {
+          // Fallback para categorías
+          setFeaturedCervezas(productsData.data.filter((p: any) => p.is_featured).slice(0, 4));
+          setFeaturedComidas([]);
+        }
+
+        // Procesar servicios
+        if (servicesResponse.status === 'fulfilled') {
+          const servicesData = await servicesResponse.value.json();
+          if (servicesData.success && servicesData.data) {
+            setServices(servicesData.data);
+          } else {
+            setServices(productsData.data.filter((p: any) => !p.is_featured).slice(0, 4));
+          }
+        } else {
+          // Fallback para servicios
+          setServices(productsData.data.filter((p: any) => !p.is_featured).slice(0, 4));
+        }
+
+      } catch (error) {
+        // Manejo silencioso de errores
         setFeaturedCervezas([]);
         setFeaturedComidas([]);
         setServices([]);
         setProducts([]);
-      });
+      }
+    };
+
+    loadData();
   }, []);
 
 
@@ -305,10 +309,12 @@ export default function HomePage() {
     </motion.div>
   );
 
-  // Funciones para manejar el modal
+  // Funciones para manejar el modal con validación
   const openProductModal = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
+    if (product && product.id) {
+      setSelectedProduct(product);
+      setIsModalOpen(true);
+    }
   };
 
   const closeProductModal = () => {
