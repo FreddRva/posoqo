@@ -80,10 +80,20 @@ func GetImageURL(publicID string) string {
 		return ""
 	}
 
-	url, _ := cld.Url.SignUrl(publicID, map[string]string{
-		"secure":         "true",
-		"transformation": "f_auto,q_auto",
-	})
+	// Construir URL directamente usando el cloudName
+	cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+	if cloudName == "" {
+		return ""
+	}
 
+	// URL base de Cloudinary
+	baseURL := fmt.Sprintf("https://res.cloudinary.com/%s/image/upload", cloudName)
+	
+	// Parámetros de transformación
+	transformation := "f_auto,q_auto"
+	
+	// Construir URL completa
+	url := fmt.Sprintf("%s/%s/%s", baseURL, transformation, publicID)
+	
 	return url
 }

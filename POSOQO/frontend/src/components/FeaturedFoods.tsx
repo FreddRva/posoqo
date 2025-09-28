@@ -128,9 +128,9 @@ export default function FeaturedFoods() {
                 
                 {/* Imagen flotante con sombra elegante */}
                 <div className="relative h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                  <img
-                    src={food.image_url && !food.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${food.image_url}` : (food.image_url || "/file.svg")}
-                    alt={food.name}
+            <img
+              src={food.image_url && !food.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${food.image_url}` : (food.image_url || "/file.svg")}
+              alt={food.name}
                     className="max-w-full max-h-full object-cover rounded-3xl drop-shadow-2xl filter brightness-105 contrast-105 saturate-110"
                     onError={(e) => {
                       const target = e.currentTarget;
@@ -169,7 +169,7 @@ export default function FeaturedFoods() {
                   Ver Detalles
                 </motion.button>
               </div>
-            </div>
+          </div>
             
             {/* Efecto de resplandor en hover */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>

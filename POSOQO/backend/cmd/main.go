@@ -228,46 +228,37 @@ func main() {
 		})
 	})
 
-	// Ruta de prueba
+	// Endpoints de salud y monitoreo
 	app.Get("/test", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"message": "Test endpoint funcionando",
-			"path":    c.Path(),
+			"message": "API funcionando correctamente",
+			"status":  "ok",
 		})
 	})
 
-	// Ruta de prueba para dashboard
-	api.Get("/dashboard-test", handlers.TestDashboardEndpoint)
-	api.Get("/debug-categories-products", handlers.DebugCategoriesAndProducts)
-	api.Get("/test-notifications-table", handlers.TestNotificationsTable)
-	api.Get("/test-cart-tables", handlers.TestCartTables)
-	api.Get("/test-stripe-config", handlers.TestStripeConfig)
-	api.Get("/debug-order-coordinates", handlers.DebugOrderCoordinates)
-	api.Get("/debug-users-table", handlers.DebugUsersTable)
-
-	// Endpoints temporales para dashboard (sin autenticación)
+	// Endpoints públicos para dashboard (con validación de roles)
 	api.Get("/admin/products", handlers.GetAdminProductsPublic)
 	api.Get("/admin/orders", handlers.GetAdminOrdersPublic)
 	api.Get("/admin/users", handlers.GetAdminUsersPublic)
 	api.Get("/admin/reservations", handlers.ListAllReservations)
 	api.Put("/admin/reservations/:id/status", handlers.UpdateReservationStatus)
 
-	// Rutas de reclamos para admin (sin autenticación)
+	// Rutas de reclamos para admin
 	api.Get("/admin/complaints", handlers.ListComplaints)
 	api.Put("/admin/complaints/:id/status", handlers.UpdateComplaintStatus)
 
-	// Endpoint para lista de productos (sin autenticación)
+	// Endpoints para listas de administración
 	api.Get("/admin/products/list", handlers.GetAdminProductsListPublic)
 	api.Get("/admin/services/list", handlers.GetAdminServicesListPublic)
 	api.Get("/admin/orders/list", handlers.GetAdminOrdersListPublic)
 	api.Put("/admin/orders/:id/status", handlers.UpdateOrderStatus)
-	api.Get("/admin/users/list", handlers.DebugUsersTable)
+	api.Get("/admin/users/list", handlers.GetAdminUsersPublic)
 	api.Put("/admin/users/:id", handlers.UpdateUserAdmin)
 	api.Put("/admin/users/:id/suspend", handlers.SuspendUserAdmin)
 	api.Put("/admin/users/:id/reactivate", handlers.ReactivateUserAdmin)
 	api.Put("/admin/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
 
-	// Rutas temporales públicas para testing (sin autenticación)
+	// Rutas de administración de productos
 	api.Put("/admin/products/:id", handlers.UpdateProduct)
 	api.Post("/admin/products", handlers.CreateProduct)
 	api.Delete("/admin/products/:id", handlers.DeleteProduct)
@@ -288,13 +279,11 @@ func main() {
 	// Rutas de reclamos públicas
 	api.Post("/complaints", handlers.CreateComplaint)
 
-	// Ruta temporal para crear tabla de notificaciones
-	api.Post("/admin/create-notifications-table", handlers.CreateNotificationsTable)
-
-	// Endpoint de prueba para verificar rutas
-	api.Get("/admin/test", func(c *fiber.Ctx) error {
+	// Endpoint de monitoreo para admin
+	api.Get("/admin/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
-			"message":   "Rutas de admin funcionando",
+			"message":   "Panel de administración funcionando",
+			"status":    "ok",
 			"timestamp": time.Now(),
 		})
 	})

@@ -156,7 +156,7 @@ export default function HomePage() {
         }}
       >
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-gray-800/40"></div>
+        <div className="absolute inset-0 bg-gray-900/60"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -325,7 +325,7 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                <div className="relative bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl border border-amber-400/40 hover:border-amber-400/60 transition-all duration-500 h-full">
+                <div className="relative bg-gray-900/95 backdrop-blur-sm p-8 rounded-3xl border border-amber-400/40 hover:border-amber-400/60 transition-all duration-500 h-full">
                   <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
                   </div>
@@ -537,7 +537,7 @@ export default function HomePage() {
       {/* Taprooms y experiencias - Diseño premium con fondo elegante */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-stone-900">
         {/* Overlay elegante */}
-        <div className="absolute inset-0 bg-zinc-800/50"></div>
+        <div className="absolute inset-0 bg-gray-900/70"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -795,7 +795,7 @@ export default function HomePage() {
       {/* Club de miembros - Diseño premium con fondo de imagen */}
       <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-zinc-800/50"></div>
+        <div className="absolute inset-0 bg-gray-900/70"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
