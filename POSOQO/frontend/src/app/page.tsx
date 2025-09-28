@@ -156,7 +156,7 @@ export default function HomePage() {
         }}
       >
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-gray-800/80"></div>
+        <div className="absolute inset-0 bg-gray-800/40"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -537,7 +537,7 @@ export default function HomePage() {
       {/* Taprooms y experiencias - Diseño premium con fondo elegante */}
       <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-stone-900">
         {/* Overlay elegante */}
-        <div className="absolute inset-0 bg-zinc-800/85"></div>
+        <div className="absolute inset-0 bg-zinc-800/50"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -795,7 +795,7 @@ export default function HomePage() {
       {/* Club de miembros - Diseño premium con fondo de imagen */}
       <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
         {/* Overlay elegante con color fino */}
-        <div className="absolute inset-0 bg-zinc-800/80"></div>
+        <div className="absolute inset-0 bg-zinc-800/50"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
