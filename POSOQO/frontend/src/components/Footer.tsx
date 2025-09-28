@@ -53,84 +53,78 @@ export default function Footer() {
         </div>
         
         {showMoreInfo && (
-          <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-            <p className="text-sm text-gray-600 text-center">
-              Información adicional sobre POSOQO, nuestra historia, procesos de elaboración y compromiso con la calidad.
-            </p>
+          <div className="mt-4 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+              {/* Acerca de */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Acerca de</h4>
+                <ul className="space-y-2">
+                  <li><a href="/sobre-nosotros" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">POSOQO</a></li>
+                  <li><a href="/historia" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Nuestra historia</a></li>
+                  <li><a href="/proceso" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Proceso artesanal</a></li>
+                  <li><a href="/sustentabilidad" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Sustentabilidad</a></li>
+                  <li><a href="/blog" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Blog</a></li>
+                </ul>
+              </div>
+
+              {/* Productos */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Productos</h4>
+                <ul className="space-y-2">
+                  <li><a href="/products?filter=cerveza" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Cervezas</a></li>
+                  <li><a href="/products?filter=comidas" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Gastronomía</a></li>
+                  <li><a href="/products?filter=refrescos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Refrescos</a></li>
+                  <li><a href="/promociones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Promociones</a></li>
+                </ul>
+              </div>
+
+              {/* Ayuda */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Ayuda</h4>
+                <ul className="space-y-2">
+                  <li><a href="/como-comprar" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Cómo comprar</a></li>
+                  <li><a href="/envios" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Envíos</a></li>
+                  <li><a href="/devoluciones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Devoluciones</a></li>
+                  <li><a href="/reclamos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Libro de reclamaciones</a></li>
+                </ul>
+              </div>
+
+              {/* Redes sociales */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Redes sociales</h4>
+                <ul className="space-y-2">
+                  <li><a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Facebook</a></li>
+                  <li><a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Instagram</a></li>
+                  <li><a href="https://wa.me/51956099690" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">WhatsApp</a></li>
+                </ul>
+              </div>
+
+              {/* Mi cuenta */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Mi cuenta</h4>
+                <ul className="space-y-2">
+                  <li><a href="/profile" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Mi perfil</a></li>
+                  <li><a href="/favorites" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Favoritos</a></li>
+                  <li><a href="/orders" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Mis pedidos</a></li>
+                  <li><a href="/reservas" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Reservas</a></li>
+                </ul>
+              </div>
+
+              {/* Eventos */}
+              <div>
+                <h4 className="font-bold text-gray-800 mb-4 text-sm">Eventos</h4>
+                <ul className="space-y-2">
+                  <li><a href="/eventos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Próximos eventos</a></li>
+                  <li><a href="/taprooms" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Taprooms</a></li>
+                  <li><a href="/club-posoqo" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Club POSOQO</a></li>
+                  <li><a href="/degustaciones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Degustaciones</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Sección principal de enlaces */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-          {/* Acerca de */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Acerca de</h4>
-            <ul className="space-y-2">
-              <li><a href="/sobre-nosotros" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">POSOQO</a></li>
-              <li><a href="/historia" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Nuestra historia</a></li>
-              <li><a href="/proceso" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Proceso artesanal</a></li>
-              <li><a href="/sustentabilidad" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Sustentabilidad</a></li>
-              <li><a href="/blog" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Blog</a></li>
-            </ul>
-          </div>
-
-          {/* Productos */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Productos</h4>
-            <ul className="space-y-2">
-              <li><a href="/products?filter=cerveza" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Cervezas</a></li>
-              <li><a href="/products?filter=comidas" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Gastronomía</a></li>
-              <li><a href="/products?filter=refrescos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Refrescos</a></li>
-              <li><a href="/promociones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Promociones</a></li>
-            </ul>
-          </div>
-
-          {/* Ayuda */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Ayuda</h4>
-            <ul className="space-y-2">
-              <li><a href="/como-comprar" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Cómo comprar</a></li>
-              <li><a href="/envios" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Envíos</a></li>
-              <li><a href="/devoluciones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Devoluciones</a></li>
-              <li><a href="/reclamos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Libro de reclamaciones</a></li>
-            </ul>
-          </div>
-
-          {/* Redes sociales */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Redes sociales</h4>
-            <ul className="space-y-2">
-              <li><a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Facebook</a></li>
-              <li><a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Instagram</a></li>
-              <li><a href="https://wa.me/51956099690" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">WhatsApp</a></li>
-            </ul>
-          </div>
-
-          {/* Mi cuenta */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Mi cuenta</h4>
-            <ul className="space-y-2">
-              <li><a href="/profile" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Mi perfil</a></li>
-              <li><a href="/favorites" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Favoritos</a></li>
-              <li><a href="/orders" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Mis pedidos</a></li>
-              <li><a href="/reservas" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Reservas</a></li>
-            </ul>
-          </div>
-
-          {/* Eventos */}
-          <div>
-            <h4 className="font-bold text-gray-800 mb-4 text-sm">Eventos</h4>
-            <ul className="space-y-2">
-              <li><a href="/eventos" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Próximos eventos</a></li>
-              <li><a href="/taprooms" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Taprooms</a></li>
-              <li><a href="/club-posoqo" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Club POSOQO</a></li>
-              <li><a href="/degustaciones" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">Degustaciones</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
 
       {/* Enlaces legales */}
       <div className="max-w-7xl mx-auto px-6 py-4 border-t border-gray-300">
