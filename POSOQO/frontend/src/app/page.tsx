@@ -144,11 +144,19 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white ${montserrat.className}`}>
-      {/* Hero Section - Diseño premium con gradientes */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32 bg-gradient-to-br from-amber-900/20 via-slate-900 to-gray-900">
-        {/* Overlay elegante */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
+    <div className={`min-h-screen bg-slate-900 text-white ${montserrat.className}`}>
+      {/* Hero Section - Con imagen de fondo */}
+      <section 
+        className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" 
+        style={{
+          backgroundImage: 'url(/FondoPo.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay elegante con color fino */}
+        <div className="absolute inset-0 bg-slate-800/85"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -250,7 +258,7 @@ export default function HomePage() {
       </section>
 
       {/* Raíces Ayacuchanas - Fondo elegante */}
-      <section className="py-20 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900">
+      <section className="py-20 bg-gray-800">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -337,7 +345,7 @@ export default function HomePage() {
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
-      <section ref={productosRef} className="py-20 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
+      <section ref={productosRef} className="py-20 bg-slate-800">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Sección de Cervezas */}
           <motion.div 
@@ -527,9 +535,9 @@ export default function HomePage() {
       </section>
 
       {/* Taprooms y experiencias - Diseño premium con fondo elegante */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-gradient-to-br from-amber-900/30 via-slate-900 to-gray-900">
+      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-gray-900">
         {/* Overlay elegante */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+        <div className="absolute inset-0 bg-slate-800/90"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -647,7 +655,7 @@ export default function HomePage() {
       
 
       {/* Servicios - Fondo elegante */}
-      <section id="servicios" className="py-20 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900">
+      <section id="servicios" className="py-20 bg-slate-700">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-16"
@@ -786,10 +794,8 @@ export default function HomePage() {
 
       {/* Club de miembros - Diseño premium con fondo de imagen */}
       <section id="club-posoqo" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoC.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay más oscuro para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/80"></div>
-        {/* Gradiente adicional para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+        {/* Overlay elegante con color fino */}
+        <div className="absolute inset-0 bg-slate-800/85"></div>
         
         <div className="relative max-w-5xl mx-auto px-6 text-center">
           <motion.div 
@@ -983,8 +989,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contacto - Fondo negro igual a RAÍCES AYACUCHANAS */}
-      <section id="contacto" className="py-20" style={{backgroundColor: '#0f0f0f'}}>
+      {/* Contacto - Fondo elegante */}
+      <section id="contacto" className="py-20 bg-gray-800">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
