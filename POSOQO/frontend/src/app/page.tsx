@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Montserrat, Playfair_Display, Inter, Cormorant_Garamond } from "next/font/google";
-import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsCrossed, Calendar, Flame, TestTube, Sparkles } from "lucide-react";
-import { motion, useAnimation } from "framer-motion";
+import { Montserrat, Playfair_Display, Inter } from "next/font/google";
+import { Beer, Mountain, Wheat, MapPin, Mail, Phone, Star, ArrowRight, UtensilsCrossed, Flame, TestTube, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { getImageUrl } from "@/lib/api";
@@ -13,16 +13,11 @@ import { getImageUrl } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
-import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import ProductCard from "@/components/ui/ProductCard";
-import SectionHeader from "@/components/ui/SectionHeader";
 import FeaturedFoods from "@/components/FeaturedFoods";
 
 const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
-const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 interface Product {
   id: string;
@@ -51,50 +46,32 @@ export default function HomePage() {
   const productosRef = useRef<HTMLDivElement>(null);
   const taproomsRef = useRef<HTMLDivElement>(null);
   const { data: session } = useSession();
-  const controls = useAnimation();
 
-  // Scroll suave a secciones con validación
+  // Scroll suave a secciones
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    try {
-      if (ref.current) {
-        ref.current.scrollIntoView({ behavior: "smooth" });
-      }
-    } catch (error) {
-      // Fallback silencioso en caso de error
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const [products, setProducts] = useState<Product[]>([]);
   const [featuredCervezas, setFeaturedCervezas] = useState<Product[]>([]);
   const [featuredComidas, setFeaturedComidas] = useState<Product[]>([]);
   const [services, setServices] = useState<Service[]>([]);
-  const [activeTab, setActiveTab] = useState("cervezas");
-  const [isScrolled, setIsScrolled] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Efecto para detectar scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Cargar productos de forma optimizada
+  // Cargar datos de forma optimizada
   useEffect(() => {
     const loadData = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://posoqo-backend.onrender.com";
         const productsUrl = apiUrl.endsWith('/api') ? `${apiUrl}/products` : `${apiUrl}/api/products`;
 
-        // Cargar productos principales
         const productsResponse = await fetch(productsUrl);
         if (!productsResponse.ok) throw new Error('Error cargando productos');
         
         const productsData = await productsResponse.json();
-        setProducts(productsData.data || []);
+        const products = productsData.data || [];
 
         // Cargar categorías y servicios en paralelo
         const [categoriesResponse, servicesResponse] = await Promise.allSettled([
@@ -108,16 +85,14 @@ export default function HomePage() {
           const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
           
           if (cervezaCategory) {
-            // Filtrar cervezas destacadas
-            const cervezasDestacadas = productsData.data.filter((p: any) => {
+            const cervezasDestacadas = products.filter((p: any) => {
               const isCervezaByCategory = p.category_id === cervezaCategory.id;
               const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
               return (isCervezaByCategory || isCervezaBySubcategory) && p.is_featured;
             }).slice(0, 4);
             setFeaturedCervezas(cervezasDestacadas);
 
-            // Filtrar comidas destacadas
-            const comidasDestacadas = productsData.data.filter((p: any) => {
+            const comidasDestacadas = products.filter((p: any) => {
               const isCervezaByCategory = p.category_id === cervezaCategory.id;
               const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
               const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
@@ -125,12 +100,11 @@ export default function HomePage() {
             }).slice(0, 4);
             setFeaturedComidas(comidasDestacadas);
           } else {
-            setFeaturedCervezas(productsData.data.filter((p: any) => p.is_featured).slice(0, 4));
+            setFeaturedCervezas(products.filter((p: any) => p.is_featured).slice(0, 4));
             setFeaturedComidas([]);
           }
         } else {
-          // Fallback para categorías
-          setFeaturedCervezas(productsData.data.filter((p: any) => p.is_featured).slice(0, 4));
+          setFeaturedCervezas(products.filter((p: any) => p.is_featured).slice(0, 4));
           setFeaturedComidas([]);
         }
 
@@ -140,176 +114,23 @@ export default function HomePage() {
           if (servicesData.success && servicesData.data) {
             setServices(servicesData.data);
           } else {
-            setServices(productsData.data.filter((p: any) => !p.is_featured).slice(0, 4));
+            setServices(products.filter((p: any) => !p.is_featured).slice(0, 4));
           }
         } else {
-          // Fallback para servicios
-          setServices(productsData.data.filter((p: any) => !p.is_featured).slice(0, 4));
+          setServices(products.filter((p: any) => !p.is_featured).slice(0, 4));
         }
 
       } catch (error) {
-        // Manejo silencioso de errores
         setFeaturedCervezas([]);
         setFeaturedComidas([]);
         setServices([]);
-        setProducts([]);
       }
     };
 
     loadData();
   }, []);
-
-
-  // Scroll a hash en la URL
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    
-    const scrollToHash = () => {
-      const hash = window.location.hash;
-      if (hash) {
-        const el = document.getElementById(hash.replace('#', ''));
-        if (el) {
-          setTimeout(() => {
-            el.scrollIntoView({ behavior: "smooth" });
-          }, 300);
-        }
-      }
-    };
-    
-    scrollToHash();
-    window.addEventListener("hashchange", scrollToHash);
-    return () => window.removeEventListener("hashchange", scrollToHash);
-  }, []);
-
-  // Animaciones cuando los elementos entran en el viewport
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            controls.start("visible");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    const sections = document.querySelectorAll("section");
-    sections.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
-  }, [controls]);
-
-  // Debug: mostrar qué productos se están cargando
   
-  
-  // Renderizado condicional para mobile/desktop - ProductCard mejorado
-  const ProductCard = ({ product }: { product: Product }) => (
-    <motion.div
-      className="group relative bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm p-6 rounded-3xl border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2 w-full h-auto min-h-[380px] cursor-pointer"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={() => openProductModal(product)}
-    >
-      {/* Efecto de brillo en hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-      {/* Contenido principal */}
-      <div className="relative z-10 flex flex-col items-center h-full">
-        {/* Imagen mejorada con efectos premium */}
-        <div className="relative w-28 h-36 flex-shrink-0 mb-6 group">
-          {/* Efecto de resplandor premium */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
-          
-          {/* Contenedor de imagen con gradiente */}
-          <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-3 group-hover:scale-105 transition-transform duration-500">
-            <img
-              src={getImageUrl(product.image_url)}
-              alt={product.name}
-              className="object-contain w-full h-full rounded-lg"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-12 h-12 text-black" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
-                }
-              }}
-            />
-          </div>
-          
-          {/* Efecto de resplandor en la imagen */}
-          <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        </div>
-
-        {/* Información del producto mejorada */}
-        <div className="flex flex-col items-center text-center w-full space-y-4 flex-grow">
-          {/* Nombre del producto */}
-          <h2 className="text-xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 line-clamp-2">
-            {product.name}
-          </h2>
-          
-          {/* Descripción */}
-          <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">
-            {product.description}
-          </p>
-          
-          {/* Especificaciones técnicas mejoradas */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            {product.abv && (
-              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
-                <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
-              </div>
-            )}
-            {product.ibu && (
-              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
-                <span className="text-xs font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
-              </div>
-            )}
-            {product.color && (
-              <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full">
-                <span className="text-xs font-semibold text-[#D4AF37]">{product.color}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Precio */}
-          {product.price && (
-            <div className="text-2xl font-bold text-[#D4AF37] mt-2">
-              S/ {product.price.toFixed(2)}
-            </div>
-          )}
-        </div>
-
-        {/* Botón de acción mejorado */}
-        <div className="mt-4 w-full">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
-          >
-            Ver Detalles
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Efecto de resplandor premium en hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
-      
-      {/* Indicador de click premium */}
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500">
-        <div className="w-8 h-8 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-full flex items-center justify-center shadow-xl">
-          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  // Funciones para manejar el modal con validación
+  // Funciones para manejar el modal
   const openProductModal = (product: Product) => {
     if (product && product.id) {
       setSelectedProduct(product);
@@ -323,16 +144,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`min-h-screen premium-gradient text-white ${montserrat.className} pt-4 lg:pt-8 relative overflow-hidden`}>
-      {/* Fondo simple sin efectos */}
-      
-      
-      {/* Hero Section - Fondo con imagen */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32" style={{backgroundImage: 'url(/FondoPo.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay más oscuro para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/85"></div>
-        {/* Gradiente adicional para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
+    <div className={`min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white ${montserrat.className}`}>
+      {/* Hero Section - Diseño premium con gradientes */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 lg:pt-32 bg-gradient-to-br from-amber-900/20 via-slate-900 to-gray-900">
+        {/* Overlay elegante */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"></div>
         
         <motion.div 
           className="relative z-10 max-w-7xl w-full px-6 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-16"
@@ -340,53 +156,49 @@ export default function HomePage() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Contenido de texto - Diseño premium mejorado */}
+          {/* Contenido de texto - Diseño premium limpio */}
           <motion.div 
             className="flex-1 text-center lg:text-left order-1"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            {/* Logo con efecto dorado */}
+            {/* Logo elegante */}
             <div className="mb-8 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-posoqo-gold/20 to-posoqo-gold-accent/20 rounded-2xl blur-xl scale-110"></div>
-              <div className="relative">
-                <Image 
-                  src="/Imagen2.png" 
-                  alt="POSOQO" 
-                  width={500} 
-                  height={200} 
-                  className="mx-auto lg:mx-0 w-auto h-auto max-w-full drop-shadow-2xl"
-                  priority
-                />
-              </div>
+              <Image 
+                src="/Imagen2.png" 
+                alt="POSOQO" 
+                width={500} 
+                height={200} 
+                className="mx-auto lg:mx-0 w-auto h-auto max-w-full drop-shadow-2xl"
+                priority
+              />
             </div>
             
-            {/* Título principal con efecto premium */}
+            {/* Título principal elegante */}
             <div className="mb-8 relative">
-              <h2 className={`text-4xl md:text-6xl lg:text-7xl gold-text ${cormorant.className} italic font-extralight leading-tight premium-text-shadow`}>
+              <h2 className={`text-4xl md:text-6xl lg:text-7xl text-amber-400 ${playfair.className} font-bold leading-tight`}>
                 Cerveza Ayacuchana
               </h2>
-              {/* Línea decorativa dorada */}
-              <div className="w-24 h-1 gold-gradient mx-auto lg:mx-0 mt-4 rounded-full shadow-lg"></div>
+              <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto lg:mx-0 mt-4 rounded-full"></div>
             </div>
             
             {/* Descripción elegante */}
             <div className="mb-10 max-w-3xl mx-auto lg:mx-0">
-              <p className={`text-lg md:text-xl lg:text-2xl leading-relaxed ${inter.className} font-light text-white drop-shadow-lg`}>
-                Posoqo viene del quechua <span className="font-medium gold-text">pusuqu</span>, que significa <span className="font-medium gold-text">espuma</span>.
+              <p className={`text-lg md:text-xl lg:text-2xl leading-relaxed ${inter.className} font-light text-white`}>
+                Posoqo viene del quechua <span className="font-medium text-amber-400">pusuqu</span>, que significa <span className="font-medium text-amber-400">espuma</span>.
               </p>
-              <p className={`text-base md:text-lg lg:text-xl mt-4 leading-relaxed ${inter.className} font-light text-gray-300 drop-shadow-md`}>
+              <p className={`text-base md:text-lg lg:text-xl mt-4 leading-relaxed ${inter.className} font-light text-gray-300`}>
                 Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.
               </p>
             </div>
             
-            {/* Botones de acción mejorados */}
+            {/* Botones de acción elegantes */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg transition-all duration-300 shadow-2xl gold-glow premium-hover overflow-hidden"
+                className="group relative px-10 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-amber-500/30 overflow-hidden"
                 onClick={() => scrollToSection(productosRef)}
               >
                 <span className="relative z-10 flex items-center gap-3">
@@ -394,36 +206,34 @@ export default function HomePage() {
                   Nuestras Cervezas
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-gold-accent to-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.button>
               
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative px-10 py-4 rounded-full gold-border text-white font-bold text-lg hover:gold-glow transition-all duration-300 shadow-xl premium-hover overflow-hidden"
+                className="group relative px-10 py-4 rounded-full border-2 border-amber-400 text-amber-400 font-bold text-lg hover:bg-amber-400 hover:text-black transition-all duration-300 shadow-xl"
                 onClick={() => scrollToSection(taproomsRef)}
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <MapPin className="w-5 h-5" />
                   Visítanos
                 </span>
-                <div className="absolute inset-0 gold-gradient opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
               </motion.button>
             </div>
           </motion.div>
           
-          {/* Imagen principal - Diseño premium mejorado */}
+          {/* Imagen principal - Diseño elegante */}
           <motion.div 
             className="flex-1 flex justify-center items-center relative order-2 lg:order-2 mt-8 lg:mt-20"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <div className="relative w-[28rem] h-[40rem] lg:w-[32rem] lg:h-[44rem] animate-float flex items-center justify-center">
-              {/* Efecto de resplandor dorado */}
-              <div className="absolute inset-0 bg-gradient-to-br from-posoqo-gold/30 via-transparent to-posoqo-gold-accent/20 rounded-full blur-3xl scale-110"></div>
+            <div className="relative w-[28rem] h-[40rem] lg:w-[32rem] lg:h-[44rem] flex items-center justify-center">
+              {/* Efecto de resplandor sutil */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 via-transparent to-amber-600/20 rounded-full blur-3xl scale-110"></div>
               
-              {/* Contenedor de la imagen con efectos */}
+              {/* Contenedor de la imagen */}
               <div className="relative z-10 group">
                 <Image 
                   src="/FondoS.png" 
@@ -433,22 +243,14 @@ export default function HomePage() {
                   className="object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-700 mx-auto"
                   priority
                 />
-                
-                {/* Efecto de brillo en hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-posoqo-gold/10 via-transparent to-posoqo-gold/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              
-              {/* Partículas doradas flotantes */}
-              <div className="absolute top-10 right-10 w-2 h-2 bg-posoqo-gold rounded-full gold-sparkle opacity-60"></div>
-              <div className="absolute bottom-20 left-8 w-1.5 h-1.5 bg-posoqo-gold-accent rounded-full gold-sparkle opacity-80" style={{animationDelay: '1s'}}></div>
-              <div className="absolute top-1/2 right-4 w-1 h-1 bg-posoqo-gold rounded-full gold-sparkle opacity-70" style={{animationDelay: '2s'}}></div>
             </div>
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Raíces Ayacuchanas - Fondo negro más oscuro */}
-      <section className="py-20" style={{backgroundColor: '#0f0f0f'}}>
+      {/* Raíces Ayacuchanas - Fondo elegante */}
+      <section className="py-20 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-20"
@@ -457,27 +259,26 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            {/* Badge superior con icono */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-[#D4AF37]/20 rounded-full border border-[#D4AF37]/50 shadow-lg">
-              <Mountain className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            {/* Badge superior elegante */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-amber-500/20 rounded-full border border-amber-400/50 shadow-lg">
+              <Mountain className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 font-bold tracking-wider text-sm md:text-base uppercase">
                 RAÍCES AYACUCHANAS
               </span>
             </div>
             
-            {/* Título principal con efecto premium */}
+            {/* Título principal elegante */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
+              <h2 className={`text-5xl md:text-7xl font-bold text-amber-400 ${playfair.className} tracking-wider`}>
                 Tradición en cada sorbo
               </h2>
-              {/* Línea decorativa dorada */}
-              <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             </div>
             
-            {/* Descripción elegante con mejor tipografía */}
+            {/* Descripción elegante */}
             <div className="max-w-4xl mx-auto">
               <p className={`text-lg md:text-xl text-gray-200 leading-relaxed ${inter.className} font-light`}>
-                Posoqo viene del quechua <span className="font-medium text-[#D4AF37]">pusuqu</span>, que significa <span className="font-medium text-[#D4AF37]">espuma</span>. 
+                Posoqo viene del quechua <span className="font-medium text-amber-400">pusuqu</span>, que significa <span className="font-medium text-amber-400">espuma</span>. 
               </p>
               <p className={`text-base md:text-lg mt-4 text-gray-300 leading-relaxed ${inter.className} font-light`}>
                 Para nosotros, la espuma es símbolo de calidad, unión y celebración auténtica que conecta nuestras raíces ayacuchanas con cada sorbo.
@@ -495,20 +296,17 @@ export default function HomePage() {
               {
                 icon: <Beer className="w-8 h-8 text-black" />,
                 title: "Tradición y dedicación",
-                text: "La espuma no es solo un símbolo de fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico en cada receta.",
-                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
+                text: "La espuma no es solo un símbolo de fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico en cada receta."
               },
               {
                 icon: <Wheat className="w-8 h-8 text-black" />,
                 title: "Orgullo ayacuchano",
-                text: "Cada una de nuestras cervezas artesanales nace de esta filosofía: honrar nuestras raíces con sabores únicos, elaborados con esmero y con el orgullo de ser ayacuchanos.",
-                gradient: "from-[#FFD700]/20 to-[#D4AF37]/20"
+                text: "Cada una de nuestras cervezas artesanales nace de esta filosofía: honrar nuestras raíces con sabores únicos, elaborados con esmero y con el orgullo de ser ayacuchanos."
               },
               {
                 icon: <Mountain className="w-8 h-8 text-black" />,
                 title: "Espuma que une",
-                text: "Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico.",
-                gradient: "from-[#D4AF37]/20 to-[#FFD700]/20"
+                text: "Para nosotros, la espuma no es solo un símbolo de calidad y fermentación bien lograda, sino también una expresión de tradición, dedicación y respeto por lo auténtico."
               }
             ].map((item, index) => (
               <motion.div 
@@ -519,22 +317,19 @@ export default function HomePage() {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
-                {/* Contenido principal */}
-                <div className="relative bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl border border-[#D4AF37]/40 hover:border-[#D4AF37]/60 transition-all duration-500 h-full">
-                  {/* Icono elegante con fondo dorado */}
-                  <div className="w-20 h-20 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
+                <div className="relative bg-gray-800/80 backdrop-blur-sm p-8 rounded-3xl border border-amber-400/40 hover:border-amber-400/60 transition-all duration-500 h-full">
+                  <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 shadow-lg">
                     {item.icon}
                   </div>
                   
-                  {/* Título */}
-                  <h3 className="text-2xl font-bold mb-6 text-[#D4AF37] text-center group-hover:scale-105 transition-all duration-300 drop-shadow-lg">
+                  <h3 className="text-2xl font-bold mb-6 text-amber-400 text-center group-hover:scale-105 transition-all duration-300">
                     {item.title}
                   </h3>
                   
-                  {/* Descripción */}
-                  <p className="text-gray-200 leading-relaxed text-center font-light text-sm md:text-base" dangerouslySetInnerHTML={{ __html: item.text }} />
+                  <p className="text-gray-200 leading-relaxed text-center font-light text-sm md:text-base">
+                    {item.text}
+                  </p>
                 </div>
-                
               </motion.div>
             ))}
           </motion.div>
@@ -542,8 +337,7 @@ export default function HomePage() {
       </section>
 
       {/* Sección Combinada - Cervezas y Gastronomía */}
-      <section ref={productosRef} className="py-20 bg-gray-800">
-        
+      <section ref={productosRef} className="py-20 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           {/* Sección de Cervezas */}
           <motion.div 
@@ -553,21 +347,20 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
-              <Beer className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            {/* Badge superior elegante */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-amber-500/20 rounded-full border-2 border-amber-400/50 backdrop-blur-sm shadow-lg">
+              <Beer className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 font-bold tracking-wider text-sm md:text-base uppercase">
                 LAS MÁS PEDIDAS
               </span>
             </div>
             
-            {/* Título principal con efecto premium */}
+            {/* Título principal elegante */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${playfair.className} tracking-wider drop-shadow-2xl`}>
+              <h2 className={`text-5xl md:text-7xl font-bold text-amber-400 ${playfair.className} tracking-wider`}>
                 Cervezas
               </h2>
-              {/* Línea decorativa dorada */}
-              <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             </div>
             
             {/* Grid de productos destacados con imagen flotante y descripción al costado */}
@@ -586,17 +379,17 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
-                    className="group relative bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-3xl p-6 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2 overflow-hidden"
+                    className="group relative bg-gradient-to-br from-gray-800/95 to-gray-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
                   >
                     {/* Efecto de brillo en hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6">
                       {/* Imagen flotante sin fondo */}
                       <div className="flex-shrink-0 w-full lg:w-48">
                         <div className="relative h-80 group">
                           {/* Solo efecto de resplandor sutil */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 rounded-2xl blur-xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                          <div className="absolute inset-0 bg-gradient-to-br from-amber-400/10 to-amber-600/10 rounded-2xl blur-xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
                           
                           {/* Imagen flotante sin contenedor de fondo */}
                           <div className="relative h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
@@ -609,7 +402,7 @@ export default function HomePage() {
                                 target.style.display = 'none';
                                 const parent = target.parentElement;
                                 if (parent) {
-                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-20 h-20 text-[#D4AF37]" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
+                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-20 h-20 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path></svg></div>';
                                 }
                               }}
                             />
@@ -620,7 +413,7 @@ export default function HomePage() {
                       {/* Información del producto al costado */}
                       <div className="flex-1 text-center lg:text-left">
                         {/* Título principal */}
-                        <h3 className="text-2xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 mb-4">
+                        <h3 className="text-2xl font-bold text-white group-hover:text-amber-400 transition-colors duration-300 mb-4">
                           {product.name}
                         </h3>
                         
@@ -632,29 +425,28 @@ export default function HomePage() {
                         {/* Especificaciones técnicas */}
                         <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-4">
                           {product.abv && (
-                            <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full border border-[#D4AF37]/40">
-                              <span className="text-xs font-semibold text-[#D4AF37]">ABV {product.abv}</span>
+                            <div className="bg-amber-400/20 px-3 py-1 rounded-full border border-amber-400/40">
+                              <span className="text-xs font-semibold text-amber-400">ABV {product.abv}</span>
                             </div>
                           )}
                           {product.ibu && (
-                            <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full border border-[#D4AF37]/40">
-                              <span className="text-xs font-semibold text-[#D4AF37]">IBU {product.ibu}</span>
+                            <div className="bg-amber-400/20 px-3 py-1 rounded-full border border-amber-400/40">
+                              <span className="text-xs font-semibold text-amber-400">IBU {product.ibu}</span>
                             </div>
                           )}
                           {product.color && (
-                            <div className="bg-[#D4AF37]/20 px-3 py-1 rounded-full border border-[#D4AF37]/40">
-                              <span className="text-xs font-semibold text-[#D4AF37]">{product.color}</span>
+                            <div className="bg-amber-400/20 px-3 py-1 rounded-full border border-amber-400/40">
+                              <span className="text-xs font-semibold text-amber-400">{product.color}</span>
                             </div>
                           )}
                         </div>
-                        
                         
                         {/* Solo botón Ver Detalles */}
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => openProductModal(product)}
-                          className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300 group-hover:from-amber-600 group-hover:to-amber-500"
                         >
                           Ver Detalles
                         </motion.button>
@@ -676,23 +468,22 @@ export default function HomePage() {
                 href="/products?filter=cervezas"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group relative flex items-center justify-center px-10 py-4 rounded-full gold-gradient text-black font-bold text-lg shadow-2xl gold-glow transition-all duration-300 premium-hover overflow-hidden mx-auto w-fit"
+                className="group relative flex items-center justify-center px-10 py-4 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-lg shadow-2xl hover:shadow-amber-500/30 transition-all duration-300 overflow-hidden mx-auto w-fit"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   <Beer className="w-5 h-5" />
                   ¡Quiero chela!
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-gold-accent to-gold-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </motion.a>
             </motion.div>
           </motion.div>
           
           {/* Separador decorativo */}
           <div className="flex items-center justify-center mb-20">
-            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
-            <div className="mx-4 w-2 h-2 bg-[#D4AF37] rounded-full"></div>
-            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
+            <div className="mx-4 w-2 h-2 bg-amber-400 rounded-full"></div>
+            <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
           </div>
 
           {/* Sección de Gastronomía */}
@@ -703,21 +494,20 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            {/* Badge superior con icono dorado */}
-            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-gradient-to-r from-gold-primary/20 to-gold-accent/20 rounded-full border-2 border-gold-primary/50 backdrop-blur-sm shadow-lg">
-              <UtensilsCrossed className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase">
+            {/* Badge superior elegante */}
+            <div className="inline-flex items-center gap-3 mb-6 px-6 py-3 bg-amber-500/20 rounded-full border-2 border-amber-400/50 backdrop-blur-sm shadow-lg">
+              <UtensilsCrossed className="w-5 h-5 text-amber-400" />
+              <span className="text-amber-400 font-bold tracking-wider text-sm md:text-base uppercase">
                 SABORES TRADICIONALES
               </span>
             </div>
             
-            {/* Título principal con efecto premium */}
+            {/* Título principal elegante */}
             <div className="relative mb-8">
-              <h2 className={`text-5xl md:text-7xl font-black text-[#D4AF37] ${cormorant.className} italic tracking-wider drop-shadow-2xl`}>
+              <h2 className={`text-5xl md:text-7xl font-bold text-amber-400 ${playfair.className} tracking-wider`}>
                 Gastronomía
               </h2>
-              {/* Línea decorativa dorada */}
-              <div className="w-32 h-1.5 gold-gradient mx-auto mt-6 rounded-full shadow-lg"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             </div>
             
             {/* Descripción elegante */}
@@ -736,12 +526,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Taprooms y experiencias - Diseño premium con fondo de imagen */}
-      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden" style={{backgroundImage: 'url(/FondoPoS.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat'}}>
-        {/* Overlay más oscuro para mejor legibilidad del texto */}
-        <div className="absolute inset-0 bg-black/90"></div>
-        {/* Gradiente adicional para profundidad */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90"></div>
+      {/* Taprooms y experiencias - Diseño premium con fondo elegante */}
+      <section ref={taproomsRef} id="taprooms" className="py-20 relative overflow-hidden bg-gradient-to-br from-amber-900/30 via-slate-900 to-gray-900">
+        {/* Overlay elegante */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80"></div>
         
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <motion.div 
@@ -751,20 +539,18 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            {/* Sin efecto de resplandor */}
-            
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 bg-[#D4AF37]/20 rounded-lg border border-[#D4AF37]/30">
-                <MapPin className="w-6 h-6 text-[#D4AF37]" />
+              <div className="p-2 bg-amber-400/20 rounded-lg border border-amber-400/30">
+                <MapPin className="w-6 h-6 text-amber-400" />
               </div>
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
+              <span className="text-amber-400 font-bold tracking-wider text-sm md:text-base uppercase relative z-10">
                 ENCUENTRA POSOQO
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black text-[#D4AF37] ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-bold text-amber-400 ${playfair.className} relative z-10 tracking-wider`}>
               Nuestros espacios
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             
             {/* Descripción elegante */}
             <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
@@ -784,11 +570,11 @@ export default function HomePage() {
                 title: "Taproom Histórico",
                 location: "Portal Independencia n65 – interior B",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Música en vivo con artistas ayacuchanos" },
-                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Cata de cervezas artesanales" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Fast food, platos a la carta, comida oriental, café y más" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Lanzamiento de cervezas estacionales" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Ambiente colonial con arte local" }
+                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Música en vivo con artistas ayacuchanos" },
+                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Cata de cervezas artesanales" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Fast food, platos a la carta, comida oriental, café y más" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Lanzamiento de cervezas estacionales" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Ambiente colonial con arte local" }
                 ]
               },
               {
@@ -796,11 +582,11 @@ export default function HomePage() {
                 title: "Taproom Rockero",
                 location: "Jr. Asamblea n310",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Música en vivo: Rock peruano, rock inglés, Punk y más" },
-                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Tributos musicales y bandas en vivo" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Fast food y snacks para acompañar" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Lanzamiento de cervezas estacionales" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Ambiente de alma rockera y underground" }
+                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Música en vivo: Rock peruano, rock inglés, Punk y más" },
+                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Tributos musicales y bandas en vivo" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Fast food y snacks para acompañar" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Lanzamiento de cervezas estacionales" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Ambiente de alma rockera y underground" }
                 ]
               },
               {
@@ -808,11 +594,11 @@ export default function HomePage() {
                 title: "Taproom Planta",
                 location: "Sector Publico Mz Y lote",
                 features: [
-                  { icon: <Flame className="w-5 h-5 text-[#D4AF37]" />, text: "Tour por nuestra cervecería artesanal" },
-                  { icon: <TestTube className="w-5 h-5 text-[#D4AF37]" />, text: "Eventos y talleres cerveceros" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Degustación de cervezas frescas" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Experiencias educativas cerveceras" },
-                  { icon: <Sparkles className="w-5 h-5 text-[#D4AF37]" />, text: "Vista directa al proceso de elaboración" }
+                  { icon: <Flame className="w-5 h-5 text-amber-400" />, text: "Tour por nuestra cervecería artesanal" },
+                  { icon: <TestTube className="w-5 h-5 text-amber-400" />, text: "Eventos y talleres cerveceros" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Degustación de cervezas frescas" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Experiencias educativas cerveceras" },
+                  { icon: <Sparkles className="w-5 h-5 text-amber-400" />, text: "Vista directa al proceso de elaboración" }
                 ]
               }
             ].map((taproom, index) => (
@@ -835,7 +621,7 @@ export default function HomePage() {
                 <div className={`absolute left-0 right-0 p-6 md:p-8 ${
                   index === 2 ? 'bottom-8' : 'bottom-0'
                 }`}>
-                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-[#D4AF37] group-hover:text-[#FFD700] transition-colors duration-300 drop-shadow-lg">
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 text-amber-400 group-hover:text-amber-300 transition-colors duration-300 drop-shadow-lg">
                     {taproom.title}
                   </h3>
                   <p className="text-base md:text-lg lg:text-xl mb-4 md:mb-6 text-stone-100 font-medium drop-shadow-lg">
@@ -860,8 +646,8 @@ export default function HomePage() {
       
       
 
-      {/* Servicios - Fondo simple como LAS MÁS PEDIDAS */}
-      <section id="servicios" className="py-20 bg-gray-800">
+      {/* Servicios - Fondo elegante */}
+      <section id="servicios" className="py-20 bg-gradient-to-br from-slate-800 via-gray-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div 
             className="text-center mb-16"
@@ -870,20 +656,18 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            {/* Sin efecto de resplandor */}
-            
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-2 bg-[#D4AF37]/20 rounded-lg border border-[#D4AF37]/30">
-                <Sparkles className="w-6 h-6 text-[#D4AF37]" />
+              <div className="p-2 bg-amber-400/20 rounded-lg border border-amber-400/30">
+                <Sparkles className="w-6 h-6 text-amber-400" />
               </div>
-              <span className="text-[#D4AF37] font-black tracking-[0.3em] text-sm md:text-base uppercase relative z-10">
+              <span className="text-amber-400 font-bold tracking-wider text-sm md:text-base uppercase relative z-10">
                 NUESTROS SERVICIOS
               </span>
             </div>
-            <h2 className={`text-5xl md:text-7xl mt-6 font-black text-[#D4AF37] ${cormorant.className} italic relative z-10 tracking-wider drop-shadow-2xl`}>
+            <h2 className={`text-5xl md:text-7xl mt-6 font-bold text-amber-400 ${playfair.className} relative z-10 tracking-wider`}>
               Experiencias POSOQO
             </h2>
-            <div className="w-32 h-1.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] mx-auto mt-6 rounded-full shadow-lg"></div>
+            <div className="w-32 h-1.5 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto mt-6 rounded-full"></div>
             
             {/* Descripción elegante */}
             <p className={`text-lg md:text-xl mt-8 max-w-3xl mx-auto text-gray-300 leading-relaxed ${inter.className} font-light`}>
@@ -900,23 +684,23 @@ export default function HomePage() {
             {services && services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                className="group relative bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-3xl p-6 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#D4AF37]/30 hover:-translate-y-2 overflow-hidden"
+                className="group relative bg-gradient-to-br from-gray-800/95 to-gray-700/95 backdrop-blur-sm rounded-3xl p-6 border border-amber-400/30 hover:border-amber-400/60 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-400/30 hover:-translate-y-2 overflow-hidden"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
               >
                 {/* Efecto de brillo en hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-400/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div className="relative z-10 text-center">
                   {/* Imagen grande centrada */}
                   <div className="relative w-full h-64 mb-6 group">
                     {/* Efecto de resplandor premium */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/20 to-[#FFD700]/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-amber-600/20 rounded-2xl blur-lg scale-110 group-hover:scale-125 transition-all duration-500"></div>
                     
                     {/* Contenedor de imagen con gradiente */}
-                    <div className="relative bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-2xl p-4 h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                    <div className="relative bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-4 h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                       {service.image_url ? (
                         <Image 
                           src={service.image_url.startsWith('http') ? service.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${service.image_url}`}
@@ -942,13 +726,13 @@ export default function HomePage() {
                     </div>
                     
                     {/* Efecto de resplandor en la imagen */}
-                    <div className="absolute inset-0 border-2 border-[#D4AF37]/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 border-2 border-amber-400/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
                   
                   {/* Información del servicio */}
                   <div className="space-y-4">
                     {/* Título principal */}
-                    <h3 className="text-2xl font-bold text-white group-hover:text-[#D4AF37] transition-colors duration-300 line-clamp-2">
+                    <h3 className="text-2xl font-bold text-white group-hover:text-amber-400 transition-colors duration-300 line-clamp-2">
                       {service.name}
                     </h3>
                     
@@ -959,7 +743,7 @@ export default function HomePage() {
                     
                     {/* Precio si existe */}
                     {service.price && (
-                      <div className="text-3xl font-bold text-[#D4AF37]">
+                      <div className="text-3xl font-bold text-amber-400">
                         S/ {service.price.toFixed(2)}
                       </div>
                     )}
@@ -977,14 +761,14 @@ export default function HomePage() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-[#D4AF37]/30 transition-all duration-300 group-hover:from-[#FFD700] group-hover:to-[#D4AF37]"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 px-6 rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300 group-hover:from-amber-600 group-hover:to-amber-500"
                       >
                         Contáctanos
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full border-2 border-[#D4AF37] text-[#D4AF37] font-bold py-3 px-6 rounded-xl hover:bg-[#D4AF37] hover:text-black transition-all duration-300"
+                        className="w-full border-2 border-amber-400 text-amber-400 font-bold py-3 px-6 rounded-xl hover:bg-amber-400 hover:text-black transition-all duration-300"
                       >
                         Más Información
                       </motion.button>
@@ -993,7 +777,7 @@ export default function HomePage() {
                 </div>
                 
                 {/* Efecto de resplandor en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 pointer-events-none"></div>
               </motion.div>
             ))}
           </motion.div>
