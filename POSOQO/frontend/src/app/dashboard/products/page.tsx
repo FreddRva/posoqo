@@ -207,9 +207,17 @@ export default function AdminProducts() {
       const data = await response.json();
       console.log('✅ [UPLOAD] Imagen subida exitosamente:', data);
       
+      // Construir URL completa si es una ruta local
+      let imageUrl = data.url || data.image_url;
+      if (imageUrl && !imageUrl.startsWith('http')) {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+        const baseUrl = backendUrl.endsWith('/api') ? backendUrl.replace('/api', '') : backendUrl;
+        imageUrl = `${baseUrl}${imageUrl}`;
+      }
+      
       setForm(prev => ({
         ...prev,
-        image_url: data.url || data.image_url
+        image_url: imageUrl
       }));
     } catch (error: any) {
       console.error('❌ [UPLOAD] Error subiendo imagen:', error);
