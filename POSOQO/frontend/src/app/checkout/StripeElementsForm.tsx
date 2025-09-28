@@ -3,6 +3,7 @@ import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { apiFetch } from "@/lib/api";
+import { CreditCard, Package, CheckCircle, AlertCircle } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
@@ -51,282 +52,204 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
 
       if (result?.error) {
         throw new Error(result.error.message || "Error al procesar el pago");
-      } else if (result?.paymentIntent?.status === "succeeded") {
-        setSuccess("¡Pago exitoso! Tu pedido ha sido confirmado.");
-        
-        // Crear el pedido en la base de datos
-        try {
-          const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-          
-          // Obtener la ubicación del localStorage
-          let location = 'Ubicación no especificada';
-          try {
-            const storedAddress = localStorage.getItem('userAddress');
-            if (storedAddress) {
-              const addressData = JSON.parse(storedAddress);
-              if (addressData.address || addressData.addressRef || addressData.streetNumber) {
-                const parts = [];
-                if (addressData.address) parts.push(addressData.address);
-                if (addressData.addressRef) parts.push(addressData.addressRef);
-                if (addressData.streetNumber) parts.push(`N° ${addressData.streetNumber}`);
-                if (parts.length > 0) {
-                  location = parts.join(', ');
-                }
-              }
-            }
-          } catch (error) {
-            console.error("Error reading address from localStorage:", error);
-          }
-          
-          // Si aún no hay ubicación válida, usar un valor por defecto
-          if (!location || location === 'Ubicación no especificada') {
-            location = 'Dirección del cliente';
-          }
-          
-          console.log("🛒 Carrito:", cartItems);
-          console.log("📍 Ubicación:", location);
-          
-          if (cartItems.length > 0) {
-            const orderData = {
-              items: cartItems.map((item: any) => ({
-                product_id: item.id,
-                quantity: item.quantity
-              })),
-              location: location
-            };
-            
-            console.log("📦 Datos del pedido:", orderData);
-            
-            const orderResponse = await apiFetch("/protected/orders", {
-              method: "POST",
-              body: JSON.stringify(orderData),
-            });
-            
-            console.log("✅ Pedido creado:", orderResponse);
-            
-            // Limpiar el carrito después de crear el pedido
-            localStorage.removeItem('cart');
-            localStorage.removeItem('userAddress');
-          } else {
-            console.log("⚠️ Carrito vacío, no se puede crear pedido");
-          }
-        } catch (error) {
-          console.error("❌ Error creando pedido:", error);
-        }
-        
-        // Crear notificación de pago exitoso - SIN ESPERAR RESPUESTA
-        apiFetch("/admin/notifications", {
-          method: "POST",
-          body: JSON.stringify({
-            type: "success",
-            title: "🎉 ¡Pago Exitoso!",
-            message: `Tu pago de S/${amount.toFixed(2)} ha sido procesado exitosamente. ¡Gracias por tu compra!`
-          }),
-        }).then(() => {
-          // Actualizar notificaciones después de crear una nueva
-          console.log("✅ Notificación creada, actualizando lista...");
-        }).catch(error => {
-          console.error("Error creando notificación:", error);
-        });
-        
-        // Reproducir sonido de éxito INMEDIATAMENTE
-        if (typeof window !== 'undefined' && 'Audio' in window) {
-          try {
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-            audio.play().catch(() => {});
-          } catch (e) {
-            // Ignorar errores de audio
-          }
-        }
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Ocurrió un error desconocido";
-      
-      // Mensaje más específico para errores de Stripe
-      if (errorMessage.includes("PaymentIntent") || errorMessage.includes("pagos no está disponible")) {
-        setError("El sistema de pagos no está disponible en este momento. Por favor, intenta más tarde o contacta con soporte.");
-      } else {
-        setError(errorMessage);
-      }
-    } finally {
+
+      setSuccess("¡Pago procesado exitosamente!");
+      setProcessing(false);
+    } catch (err: any) {
+      setError(err.message || "Error al procesar el pago");
       setProcessing(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 pt-20 pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-stone-900/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-yellow-400/20 p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-yellow-400 mb-2">Información de Pago</h1>
-            <p className="text-stone-300">Completa los datos de tu tarjeta de forma segura</p>
+    <div className="min-h-screen bg-gray-50 pt-24 pb-16 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Formulario de pago */}
+          <div className="space-y-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              {/* Banner informativo */}
+              <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-bold">i</span>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-800">
+                      Activa compras por internet en la app de tu banco o llamando al teléfono que está en la tarjeta.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <CreditCard className="w-6 h-6 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Información de Pago</h2>
+              </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Número de tarjeta */}
+                <div className="space-y-2">
+                  <label className="text-gray-700 text-sm font-medium">Número de tarjeta</label>
+                  <div className="border border-gray-300 rounded-lg px-4 py-3 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all duration-200">
+                    <CardNumberElement
+                      options={{
+                        style: {
+                          base: {
+                            fontSize: '16px',
+                            color: '#374151',
+                            '::placeholder': {
+                              color: '#9CA3AF',
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Nombre del titular */}
+                <div className="space-y-2">
+                  <label className="text-gray-700 text-sm font-medium">Nombre del titular</label>
+                  <input
+                    type="text"
+                    value={cardholderName}
+                    onChange={(e) => setCardholderName(e.target.value)}
+                    placeholder="Ej.: María López"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200"
+                    required
+                  />
+                </div>
+
+                {/* Fecha de vencimiento y CVC */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-gray-700 text-sm font-medium">Vencimiento</label>
+                    <div className="border border-gray-300 rounded-lg px-4 py-3 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all duration-200">
+                      <CardExpiryElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: '16px',
+                              color: '#374151',
+                              '::placeholder': {
+                                color: '#9CA3AF',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-gray-700 text-sm font-medium">Código de seguridad</label>
+                    <div className="border border-gray-300 rounded-lg px-4 py-3 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all duration-200">
+                      <CardCvcElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: '16px',
+                              color: '#374151',
+                              '::placeholder': {
+                                color: '#9CA3AF',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Documento del titular */}
+                <div className="space-y-2">
+                  <label className="text-gray-700 text-sm font-medium">Documento del titular</label>
+                  <div className="flex gap-2">
+                    <select className="border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200">
+                      <option value="DNI">DNI</option>
+                      <option value="CE">CE</option>
+                      <option value="PAS">PAS</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="99.999.999"
+                      className="flex-1 border border-gray-300 rounded-lg px-4 py-3 bg-white text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all duration-200"
+                    />
+                  </div>
+                </div>
+
+                {/* Botón de pago */}
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className={`w-full font-bold py-4 px-8 rounded-lg transition-all duration-200 flex items-center justify-center gap-3 ${
+                    processing 
+                      ? 'bg-gray-400 text-white cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  {processing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Procesando...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5" />
+                      Pagar S/ {amount}
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Formulario de pago */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-yellow-400 font-medium mb-2">Nombre del Titular</label>
-                <input
-                  type="text"
-                  value={cardholderName}
-                  onChange={(e) => setCardholderName(e.target.value)}
-                  className="w-full px-4 py-3 bg-stone-800/60 border border-yellow-400/30 rounded-lg text-stone-100 placeholder-stone-400 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all"
-                  placeholder="Como aparece en la tarjeta"
-                />
-              </div>
-
-              <div>
-                <label className="block text-yellow-400 font-medium mb-2">Número de Tarjeta</label>
-                <div className="relative">
-                  <CardNumberElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: '16px',
-                          color: '#f5f5f4',
-                          backgroundColor: 'rgba(41, 37, 36, 0.6)',
-                          padding: '12px 16px',
-                          '::placeholder': {
-                            color: '#a8a29e',
-                          },
-                        },
-                        invalid: {
-                          color: '#fca5a5',
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-yellow-400 font-medium mb-2">Fecha de Vencimiento</label>
-                  <CardExpiryElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: '16px',
-                          color: '#f5f5f4',
-                          backgroundColor: 'rgba(41, 37, 36, 0.6)',
-                          padding: '12px 16px',
-                          '::placeholder': {
-                            color: '#a8a29e',
-                          },
-                        },
-                        invalid: {
-                          color: '#fca5a5',
-                        },
-                      },
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-yellow-400 font-medium mb-2">Código de Seguridad</label>
-                  <CardCvcElement
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: '16px',
-                          color: '#f5f5f4',
-                          backgroundColor: 'rgba(41, 37, 36, 0.6)',
-                          padding: '12px 16px',
-                          '::placeholder': {
-                            color: '#a8a29e',
-                          },
-                        },
-                        invalid: {
-                          color: '#fca5a5',
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Botón de pago */}
-              <button
-                onClick={handleSubmit}
-                disabled={processing}
-                className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
-                  processing
-                    ? 'bg-stone-600 text-stone-400 cursor-not-allowed'
-                    : 'bg-yellow-400 text-stone-900 hover:bg-yellow-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl shadow-yellow-400/25'
-                }`}
-              >
-                {processing ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-stone-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Procesando...
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
-                    </svg>
-                    Pagar S/ {amount}
-                  </div>
-                )}
-              </button>
-
-              {/* Mensajes de estado */}
-              {error && (
-                <div className="p-4 bg-red-900/20 border border-red-400/30 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-red-300">{error}</span>
-                  </div>
-                </div>
-              )}
-
-              {success && (
-                <div className="p-4 bg-green-900/20 border border-green-400/30 rounded-lg">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-green-300">{success}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
+          {/* Resumen y métodos de pago */}
+          <div className="space-y-8">
             {/* Resumen del pedido */}
-            <div className="bg-stone-800/60 rounded-lg p-6 border-l border-yellow-400/20">
-              <h3 className="text-xl font-semibold text-yellow-400 mb-4">Resumen del Pedido</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between text-stone-300">
-                  <span>Subtotal</span>
-                  <span>S/ {subtotal}</span>
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Package className="w-6 h-6 text-green-600" />
                 </div>
-                <div className="flex justify-between text-stone-300">
-                  <span>Envío</span>
-                  <span className="text-green-400">Gratis</span>
+                <h2 className="text-xl font-bold text-gray-900">Resumen del Pedido</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="text-gray-900 font-medium">S/ {amount}</span>
                 </div>
-                <div className="flex justify-between text-stone-300">
-                  <span>IGV</span>
-                  <span>S/ {tax}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Envío:</span>
+                  <span className="text-green-600 font-semibold">Gratis</span>
                 </div>
-                <div className="border-t border-yellow-400/20 pt-3">
-                  <div className="flex justify-between text-lg font-semibold text-yellow-400">
-                    <span>Total</span>
-                    <span>S/ {amount}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">IGV:</span>
+                  <span className="text-gray-900 font-medium">S/ 0</span>
+                </div>
+                <div className="border-t border-gray-200 pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-900">Total:</span>
+                    <span className="text-2xl font-extrabold text-blue-600">
+                      S/ {amount}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Métodos de pago */}
               <div className="mt-8">
-                <h3 className="font-semibold text-yellow-300 mb-4">Métodos de Pago Aceptados</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Métodos de Pago Aceptados</h3>
                 <div className="grid grid-cols-4 gap-3">
                   {/* Visa */}
-                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
                     <svg viewBox="0 0 38 24" className="w-12 h-7">
                       <rect width="38" height="24" rx="4" fill="#1A1F71"/>
                       <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
@@ -338,7 +261,7 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                   </div>
                   
                   {/* Mastercard */}
-                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
                     <svg viewBox="0 0 38 24" className="w-12 h-7">
                       <rect width="38" height="24" rx="4" fill="#EB001B"/>
                       <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
@@ -349,7 +272,7 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                   </div>
                   
                   {/* American Express */}
-                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
                     <svg viewBox="0 0 38 24" className="w-12 h-7">
                       <rect width="38" height="24" rx="4" fill="#006FCF"/>
                       <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
@@ -359,7 +282,7 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                   </div>
                   
                   {/* Diners Club */}
-                  <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
                     <svg viewBox="0 0 38 24" className="w-12 h-7">
                       <rect width="38" height="24" rx="4" fill="#0079BE"/>
                       <rect x="1" y="1" width="36" height="22" rx="3" fill="#FFF"/>
@@ -371,53 +294,51 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                 
                 {/* Bancos peruanos */}
                 <div className="mt-6">
-                  <h4 className="text-sm font-medium text-yellow-300 mb-4">Bancos peruanos compatibles:</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-4">Bancos peruanos compatibles:</h4>
                   <div className="grid grid-cols-4 gap-3">
                     {/* BCP */}
-                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
-                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
-                        <rect width="120" height="30" rx="4" fill="#1E3A8A"/>
-                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-sm">BCP</text>
-                      </svg>
+                    <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="w-12 h-6 bg-blue-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">BCP</span>
+                      </div>
                     </div>
                     
                     {/* BBVA */}
-                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
-                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
-                        <rect width="120" height="30" rx="4" fill="#DC2626"/>
-                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-sm">BBVA</text>
-                      </svg>
+                    <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="w-12 h-6 bg-red-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">BBVA</span>
+                      </div>
                     </div>
                     
                     {/* Interbank */}
-                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
-                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
-                        <rect width="120" height="30" rx="4" fill="#059669"/>
-                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-xs">Interbank</text>
-                      </svg>
+                    <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="w-12 h-6 bg-green-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">Interbank</span>
+                      </div>
                     </div>
                     
                     {/* Scotiabank */}
-                    <div className="w-16 h-10 bg-white border border-yellow-400/30 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
-                      <svg className="w-12 h-6" viewBox="0 0 120 30" fill="none">
-                        <rect width="120" height="30" rx="4" fill="#B91C1C"/>
-                        <text x="60" y="20" textAnchor="middle" className="text-white font-bold text-xs">Scotiabank</text>
-                      </svg>
+                    <div className="w-16 h-10 bg-white border border-gray-200 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200">
+                      <div className="w-12 h-6 bg-red-700 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-xs">Scotiabank</span>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
                 {/* Información adicional sobre métodos de pago */}
-                <div className="mt-4 p-3 bg-stone-800/40 rounded-lg border border-yellow-400/10">
-                  <p className="text-stone-300 text-xs">
-                    <span className="text-yellow-400 font-semibold">✓</span> Aceptamos todas las tarjetas principales
-                  </p>
-                  <p className="text-stone-300 text-xs mt-1">
-                    <span className="text-yellow-400 font-semibold">✓</span> Pagos seguros con encriptación SSL
-                  </p>
-                  <p className="text-stone-300 text-xs mt-1">
-                    <span className="text-yellow-400 font-semibold">✓</span> Incluye tarjetas de BCP, BBVA, Interbank, Scotiabank, etc.
-                  </p>
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="space-y-2">
+                    <p className="text-gray-600 text-sm flex items-center">
+                      <span className="text-green-500 font-semibold mr-2">✓</span> Aceptamos todas las tarjetas principales
+                    </p>
+                    <p className="text-gray-600 text-sm flex items-center">
+                      <span className="text-green-500 font-semibold mr-2">✓</span> Pagos seguros con encriptación SSL
+                    </p>
+                    <p className="text-gray-600 text-sm flex items-center">
+                      <span className="text-green-500 font-semibold mr-2">✓</span> Incluye tarjetas de BCP, BBVA, Interbank, Scotiabank, etc.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
