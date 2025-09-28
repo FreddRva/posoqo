@@ -71,7 +71,23 @@ export default function AdminProducts() {
   const reloadProducts = () => {
     apiFetch("/admin/products/list")
       .then((data: any) => {
-        setProducts(data.data || []);
+        const products = data.data || [];
+        console.log('🔍 [ADMIN] Productos cargados:', products);
+        
+        // Log específico para cervezas
+        const cervezas = products.filter((p: any) => p.name?.toLowerCase().includes('cerveza'));
+        console.log('🍺 [ADMIN] Cervezas encontradas:', cervezas);
+        cervezas.forEach((cerveza: any) => {
+          console.log(`🍺 [ADMIN] ${cerveza.name}:`, {
+            id: cerveza.id,
+            name: cerveza.name,
+            image_url: cerveza.image_url,
+            hasImage: !!cerveza.image_url,
+            imageType: typeof cerveza.image_url
+          });
+        });
+        
+        setProducts(products);
         setLoading(false);
       })
       .catch((error) => {
@@ -609,7 +625,18 @@ export default function AdminProducts() {
                           {product.image_url ? (
                             <img
                               className="w-12 h-12 rounded-lg object-cover"
-                              src={product.image_url && !product.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}` : (product.image_url || "/file.svg")}
+                              src={(() => {
+                                const imageUrl = product.image_url && !product.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url}` : (product.image_url || "/file.svg");
+                                if (product.name?.toLowerCase().includes('cerveza')) {
+                                  console.log(`🍺 [URL] ${product.name}:`, {
+                                    original: product.image_url,
+                                    final: imageUrl,
+                                    hasImage: !!product.image_url,
+                                    startsWithHttp: product.image_url?.startsWith('http')
+                                  });
+                                }
+                                return imageUrl;
+                              })()}
                               alt={product.name}
                               onError={(e) => {
                                 e.currentTarget.style.display = 'none';
