@@ -48,7 +48,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
           
           <ErrorWithRetry 
             error={error} 
-            onRetry={onRetry}
+            onRetry={onRetry || (() => {})}
             title={`Error cargando ${title.toLowerCase()}`}
           />
         </div>
