@@ -13,7 +13,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background with Brewery Murals - Less Dark */}
+        {/* Background with Brewery Murals - Much Darker */}
         <div className="absolute inset-0 z-0">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -22,16 +22,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
               backgroundAttachment: 'fixed'
             }}
           />
-          {/* Lighter overlay to show background image better */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/50"></div>
+          {/* Much darker overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/85"></div>
         </div>
 
-        {/* Floating Background Image - More Visible */}
+        {/* Floating Background Image - Complete and Properly Sized */}
         <motion.div
-          className="absolute right-8 top-1/2 transform -translate-y-1/2 z-5 w-80 h-80 md:w-96 md:h-96 lg:w-[500px] lg:h-[500px]"
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-5 w-72 h-96 md:w-80 md:h-[500px] lg:w-96 lg:h-[600px]"
           initial={{ opacity: 0, x: 100, scale: 0.8 }}
           animate={{ 
-            opacity: 0.7, 
+            opacity: 0.8, 
             x: 0, 
             scale: 1,
             y: [0, -20, 0]
@@ -50,6 +50,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
             className="w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl shadow-2xl"
             style={{
               backgroundImage: 'url(/FondoS.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
               filter: 'drop-shadow(0 0 40px rgba(251, 191, 36, 0.4))'
             }}
           />
@@ -132,22 +134,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
               {/* This space is for the floating products positioned absolutely */}
             </motion.div>
           </div>
-        </motion.div>
-
-        {/* WhatsApp Floating Button */}
-        <motion.div
-          className="fixed bottom-8 right-8 z-50"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 1.5 }}
-        >
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl flex items-center justify-center text-white transition-colors duration-300"
-          >
-            <MessageCircle className="w-8 h-8" />
-          </motion.button>
         </motion.div>
       </section>
     </>
