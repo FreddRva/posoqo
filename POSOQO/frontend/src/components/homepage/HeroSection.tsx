@@ -29,6 +29,37 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/50"></div>
         </div>
 
+        {/* Floating Background Image */}
+        <motion.div
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-5 w-96 h-96 md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]"
+          initial={{ opacity: 0, x: 100, scale: 0.8 }}
+          animate={{ 
+            opacity: 0.3, 
+            x: 0, 
+            scale: 1,
+            y: [0, -20, 0]
+          }}
+          transition={{ 
+            duration: 2,
+            delay: 0.5,
+            y: {
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }
+          }}
+        >
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat rounded-full shadow-2xl"
+            style={{
+              backgroundImage: 'url(/FondoS.png)',
+              filter: 'drop-shadow(0 0 30px rgba(251, 191, 36, 0.3))'
+            }}
+          />
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-full blur-2xl scale-110"></div>
+        </motion.div>
+
         {/* Main Content with Cinematic Effects */}
         <motion.div 
           className="relative z-10 max-w-7xl mx-auto px-6 text-center"
