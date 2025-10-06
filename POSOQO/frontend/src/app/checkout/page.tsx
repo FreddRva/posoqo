@@ -209,7 +209,20 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <OrderSummary cart={cart} total={total} cartLoading={cartLoading} />
+                <OrderSummary 
+                  cart={cart} 
+                  total={total} 
+                  profile={profile}
+                  addressData={{
+                    address: addressHook.address,
+                    addressRef: addressHook.addressRef,
+                    streetNumber: addressHook.streetNumber,
+                    lat: addressHook.markerPosition[0],
+                    lng: addressHook.markerPosition[1]
+                  }}
+                  onProceedToPayment={handlePlaceOrder}
+                  loading={cartLoading}
+                />
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -246,7 +259,20 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <OrderSummary cart={cart} total={total} cartLoading={cartLoading} />
+                <OrderSummary 
+                  cart={cart} 
+                  total={total} 
+                  profile={profile}
+                  addressData={{
+                    address: addressHook.address,
+                    addressRef: addressHook.addressRef,
+                    streetNumber: addressHook.streetNumber,
+                    lat: addressHook.markerPosition[0],
+                    lng: addressHook.markerPosition[1]
+                  }}
+                  onProceedToPayment={handlePlaceOrder}
+                  loading={cartLoading}
+                />
               </div>
             </motion.div>
           )}
