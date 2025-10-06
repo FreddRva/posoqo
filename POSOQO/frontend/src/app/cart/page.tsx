@@ -42,7 +42,7 @@ export default function CartPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const router = useRouter();
   const { data: session } = useSession();
-  const { addNotification } = useNotifications();
+  const { showSuccess, showError } = useNotifications();
   
   // Hook del carrito
   const { 
@@ -121,17 +121,9 @@ export default function CartPage() {
   const removeItem = async (id: string) => {
     try {
       await removeFromCart(id);
-      addNotification({
-        type: "success",
-        title: "Eliminado",
-        message: "Producto removido del carrito"
-      });
+      showSuccess("Eliminado", "Producto removido del carrito");
     } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudo eliminar el producto"
-      });
+      showError("Error", "No se pudo eliminar el producto");
     }
     
     // Cerrar modal
@@ -169,17 +161,9 @@ export default function CartPage() {
           : [...prev, productId]
       );
       
-      addNotification({
-        type: "success",
-        title: "Favoritos",
-        message: favorites.includes(productId) ? "Removido de favoritos" : "Agregado a favoritos"
-      });
+      showSuccess("Favoritos", favorites.includes(productId) ? "Removido de favoritos" : "Agregado a favoritos");
     } catch (error) {
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudo actualizar favoritos"
-      });
+      showError("Error", "No se pudo actualizar favoritos");
     }
   };
 
@@ -204,18 +188,10 @@ export default function CartPage() {
         image_url: imageUrl,
       });
       
-      addNotification({
-        type: "success",
-        title: "Agregado al carrito",
-        message: `${product.name} agregado al carrito`
-      });
+      showSuccess("Agregado al carrito", `${product.name} agregado al carrito`);
     } catch (error) {
       console.error('Error agregando al carrito:', error);
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudo agregar al carrito"
-      });
+      showError("Error", "No se pudo agregar al carrito");
     }
   };
 
