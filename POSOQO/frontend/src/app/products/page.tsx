@@ -71,7 +71,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 function ProductsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const { addNotification } = useNotifications();
+  const { showSuccess, showError } = useNotifications();
   const { manager } = useCombinedNotifications();
   const [isMobile, setIsMobile] = useState(false);
   
@@ -248,11 +248,7 @@ function ProductsContent() {
         }
       }
       
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudo actualizar favoritos. Intenta de nuevo."
-      });
+      showError("Error", "No se pudo actualizar favoritos. Intenta de nuevo.");
     }
   };
 
@@ -289,11 +285,7 @@ function ProductsContent() {
     setTimeout(() => setAddedToCart(null), 1500);
     } catch (error) {
       console.error('Error agregando al carrito:', error);
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudo agregar el producto al carrito"
-      });
+      showError("Error", "No se pudo agregar el producto al carrito");
     }
   };
 
@@ -484,18 +476,10 @@ function ProductsContent() {
       setFavorites([]);
       localStorage.setItem("favorites", JSON.stringify([]));
       
-      addNotification({
-        type: "success",
-        title: "Éxito",
-        message: "Favoritos limpiados correctamente"
-      });
+      showSuccess("Éxito", "Favoritos limpiados correctamente");
     } catch (error) {
       console.error('Error limpiando favoritos:', error);
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: "No se pudieron limpiar los favoritos"
-      });
+      showError("Error", "No se pudieron limpiar los favoritos");
     }
   };
 
