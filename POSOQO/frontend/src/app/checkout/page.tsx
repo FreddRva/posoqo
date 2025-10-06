@@ -195,7 +195,18 @@ export default function CheckoutPage() {
                   onSave={saveProfile}
                   onCancel={() => {}}
                 />
-                <AddressForm addressHook={addressHook} saving={profileSaving} />
+                <AddressForm 
+                  address={addressHook.address}
+                  setAddress={addressHook.setAddress}
+                  addressRef={addressHook.addressRef}
+                  setAddressRef={addressHook.setAddressRef}
+                  streetNumber={addressHook.streetNumber}
+                  setStreetNumber={addressHook.setStreetNumber}
+                  location={location}
+                  markerPosition={markerPosition}
+                  onMapClick={() => {}}
+                  onAddressFromCoords={() => fetchAddressFromCoordinates(markerPosition[0], markerPosition[1])}
+                />
               </div>
               <div>
                 <OrderSummary cart={cart} total={total} cartLoading={cartLoading} />
