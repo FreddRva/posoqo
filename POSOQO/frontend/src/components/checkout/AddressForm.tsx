@@ -131,4 +131,4 @@ export const AddressFormComponent: React.FC<AddressFormProps> = ({
   );
 };
 
-export default AddressForm;
+export default AddressFormComponent;
