@@ -1279,7 +1279,12 @@ function ProductsContent() {
               <div className="flex-1 h-px bg-gradient-to-r from-emerald-400/50 to-transparent"></div>
             </div>
             <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl overflow-hidden border border-slate-600/30 h-96 shadow-xl">
-              <Map />
+              <Map 
+                orderId="products-map"
+                lat={-13.1631}
+                lng={-74.2247}
+                location="Ayacucho, Perú"
+              />
             </div>
           </div>
         )}
