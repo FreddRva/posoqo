@@ -5,7 +5,7 @@ import { apiFetch } from '@/lib/api';
 import { getImageUrl } from '@/lib/config';
 import { 
   normalizeCart, 
-  validateCart, 
+  validateCart as validateCartUtil, 
   calculateCartTotal, 
   calculateCartItemCount,
   addOrUpdateCartItem,
@@ -290,7 +290,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Validar carrito
   const validateCart = useCallback((): boolean => {
-    const validation = validateCart(cart);
+    const validation = validateCartUtil(cart);
     if (!validation.isValid) {
       handleError(new Error(`Carrito inválido: ${validation.errors.join(', ')}`), 'validateCart', {
         showNotification: true,
