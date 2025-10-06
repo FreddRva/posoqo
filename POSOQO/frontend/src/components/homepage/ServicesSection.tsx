@@ -46,7 +46,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           
           <ErrorWithRetry 
             error={error} 
-            onRetry={onRetry}
+            onRetry={onRetry || (() => {})}
             title="Error cargando servicios"
           />
         </div>
