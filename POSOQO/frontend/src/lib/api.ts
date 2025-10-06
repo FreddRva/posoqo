@@ -1,18 +1,8 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+import { config, getImageUrl as configGetImageUrl, getApiUrl } from './config';
+import { handleError, handleNetworkError, isRetryableError } from './errorHandler';
 
-// Función para construir URL de imagen
-export const getImageUrl = (imageUrl: string | undefined): string => {
-  if (!imageUrl) return '/file.svg';
-  
-  // Si ya es una URL completa (Cloudinary), devolverla tal como está
-  if (imageUrl.startsWith('http')) {
-    return imageUrl;
-  }
-  
-  // Si es una ruta local, construir la URL completa
-  const baseUrl = API_URL.replace('/api', '');
-  return `${baseUrl}${imageUrl}`;
-};
+// Re-exportar la función de configuración para mantener compatibilidad
+export const getImageUrl = configGetImageUrl;
 
 // Función para obtener el token de autenticación
 async function getAuthToken(): Promise<string | null> {
@@ -62,7 +52,7 @@ async function refreshAccessToken(): Promise<string | null> {
       const refreshToken = data.data?.refreshToken || data.refreshToken;
       
       if (refreshToken) {
-        const response = await fetch(`${API_URL}/auth/refresh`, {
+        const response = await fetch(getApiUrl('/auth/refresh'), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -114,7 +104,15 @@ function handleApiError(response: Response, errorData?: any): Error {
     }
   }
   
-  return new Error(errorMsg);
+  // Usar el sistema centralizado de manejo de errores
+  const error = new Error(errorMsg);
+  handleError(error, `API Error ${response.status}`, {
+    showNotification: true,
+    logToConsole: true,
+    retryable: isRetryableError({ status: response.status }),
+  });
+  
+  return error;
 }
 
 export async function apiFetch<T>(
@@ -123,57 +121,71 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { authToken, ...fetchOptions } = options || {};
   
-  // Obtener token automáticamente si no se proporciona uno
-  let token = authToken;
-  if (!token) {
-    // Intentar obtener el token de la sesión primero, luego del localStorage
-    const sessionToken = await getSessionToken();
-    const authTokenResult = await getAuthToken();
-    token = sessionToken || authTokenResult || undefined;
-  }
-
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...fetchOptions,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...fetchOptions.headers,
-    },
-  });
-  
-  // Si el token expiró, intentar renovarlo y repetir la petición
-  if (res.status === 401 && token) {
-    const newToken = await refreshAccessToken();
-    
-    if (newToken) {
-      const retryRes = await fetch(`${API_URL}${endpoint}`, {
-        ...fetchOptions,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${newToken}`,
-          ...fetchOptions.headers,
-        },
-      });
-      
-      if (!retryRes.ok) {
-        let errorData;
-        try {
-          errorData = await retryRes.json();
-        } catch {}
-        throw handleApiError(retryRes, errorData);
-      }
-      return retryRes.json();
+  try {
+    // Obtener token automáticamente si no se proporciona uno
+    let token = authToken;
+    if (!token) {
+      // Intentar obtener el token de la sesión primero, luego del localStorage
+      const sessionToken = await getSessionToken();
+      const authTokenResult = await getAuthToken();
+      token = sessionToken || authTokenResult || undefined;
     }
+
+    const res = await fetch(getApiUrl(endpoint), {
+      ...fetchOptions,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...fetchOptions.headers,
+      },
+    });
+    
+    // Si el token expiró, intentar renovarlo y repetir la petición
+    if (res.status === 401 && token) {
+      const newToken = await refreshAccessToken();
+      
+      if (newToken) {
+        const retryRes = await fetch(getApiUrl(endpoint), {
+          ...fetchOptions,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${newToken}`,
+            ...fetchOptions.headers,
+          },
+        });
+        
+        if (!retryRes.ok) {
+          let errorData;
+          try {
+            errorData = await retryRes.json();
+          } catch {}
+          throw handleApiError(retryRes, errorData);
+        }
+        return retryRes.json();
+      }
+    }
+    
+    if (!res.ok) {
+      let errorData;
+      try {
+        errorData = await res.json();
+      } catch {}
+      throw handleApiError(res, errorData);
+    }
+    return res.json();
+  } catch (error) {
+    // Manejar errores de red y otros errores
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw handleNetworkError(error, getApiUrl(endpoint), {
+        showNotification: true,
+        logToConsole: true,
+        retryable: true,
+      });
+    }
+    
+    // Re-lanzar errores ya manejados
+    throw error;
   }
-  
-  if (!res.ok) {
-    let errorData;
-    try {
-      errorData = await res.json();
-    } catch {}
-    throw handleApiError(res, errorData);
-  }
-  return res.json();
 }
 
 // Función para sincronizar tokens con localStorage

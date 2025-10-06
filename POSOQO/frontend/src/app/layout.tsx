@@ -5,6 +5,7 @@ import DashboardWrapper from "@/components/DashboardWrapper";
 import { NotificationProvider } from "@/components/NotificationSystem";
 import { RecentlyViewedProvider } from "@/lib/recentlyViewedContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ErrorBoundaryProvider } from "@/components/ErrorBoundaryProvider";
 
 export const metadata: Metadata = {
   title: "POSOQO",
@@ -15,17 +16,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <body>
-        <Providers>
-          <CartProvider>
-            <NotificationProvider>
-              <RecentlyViewedProvider>
-                <DashboardWrapper>
-                {children}
-                </DashboardWrapper>
-              </RecentlyViewedProvider>
-            </NotificationProvider>
-          </CartProvider>
-        </Providers>
+        <ErrorBoundaryProvider>
+          <Providers>
+            <CartProvider>
+              <NotificationProvider>
+                <RecentlyViewedProvider>
+                  <DashboardWrapper>
+                  {children}
+                  </DashboardWrapper>
+                </RecentlyViewedProvider>
+              </NotificationProvider>
+            </CartProvider>
+          </Providers>
+        </ErrorBoundaryProvider>
       </body>
     </html>
   );

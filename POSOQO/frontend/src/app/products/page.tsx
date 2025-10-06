@@ -17,7 +17,7 @@ import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/hooks/useCart";
 
 // Componentes dinámicos
-const Map = dynamic(() => import("@/components/ProductsMap"), { 
+const Map = dynamic(() => import("@/components/OrderMap"), { 
   ssr: false,
   loading: () => <div className="h-64 bg-stone-800 rounded-lg animate-pulse"></div>
 });
@@ -299,14 +299,7 @@ function ProductsContent() {
 
   // Filtrado y ordenamiento de productos
   const filteredProducts = useMemo(() => {
-    console.log("🔍 [FILTER] Aplicando filtro:", filter);
-    console.log("🔍 [FILTER] Total productos:", products.length);
-    console.log("🔍 [FILTER] Categorías disponibles:", categories.map(c => c.name));
-    console.log("🔍 [FILTER] Productos con categorías:", products.map(p => ({
-      name: p.name,
-      category_id: p.category_id,
-      subcategory_id: p.subcategory_id
-    })));
+    // Aplicando filtros de productos
     
     return products.filter(product => {
       // Búsqueda
@@ -365,7 +358,7 @@ function ProductsContent() {
               );
             }
             
-            console.log(`🔍 [FILTER] Producto ${product.name}: categoryMatch=${categoryMatch}, category_id=${product.category_id}, subcategory=${product.subcategory}, selectedCategory.id=${selectedCategory.id}`);
+            // Verificando coincidencia de categoría
           } else {
             // Si no encuentra la categoría en BD, usar filtro por texto como fallback
             const productText = `${product.name} ${product.description}`.toLowerCase();
@@ -436,7 +429,7 @@ function ProductsContent() {
   }, [products, debouncedSearch, filter, priceRange, selectedCategories]);
   
   // Log del resultado del filtrado
-  console.log("🔍 [FILTER] Productos filtrados:", filteredProducts.length);
+  // Productos filtrados
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {

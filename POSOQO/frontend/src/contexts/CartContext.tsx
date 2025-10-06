@@ -2,6 +2,23 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiFetch } from '@/lib/api';
+import { getImageUrl } from '@/lib/config';
+import { 
+  normalizeCart, 
+  validateCart, 
+  calculateCartTotal, 
+  calculateCartItemCount,
+  addOrUpdateCartItem,
+  updateCartItemQuantity,
+  removeCartItem,
+  clearCart as clearCartUtil,
+  persistCartToLocalStorage,
+  loadCartFromLocalStorage,
+  syncCartWithServer,
+  generateCartSummary,
+  CartSyncResult
+} from '@/lib/cartUtils';
+import { handleError } from '@/lib/errorHandler';
 
 export interface CartItem {
   id: string;
@@ -17,11 +34,17 @@ interface CartContextType {
   error: string | null;
   total: number;
   itemCount: number;
+  uniqueItems: number;
+  isEmpty: boolean;
+  hasItems: boolean;
   addToCart: (product: Omit<CartItem, 'quantity'>) => Promise<void>;
   updateQuantity: (productId: string, newQuantity: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => void;
   loadCart: () => Promise<void>;
+  syncCart: () => Promise<void>;
+  validateCart: () => boolean;
+  getCartSummary: () => any;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -34,43 +57,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito desde el backend
   const loadCart = useCallback(async () => {
-    // TEMPORAL: Limpiar URLs incorrectas del localStorage
-    const stored = localStorage.getItem("cart");
-    let localCart = [];
-    
-    if (stored) {
-      try {
-        const parsedCart = JSON.parse(stored);
-        localCart = parsedCart.map((item: CartItem) => ({
-          ...item,
-          image_url: item.image_url?.includes('localhost:4000')
-            ? item.image_url.replace('http://localhost:4000', 'https://posoqo-backend.onrender.com')
-            : item.image_url
-        }));
-        
-        // Actualizar localStorage con URLs limpias
-        if (JSON.stringify(localCart) !== JSON.stringify(parsedCart)) {
-          localStorage.setItem("cart", JSON.stringify(localCart));
-          console.log('🧹 [CART] URLs de localhost limpiadas en contexto');
-        }
-      } catch (error) {
-        console.error("Error parsing stored cart:", error);
-        localStorage.removeItem("cart");
-        localCart = [];
-      }
-    }
-    
-    setCart(localCart);
-
-    if (!session?.accessToken) {
-      // Si no hay sesión, usar solo localStorage
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
-      
+
+      // Cargar carrito local primero
+      const localCart = loadCartFromLocalStorage();
+      setCart(localCart);
+
+      if (!session?.accessToken) {
+        // Si no hay sesión, usar solo localStorage
+        return;
+      }
+
+      // Cargar carrito del servidor
       const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
         authToken: session.accessToken,
       });
@@ -81,21 +81,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
           response.items.map(async (item) => {
             try {
               const productRes = await apiFetch<any>(`/products/${item.product_id}`);
-              let imageUrl = "";
-              if (productRes.image_url) {
-                imageUrl = productRes.image_url.startsWith('http')
-                  ? productRes.image_url
-                  : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${productRes.image_url}`;
-              }
               return {
                 id: item.product_id,
                 name: productRes.name || "Producto",
                 price: productRes.price || 0,
-                image_url: imageUrl,
+                image_url: getImageUrl(productRes.image_url),
                 quantity: item.quantity,
               };
             } catch (prodError) {
-              console.error(`Error fetching product ${item.product_id}:`, prodError);
+              handleError(prodError, `Error fetching product ${item.product_id}`, {
+                showNotification: false,
+                logToConsole: true,
+              });
               return {
                 id: item.product_id,
                 name: "Producto no disponible",
@@ -106,15 +103,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
             }
           })
         );
-        setCart(itemsWithDetails);
-        // Actualizar localStorage con los datos del backend
-        localStorage.setItem("cart", JSON.stringify(itemsWithDetails));
+
+        // Sincronizar carritos
+        const syncResult = await syncCartWithServer(localCart, response.items);
+        
+        if (syncResult.success) {
+          setCart(syncResult.syncedItems);
+          persistCartToLocalStorage(syncResult.syncedItems);
+        } else {
+          // Fallback al carrito local si la sincronización falla
+        }
       } else {
         // Si el backend está vacío, mantener localStorage
-        console.log('Backend carrito vacío, manteniendo localStorage');
       }
     } catch (err) {
-      console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
+      handleError(err, 'loadCart', {
+        showNotification: false,
+        logToConsole: true,
+      });
       // Mantener el carrito de localStorage que ya se cargó
     } finally {
       setLoading(false);
@@ -123,137 +129,196 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Agregar producto al carrito
   const addToCart = useCallback(async (product: Omit<CartItem, 'quantity'>) => {
-    const newItem: CartItem = {
-      ...product,
-      quantity: 1,
-    };
+    try {
+      // Normalizar el producto
+      const normalizedProduct = normalizeCart([product])[0];
+      
+      // Actualizar estado local inmediatamente
+      setCart(prevCart => {
+        const updatedCart = addOrUpdateCartItem(prevCart, normalizedProduct, 1);
+        persistCartToLocalStorage(updatedCart);
+        return updatedCart;
+      });
 
-    // Actualizar estado local inmediatamente
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === product.id);
-      let updatedCart;
-      
-      if (existingItem) {
-        updatedCart = prevCart.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        updatedCart = [...prevCart, newItem];
+      // Sincronizar con backend si está autenticado
+      if (session?.accessToken) {
+        try {
+          await apiFetch('/protected/cart/add', {
+            method: 'POST',
+            authToken: session.accessToken,
+            body: JSON.stringify({
+              product_id: product.id,
+              quantity: 1,
+            }),
+          });
+        } catch (err) {
+          handleError(err, 'addToCart backend sync', {
+            showNotification: false,
+            logToConsole: true,
+          });
+        }
       }
-      
-      // Actualizar localStorage con el carrito actualizado
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      
-      return updatedCart;
-    });
 
-    // Sincronizar con backend si está autenticado (temporalmente deshabilitado)
-    if (session?.accessToken) {
-      try {
-        await apiFetch('/protected/cart/add', {
-          method: 'POST',
-          authToken: session.accessToken,
-          body: JSON.stringify({
-            product_id: product.id,
-            quantity: 1,
-          }),
-        });
-      } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
-        // El carrito ya se actualizó localmente, no necesitamos recargar
-      }
+      // Disparar evento para actualizar contador en navbar
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (err) {
+      handleError(err, 'addToCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
     }
-
-    // Disparar evento para actualizar contador en navbar
-    window.dispatchEvent(new Event("cartUpdated"));
   }, [session?.accessToken]);
 
   // Actualizar cantidad de un producto
   const updateQuantity = useCallback(async (productId: string, newQuantity: number) => {
-    const quantity = Math.max(1, newQuantity);
-    
-    // Actualizar estado local
-    setCart(prevCart => {
-      const updatedCart = prevCart.map(item => 
-        item.id === productId ? { ...item, quantity } : item
-      );
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    try {
+      const quantity = Math.max(1, newQuantity);
+      
+      // Actualizar estado local
+      setCart(prevCart => {
+        const updatedCart = updateCartItemQuantity(prevCart, productId, quantity);
+        persistCartToLocalStorage(updatedCart);
+        return updatedCart;
+      });
 
-    // Sincronizar con backend si está autenticado
-    if (session?.accessToken) {
-      try {
-        const updatedCart = cart.map(item => 
-          item.id === productId ? { ...item, quantity } : item
-        );
-        await apiFetch('/protected/cart', {
-          method: 'POST',
-          authToken: session.accessToken,
-          body: JSON.stringify({
-            items: updatedCart.map(item => ({
-              product_id: item.id,
-              quantity: item.quantity,
-            })),
-          }),
-        });
-      } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
+      // Sincronizar con backend si está autenticado
+      if (session?.accessToken) {
+        try {
+          const updatedCart = updateCartItemQuantity(cart, productId, quantity);
+          await apiFetch('/protected/cart', {
+            method: 'POST',
+            authToken: session.accessToken,
+            body: JSON.stringify({
+              items: updatedCart.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+              })),
+            }),
+          });
+        } catch (err) {
+          handleError(err, 'updateQuantity backend sync', {
+            showNotification: false,
+            logToConsole: true,
+          });
+        }
       }
-    }
 
-    // Disparar evento para actualizar contador en navbar
-    window.dispatchEvent(new Event("cartUpdated"));
+      // Disparar evento para actualizar contador en navbar
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (err) {
+      handleError(err, 'updateQuantity', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    }
   }, [cart, session?.accessToken]);
 
   // Remover producto del carrito
   const removeFromCart = useCallback(async (productId: string) => {
-    // Actualizar estado local
-    setCart(prevCart => {
-      const updatedCart = prevCart.filter(item => item.id !== productId);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-      return updatedCart;
-    });
+    try {
+      // Actualizar estado local
+      setCart(prevCart => {
+        const updatedCart = removeCartItem(prevCart, productId);
+        persistCartToLocalStorage(updatedCart);
+        return updatedCart;
+      });
 
-    // Sincronizar con backend si está autenticado
-    if (session?.accessToken) {
-      try {
-        const updatedCart = cart.filter(item => item.id !== productId);
-        await apiFetch('/protected/cart', {
-          method: 'POST',
-          authToken: session.accessToken,
-          body: JSON.stringify({
-            items: updatedCart.map(item => ({
-              product_id: item.id,
-              quantity: item.quantity,
-            })),
-          }),
-        });
-      } catch (err) {
-        console.log('Backend de carrito no disponible, usando localStorage:', err instanceof Error ? err.message : String(err));
+      // Sincronizar con backend si está autenticado
+      if (session?.accessToken) {
+        try {
+          const updatedCart = removeCartItem(cart, productId);
+          await apiFetch('/protected/cart', {
+            method: 'POST',
+            authToken: session.accessToken,
+            body: JSON.stringify({
+              items: updatedCart.map(item => ({
+                product_id: item.id,
+                quantity: item.quantity,
+              })),
+            }),
+          });
+        } catch (err) {
+          handleError(err, 'removeFromCart backend sync', {
+            showNotification: false,
+            logToConsole: true,
+          });
+        }
       }
-    }
 
-    // Disparar evento para actualizar contador en navbar
-    window.dispatchEvent(new Event("cartUpdated"));
+      // Disparar evento para actualizar contador en navbar
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (err) {
+      handleError(err, 'removeFromCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    }
   }, [cart, session?.accessToken]);
 
   // Limpiar carrito
   const clearCart = useCallback(() => {
-    setCart([]);
-    localStorage.removeItem("cart");
-    
-    // Disparar evento para actualizar contador en navbar
-    window.dispatchEvent(new Event("cartUpdated"));
+    try {
+      setCart(clearCartUtil());
+      persistCartToLocalStorage(clearCartUtil());
+      
+      // Disparar evento para actualizar contador en navbar
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (err) {
+      handleError(err, 'clearCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    }
   }, []);
 
+  // Sincronizar carrito
+  const syncCart = useCallback(async () => {
+    if (!session?.accessToken) return;
+    
+    try {
+      setLoading(true);
+      await loadCart();
+    } catch (err) {
+      handleError(err, 'syncCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.accessToken, loadCart]);
+
+  // Validar carrito
+  const validateCart = useCallback(() => {
+    const validation = validateCart(cart);
+    if (!validation.isValid) {
+      handleError(new Error(`Carrito inválido: ${validation.errors.join(', ')}`), 'validateCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    }
+    return validation.isValid;
+  }, [cart]);
+
+  // Obtener resumen del carrito
+  const getCartSummary = useCallback(() => {
+    return generateCartSummary(cart);
+  }, [cart]);
+
   // Calcular total
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = calculateCartTotal(cart);
 
   // Calcular cantidad total de items
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = calculateCartItemCount(cart);
+
+  // Calcular items únicos
+  const uniqueItems = cart.length;
+
+  // Verificar si está vacío
+  const isEmpty = cart.length === 0;
+
+  // Verificar si tiene items
+  const hasItems = cart.length > 0;
   
 
   // Cargar carrito al montar el componente
@@ -269,11 +334,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         error,
         total,
         itemCount,
+        uniqueItems,
+        isEmpty,
+        hasItems,
         addToCart,
         updateQuantity,
         removeFromCart,
         clearCart,
         loadCart,
+        syncCart,
+        validateCart,
+        getCartSummary,
       }}
     >
       {children}

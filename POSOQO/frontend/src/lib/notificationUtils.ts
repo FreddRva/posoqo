@@ -1,5 +1,5 @@
 import { useNotifications } from '@/hooks/useNotifications';
-import { createNotification, useNotifications as useSystemNotifications } from '@/components/NotificationSystem';
+import { useNotifications as useSystemNotifications } from '@/components/NotificationSystem';
 
 // Tipos de notificaciones
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
@@ -38,7 +38,7 @@ export class NotificationManager {
 
   // Notificaciones para usuarios normales
   userAddedToCart(productName: string) {
-    console.log('userAddedToCart called with:', productName);
+    // userAddedToCart called
     
     this.createSystemNotification({
       title: "Producto agregado al carrito",
@@ -47,19 +47,21 @@ export class NotificationManager {
     });
     
     if (this.addNotificationFunc) {
-      console.log('Adding notification to system');
-      this.addNotificationFunc(createNotification.success(
-        "Producto agregado",
-        `${productName} se ha añadido al carrito.`
-      ));
+      // Adding notification to system
+      this.addNotificationFunc({
+        id: Date.now().toString(),
+        type: 'success',
+        title: "Producto agregado",
+        message: `${productName} se ha añadido al carrito.`
+      });
     } else {
-      console.log('addNotificationFunc is not available');
+      // addNotificationFunc is not available
     }
     
     // Forzar actualización de notificaciones después de un breve delay
     if (this.useNotificationsHook?.loadNotifications) {
       setTimeout(() => {
-        console.log('Forcing notification refresh');
+        // Forcing notification refresh
         this.useNotificationsHook.loadNotifications();
       }, 500);
     }
@@ -80,10 +82,12 @@ export class NotificationManager {
       type: "success"
     });
     
-    this.addNotificationFunc(createNotification.success(
-      "Favorito añadido",
-      `${productName} se ha añadido a favoritos.`
-    ));
+    this.addNotificationFunc({
+      id: Date.now().toString(),
+      type: 'success',
+      title: "Favorito añadido",
+      message: `${productName} se ha añadido a favoritos.`
+    });
   }
 
   userRemovedFromFavorites(productName: string) {
@@ -93,10 +97,12 @@ export class NotificationManager {
       type: "info"
     });
     
-    this.addNotificationFunc(createNotification.info(
-      "Favorito removido",
-      `${productName} se ha removido de favoritos.`
-    ));
+    this.addNotificationFunc({
+      id: Date.now().toString(),
+      type: 'info',
+      title: "Favorito removido",
+      message: `${productName} se ha removido de favoritos.`
+    });
   }
 
   userCompletedPurchase(orderId: string, total: number) {
@@ -108,10 +114,12 @@ export class NotificationManager {
       action_label: "Ver pedido"
     });
     
-    this.addNotificationFunc(createNotification.success(
-      "¡Compra exitosa!",
-      `Tu pedido #${orderId} ha sido procesado.`
-    ));
+    this.addNotificationFunc({
+      id: Date.now().toString(),
+      type: 'success',
+      title: "¡Compra exitosa!",
+      message: `Tu pedido #${orderId} ha sido procesado.`
+    });
   }
 
   userOrderStatusChanged(orderId: string, status: string) {
@@ -140,10 +148,12 @@ export class NotificationManager {
       type: "success"
     });
     
-    this.addNotificationFunc(createNotification.success(
-      "Cupón aplicado",
-      `Descuento de $${discount} aplicado con éxito.`
-    ));
+    this.addNotificationFunc({
+      id: Date.now().toString(),
+      type: 'success',
+      title: "Cupón aplicado",
+      message: `Descuento de $${discount} aplicado con éxito.`
+    });
   }
 
   userEmailVerified(email: string) {
@@ -161,10 +171,12 @@ export class NotificationManager {
       type: "success"
     });
     
-    this.addNotificationFunc(createNotification.success(
-      "Perfil actualizado",
-      "Tu información se guardó correctamente."
-    ));
+    this.addNotificationFunc({
+      id: Date.now().toString(),
+      type: 'success',
+      title: "Perfil actualizado",
+      message: "Tu información se guardó correctamente."
+    });
   }
 
   // Notificaciones para administradores
