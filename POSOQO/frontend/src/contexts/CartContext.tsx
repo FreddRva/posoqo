@@ -289,7 +289,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [session?.accessToken, loadCart]);
 
   // Validar carrito
-  const validateCart = useCallback(() => {
+  const validateCart = useCallback((): boolean => {
     const validation = validateCart(cart);
     if (!validation.isValid) {
       handleError(new Error(`Carrito inválido: ${validation.errors.join(', ')}`), 'validateCart', {
