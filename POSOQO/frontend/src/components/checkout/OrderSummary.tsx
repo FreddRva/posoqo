@@ -140,4 +140,4 @@ export const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
   );
 };
 
-export default OrderSummary;
+export default OrderSummaryComponent;
