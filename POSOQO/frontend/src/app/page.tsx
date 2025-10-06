@@ -99,10 +99,10 @@ function HomePageContent() {
       <FeaturedFoods />
 
       {/* Club de miembros */}
-      <ClubSection onJoinClub={handleJoinClub} />
+      <ClubSection />
 
       {/* Sección de contacto */}
-      <ContactSection onContact={handleContact} />
+      <ContactSection />
 
       {/* Footer */}
       <Footer />

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { getImageUrl } from '@/lib/config';
 import { FeaturedProductsProps } from '@/types/homepage';
 import { ProductSkeleton, ErrorWithRetry } from '@/components/LoadingStates';
-import { Eye, Heart, ShoppingCart } from 'lucide-react';
+import { Eye, Heart, ShoppingCart, ArrowDown } from 'lucide-react';
 
 export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
