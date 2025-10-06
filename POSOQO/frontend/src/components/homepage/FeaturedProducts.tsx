@@ -21,7 +21,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   if (loading) {
     return (
       <section className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/FondoPo.png')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('/FondoS.png')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-transparent to-yellow-400/5"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
@@ -54,7 +54,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   if (error) {
     return (
       <section className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/FondoPo.png')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('/FondoS.png')] bg-cover bg-center opacity-20"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-7xl md:text-8xl font-black text-white mb-6">
@@ -76,7 +76,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   if (!products || products.length === 0) {
     return (
       <section className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/FondoPo.png')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('/FondoS.png')] bg-cover bg-center opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-transparent to-yellow-400/5"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
@@ -122,7 +122,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   return (
     <section ref={ref} className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
       {/* Cinematic Background */}
-      <div className="absolute inset-0 bg-[url('/FondoPo.png')] bg-cover bg-center opacity-20"></div>
+      <div className="absolute inset-0 bg-[url('/FondoS.png')] bg-cover bg-center opacity-20"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-transparent to-yellow-400/5"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40"></div>
       
