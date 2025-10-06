@@ -13,7 +13,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background with Brewery Murals - Darker */}
+        {/* Background with Brewery Murals - Less Dark */}
         <div className="absolute inset-0 z-0">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -22,16 +22,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToProducts }) 
               backgroundAttachment: 'fixed'
             }}
           />
-          {/* Darker overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/75"></div>
+          {/* Lighter overlay to show background image better */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/50"></div>
         </div>
 
-        {/* Floating Background Image */}
+        {/* Floating Background Image - More Visible */}
         <motion.div
           className="absolute right-8 top-1/2 transform -translate-y-1/2 z-5 w-80 h-80 md:w-96 md:h-96 lg:w-[500px] lg:h-[500px]"
           initial={{ opacity: 0, x: 100, scale: 0.8 }}
           animate={{ 
-            opacity: 0.4, 
+            opacity: 0.7, 
             x: 0, 
             scale: 1,
             y: [0, -20, 0]

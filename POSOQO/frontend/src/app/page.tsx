@@ -15,6 +15,7 @@ import { useHomeData } from "@/hooks/useHomeData";
 
 // Homepage Components
 import { HeroSection } from "@/components/homepage/HeroSection";
+import { TraditionSection } from "@/components/homepage/TraditionSection";
 import { FeaturedProducts } from "@/components/homepage/FeaturedProducts";
 import { ServicesSection } from "@/components/homepage/ServicesSection";
 import { ClubSection } from "@/components/homepage/ClubSection";
@@ -62,6 +63,9 @@ function HomePageContent() {
 
       {/* Hero Section */}
       <HeroSection onScrollToProducts={handleScrollToProducts} />
+
+      {/* Tradition Section - Nueva sección */}
+      <TraditionSection />
 
       {/* Sección de productos destacados - Cervezas */}
       <div ref={productosRef}>
