@@ -294,14 +294,17 @@ export const useNotificationManager = () => {
 // Hook combinado para usar ambos sistemas
 export const useCombinedNotifications = () => {
   const systemNotifications = useNotifications();
-  const { addNotification } = useSystemNotifications();
+  const { showSuccess, showError, showWarning, showInfo } = useSystemNotifications();
   
   const manager = NotificationManager.getInstance();
-  manager.init(systemNotifications, addNotification);
+  manager.init(systemNotifications, showSuccess);
   
   return {
     manager,
     systemNotifications,
-    addNotification
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo
   };
 }; 

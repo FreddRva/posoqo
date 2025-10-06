@@ -1,8 +1,5 @@
-import { config, getImageUrl as configGetImageUrl, getApiUrl } from './config';
+import { config, getApiUrl } from './config';
 import { handleError, handleNetworkError, isRetryableError } from './errorHandler';
-
-// Re-exportar la función de configuración para mantener compatibilidad
-export const getImageUrl = configGetImageUrl;
 
 // Función para obtener el token de autenticación
 async function getAuthToken(): Promise<string | null> {
