@@ -29,7 +29,7 @@ export const useDashboardProducts = () => {
   // Cargar productos
   const loadProducts = async () => {
     try {
-      const response = await apiFetch("/admin/products/list");
+      const response = await apiFetch<{ data: Product[] }>("/admin/products/list");
       const products = response.data || [];
       setProducts(products);
       setLoading(false);
@@ -43,7 +43,7 @@ export const useDashboardProducts = () => {
   // Cargar categorías
   const loadCategories = async () => {
     try {
-      const response = await apiFetch("/categories");
+      const response = await apiFetch<{ success: boolean; data: Category[] }>("/categories");
       if (response && typeof response === 'object' && 'success' in response && response.success) {
         const cats = response.data || [];
         const mainCats = cats.filter((c: Category) => !c.parent_id);
