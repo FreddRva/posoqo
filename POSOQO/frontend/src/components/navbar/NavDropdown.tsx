@@ -33,7 +33,7 @@ export const NavDropdown: React.FC<NavDropdownProps> = ({
       className={`
       ${isMobile 
         ? "pl-6 space-y-3 mt-2" 
-        : "fixed left-1/2 -translate-x-1/2 top-20 w-[22rem] p-3 z-[9999] animate-fade-in"}
+        : "absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[22rem] p-3 z-[9999] animate-fade-in"}
     `}>
       {!isMobile && (
         <div className="relative">

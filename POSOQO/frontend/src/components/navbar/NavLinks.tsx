@@ -63,18 +63,16 @@ export const NavLinks: React.FC<NavLinksProps> = ({
             />
           </button>
           {activeDropdown === item.label && item.subitems && (
-            <div className="relative z-[9999]">
-              <NavDropdown
-                items={item.subitems}
-                isMobile={isMobile}
-                isOpen={true}
-                onClose={() => setActiveDropdown(null)}
-                onItemClick={() => {
-                  if (isMobile) onMobileClose?.();
-                }}
-                dropdownRef={dropdownRef}
-              />
-            </div>
+            <NavDropdown
+              items={item.subitems}
+              isMobile={isMobile}
+              isOpen={true}
+              onClose={() => setActiveDropdown(null)}
+              onItemClick={() => {
+                if (isMobile) onMobileClose?.();
+              }}
+              dropdownRef={dropdownRef}
+            />
           )}
         </div>
       );
