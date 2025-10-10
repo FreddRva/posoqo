@@ -122,8 +122,9 @@ export const NavLinks: React.FC<NavLinksProps> = ({
         <Link
           key={item.href}
           href={item.href}
-          className={`${baseClasses} ${textClasses}`}
+          className={`${baseClasses} ${textClasses} cursor-pointer`}
           onClick={() => {
+            console.log('Navegando a:', item.href);
             if (isMobile) onMobileClose?.();
           }}
         >
