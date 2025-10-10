@@ -119,13 +119,11 @@ export const NavLinks: React.FC<NavLinksProps> = ({
     // Links normales
     if (item.href) {
       return (
-        <a
+        <Link
           key={item.href}
           href={item.href}
           className={`${baseClasses} ${textClasses}`}
-          onClick={e => {
-            e.preventDefault();
-            router.push(item.href!);
+          onClick={() => {
             if (isMobile) onMobileClose?.();
           }}
         >
@@ -135,7 +133,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({
               ¡GRATIS!
             </span>
           )}
-        </a>
+        </Link>
       );
     }
     return null;
