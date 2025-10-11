@@ -19,9 +19,11 @@ import {
   Info,
   CheckCircle2,
   XCircle,
-  X
+  X,
+  Sparkles,
+  Award
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 interface ReportStats {
@@ -155,50 +157,49 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-            <p className="text-stone-600">Cargando reportes...</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+          <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
+            <BarChart3 className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
+          </motion.div>
+          <p className="text-yellow-300 text-2xl font-bold">Cargando Reportes...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="mb-4">
-            <BarChart3 className="w-16 h-16 text-blue-600 mx-auto" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-stone-800 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }} transition={{ duration: 8, repeat: Infinity }} className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl" />
+        <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }} transition={{ duration: 10, repeat: Infinity, delay: 2 }} className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20 text-center">
+          <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="inline-block relative mb-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
+            <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
+              <BarChart3 className="w-12 h-12 text-black" />
+            </div>
+          </motion.div>
+          <h1 className="text-3xl md:text-5xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent mb-4">
             Reportes y Estadísticas
           </h1>
-          <p className="text-stone-600 text-lg">
+          <p className="text-gray-400 text-sm md:text-lg flex items-center justify-center gap-2">
+            <Sparkles className="w-5 h-5 text-yellow-400" />
             Genera reportes detallados de ventas, usuarios y más
           </p>
         </motion.div>
 
-        {/* Estadísticas generales */}
-        <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-stone-600 text-sm font-medium">Ventas Totales</p>
-                <p className="text-3xl font-bold text-green-600">S/ {stats.totalSales.toFixed(2)}</p>
+        <motion.div className="grid grid-cols-2 md:grid-cols-4 gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.05, y: -5 }} className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-xl p-4 border border-green-400/20 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-xs md:text-sm font-medium">Ventas Totales</p>
+                  <p className="text-2xl md:text-3xl font-bold text-green-400">S/ {stats.totalSales.toFixed(2)}</p>
               </div>
               <div className="text-green-600">
                 <DollarSign className="w-8 h-8" />

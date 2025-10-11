@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 import { uploadImageToCloudinary } from '@/lib/cloudinary';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Wrench, 
   Plus, 
@@ -21,7 +22,9 @@ import {
   Calendar,
   Clock,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Sparkles,
+  Award
 } from 'lucide-react';
 
 interface Service {
@@ -213,34 +216,76 @@ export default function ServicesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-            <p className="text-stone-600">Cargando servicios...</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Wrench className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
+          </motion.div>
+          <p className="text-yellow-300 text-2xl font-bold">Cargando Servicios...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-stone-800 mb-2">Gestión de Servicios</h1>
-            <p className="text-stone-600">Administra los servicios de tu restaurante</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
+      {/* Efectos de fondo */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }}
+          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+          className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl"
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+        {/* Header Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20"
+        >
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
+                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
+                  <Wrench className="w-8 h-8 text-black" />
+                </div>
+              </motion.div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+                  Gestión de Servicios
+                </h1>
+                <p className="text-gray-400 text-sm md:text-base mt-1 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-yellow-400" />
+                  Administra tus servicios premium
+                </p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setEditModal({ isOpen: true, service: null })}
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 rounded-xl text-black font-bold shadow-lg shadow-yellow-500/30 transition-all duration-300"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Agregar Servicio</span>
+            </motion.button>
           </div>
-          <button
-            onClick={() => setEditModal({ isOpen: true, service: null })}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Agregar Servicio</span>
-          </button>
-        </div>
+        </motion.div>
 
         {/* Estadísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Settings, 
   Save, 
@@ -21,7 +22,9 @@ import {
   Info,
   CheckCircle2,
   XCircle,
-  X
+  X,
+  Sparkles,
+  Award
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -104,51 +107,57 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl font-bold text-stone-800 mb-2">Configuración del Sistema</h1>
-            <p className="text-stone-600">Gestiona la configuración general de la aplicación</p>
-          </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg disabled:opacity-50"
-          >
-            {saving ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : saved ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <Save className="w-5 h-5" />
-            )}
-            <span>
-              {saving ? 'Guardando...' : saved ? 'Guardado' : 'Guardar Cambios'}
-            </span>
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }} transition={{ duration: 8, repeat: Infinity }} className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl" />
+        <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }} transition={{ duration: 10, repeat: Infinity, delay: 2 }} className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl" />
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Información General */}
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Globe className="w-6 h-6 text-blue-600" />
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
+                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
+                  <Settings className="w-8 h-8 text-black" />
+                </div>
+              </motion.div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+                  Configuración del Sistema
+                </h1>
+                <p className="text-gray-400 text-sm md:text-base mt-1 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-yellow-400" />
+                  Gestiona la configuración general
+                </p>
               </div>
-              <h2 className="text-xl font-bold text-stone-800">Información General</h2>
+            </div>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSave} disabled={saving} className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 rounded-xl text-black font-bold shadow-lg shadow-yellow-500/30 transition-all duration-300 disabled:opacity-50">
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : saved ? <CheckCircle className="w-5 h-5" /> : <Save className="w-5 h-5" />}
+              <span>{saving ? 'Guardando...' : saved ? 'Guardado' : 'Guardar Cambios'}</span>
+            </motion.button>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-xl p-6 border border-yellow-400/20 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-yellow-400/10 rounded-lg">
+                <Globe className="w-6 h-6 text-yellow-400" />
+              </div>
+              <h2 className="text-xl font-bold text-yellow-300">Información General</h2>
             </div>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nombre del Sitio
                 </label>
                 <input
                   type="text"
                   value={settings.siteName}
                   onChange={(e) => setSettings({...settings, siteName: e.target.value})}
-                  className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-yellow-400/20 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 text-white transition-colors"
                 />
               </div>
               <div>
