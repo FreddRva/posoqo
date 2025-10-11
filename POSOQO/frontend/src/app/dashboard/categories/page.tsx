@@ -408,12 +408,13 @@ export default function AdminCategories() {
                 }}
                 className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-3 rounded-xl hover:bg-purple-700 transition-colors shadow-lg"
               >
-                <FolderOpen className="w-5 h-5" />
-                <span>Subcategoría</span>
-            </button>
-            </div>
+              <FolderOpen className="w-5 h-5" />
+              <span>Subcategoría</span>
+          </button>
           </div>
         </div>
+        </div>
+        </motion.div>
 
         {/* Estadísticas Premium */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
