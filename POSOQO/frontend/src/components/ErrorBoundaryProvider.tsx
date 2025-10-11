@@ -107,7 +107,7 @@ const ErrorNotification: React.FC<{
   errorInfo: ErrorInfo;
   onDismiss: () => void;
 }> = ({ errorInfo, onDismiss }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(false);
 
   return (
     <motion.div
