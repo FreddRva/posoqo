@@ -7,7 +7,7 @@ import { apiFetch } from "@/lib/api";
 import { Trash2, ChevronLeft, ChevronRight, ShoppingCart, Heart, Eye, X, Package, CreditCard, ArrowRight, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useNotifications } from "@/components/NotificationSystem";
+import { useNotifications as useToast } from "@/components/NotificationSystem";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/hooks/useCart";
 
@@ -42,7 +42,7 @@ export default function CartPage() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const router = useRouter();
   const { data: session } = useSession();
-  const { showSuccess, showError } = useNotifications();
+  const { showSuccess, showError } = useToast();
   
   // Hook del carrito
   const { 

@@ -11,7 +11,7 @@ import {
   Grid3X3, Heart, ShoppingCart, 
   Eye, X, ChevronDown, UtensilsCrossed, Beer, Coffee
 } from "lucide-react";
-import { useNotifications } from "@/components/NotificationSystem";
+import { useNotifications as useToast } from "@/components/NotificationSystem";
 import { useCombinedNotifications } from "@/lib/notificationUtils";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/hooks/useCart";
@@ -71,7 +71,7 @@ const SORT_LABELS: Record<SortOption, string> = {
 function ProductsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const { showSuccess, showError } = useNotifications();
+  const { showSuccess, showError } = useToast();
   const { manager } = useCombinedNotifications();
   const [isMobile, setIsMobile] = useState(false);
   
