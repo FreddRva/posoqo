@@ -171,128 +171,73 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
-      {/* Efectos de fondo */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }}
-          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-          className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl"
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-stone-800 mb-2">Gestión de Pedidos</h1>
+            <p className="text-stone-600">Control total de órdenes en tiempo real</p>
+          </div>
+          <button
+            onClick={loadOrders}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+          >
+            <RefreshCw className="w-5 h-5" />
+            <span>Actualizar</span>
+          </button>
+        </div>
 
-      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
-        {/* Header Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20"
-        >
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
-                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
-                  <Package className="w-8 h-8 text-black" />
+        {/* Estadísticas */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          {[
+            { label: 'Total', value: stats.total, icon: <TrendingUp className="w-8 h-8 text-blue-600" />, bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
+            { label: 'Recibidos', value: stats.recibido, icon: <Package className="w-8 h-8 text-green-600" />, bgColor: 'bg-green-100', textColor: 'text-green-600' },
+            { label: 'Preparando', value: stats.preparando, icon: <ChefHat className="w-8 h-8 text-yellow-600" />, bgColor: 'bg-yellow-100', textColor: 'text-yellow-600' },
+            { label: 'En Camino', value: stats.camino, icon: <Truck className="w-8 h-8 text-orange-600" />, bgColor: 'bg-orange-100', textColor: 'text-orange-600' },
+            { label: 'Entregados', value: stats.entregado, icon: <CheckCircle className="w-8 h-8 text-green-600" />, bgColor: 'bg-green-100', textColor: 'text-green-600' },
+            { label: 'Cancelados', value: stats.cancelado, icon: <XCircle className="w-8 h-8 text-red-600" />, bgColor: 'bg-red-100', textColor: 'text-red-600' }
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
+            >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</div>
+                    <div className="text-stone-600 text-sm font-medium">{stat.label}</div>
+                  </div>
+                  <div className={stat.bgColor}>{stat.icon}</div>
                 </div>
-              </motion.div>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
-                  Gestión de Pedidos
-                </h1>
-                <p className="text-gray-400 text-sm md:text-base mt-1 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-yellow-400" />
-                  Control total de órdenes en tiempo real
-                </p>
               </div>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={loadOrders}
-              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 hover:from-yellow-400/30 hover:to-amber-500/30 rounded-xl border border-yellow-400/30 transition-all duration-300 group"
-            >
-              <RefreshCw className="w-4 h-4 text-yellow-300 group-hover:rotate-180 transition-transform duration-500" />
-              <span className="text-yellow-200 text-sm font-medium">Actualizar</span>
-            </motion.button>
-          </div>
-        </motion.div>
-
-        {/* Estadísticas Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
-        >
-          {[
-            { label: 'Total', value: stats.total, icon: <TrendingUp />, color: 'yellow', gradient: 'from-yellow-500/20 to-amber-500/20' },
-            { label: 'Recibidos', value: stats.recibido, icon: <Package />, color: 'blue', gradient: 'from-blue-500/20 to-blue-600/20' },
-            { label: 'Preparando', value: stats.preparando, icon: <ChefHat />, color: 'yellow', gradient: 'from-yellow-500/20 to-yellow-600/20' },
-            { label: 'En Camino', value: stats.camino, icon: <Truck />, color: 'orange', gradient: 'from-orange-500/20 to-orange-600/20' },
-            { label: 'Entregados', value: stats.entregado, icon: <CheckCircle />, color: 'green', gradient: 'from-green-500/20 to-green-600/20' },
-            { label: 'Cancelados', value: stats.cancelado, icon: <XCircle />, color: 'red', gradient: 'from-red-500/20 to-red-600/20' }
-          ].map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.05 }}
-              whileHover={{ scale: 1.05, y: -4 }}
-              className="relative group"
-            >
-              <div className={`relative bg-gradient-to-br ${stat.gradient} backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-${stat.color}-500/20 shadow-xl`}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`text-${stat.color}-400`}>{stat.icon}</div>
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className={`w-2 h-2 rounded-full bg-${stat.color}-400`}
-                  />
-                </div>
-                <div className="text-2xl md:text-3xl font-black bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
-                  {stat.value}
-                </div>
-                <div className="text-gray-400 text-xs md:text-sm font-medium mt-1">{stat.label}</div>
-              </div>
-            </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Filtros Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-yellow-400/20"
-        >
+        {/* Filtros */}
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Buscar Pedidos</label>
+              <label className="block text-sm font-medium text-stone-700 mb-2">Buscar Pedidos</label>
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="ID, cliente, email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-yellow-400/20 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 placeholder-stone-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Filtrar por Estado</label>
+              <label className="block text-sm font-medium text-stone-700 mb-2">Filtrar por Estado</label>
               <div className="relative">
-                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
                 <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-yellow-400/20 rounded-xl text-gray-200 focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all appearance-none cursor-pointer"
+                  className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
                   <option value="all">Todos los pedidos</option>
                   <option value="recibido">Recibidos</option>
@@ -304,7 +249,7 @@ export default function OrdersPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Lista de Pedidos Premium */}
         <motion.div

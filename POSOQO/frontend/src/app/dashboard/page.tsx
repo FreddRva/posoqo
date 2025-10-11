@@ -187,421 +187,136 @@ export default function DashboardPage() {
     }
   ], []);
 
-  const handleRefresh = () => {
-    refreshNotifications();
-    refreshStats();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefreshAll = async () => {
+    setIsRefreshing(true);
+    await Promise.all([refreshNotifications(), refreshStats()]);
     setLastUpdate(new Date());
+    setIsRefreshing(false);
   };
 
   if (statsLoading || notificationsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="inline-block"
-          >
-            <Sparkles className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-yellow-300 text-2xl font-bold"
-          >
-            Cargando Dashboard Premium...
-          </motion.p>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="h-1 w-64 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-400 rounded-full mt-4 mx-auto"
-          />
-        </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
+            <p className="text-stone-600">Cargando Dashboard...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
-      {/* Efectos de fondo animados */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.03, 0.06, 0.03],
-          }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.03, 0.06, 0.03],
-          }}
-          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-          className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl"
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-stone-800 mb-2">Dashboard</h1>
+            <p className="text-stone-600">Bienvenido, {session?.user?.name}</p>
+          </div>
+          <button
+            onClick={handleRefreshAll}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+          >
+            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Actualizar</span>
+          </button>
+        </div>
 
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8 relative z-10">
-        {/* Header del Dashboard - Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20 overflow-hidden"
-        >
-          {/* Efectos decorativos */}
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-transparent to-amber-500/5" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center space-x-4">
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
-                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
-                  <Award className="w-8 h-8 text-black" />
+        {/* Alerts Section - simplificado */}
+        {alerts.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Bell className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-bold text-stone-800">Alertas Importantes</h2>
+            </div>
+            <div className="space-y-3">
+              {alerts.slice(0, 3).map((alert, index) => (
+                <Link
+                  key={index}
+                  href={alert.link}
+                  className="block p-4 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors border border-stone-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="text-blue-600">{alert.icon}</div>
+                    <p className="text-stone-800 text-sm">{alert.message}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Stats Cards - simplificado sin motion */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statsCards.map((stat, index) => (
+            <Link
+              key={index}
+              href={stat.link}
+              className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={`${stat.bgColor} p-3 rounded-lg`}>
+                  {stat.icon}
                 </div>
-              </motion.div>
+              </div>
               <div>
-                <motion.h1
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent"
-                >
-                  Dashboard Premium
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-gray-400 text-sm md:text-base mt-1 flex items-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4 text-yellow-400" />
-                  Bienvenido, <span className="text-yellow-300 font-semibold">{(session?.user as any)?.name}</span>
-                </motion.p>
+                <div className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</div>
+                <div className="text-stone-600 text-sm font-medium mt-1">{stat.subtitle}</div>
+                <div className={`text-xs font-semibold mt-2 ${stat.trendColor}`}>{stat.trend}</div>
               </div>
-            </div>
+            </Link>
+          ))}
+        </div>
 
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleRefresh}
-                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 hover:from-yellow-400/30 hover:to-amber-500/30 rounded-xl border border-yellow-400/30 transition-all duration-300 group w-full md:w-auto justify-center"
-              >
-                <RefreshCw className="w-4 h-4 text-yellow-300 group-hover:rotate-180 transition-transform duration-500" />
-                <span className="text-yellow-200 text-sm font-medium">Actualizar</span>
-              </motion.button>
-              
-              <div className="text-left md:text-right">
-                <div className="flex items-center space-x-2 text-gray-500 text-xs">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Última actualización</span>
-                </div>
-                <p className="text-yellow-200 font-medium text-sm mt-0.5">
-                  {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Alertas Importantes - Premium */}
-        <AnimatePresence>
-          {alerts.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="space-y-4"
-            >
-              <div className="flex items-center space-x-3">
-                <motion.div
-                  animate={{ rotate: [0, 15, -15, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                >
-                  <Bell className="w-6 h-6 text-yellow-400" />
-                </motion.div>
-                <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-200 to-amber-400 bg-clip-text text-transparent">
-                  Alertas del Sistema
-                </h2>
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full"
-                >
-                  <span className="text-red-400 text-xs font-bold">{alerts.length}</span>
-                </motion.div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {alerts.map((alert, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.02, y: -4 }}
-                  >
-                    <Link href={alert.link}>
-                      <div className="relative group overflow-hidden rounded-2xl">
-                        {/* Efecto de brillo en hover */}
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                          initial={{ x: '-100%' }}
-                          whileHover={{ x: '100%' }}
-                          transition={{ duration: 0.6 }}
-                        />
-                        
-                        <div className={`relative ${alert.color} p-6 text-white shadow-2xl cursor-pointer border border-white/10`}>
-                          <div className="flex items-start space-x-4">
-                            <motion.div
-                              whileHover={{ rotate: 360, scale: 1.2 }}
-                              transition={{ duration: 0.6 }}
-                              className="bg-white/20 backdrop-blur-sm rounded-xl p-3 flex-shrink-0"
-                            >
-                              {alert.icon}
-                            </motion.div>
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm md:text-base mb-2">{alert.message}</p>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                  {alert.priority === 'high' && <Zap className="w-4 h-4" />}
-                                  {alert.priority === 'medium' && <Activity className="w-4 h-4" />}
-                                  {alert.priority === 'low' && <Info className="w-4 h-4" />}
-                                  <span className="text-xs opacity-90 font-medium">
-                                    {alert.priority === 'high' ? 'Urgente' : 
-                                     alert.priority === 'medium' ? 'Normal' : 'Info'}
-                                  </span>
-                                </div>
-                                <ChevronRight className="w-5 h-5 opacity-70 group-hover:translate-x-1 transition-transform" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Estadísticas Principales - Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className="flex items-center space-x-3 mb-6">
-            <BarChart3 className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-200 to-amber-400 bg-clip-text text-transparent">
-              Métricas de Rendimiento
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {statsCards.map((card, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-              >
-                <Link href={card.link}>
-                  <div className="relative group h-full">
-                    {/* Efecto de brillo dorado */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    />
-
-                    <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-300 h-full">
-                      {/* Decoración superior */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-400/5 to-transparent rounded-bl-full" />
-                      
-                      <div className="relative z-10 flex flex-col h-full">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <p className="text-gray-400 text-xs md:text-sm font-medium uppercase tracking-wider mb-2">
-                              {card.title}
-                            </p>
-                            <motion.p
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 to-amber-400 bg-clip-text text-transparent"
-                            >
-                              {card.value}
-                            </motion.p>
-                            {card.subtitle && (
-                              <p className="text-gray-500 text-xs mt-1">{card.subtitle}</p>
-                            )}
-                          </div>
-                          
-                          <motion.div
-                            whileHover={{ rotate: 360, scale: 1.2 }}
-                            transition={{ duration: 0.6 }}
-                            className="relative"
-                          >
-                            <div className={`${card.bgColor} rounded-xl p-3 border border-yellow-400/20 shadow-lg`}>
-                              {card.icon}
-                            </div>
-                          </motion.div>
-                        </div>
-
-                        <div className="mt-auto flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            {card.trend.includes('Pendientes') || card.trendColor === 'text-orange-600' ? (
-                              <AlertCircle className="w-4 h-4 text-orange-400" />
-                            ) : (
-                              <TrendingUp className="w-4 h-4 text-green-400" />
-                            )}
-                            <span className={`text-xs md:text-sm font-semibold ${
-                              card.trendColor === 'text-orange-600' ? 'text-orange-400' : 
-                              card.trendColor === 'text-green-600' ? 'text-green-400' : 'text-gray-400'
-                            }`}>
-                              {card.trend}
-                            </span>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-yellow-400 group-hover:translate-x-1 transition-all" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Acciones Rápidas - Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-yellow-400/20"
-        >
-          <div className="flex items-center space-x-3 mb-6">
-            <Zap className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-yellow-200 to-amber-400 bg-clip-text text-transparent">
-              Acciones Rápidas
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {/* Quick Actions - simplificado */}
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+          <h2 className="text-xl font-bold text-stone-800 mb-4">Acciones Rápidas</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {quickActions.map((action, index) => (
-              <motion.div
+              <Link
                 key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -4 }}
-                whileTap={{ scale: 0.95 }}
+                href={action.link}
+                className={`${action.bgColor} rounded-lg p-4 text-center transition-colors`}
               >
-                <Link href={action.link}>
-                  <div className="relative group">
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    />
-                    <div className={`relative flex flex-col items-center space-y-3 p-4 md:p-5 rounded-xl ${action.bgColor.replace('50', '900/50').replace('100', '800/50')} border border-yellow-400/10 group-hover:border-yellow-400/30 transition-all duration-300 cursor-pointer backdrop-blur-sm`}>
-                      <motion.div
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.6 }}
-                      >
-                        {action.icon}
-                      </motion.div>
-                      <span className="text-xs md:text-sm font-semibold text-gray-300 text-center group-hover:text-yellow-300 transition-colors">
-                        {action.title}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
+                <div className="mx-auto mb-2">{action.icon}</div>
+                <p className="text-stone-800 text-sm font-medium">{action.title}</p>
+              </Link>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Estado del Sistema - Premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-yellow-400/20"
-        >
-          <div className="flex items-center space-x-3 mb-6">
-            <Shield className="w-6 h-6 text-green-400" />
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-200 to-emerald-400 bg-clip-text text-transparent">
-              Estado del Sistema
-            </h2>
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full"
-            >
-              <span className="text-green-400 text-xs font-bold">Online</span>
-            </motion.div>
-          </div>
-          
+        {/* System Status - simplificado */}
+        <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
+          <h2 className="text-xl font-bold text-stone-800 mb-4">Estado del Sistema</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              { icon: <Server className="w-7 h-7" />, label: 'Servidor Backend', status: 'Operativo', color: 'green' },
-              { icon: <Database className="w-7 h-7" />, label: 'Base de Datos', status: 'Conectada', color: 'green' },
-              { icon: <Wifi className="w-7 h-7" />, label: 'API REST', status: 'Activa', color: 'green' }
-            ].map((service, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.9 + index * 0.1 }}
-                whileHover={{ scale: 1.03, y: -2 }}
-                className="relative group"
-              >
-                <div className={`flex items-center space-x-4 p-4 rounded-xl bg-${service.color}-500/10 border border-${service.color}-500/20 group-hover:border-${service.color}-500/40 transition-all duration-300`}>
-                  <motion.div
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(34, 197, 94, 0.4)',
-                        '0 0 0 10px rgba(34, 197, 94, 0)',
-                      ]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className={`bg-${service.color}-500/20 rounded-lg p-3 text-${service.color}-400 flex-shrink-0`}
-                  >
-                    {service.icon}
-                  </motion.div>
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-200 text-sm md:text-base">{service.label}</p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className={`w-2 h-2 rounded-full bg-${service.color}-400`}
-                      />
-                      <p className={`text-xs md:text-sm font-medium text-${service.color}-400`}>{service.status}</p>
-                    </div>
-                  </div>
-                  <CheckCircle className={`w-5 h-5 text-${service.color}-400 opacity-0 group-hover:opacity-100 transition-opacity`} />
-                </div>
-              </motion.div>
-            ))}
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3">
+                <Database className="w-6 h-6 text-green-600" />
+                <span className="text-stone-800 font-medium">Base de Datos</span>
+              </div>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3">
+                <Server className="w-6 h-6 text-green-600" />
+                <span className="text-stone-800 font-medium">Servidor</span>
+              </div>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3">
+                <Wifi className="w-6 h-6 text-green-600" />
+                <span className="text-stone-800 font-medium">Conexión</span>
+              </div>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
-} 
