@@ -152,20 +152,13 @@ export default function OrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Package className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
-          </motion.div>
-          <p className="text-yellow-300 text-2xl font-bold">Cargando Pedidos...</p>
-        </motion.div>
+      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
+            <p className="text-stone-600">Cargando Pedidos...</p>
+          </div>
+        </div>
       </div>
     );
   }
