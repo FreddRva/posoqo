@@ -1,6 +1,6 @@
 // src/components/navbar/NavLinks.tsx
+'use client';
 import React from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -49,12 +49,8 @@ export const NavLinks: React.FC<NavLinksProps> = ({
             whileTap={{ scale: 0.95 }}
             className={`
               relative flex items-center gap-2 px-5 py-2.5 text-base font-semibold transition-all duration-300 rounded-xl overflow-hidden
-              ${isMobile 
-                ? "w-full text-left" 
-                : ""}
-              ${activeDropdown === item.label || isActive 
-                ? "text-yellow-400" 
-                : "text-white hover:text-yellow-400"}
+              ${isMobile ? "w-full text-left" : ""}
+              ${activeDropdown === item.label || isActive ? "text-yellow-400" : "text-white hover:text-yellow-400"}
             `}
             onClick={() => toggleDropdown(item.label)}
             aria-expanded={activeDropdown === item.label}
@@ -116,7 +112,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <Link
+                    <a
                       href={subItem.href}
                       onClick={() => {
                         if (isMobile) onMobileClose?.();
@@ -158,7 +154,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({
                       >
                         →
                       </motion.div>
-                    </Link>
+                    </a>
                     
                     {/* Separador */}
                     {!isMobile && item.dropdown && index < item.dropdown.length - 1 && (
@@ -182,13 +178,11 @@ export const NavLinks: React.FC<NavLinksProps> = ({
           whileTap={{ scale: 0.95 }}
           className="relative group"
         >
-          <Link
+          <a
             href={item.href}
             className={`
               relative block px-5 py-2.5 text-base font-semibold transition-all duration-300 rounded-xl overflow-hidden
-              ${isActive 
-                ? 'text-yellow-400' 
-                : 'text-white hover:text-yellow-400'}
+              ${isActive ? 'text-yellow-400' : 'text-white hover:text-yellow-400'}
             `}
             onClick={() => {
               if (isMobile) onMobileClose?.();
@@ -215,7 +209,7 @@ export const NavLinks: React.FC<NavLinksProps> = ({
                 exit={{ opacity: 0 }}
               />
             )}
-          </Link>
+          </a>
         </motion.div>
       );
     }

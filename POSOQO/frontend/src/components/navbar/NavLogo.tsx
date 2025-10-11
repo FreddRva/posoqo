@@ -1,6 +1,6 @@
 // src/components/navbar/NavLogo.tsx
+'use client';
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Playfair_Display } from 'next/font/google';
@@ -8,7 +8,7 @@ import { Playfair_Display } from 'next/font/google';
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] });
 
 export const NavLogo: React.FC = () => (
-  <Link
+  <a
     href="/"
     className="flex-shrink-0 flex items-center gap-3 group relative"
     aria-label="Inicio"
@@ -57,5 +57,5 @@ export const NavLogo: React.FC = () => (
         transition={{ duration: 0.3 }}
       />
     </motion.span>
-  </Link>
+  </a>
 );
