@@ -415,50 +415,41 @@ export default function AdminCategories() {
           </div>
         </div>
 
-        {/* Estadísticas Premium */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ scale: 1.05, y: -5 }} className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-xl p-6 border border-yellow-400/20 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-3xl font-bold text-yellow-400">{stats.total}</div>
-                  <div className="text-gray-400 text-sm font-medium mt-1">Total</div>
-                </div>
-                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                  <Tags className="w-8 h-8 text-yellow-400" />
-                </motion.div>
+        {/* Estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-stone-800">{stats.total}</div>
+                <div className="text-stone-600 text-sm font-medium">Total Categorías</div>
+              </div>
+              <div className="text-blue-600">
+                <Tags className="w-8 h-8" />
               </div>
             </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} whileHover={{ scale: 1.05, y: -5 }} className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-xl p-6 border border-green-400/20 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-3xl font-bold text-green-400">{stats.main}</div>
-                  <div className="text-gray-400 text-sm font-medium mt-1">Principales</div>
-                </div>
-                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                  <Folder className="w-8 h-8 text-green-400" />
-                </motion.div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-green-600">{stats.main}</div>
+                <div className="text-stone-600 text-sm font-medium">Categorías Principales</div>
+              </div>
+              <div className="text-green-600">
+                <Folder className="w-8 h-8" />
               </div>
             </div>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} whileHover={{ scale: 1.05, y: -5 }} className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-xl p-6 border border-purple-400/20 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-3xl font-bold text-purple-400">{stats.sub}</div>
-                  <div className="text-gray-400 text-sm font-medium mt-1">Subcategorías</div>
-                </div>
-                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                  <FolderOpen className="w-8 h-8 text-purple-400" />
-                </motion.div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-3xl font-bold text-purple-600">{stats.sub}</div>
+                <div className="text-stone-600 text-sm font-medium">Subcategorías</div>
+              </div>
+              <div className="text-purple-600">
+                <FolderOpen className="w-8 h-8" />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Filtros y búsqueda */}
