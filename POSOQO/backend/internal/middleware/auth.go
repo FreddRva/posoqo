@@ -44,11 +44,11 @@ var AuthRateLimiter = limiter.New(limiter.Config{
 
 // CORS configurado para producción
 var CorsConfig = cors.Config{
-	AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,https://posoqo.com,https://posoqo.vercel.app,https://posoqo-frontend.vercel.app,https://*.vercel.app", // Dominios permitidos
-	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With",
+	AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,https://posoqo.vercel.app", // Dominios permitidos
+	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin",
 	AllowCredentials: true,
-	ExposeHeaders:    "Content-Length",
+	ExposeHeaders:    "Content-Length,Authorization",
 	MaxAge:           86400, // 24 horas
 }
 
