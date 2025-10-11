@@ -5,7 +5,6 @@ import { Montserrat, Playfair_Display, Inter } from "next/font/google";
 import { useSession } from "next-auth/react";
 
 // Components
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
 import FeaturedFoods from "@/components/FeaturedFoods";
@@ -58,9 +57,6 @@ function HomePageContent() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 ${montserrat.className}`}>
-      {/* Navbar */}
-      <Navbar />
-
       {/* Hero Section */}
       <HeroSection onScrollToProducts={handleScrollToProducts} />
 
