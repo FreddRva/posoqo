@@ -63,20 +63,6 @@ CREATE TABLE IF NOT EXISTS reviews (
     UNIQUE(user_id, product_id)
 );
 
--- Crear tabla de pagos
-CREATE TABLE IF NOT EXISTS payments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    order_id UUID REFERENCES orders(id) ON DELETE SET NULL,
-    reservation_id UUID REFERENCES reservations(id) ON DELETE SET NULL,
-    stripe_payment_id TEXT,
-    amount NUMERIC(10,2) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    method VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Crear tabla de cupones
 CREATE TABLE IF NOT EXISTS coupons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -101,7 +87,7 @@ CREATE TABLE IF NOT EXISTS services (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Crear tabla de reservas
+-- Crear tabla de reservas (ANTES de payments)
 CREATE TABLE IF NOT EXISTS reservations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
@@ -111,6 +97,20 @@ CREATE TABLE IF NOT EXISTS reservations (
     payment_method VARCHAR(20) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pendiente',
     advance NUMERIC(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Crear tabla de pagos (DESPUÉS de reservations)
+CREATE TABLE IF NOT EXISTS payments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    order_id UUID REFERENCES orders(id) ON DELETE SET NULL,
+    reservation_id UUID REFERENCES reservations(id) ON DELETE SET NULL,
+    stripe_payment_id TEXT,
+    amount NUMERIC(10,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    method VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -220,4 +220,4 @@ COMMENT ON TABLE payments IS 'Registro de pagos realizados';
 COMMENT ON TABLE coupons IS 'Cupones de descuento';
 COMMENT ON TABLE services IS 'Servicios ofrecidos';
 COMMENT ON TABLE reservations IS 'Reservas de usuarios';
-COMMENT ON TABLE complaints IS 'Quejas y mensajes de contacto'; 
+COMMENT ON TABLE complaints IS 'Quejas y mensajes de contacto';
