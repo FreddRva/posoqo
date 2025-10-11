@@ -202,13 +202,12 @@ export default function OrdersPage() {
               key={stat.label}
               className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow"
             >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</div>
-                    <div className="text-stone-600 text-sm font-medium">{stat.label}</div>
-                  </div>
-                  <div className={stat.bgColor}>{stat.icon}</div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</div>
+                  <div className="text-stone-600 text-sm font-medium">{stat.label}</div>
                 </div>
+                <div className={stat.bgColor}>{stat.icon}</div>
               </div>
             </div>
           ))}
