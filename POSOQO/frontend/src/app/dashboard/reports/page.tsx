@@ -200,12 +200,13 @@ export default function ReportsPage() {
                 <div>
                   <p className="text-gray-400 text-xs md:text-sm font-medium">Ventas Totales</p>
                   <p className="text-2xl md:text-3xl font-bold text-green-400">S/ {stats.totalSales.toFixed(2)}</p>
-              </div>
-              <div className="text-green-600">
-                <DollarSign className="w-8 h-8" />
+                </div>
+                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
+                  <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+                </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">

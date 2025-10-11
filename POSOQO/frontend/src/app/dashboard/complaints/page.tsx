@@ -236,9 +236,10 @@ export default function ComplaintsPage() {
                 </div>
                 <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
                   <Clock className="w-6 h-6 md:w-8 md:h-8 text-orange-400" />
+                </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
           <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
