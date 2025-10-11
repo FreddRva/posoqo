@@ -228,7 +228,7 @@ export default function SettingsPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Configuración de Notificaciones */}
           <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6">
