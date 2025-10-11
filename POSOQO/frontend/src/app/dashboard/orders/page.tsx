@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 import OrderMap from '@/components/OrderMap';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Package, 
   ChefHat, 
@@ -15,7 +16,18 @@ import {
   DollarSign,
   User,
   MapPin,
-  Loader2
+  Loader2,
+  Sparkles,
+  TrendingUp,
+  Clock,
+  Phone,
+  Mail,
+  MapPinned,
+  CreditCard,
+  ArrowRight,
+  Eye,
+  RefreshCw,
+  AlertCircle
 } from 'lucide-react';
 
 interface Order {
@@ -44,19 +56,12 @@ interface OrderItem {
   price: number;
 }
 
-interface Notification {
-  id: string;
-  type: string;
-  message: string;
-  created_at: string;
-  is_read: boolean;
-}
-
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const loadOrders = async () => {
     try {
@@ -79,33 +84,17 @@ export default function OrdersPage() {
         body: JSON.stringify({ status: newStatus })
       });
       
-      // Actualizar el estado local
       setOrders(orders.map(order => 
         order.id === orderId 
           ? { ...order, status: newStatus }
           : order
       ));
 
-      // NO crear notificación aquí - el backend ya la crea automáticamente
-      console.log(`✅ Estado del pedido #${orderId.slice(-8)} actualizado a: ${newStatus}`);
-      
-      // Esperar un momento y luego actualizar notificaciones
       setTimeout(() => {
-        // Disparar un evento personalizado para actualizar notificaciones
         window.dispatchEvent(new CustomEvent('notification-update'));
       }, 1000);
     } catch (error) {
       console.error('Error actualizando pedido:', error);
-    }
-  };
-
-  const markNotificationAsRead = async (notificationId: string) => {
-    try {
-      await apiFetch<{ success: boolean; error?: string }>(`/admin/notifications/${notificationId}/read`, {
-        method: 'PUT'
-      });
-    } catch (error) {
-      console.error('Error marcando notificación:', error);
     }
   };
 
@@ -115,12 +104,12 @@ export default function OrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'recibido': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'preparando': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'camino': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'entregado': return 'bg-green-100 text-green-800 border-green-200';
-      case 'cancelado': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'recibido': return { bg: 'from-blue-500/20 to-blue-600/20', border: 'border-blue-500/40', text: 'text-blue-300', glow: 'shadow-blue-500/20' };
+      case 'preparando': return { bg: 'from-yellow-500/20 to-yellow-600/20', border: 'border-yellow-500/40', text: 'text-yellow-300', glow: 'shadow-yellow-500/20' };
+      case 'camino': return { bg: 'from-orange-500/20 to-orange-600/20', border: 'border-orange-500/40', text: 'text-orange-300', glow: 'shadow-orange-500/20' };
+      case 'entregado': return { bg: 'from-green-500/20 to-green-600/20', border: 'border-green-500/40', text: 'text-green-300', glow: 'shadow-green-500/20' };
+      case 'cancelado': return { bg: 'from-red-500/20 to-red-600/20', border: 'border-red-500/40', text: 'text-red-300', glow: 'shadow-red-500/20' };
+      default: return { bg: 'from-gray-500/20 to-gray-600/20', border: 'border-gray-500/40', text: 'text-gray-300', glow: 'shadow-gray-500/20' };
     }
   };
 
@@ -143,6 +132,7 @@ export default function OrdersPage() {
       camino: orders.filter(o => o.status === 'camino').length,
       entregado: orders.filter(o => o.status === 'entregado').length,
       cancelado: orders.filter(o => o.status === 'cancelado').length,
+      totalRevenue: orders.filter(o => o.status === 'entregado').reduce((sum, o) => sum + o.total, 0)
     };
     return stats;
   };
@@ -160,271 +150,302 @@ export default function OrdersPage() {
 
   const stats = getOrderStats();
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Package className="w-20 h-20 text-yellow-400 mx-auto mb-6" />
+          </motion.div>
+          <p className="text-yellow-300 text-2xl font-bold">Cargando Pedidos...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      {/* Header con estadísticas */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-stone-800 mb-2">Panel de Pedidos</h1>
-            <p className="text-stone-600">Gestiona todos los pedidos de tu restaurante</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <div className="text-2xl font-bold text-stone-800">{stats.total}</div>
-              <div className="text-stone-500 text-sm">Total Pedidos</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Estadísticas con diseño mejorado */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-blue-600">{stats.recibido}</div>
-                <div className="text-stone-600 text-sm font-medium">Recibidos</div>
-              </div>
-              <div className="text-blue-600">
-                <Package className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-yellow-600">{stats.preparando}</div>
-                <div className="text-stone-600 text-sm font-medium">Preparando</div>
-              </div>
-              <div className="text-yellow-600">
-                <ChefHat className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-orange-600">{stats.camino}</div>
-                <div className="text-stone-600 text-sm font-medium">En Camino</div>
-              </div>
-              <div className="text-orange-600">
-                <Truck className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-green-600">{stats.entregado}</div>
-                <div className="text-stone-600 text-sm font-medium">Entregados</div>
-              </div>
-              <div className="text-green-600">
-                <CheckCircle className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-3xl font-bold text-red-600">{stats.cancelado}</div>
-                <div className="text-stone-600 text-sm font-medium">Cancelados</div>
-              </div>
-              <div className="text-red-600">
-                <XCircle className="w-8 h-8" />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black p-4 md:p-8 relative overflow-hidden">
+      {/* Efectos de fondo */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.06, 0.03] }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute top-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], opacity: [0.03, 0.06, 0.03] }}
+          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+          className="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl"
+        />
       </div>
 
-      {/* Filtros y búsqueda con diseño mejorado */}
-      <div className="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-stone-700 mb-2">Buscar Pedidos</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Buscar por ID, cliente o email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 placeholder-stone-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
+        {/* Header Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative bg-gradient-to-r from-gray-900/90 via-black/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-yellow-400/20"
+        >
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-2xl blur-lg opacity-50" />
+                <div className="relative bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 rounded-2xl p-4">
+                  <Package className="w-8 h-8 text-black" />
+                </div>
+              </motion.div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+                  Gestión de Pedidos
+                </h1>
+                <p className="text-gray-400 text-sm md:text-base mt-1 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-yellow-400" />
+                  Control total de órdenes en tiempo real
+                </p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={loadOrders}
+              className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 hover:from-yellow-400/30 hover:to-amber-500/30 rounded-xl border border-yellow-400/30 transition-all duration-300 group"
+            >
+              <RefreshCw className="w-4 h-4 text-yellow-300 group-hover:rotate-180 transition-transform duration-500" />
+              <span className="text-yellow-200 text-sm font-medium">Actualizar</span>
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Estadísticas Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+        >
+          {[
+            { label: 'Total', value: stats.total, icon: <TrendingUp />, color: 'yellow', gradient: 'from-yellow-500/20 to-amber-500/20' },
+            { label: 'Recibidos', value: stats.recibido, icon: <Package />, color: 'blue', gradient: 'from-blue-500/20 to-blue-600/20' },
+            { label: 'Preparando', value: stats.preparando, icon: <ChefHat />, color: 'yellow', gradient: 'from-yellow-500/20 to-yellow-600/20' },
+            { label: 'En Camino', value: stats.camino, icon: <Truck />, color: 'orange', gradient: 'from-orange-500/20 to-orange-600/20' },
+            { label: 'Entregados', value: stats.entregado, icon: <CheckCircle />, color: 'green', gradient: 'from-green-500/20 to-green-600/20' },
+            { label: 'Cancelados', value: stats.cancelado, icon: <XCircle />, color: 'red', gradient: 'from-red-500/20 to-red-600/20' }
+          ].map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 + index * 0.05 }}
+              whileHover={{ scale: 1.05, y: -4 }}
+              className="relative group"
+            >
+              <div className={`relative bg-gradient-to-br ${stat.gradient} backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-${stat.color}-500/20 shadow-xl`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`text-${stat.color}-400`}>{stat.icon}</div>
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className={`w-2 h-2 rounded-full bg-${stat.color}-400`}
+                  />
+                </div>
+                <div className="text-2xl md:text-3xl font-black bg-gradient-to-r from-gray-100 to-gray-300 bg-clip-text text-transparent">
+                  {stat.value}
+                </div>
+                <div className="text-gray-400 text-xs md:text-sm font-medium mt-1">{stat.label}</div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Filtros Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-yellow-400/20"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Buscar Pedidos</label>
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="ID, cliente, email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-yellow-400/20 rounded-xl text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Filtrar por Estado</label>
+              <div className="relative">
+                <Filter className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-yellow-400/20 rounded-xl text-gray-200 focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="all">Todos los pedidos</option>
+                  <option value="recibido">Recibidos</option>
+                  <option value="preparando">Preparando</option>
+                  <option value="camino">En Camino</option>
+                  <option value="entregado">Entregados</option>
+                  <option value="cancelado">Cancelados</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div className="md:w-64">
-            <label className="block text-sm font-medium text-stone-700 mb-2">Filtrar por Estado</label>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-lg text-stone-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        </motion.div>
+
+        {/* Lista de Pedidos Premium */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-4"
+        >
+          <AnimatePresence>
+            {filteredOrders.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-12 text-center border border-yellow-400/20"
               >
-                <option value="all">Todos los pedidos</option>
-                <option value="recibido">Recibidos</option>
-                <option value="preparando">Preparando</option>
-                <option value="camino">En Camino</option>
-                <option value="entregado">Entregados</option>
-                <option value="cancelado">Cancelados</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+                <Package className="w-20 h-20 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg font-medium">No hay pedidos para mostrar</p>
+                <p className="text-gray-500 text-sm mt-2">Los pedidos aparecerán aquí cuando los clientes realicen compras</p>
+              </motion.div>
+            ) : (
+              filteredOrders.map((order, index) => {
+                const statusColor = getStatusColor(order.status);
+                return (
+                  <motion.div
+                    key={order.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.01, y: -2 }}
+                    className="relative group"
+                  >
+                    <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-2xl p-6 border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-300 shadow-xl">
+                      {/* Header del pedido */}
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="bg-gradient-to-br from-yellow-400/20 to-amber-500/20 rounded-xl p-3 border border-yellow-400/30">
+                            <Package className="w-6 h-6 text-yellow-400" />
+                          </div>
+                          <div>
+                            <div className="text-xl font-bold text-gray-200">Pedido #{order.id.slice(-8)}</div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <Clock className="w-4 h-4" />
+                              <span>{new Date(order.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`flex items-center space-x-2 px-4 py-2 bg-gradient-to-r ${statusColor.bg} border ${statusColor.border} rounded-xl ${statusColor.glow} shadow-lg`}>
+                          {getStatusIcon(order.status)}
+                          <span className={`font-bold text-sm uppercase ${statusColor.text}`}>{order.status}</span>
+                        </div>
+                      </div>
 
-      {/* Tabla de pedidos con diseño mejorado */}
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-            <p className="text-stone-600">Cargando pedidos...</p>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-stone-200">
-              <thead className="bg-stone-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Pedido
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Datos de Entrega
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-stone-600 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-stone-200">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-stone-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-stone-900">
-                        #{order.id.slice(-8)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
-                        <div className="bg-stone-100 rounded-full p-2">
-                          <User className="w-4 h-4 text-stone-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm text-stone-900 font-medium">
-                            {order.user_name || 'Cliente'}
+                      {/* Grid de información */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        {/* Cliente */}
+                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <User className="w-4 h-4 text-blue-400" />
+                            <span className="text-xs font-semibold text-gray-400 uppercase">Cliente</span>
                           </div>
-                          <div className="text-sm text-stone-500">
-                            {order.user_email || order.user_id}
+                          <div className="text-gray-200 font-medium">{order.user_name || 'Cliente'}</div>
+                          <div className="text-gray-500 text-sm">{order.user_email}</div>
+                        </div>
+
+                        {/* Contacto */}
+                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Phone className="w-4 h-4 text-green-400" />
+                            <span className="text-xs font-semibold text-gray-400 uppercase">Contacto</span>
+                          </div>
+                          <div className="text-gray-200 font-medium">{order.phone || 'No especificado'}</div>
+                          <div className="text-gray-500 text-sm">DNI: {order.dni || 'N/A'}</div>
+                        </div>
+
+                        {/* Total */}
+                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <DollarSign className="w-4 h-4 text-yellow-400" />
+                            <span className="text-xs font-semibold text-gray-400 uppercase">Total</span>
+                          </div>
+                          <div className="text-2xl font-black bg-gradient-to-r from-yellow-200 to-amber-400 bg-clip-text text-transparent">
+                            S/ {order.total.toFixed(2)}
                           </div>
                         </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-stone-900 space-y-2">
-                        <div className="font-medium">
-                          {order.user_name} {order.user_last_name}
+
+                      {/* Mapa */}
+                      {order.lat && order.lng && (
+                        <div className="mb-4">
+                          <OrderMap lat={order.lat} lng={order.lng} location={order.location} orderId={order.id} />
                         </div>
-                        <div className="text-stone-500 text-xs space-y-1">
-                          <div>DNI: {order.dni || 'No especificado'}</div>
-                          <div>Teléfono: {order.phone || 'No especificado'}</div>
-                          <div>Email: {order.user_email}</div>
-                        </div>
-                        <OrderMap 
-                          lat={order.lat} 
-                          lng={order.lng} 
-                          location={order.location}
-                          orderId={order.id}
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        <div className="text-sm font-semibold text-stone-900">
-                          S/ {order.total.toFixed(2)}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(order.status)}
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="w-4 h-4 text-stone-400" />
-                        <div className="text-sm text-stone-500">
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      )}
+
+                      {/* Acciones */}
                       <div className="flex flex-wrap gap-2">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => updateOrderStatus(order.id, 'preparando')}
-                          disabled={order.status === 'preparando' || order.status === 'camino' || order.status === 'entregado' || order.status === 'cancelado'}
-                          className="px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          disabled={order.status !== 'recibido'}
+                          className="px-4 py-2 text-sm font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-xl hover:bg-blue-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           Preparar
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => updateOrderStatus(order.id, 'camino')}
                           disabled={order.status !== 'preparando'}
-                          className="px-3 py-1 text-xs font-medium text-orange-600 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="px-4 py-2 text-sm font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded-xl hover:bg-orange-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           Enviar
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => updateOrderStatus(order.id, 'entregado')}
                           disabled={order.status !== 'camino'}
-                          className="px-3 py-1 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="px-4 py-2 text-sm font-medium bg-green-500/20 text-green-300 border border-green-500/30 rounded-xl hover:bg-green-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           Entregado
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => updateOrderStatus(order.id, 'cancelado')}
                           disabled={order.status === 'entregado' || order.status === 'cancelado'}
-                          className="px-3 py-1 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="px-4 py-2 text-sm font-medium bg-red-500/20 text-red-300 border border-red-500/30 rounded-xl hover:bg-red-500/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
                           Cancelar
-                        </button>
+                        </motion.button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {!loading && filteredOrders.length === 0 && (
-        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-stone-200">
-          <div className="text-4xl mb-4">
-            <Package className="w-16 h-16 text-stone-400 mx-auto" />
-          </div>
-          <div className="text-stone-600 text-lg font-medium">No hay pedidos para mostrar</div>
-          <div className="text-stone-500 text-sm mt-2">Los pedidos aparecerán aquí cuando los clientes realicen compras</div>
-        </div>
-      )}
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
     </div>
   );
-} 
+}
