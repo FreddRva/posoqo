@@ -719,26 +719,67 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 	// Log para debug
 	fmt.Printf("[DEBUG] Iniciando GetAdminOrdersListPublic\n")
 	
-	rows, err := db.DB.Query(context.Background(), `
-		SELECT 
-			o.id,
-			o.user_id,
-			COALESCE(u.name, '') as user_name,
-			COALESCE(u.last_name, '') as user_last_name,
-			COALESCE(u.email, '') as user_email,
-			COALESCE(u.dni, '') as dni,
-			COALESCE(u.phone, '') as phone,
-			o.total,
-			o.status,
-			COALESCE(o.location, '') as location,
-			COALESCE(o.lat, 0) as lat,
-			COALESCE(o.lng, 0) as lng,
-			o.created_at,
-			o.updated_at
-		FROM orders o
-		LEFT JOIN users u ON o.user_id = u.id
-		ORDER BY o.created_at DESC
-	`)
+	// Primero verificar si existen las columnas lat y lng
+	var hasCoordinates bool
+	err := db.DB.QueryRow(context.Background(), `
+		SELECT EXISTS (
+			SELECT FROM information_schema.columns 
+			WHERE table_name = 'orders' AND column_name = 'lat'
+		)
+	`).Scan(&hasCoordinates)
+	
+	if err != nil {
+		fmt.Printf("[ERROR] Error verificando columnas: %v\n", err)
+		hasCoordinates = false
+	}
+	
+	fmt.Printf("[DEBUG] Columnas de coordenadas existen: %v\n", hasCoordinates)
+	
+	// Query dinámico según si existen las columnas
+	var query string
+	if hasCoordinates {
+		query = `
+			SELECT 
+				o.id,
+				o.user_id,
+				COALESCE(u.name, '') as user_name,
+				COALESCE(u.last_name, '') as user_last_name,
+				COALESCE(u.email, '') as user_email,
+				COALESCE(u.dni, '') as dni,
+				COALESCE(u.phone, '') as phone,
+				o.total,
+				o.status,
+				COALESCE(o.location, '') as location,
+				COALESCE(o.lat, 0) as lat,
+				COALESCE(o.lng, 0) as lng,
+				o.created_at,
+				o.updated_at
+			FROM orders o
+			LEFT JOIN users u ON o.user_id = u.id
+			ORDER BY o.created_at DESC
+		`
+	} else {
+		query = `
+			SELECT 
+				o.id,
+				o.user_id,
+				COALESCE(u.name, '') as user_name,
+				COALESCE(u.last_name, '') as user_last_name,
+				COALESCE(u.email, '') as user_email,
+				COALESCE(u.dni, '') as dni,
+				COALESCE(u.phone, '') as phone,
+				o.total,
+				o.status,
+				COALESCE(o.location, '') as location,
+				o.created_at,
+				o.updated_at
+			FROM orders o
+			LEFT JOIN users u ON o.user_id = u.id
+			ORDER BY o.created_at DESC
+		`
+	}
+	
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		fmt.Printf("[ERROR] Error en query GetAdminOrdersListPublic: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{
@@ -757,13 +798,23 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 		var total float64
 		var status string
 		var location string
-		var lat, lng float64
 		var createdAt, updatedAt time.Time
+		var lat, lng float64
 
-		err := rows.Scan(&id, &userID, &userName, &userLastName, &userEmail, &dni, &phone, &total, &status, &location, &lat, &lng, &createdAt, &updatedAt)
-		if err != nil {
-			fmt.Printf("[ERROR] Error escaneando orden: %v\n", err)
-			continue
+		if hasCoordinates {
+			err := rows.Scan(&id, &userID, &userName, &userLastName, &userEmail, &dni, &phone, &total, &status, &location, &lat, &lng, &createdAt, &updatedAt)
+			if err != nil {
+				fmt.Printf("[ERROR] Error escaneando orden con coordenadas: %v\n", err)
+				continue
+			}
+		} else {
+			err := rows.Scan(&id, &userID, &userName, &userLastName, &userEmail, &dni, &phone, &total, &status, &location, &createdAt, &updatedAt)
+			if err != nil {
+				fmt.Printf("[ERROR] Error escaneando orden sin coordenadas: %v\n", err)
+				continue
+			}
+			lat = 0
+			lng = 0
 		}
 
 		// Construir nombre completo
