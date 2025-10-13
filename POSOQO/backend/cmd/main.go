@@ -190,6 +190,9 @@ func main() {
 	admin.Put("/categories/:id", handlers.UpdateCategory)
 	admin.Delete("/categories/:id", handlers.DeleteCategory)
 
+	// Upload de imágenes a Cloudinary (protegido)
+	admin.Post("/upload", handlers.CloudinaryUploadHandler)
+
 	// Gestión de reclamos (solo admin)
 	admin.Get("/complaints", handlers.ListComplaints)
 	admin.Put("/complaints/:id/status", handlers.UpdateComplaintStatus)

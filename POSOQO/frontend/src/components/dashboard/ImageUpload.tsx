@@ -41,10 +41,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     setUploading(true);
     
     try {
+      // Usar Cloudinary directamente desde el frontend
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('file', file);
+      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo_products');
+      formData.append('folder', 'posoqo/products');
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -54,7 +57,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       }
 
       const data = await response.json();
-      onImageUpload(data.url);
+      onImageUpload(data.secure_url);
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error al subir la imagen');
