@@ -85,40 +85,45 @@ export const useHomeData = (): UseHomeDataReturn => {
       // Procesar categorías
       if (categoriesResponse.status === 'fulfilled') {
         const catData = await categoriesResponse.value.json();
-        const cervezaCategory = catData.data?.find((c: any) => c.name === "Cervezas");
+        const categories = catData.data || [];
         
-        if (cervezaCategory) {
-          featuredCervezas = products.filter((p: Product) => {
-            const isCervezaByCategory = p.category_id === cervezaCategory.id;
-            const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
-            return (isCervezaByCategory || isCervezaBySubcategory) && p.is_featured;
-          }).slice(0, 4);
-
-          featuredComidas = products.filter((p: Product) => {
-            const isCervezaByCategory = p.category_id === cervezaCategory.id;
-            const isCervezaBySubcategory = p.subcategory === cervezaCategory.id;
-            const isCerveza = isCervezaByCategory || isCervezaBySubcategory;
-            return !isCerveza && p.is_featured;
-          }).slice(0, 4);
+        // Buscar categoría "Cervezas" y subcategoría "Cerveza"
+        const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
+        const cervezaSubcategory = categories.find((c: any) => c.name === "Cerveza" && c.parent_id);
+        const comidasCategory = categories.find((c: any) => c.name === "Comidas");
+        
+        // Filtrar cervezas: solo productos destacados de subcategoría "Cerveza"
+        if (cervezaSubcategory) {
+          featuredCervezas = products.filter((p: Product) => 
+            p.subcategory_id === cervezaSubcategory.id && p.is_featured
+          ).slice(0, 4);
         } else {
-          featuredCervezas = products.filter((p: Product) => p.is_featured).slice(0, 4);
+          featuredCervezas = [];
+        }
+
+        // Filtrar comidas: solo productos destacados de categoría "Comidas"
+        if (comidasCategory) {
+          featuredComidas = products.filter((p: Product) => 
+            p.category_id === comidasCategory.id && p.is_featured
+          ).slice(0, 4);
+        } else {
           featuredComidas = [];
         }
       } else {
-        featuredCervezas = products.filter((p: Product) => p.is_featured).slice(0, 4);
+        featuredCervezas = [];
         featuredComidas = [];
       }
 
-      // Procesar servicios
+      // Procesar servicios - solo servicios activos
       if (servicesResponse.status === 'fulfilled') {
         const servicesData = await servicesResponse.value.json();
         if (servicesData.success && servicesData.data) {
-          services = servicesData.data;
+          services = servicesData.data.filter((s: Service) => s.is_active === true);
         } else {
-          services = products.filter((p: Product) => !p.is_featured).slice(0, 4);
+          services = [];
         }
       } else {
-        services = products.filter((p: Product) => !p.is_featured).slice(0, 4);
+        services = [];
       }
 
       return {
