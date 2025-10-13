@@ -1,0 +1,10 @@
+[33mf934643[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: cerrar correctamente div del header en categories page
+[33m68d90e6[m fix: aplicar diseño premium a stats cards de categories page
+[33mc718dd9[m fix: cerrar correctamente tags motion.div en dashboard pages
+[33mdb61800[m feat: dashboard premium COMPLETO - diseño oscuro espectacular con efectos dorados, glassmorphism y animaciones fluidas en TODAS las páginas (orders, products, categories, services, users, complaints, reservations, reports, settings)
+[33mf1f98d4[m feat: dashboard orders premium - diseño espectacular con animaciones, glassmorphism y UX mejorada
+[33m64541fa[m feat: dashboard premium con diseño espectacular - animaciones fluidas, glassmorphism, gradientes dorados, iconos profesionales y UX de otro mundo
+[33mb96c17f[m fix: hacer GetAdminOrdersListPublic robusto - detectar y manejar columnas de coordenadas dinámicamente
+[33m4ab66a5[m fix: corregir endpoint /api/admin/orders/list - usar COALESCE para manejar NULLs correctamente
+[33m5b6405b[m fix: Mejorar configuracion CORS del backend para Vercel
+[33mc307365[m fix: Arreglar orden de migraciones SQL - reservations antes de payments

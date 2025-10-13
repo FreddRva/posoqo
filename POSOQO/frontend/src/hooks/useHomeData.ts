@@ -137,7 +137,7 @@ export const useHomeData = (): UseHomeDataReturn => {
     if (result) {
       setData(result);
     }
-  }, [loadingState]);
+  }, []);
 
   const refetch = useCallback(() => {
     loadData();
