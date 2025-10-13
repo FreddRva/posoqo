@@ -88,18 +88,34 @@ export const useHomeData = (): UseHomeDataReturn => {
         const catData = await categoriesResponse.value.json();
         const categories = catData.data || [];
         
+        console.log('Categorías recibidas:', categories);
+        console.log('Productos recibidos:', products);
+        
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
         const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
         const cervezaSubcategory = categories.find((c: any) => c.name === "Cerveza" && c.parent_id);
         const comidasCategory = categories.find((c: any) => c.name === "Comidas");
+        
+        console.log('Cerveza Category:', cervezaCategory);
+        console.log('Cerveza Subcategory:', cervezaSubcategory);
+        console.log('Comidas Category:', comidasCategory);
         
         // Filtrar cervezas: solo productos destacados de subcategoría "Cerveza"
         if (cervezaSubcategory) {
           featuredCervezas = products.filter((p: Product) => 
             p.subcategory_id === cervezaSubcategory.id && p.is_featured
           ).slice(0, 4);
+          console.log('Cervezas filtradas:', featuredCervezas);
         } else {
-          featuredCervezas = [];
+          // Si no hay subcategoría, buscar por categoría "Cervezas"
+          if (cervezaCategory) {
+            featuredCervezas = products.filter((p: Product) => 
+              p.category_id === cervezaCategory.id && p.is_featured
+            ).slice(0, 4);
+            console.log('Cervezas por categoría:', featuredCervezas);
+          } else {
+            featuredCervezas = [];
+          }
         }
 
         // Filtrar comidas: solo productos destacados de categoría "Comidas"
@@ -107,6 +123,7 @@ export const useHomeData = (): UseHomeDataReturn => {
           featuredComidas = products.filter((p: Product) => 
             p.category_id === comidasCategory.id && p.is_featured
           ).slice(0, 4);
+          console.log('Comidas filtradas:', featuredComidas);
         } else {
           featuredComidas = [];
         }
