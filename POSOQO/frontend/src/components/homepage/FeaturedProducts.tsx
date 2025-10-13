@@ -121,12 +121,12 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   return (
     <section ref={ref} className="py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
       {/* Efectos de fondo sutiles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-1/4 -left-64 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-6 z-20">
+      <div className="relative max-w-7xl mx-auto px-6 z-50">
         {/* Section Header */}
         <motion.div 
           className="text-center mb-20"
@@ -156,7 +156,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-50">
           {products.map((product, index) => (
             <motion.div
               key={product.id}
@@ -164,10 +164,10 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -10 }}
-              className="group relative z-30"
+              className="group relative z-50"
             >
               {/* Card con glassmorphism */}
-              <div className="relative h-full bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500 shadow-2xl">
+              <div className="relative h-full bg-gradient-to-br from-gray-800 to-black rounded-3xl overflow-hidden border border-yellow-400/30 hover:border-yellow-400/50 transition-all duration-500 shadow-2xl">
                 
                 {/* Imagen del producto */}
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
