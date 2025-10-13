@@ -144,12 +144,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         <motion.div 
           className="text-center mb-20"
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-flex items-center gap-3 bg-yellow-400/10 backdrop-blur-sm border border-yellow-400/30 rounded-full px-6 py-2 text-yellow-400 text-sm font-semibold mb-6"
           >
@@ -172,7 +172,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 80, rotateX: -20 }}
-              animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : { opacity: 0, y: 80, rotateX: -20 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0 }}
               transition={{ 
                 duration: 0.8, 
                 delay: index * 0.15,
