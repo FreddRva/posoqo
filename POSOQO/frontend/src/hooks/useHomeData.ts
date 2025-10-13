@@ -90,6 +90,7 @@ export const useHomeData = (): UseHomeDataReturn => {
         
         console.log('Categorías recibidas:', categories);
         console.log('Productos recibidos:', products);
+        console.log('Producto completo:', products[0]);
         
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
         const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
@@ -102,20 +103,26 @@ export const useHomeData = (): UseHomeDataReturn => {
         
         // Filtrar cervezas: productos de subcategoría "Cerveza" (destacados o todos)
         if (cervezaSubcategory) {
+          console.log('ID de subcategoría Cerveza:', cervezaSubcategory.id);
+          
           // Primero intentar solo destacados
-          featuredCervezas = products.filter((p: Product) => 
-            p.subcategory_id === cervezaSubcategory.id && p.is_featured
-          );
+          featuredCervezas = products.filter((p: Product) => {
+            console.log(`Producto ${p.name}: subcategory_id=${p.subcategory_id}, is_featured=${p.is_featured}`);
+            return p.subcategory_id === cervezaSubcategory.id && p.is_featured;
+          });
+          
+          console.log('Cervezas destacadas encontradas:', featuredCervezas.length);
           
           // Si no hay destacados, mostrar todos los de la subcategoría
           if (featuredCervezas.length === 0) {
-            featuredCervezas = products.filter((p: Product) => 
-              p.subcategory_id === cervezaSubcategory.id
-            );
+            featuredCervezas = products.filter((p: Product) => {
+              console.log(`Filtro general - Producto ${p.name}: subcategory_id=${p.subcategory_id}`);
+              return p.subcategory_id === cervezaSubcategory.id;
+            });
           }
           
           featuredCervezas = featuredCervezas.slice(0, 4);
-          console.log('Cervezas filtradas:', featuredCervezas);
+          console.log('Cervezas filtradas final:', featuredCervezas);
         } else {
           featuredCervezas = [];
         }
