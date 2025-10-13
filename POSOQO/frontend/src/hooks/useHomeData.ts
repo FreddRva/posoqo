@@ -105,19 +105,28 @@ export const useHomeData = (): UseHomeDataReturn => {
         if (cervezaSubcategory) {
           console.log('ID de subcategoría Cerveza:', cervezaSubcategory.id);
           
-          // Primero intentar solo destacados
+          // Buscar productos que tengan subcategory_id = cervezaSubcategory.id O category_id = cervezaCategory.id
           featuredCervezas = products.filter((p: Product) => {
-            console.log(`Producto ${p.name}: subcategory_id=${p.subcategory_id}, is_featured=${p.is_featured}`);
-            return p.subcategory_id === cervezaSubcategory.id && p.is_featured;
+            console.log(`Producto ${p.name}: subcategory_id=${p.subcategory_id}, category_id=${p.category_id}, is_featured=${p.is_featured}`);
+            
+            // Si tiene subcategory_id, usar esa
+            if (p.subcategory_id === cervezaSubcategory.id) {
+              return p.is_featured;
+            }
+            
+            // Si no tiene subcategory_id pero tiene category_id de "Bebidas", también es cerveza
+            if (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id) {
+              return p.is_featured;
+            }
+            
+            return false;
           });
           
-          console.log('Cervezas destacadas encontradas:', featuredCervezas.length);
-          
-          // Si no hay destacados, mostrar todos los de la subcategoría
+          // Si no hay destacados, mostrar todos los de cerveza
           if (featuredCervezas.length === 0) {
             featuredCervezas = products.filter((p: Product) => {
-              console.log(`Filtro general - Producto ${p.name}: subcategory_id=${p.subcategory_id}`);
-              return p.subcategory_id === cervezaSubcategory.id;
+              return p.subcategory_id === cervezaSubcategory.id || 
+                     (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
             });
           }
           
@@ -127,12 +136,14 @@ export const useHomeData = (): UseHomeDataReturn => {
           featuredCervezas = [];
         }
 
-        // Filtrar comidas: productos que NO sean de subcategoría "Cerveza"
+        // Filtrar comidas: productos que NO sean cervezas
         if (cervezaSubcategory) {
-          // Mostrar productos que NO sean de la subcategoría "Cerveza"
-          featuredComidas = products.filter((p: Product) => 
-            p.subcategory_id !== cervezaSubcategory.id
-          ).slice(0, 4);
+          // Mostrar productos que NO sean de la subcategoría "Cerveza" NI de la categoría "Bebidas"
+          featuredComidas = products.filter((p: Product) => {
+            const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                             (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
+            return !isCerveza;
+          }).slice(0, 4);
           console.log('Comidas filtradas (no cerveza):', featuredComidas);
         } else {
           featuredComidas = [];
