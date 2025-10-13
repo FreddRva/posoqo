@@ -70,10 +70,27 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   }, [product, isOpen]);
 
   const handleInputChange = (field: keyof ProductFormData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      
+      // Si se cambia la subcategoría, limpiar especificaciones técnicas si no es cerveza
+      if (field === 'subcategory_id') {
+        const selectedSubcategory = subcategories.find(sub => sub.id === value);
+        const isCerveza = selectedSubcategory?.name?.toLowerCase() === 'cerveza';
+        
+        if (!isCerveza) {
+          newData.estilo = '';
+          newData.abv = '';
+          newData.ibu = '';
+          newData.color = '';
+        }
+      }
+      
+      return newData;
+    });
     
     // Limpiar error del campo
     if (errors[field]) {
@@ -302,64 +319,73 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     loading={loading}
                   />
 
-                  {/* Especificaciones técnicas */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Especificaciones Técnicas</h3>
+                  {/* Especificaciones técnicas - Solo para Cerveza */}
+                  {(() => {
+                    const selectedSubcategory = subcategories.find(sub => sub.id === formData.subcategory_id);
+                    const isCerveza = selectedSubcategory?.name?.toLowerCase() === 'cerveza';
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Estilo
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.estilo}
-                          onChange={(e) => handleInputChange('estilo', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="IPA, Lager, etc."
-                        />
-                      </div>
+                    if (!isCerveza) return null;
+                    
+                    return (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Especificaciones Técnicas</h3>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Estilo
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.estilo}
+                              onChange={(e) => handleInputChange('estilo', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="IPA, Lager, etc."
+                            />
+                          </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ABV
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.abv}
-                          onChange={(e) => handleInputChange('abv', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="5.5%"
-                        />
-                      </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              ABV
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.abv}
+                              onChange={(e) => handleInputChange('abv', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="5.5%"
+                            />
+                          </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          IBU
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.ibu}
-                          onChange={(e) => handleInputChange('ibu', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="25"
-                        />
-                      </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              IBU
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.ibu}
+                              onChange={(e) => handleInputChange('ibu', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="25"
+                            />
+                          </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Color
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.color}
-                          onChange={(e) => handleInputChange('color', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Dorado, Ámbar, etc."
-                        />
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Color
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.color}
+                              onChange={(e) => handleInputChange('color', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Dorado, Ámbar, etc."
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
                   {/* Estado del producto */}
                   <div className="space-y-4">
