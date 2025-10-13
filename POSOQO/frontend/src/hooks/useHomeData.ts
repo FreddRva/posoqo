@@ -19,6 +19,7 @@ interface Product {
   image_url?: string;
   category_id?: string;
   subcategory?: string;
+  subcategory_id?: string;
   is_featured?: boolean;
 }
 
