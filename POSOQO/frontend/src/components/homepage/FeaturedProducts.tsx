@@ -126,7 +126,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-amber-400/5 rounded-full blur-3xl" />
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-6">
+      <div className="relative max-w-7xl mx-auto px-6 z-20">
         {/* Section Header */}
         <motion.div 
           className="text-center mb-20"
@@ -156,7 +156,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
         </motion.div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-20">
           {products.map((product, index) => (
             <motion.div
               key={product.id}
@@ -164,10 +164,10 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -10 }}
-              className="group relative"
+              className="group relative z-30"
             >
               {/* Card con glassmorphism */}
-              <div className="relative h-full bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500">
+              <div className="relative h-full bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500 shadow-2xl">
                 
                 {/* Imagen del producto */}
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
