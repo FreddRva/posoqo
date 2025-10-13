@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react";
 // Components
 import Footer from "@/components/Footer";
 import ProductModal from "@/components/ProductModal";
-import FeaturedFoods from "@/components/FeaturedFoods";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { MainLoadingSkeleton } from "@/components/LoadingStates";
 import { useHomeData } from "@/hooks/useHomeData";
@@ -95,8 +94,6 @@ function HomePageContent() {
         onRetry={refetch}
       />
 
-      {/* Sección de comidas destacadas (componente existente) */}
-      <FeaturedFoods />
 
       {/* Club de miembros */}
       <ClubSection />
