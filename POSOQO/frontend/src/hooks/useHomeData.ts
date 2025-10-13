@@ -100,30 +100,33 @@ export const useHomeData = (): UseHomeDataReturn => {
         console.log('Cerveza Subcategory:', cervezaSubcategory);
         console.log('Comidas Category:', comidasCategory);
         
-        // Filtrar cervezas: solo productos destacados de subcategoría "Cerveza"
+        // Filtrar cervezas: productos de subcategoría "Cerveza" (destacados o todos)
         if (cervezaSubcategory) {
+          // Primero intentar solo destacados
           featuredCervezas = products.filter((p: Product) => 
             p.subcategory_id === cervezaSubcategory.id && p.is_featured
-          ).slice(0, 4);
+          );
+          
+          // Si no hay destacados, mostrar todos los de la subcategoría
+          if (featuredCervezas.length === 0) {
+            featuredCervezas = products.filter((p: Product) => 
+              p.subcategory_id === cervezaSubcategory.id
+            );
+          }
+          
+          featuredCervezas = featuredCervezas.slice(0, 4);
           console.log('Cervezas filtradas:', featuredCervezas);
         } else {
-          // Si no hay subcategoría, buscar por categoría "Cervezas"
-          if (cervezaCategory) {
-            featuredCervezas = products.filter((p: Product) => 
-              p.category_id === cervezaCategory.id && p.is_featured
-            ).slice(0, 4);
-            console.log('Cervezas por categoría:', featuredCervezas);
-          } else {
-            featuredCervezas = [];
-          }
+          featuredCervezas = [];
         }
 
-        // Filtrar comidas: solo productos destacados de categoría "Comidas"
-        if (comidasCategory) {
+        // Filtrar comidas: productos que NO sean de subcategoría "Cerveza"
+        if (cervezaSubcategory) {
+          // Mostrar productos que NO sean de la subcategoría "Cerveza"
           featuredComidas = products.filter((p: Product) => 
-            p.category_id === comidasCategory.id && p.is_featured
+            p.subcategory_id !== cervezaSubcategory.id
           ).slice(0, 4);
-          console.log('Comidas filtradas:', featuredComidas);
+          console.log('Comidas filtradas (no cerveza):', featuredComidas);
         } else {
           featuredComidas = [];
         }
