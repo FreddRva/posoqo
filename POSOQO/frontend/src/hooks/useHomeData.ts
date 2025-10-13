@@ -109,26 +109,12 @@ export const useHomeData = (): UseHomeDataReturn => {
           featuredCervezas = products.filter((p: Product) => {
             console.log(`Producto ${p.name}: subcategory_id=${p.subcategory_id}, category_id=${p.category_id}, is_featured=${p.is_featured}`);
             
-            // Si tiene subcategory_id, usar esa
-            if (p.subcategory_id === cervezaSubcategory.id) {
-              return p.is_featured;
-            }
+            // Solo mostrar productos destacados
+            const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                             (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
             
-            // Si no tiene subcategory_id pero tiene category_id de "Bebidas", también es cerveza
-            if (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id) {
-              return p.is_featured;
-            }
-            
-            return false;
+            return isCerveza && p.is_featured === true;
           });
-          
-          // Si no hay destacados, mostrar todos los de cerveza
-          if (featuredCervezas.length === 0) {
-            featuredCervezas = products.filter((p: Product) => {
-              return p.subcategory_id === cervezaSubcategory.id || 
-                     (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
-            });
-          }
           
           featuredCervezas = featuredCervezas.slice(0, 4);
           console.log('Cervezas filtradas final:', featuredCervezas);
@@ -136,15 +122,15 @@ export const useHomeData = (): UseHomeDataReturn => {
           featuredCervezas = [];
         }
 
-        // Filtrar comidas: productos que NO sean cervezas
+        // Filtrar comidas: productos que NO sean cervezas y que sean destacados
         if (cervezaSubcategory) {
-          // Mostrar productos que NO sean de la subcategoría "Cerveza" NI de la categoría "Bebidas"
+          // Mostrar productos que NO sean de la subcategoría "Cerveza" NI de la categoría "Bebidas" y que sean destacados
           featuredComidas = products.filter((p: Product) => {
             const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
-            return !isCerveza;
+            return !isCerveza && p.is_featured === true;
           }).slice(0, 4);
-          console.log('Comidas filtradas (no cerveza):', featuredComidas);
+          console.log('Comidas filtradas (no cerveza, destacadas):', featuredComidas);
         } else {
           featuredComidas = [];
         }
@@ -156,12 +142,15 @@ export const useHomeData = (): UseHomeDataReturn => {
       // Procesar servicios - solo servicios activos
       if (servicesResponse.status === 'fulfilled') {
         const servicesData = await servicesResponse.value.json();
+        console.log('Servicios recibidos:', servicesData);
         if (servicesData.success && servicesData.data) {
           services = servicesData.data.filter((s: Service) => s.is_active === true);
+          console.log('Servicios activos filtrados:', services);
         } else {
           services = [];
         }
       } else {
+        console.log('Error cargando servicios:', servicesResponse.reason);
         services = [];
       }
 
