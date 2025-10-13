@@ -187,7 +187,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                           errors.name ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Nombre del producto"
@@ -205,7 +205,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                         value={formData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={3}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                           errors.description ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Descripción del producto"
@@ -226,7 +226,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                           min="0"
                           value={formData.price}
                           onChange={(e) => handleInputChange('price', parseFloat(e.target.value) || 0)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                             errors.price ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="0.00"
@@ -245,7 +245,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                           min="0"
                           value={formData.stock}
                           onChange={(e) => handleInputChange('stock', parseInt(e.target.value) || 0)}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                             errors.stock ? 'border-red-500' : 'border-gray-300'
                           }`}
                           placeholder="0"
@@ -271,7 +271,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                           handleInputChange('category_id', e.target.value);
                           handleInputChange('subcategory_id', ''); // Reset subcategory
                         }}
-                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                           errors.category_id ? 'border-red-500' : 'border-gray-300'
                         }`}
                       >
@@ -294,7 +294,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                       <select
                         value={formData.subcategory_id}
                         onChange={(e) => handleInputChange('subcategory_id', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         disabled={!formData.category_id}
                       >
                         <option value="">Seleccionar subcategoría</option>
@@ -339,7 +339,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               type="text"
                               value={formData.estilo}
                               onChange={(e) => handleInputChange('estilo', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                               placeholder="IPA, Lager, etc."
                             />
                           </div>
@@ -352,7 +352,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               type="text"
                               value={formData.abv}
                               onChange={(e) => handleInputChange('abv', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                               placeholder="5.5%"
                             />
                           </div>
@@ -365,7 +365,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               type="text"
                               value={formData.ibu}
                               onChange={(e) => handleInputChange('ibu', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                               placeholder="25"
                             />
                           </div>
@@ -378,7 +378,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                               type="text"
                               value={formData.color}
                               onChange={(e) => handleInputChange('color', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                               placeholder="Dorado, Ámbar, etc."
                             />
                           </div>
