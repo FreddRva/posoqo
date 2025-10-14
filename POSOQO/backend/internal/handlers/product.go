@@ -54,7 +54,7 @@ type ProductResponse struct {
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
+		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
 		WHERE is_active = true
 		ORDER BY id
@@ -75,9 +75,10 @@ func GetProducts(c *fiber.Ctx) error {
 		var isActive, isFeatured bool
 		var createdAt, updatedAt time.Time
 		
+		var stock int
 		err := rows.Scan(
 			&id, &name, &description, &price, &imageURL,
-			&categoryID, &isActive, &isFeatured, &createdAt, &updatedAt, &subcategory,
+			&categoryID, &isActive, &isFeatured, &stock, &createdAt, &updatedAt, &subcategory,
 			&estilo, &abv, &ibu, &color,
 		)
 		if err != nil {
@@ -95,7 +96,7 @@ func GetProducts(c *fiber.Ctx) error {
 			CategoryID:  categoryID,
 			IsActive:    isActive,
 			IsFeatured:  isFeatured,
-			Stock:       0, // Valor por defecto ya que no existe en la base de datos
+			Stock:       stock,
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
 			Subcategory: subcategory.String,
@@ -170,6 +171,7 @@ func CreateProduct(c *fiber.Ctx) error {
 		ABV         string  `json:"abv"`
 		IBU         string  `json:"ibu"`
 		Color       string  `json:"color"`
+		Stock       int     `json:"stock"`
 		IsFeatured  bool    `json:"is_featured"`
 	}
 	if err := c.BodyParser(&req); err != nil {
@@ -192,9 +194,9 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 	id := ""
 	err := db.DB.QueryRow(context.Background(),
-		`INSERT INTO products (name, description, price, image_url, category_id, subcategory, estilo, abv, ibu, color, is_active, is_featured, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, NOW(), NOW()) RETURNING id`,
-		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsFeatured).Scan(&id)
+		`INSERT INTO products (name, description, price, image_url, category_id, subcategory, estilo, abv, ibu, color, stock, is_active, is_featured, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, true, $12, NOW(), NOW()) RETURNING id`,
+		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.Stock, req.IsFeatured).Scan(&id)
 	if err != nil {
 		fmt.Printf("❌ [CREATE] Error creando producto: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el producto: " + err.Error()})
@@ -279,7 +281,7 @@ func DeleteProduct(c *fiber.Ctx) error {
 // GetAllProductsAdmin devuelve todos los productos (activos e inactivos) para el panel admin
 func GetAllProductsAdmin(c *fiber.Ctx) error {
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
+		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
 		ORDER BY id
 	`)
@@ -296,7 +298,7 @@ func GetAllProductsAdmin(c *fiber.Ctx) error {
 		var p Product
 		err := rows.Scan(
 			&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
-			&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
+			&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.Stock, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
 			&p.Estilo, &p.ABV, &p.IBU, &p.Color,
 		)
 		if err != nil {
@@ -314,7 +316,7 @@ func GetAllProductsAdmin(c *fiber.Ctx) error {
 			CategoryID:  nullableToString(p.CategoryID),
 			IsActive:    p.IsActive,
 			IsFeatured:  p.IsFeatured,
-			Stock:       0, // Valor por defecto ya que no existe en la base de datos
+			Stock:       p.Stock,
 			CreatedAt:   p.CreatedAt,
 			UpdatedAt:   p.UpdatedAt,
 			Subcategory: nullableToString(p.Subcategory),
