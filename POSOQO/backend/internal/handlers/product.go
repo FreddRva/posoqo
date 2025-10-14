@@ -121,7 +121,7 @@ func GetProduct(c *fiber.Ctx) error {
 	err := db.DB.QueryRow(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
-		WHERE id = $1 AND is_active = true
+		WHERE id = $1
 	`, id).Scan(
 		&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
 		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.Stock, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,

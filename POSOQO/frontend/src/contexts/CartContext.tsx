@@ -198,9 +198,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
 
-      // Validar que el producto existe y tiene stock antes de agregarlo
+      // Validar que el producto existe, está activo y tiene stock antes de agregarlo
       try {
         const productData = await apiFetch<any>(`/products/${product.id}`);
+        if (!productData.is_active) {
+          showNotification('El producto no está disponible', 'error');
+          return;
+        }
         if (productData.stock <= 0) {
           showNotification('El producto no tiene stock disponible', 'error');
           return;
