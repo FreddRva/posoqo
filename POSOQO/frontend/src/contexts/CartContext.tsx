@@ -187,6 +187,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
 
+      // Validar que el producto existe antes de agregarlo
+      try {
+        await apiFetch(`/products/${product.id}`);
+      } catch (validationError: any) {
+        if (validationError?.status === 404) {
+          console.warn(`Producto ${product.id} no encontrado - no se puede agregar al carrito`);
+          showNotification('Error', 'El producto no está disponible');
+          return;
+        }
+        // Para otros errores, continuar (puede ser problema de red)
+      }
+
       // Normalizar producto
       const normalizedProduct: CartItem = {
         ...product,
