@@ -122,11 +122,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
 
-      // 1. Cargar desde localStorage primero
-      const localCart = loadFromLocalStorage();
-      setCart(localCart);
+      // 1. Limpiar localStorage completamente para evitar productos problemáticos
+      localStorage.removeItem('posoqo_cart');
+      sessionStorage.removeItem('posoqo_cart');
+      
+      // 2. Inicializar carrito vacío
+      setCart([]);
 
-      // 2. Si hay sesión, sincronizar con backend
+      // 3. Si hay sesión, cargar desde backend
       if (session?.accessToken) {
         try {
           const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
@@ -149,7 +152,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     description: product.description
                   };
                 } catch (error) {
-                  console.warn(`Producto ${item.product_id} no encontrado`);
+                  console.warn(`Producto ${item.product_id} no encontrado - eliminando del carrito`);
                   return null;
                 }
               })
@@ -158,7 +161,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // Filtrar productos válidos
             const validItems = backendItems.filter(item => item !== null) as CartItem[];
             
-            // Usar el carrito del backend si es más reciente
+            // Usar el carrito del backend si es válido
             if (validItems.length > 0) {
               setCart(validItems);
               saveToLocalStorage(validItems);
@@ -166,7 +169,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
         } catch (backendError) {
           console.warn('Error cargando carrito del backend:', backendError);
-          // Mantener carrito local si hay error en backend
+          // Mantener carrito vacío si hay error en backend
         }
       }
 
@@ -369,8 +372,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
 
+      // Limpiar estado local
       setCart([]);
       saveToLocalStorage([]);
+      
+      // Limpiar localStorage y sessionStorage completamente
+      localStorage.removeItem('posoqo_cart');
+      sessionStorage.removeItem('posoqo_cart');
 
       // Sincronizar con backend
       if (session?.accessToken) {
@@ -385,7 +393,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      showNotification('Carrito limpiado', 'info');
+      showNotification('Carrito limpiado completamente', 'success');
       
       // Disparar evento
       window.dispatchEvent(new CustomEvent('cartUpdated', { 
