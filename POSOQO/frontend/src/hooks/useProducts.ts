@@ -41,7 +41,14 @@ export const useProducts = () => {
     try {
       const response = await apiFetch<{ success: boolean; data: Category[] }>('/categories');
       if (response && response.success) {
-        setCategories(response.data || []);
+        const cats = response.data || [];
+        console.log('📂 Categorías cargadas:', cats.length);
+        console.log('📋 Lista de categorías:', cats.map(c => ({
+          id: c.id,
+          name: c.name,
+          parent_id: c.parent_id
+        })));
+        setCategories(cats);
       }
     } catch (err) {
       console.error('Error loading categories:', err);
@@ -51,32 +58,73 @@ export const useProducts = () => {
   // Productos filtrados y ordenados
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
+    
+    console.log('🔍 FILTRADO DE PRODUCTOS');
+    console.log('📦 Productos originales:', products.length);
+    console.log('🎯 Filtros aplicados:', filters);
+    
+    // Mostrar estructura de algunos productos
+    if (products.length > 0) {
+      console.log('📋 Estructura del primer producto:', {
+        id: products[0].id,
+        name: products[0].name,
+        category_id: products[0].category_id,
+        subcategory_id: products[0].subcategory_id
+      });
+    }
 
     // Filtro por búsqueda
     if (filters.search) {
+      const beforeSearch = filtered.length;
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         product.description?.toLowerCase().includes(filters.search.toLowerCase())
       );
+      console.log(`🔎 Búsqueda "${filters.search}": ${beforeSearch} → ${filtered.length}`);
     }
 
     // Filtro por categoría (buscar tanto en category_id como en subcategory_id)
     if (filters.category) {
-      filtered = filtered.filter(product => 
+      const beforeCategory = filtered.length;
+      console.log(`🏷️ Filtrando por categoría: ${filters.category}`);
+      
+      // Mostrar qué productos coinciden
+      const matchingProducts = filtered.filter(product => 
         product.category_id === filters.category || 
         product.subcategory_id === filters.category
       );
+      
+      console.log('✅ Productos que coinciden con categoría:', matchingProducts.map(p => ({
+        name: p.name,
+        category_id: p.category_id,
+        subcategory_id: p.subcategory_id
+      })));
+      
+      filtered = matchingProducts;
+      console.log(`🏷️ Categoría: ${beforeCategory} → ${filtered.length}`);
     }
 
     // Filtro por subcategoría
     if (filters.subcategory) {
-      filtered = filtered.filter(product => product.subcategory_id === filters.subcategory);
+      const beforeSubcategory = filtered.length;
+      console.log(`🏷️ Filtrando por subcategoría: ${filters.subcategory}`);
+      
+      const matchingProducts = filtered.filter(product => product.subcategory_id === filters.subcategory);
+      console.log('✅ Productos que coinciden con subcategoría:', matchingProducts.map(p => ({
+        name: p.name,
+        subcategory_id: p.subcategory_id
+      })));
+      
+      filtered = matchingProducts;
+      console.log(`🏷️ Subcategoría: ${beforeSubcategory} → ${filtered.length}`);
     }
 
     // Filtro por rango de precio
+    const beforePrice = filtered.length;
     filtered = filtered.filter(product => 
       product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
     );
+    console.log(`💰 Rango de precio: ${beforePrice} → ${filtered.length}`);
 
     // Ordenamiento
     filtered.sort((a, b) => {
@@ -95,6 +143,10 @@ export const useProducts = () => {
           return 0;
       }
     });
+
+    console.log(`🎉 RESULTADO FINAL: ${filtered.length} productos`);
+    console.log('📋 Productos finales:', filtered.map(p => p.name));
+    console.log('=====================================');
 
     return filtered;
   }, [products, filters]);
