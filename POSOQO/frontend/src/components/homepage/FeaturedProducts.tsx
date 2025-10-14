@@ -172,11 +172,11 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 {/* Imagen del producto */}
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
                   <img
                     src={getImageUrl(product.image_url)}
                     alt={product.name}
-                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   
                   {/* Overlay sutil sin botón */}
