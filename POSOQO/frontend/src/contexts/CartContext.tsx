@@ -88,7 +88,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 image_url: getImageUrl(productRes.image_url),
                 quantity: item.quantity,
               };
-            } catch (prodError) {
+            } catch (prodError: any) {
+              // Si el producto no existe (404), no incluirlo en el carrito
+              if (prodError?.status === 404) {
+                console.warn(`Producto ${item.product_id} no encontrado, será eliminado del carrito`);
+                return null; // Marcar para eliminación
+              }
+              
               handleError(prodError, `Error fetching product ${item.product_id}`, {
                 showNotification: false,
                 logToConsole: true,
@@ -104,6 +110,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           })
         );
 
+        // Filtrar productos nulos (que no existen)
+        const validItems = itemsWithDetails.filter(item => item !== null);
+
         // Sincronizar carritos
         const syncResult = await syncCartWithServer(localCart, response.items);
         
@@ -111,7 +120,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
           setCart(syncResult.syncedItems);
           persistCartToLocalStorage(syncResult.syncedItems);
         } else {
-          // Fallback al carrito local si la sincronización falla
+          // Usar solo los productos válidos (que existen)
+          setCart(validItems);
+          persistCartToLocalStorage(validItems);
+        }
+
+        // Si hay productos que no existen, limpiarlos del backend
+        if (validItems.length < response.items.length) {
+          try {
+            await apiFetch('/protected/cart', {
+              method: 'POST',
+              authToken: session.accessToken,
+              body: JSON.stringify({
+                items: validItems.map(item => ({
+                  product_id: item.id,
+                  quantity: item.quantity,
+                })),
+              }),
+            });
+            console.log('Carrito limpiado de productos no encontrados');
+          } catch (cleanupError) {
+            console.warn('Error limpiando carrito:', cleanupError);
+          }
         }
       } else {
         // Si el backend está vacío, mantener localStorage
