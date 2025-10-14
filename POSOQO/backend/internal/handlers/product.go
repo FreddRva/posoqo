@@ -53,12 +53,40 @@ type ProductResponse struct {
 
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
-	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
-		FROM products
-		WHERE is_active = true
-		ORDER BY id
-	`)
+	// Verificar si la columna stock existe
+	var stockExists bool
+	err := db.DB.QueryRow(context.Background(), `
+		SELECT EXISTS (
+			SELECT 1 FROM information_schema.columns 
+			WHERE table_name = 'products' 
+			AND column_name = 'stock'
+		)
+	`).Scan(&stockExists)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error verificando esquema: " + err.Error(),
+		})
+	}
+
+	var query string
+	if stockExists {
+		query = `
+			SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+			FROM products
+			WHERE is_active = true
+			ORDER BY id
+		`
+	} else {
+		query = `
+			SELECT id, name, description, price, image_url, category_id, is_active, is_featured, 0 as stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+			FROM products
+			WHERE is_active = true
+			ORDER BY id
+		`
+	}
+
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
@@ -118,11 +146,39 @@ func GetProducts(c *fiber.Ctx) error {
 func GetProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var p Product
+	
+	// Verificar si la columna stock existe
+	var stockExists bool
 	err := db.DB.QueryRow(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
-		FROM products
-		WHERE id = $1
-	`, id).Scan(
+		SELECT EXISTS (
+			SELECT 1 FROM information_schema.columns 
+			WHERE table_name = 'products' 
+			AND column_name = 'stock'
+		)
+	`).Scan(&stockExists)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error verificando esquema: " + err.Error(),
+		})
+	}
+
+	var query string
+	if stockExists {
+		query = `
+			SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+			FROM products
+			WHERE id = $1
+		`
+	} else {
+		query = `
+			SELECT id, name, description, price, image_url, category_id, is_active, is_featured, 0 as stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+			FROM products
+			WHERE id = $1
+		`
+	}
+
+	err = db.DB.QueryRow(context.Background(), query, id).Scan(
 		&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
 		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.Stock, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
 		&p.Estilo, &p.ABV, &p.IBU, &p.Color,
