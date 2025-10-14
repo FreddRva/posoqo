@@ -54,7 +54,7 @@ type ProductResponse struct {
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
 	fmt.Println("🔍 [DEBUG] GetProducts iniciado")
-	
+
 	// Verificar conexión a la base de datos
 	err := db.DB.Ping(context.Background())
 	if err != nil {
@@ -82,7 +82,7 @@ func GetProducts(c *fiber.Ctx) error {
 		})
 	}
 	fmt.Printf("🔍 [DEBUG] Tabla products existe: %v\n", tableExists)
-	
+
 	if !tableExists {
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
@@ -136,7 +136,7 @@ func GetProducts(c *fiber.Ctx) error {
 		var price float64
 		var isActive, isFeatured bool
 		var createdAt, updatedAt time.Time
-		
+
 		var stock int
 		err := rows.Scan(
 			&id, &name, &description, &price, &imageURL,
