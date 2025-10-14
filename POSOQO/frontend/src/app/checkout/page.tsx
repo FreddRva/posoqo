@@ -18,7 +18,8 @@ import { apiFetch } from "@/lib/api";
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { cart, total, loading: cartLoading, clearCart } = useCart();
+  const { cart, summary, loading: cartLoading, clearCart } = useCart();
+  const total = summary.total;
 
   const {
     profile,
