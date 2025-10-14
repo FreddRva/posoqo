@@ -8,7 +8,6 @@ import {
   Beer, Utensils, Wine, Calendar, Users as UsersIcon
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { CartButton } from "@/components/cart";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NavLogo } from "./navbar/NavLogo";
 import { NavLinks } from "./navbar/NavLinks";
@@ -163,7 +162,17 @@ export default function Navbar() {
               )}
 
               {/* Carrito */}
-              <CartButton />
+              <a
+                href="/cart"
+                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {summary.itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {summary.itemCount}
+                  </span>
+                )}
+              </a>
 
 
               {/* Usuario */}
@@ -228,7 +237,14 @@ export default function Navbar() {
 
             {/* Botón Móvil */}
             <div className="lg:hidden flex items-center gap-3">
-              <CartButton />
+              <a href="/cart" className="relative p-2 text-gray-400">
+                <ShoppingCart className="w-5 h-5" />
+                {summary.itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    {summary.itemCount}
+                  </span>
+                )}
+              </a>
 
               
               <button

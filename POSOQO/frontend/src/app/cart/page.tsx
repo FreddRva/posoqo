@@ -5,6 +5,7 @@ import { ShoppingBag, Trash2, CreditCard, ArrowLeft, Star, Sparkles } from 'luci
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import CartItem from '@/components/cart/CartItem';
+import RecentlyViewed from '@/components/cart/RecentlyViewed';
 
 export default function CartPage() {
   const { cart, summary, clearCart, loading } = useCart();
@@ -113,9 +114,9 @@ export default function CartPage() {
           </motion.div>
         ) : (
           /* Lista de productos */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
             {/* Lista de productos */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-6">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -142,13 +143,14 @@ export default function CartPage() {
               </motion.div>
             </div>
 
-            {/* Resumen del pedido */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-1"
-            >
-              <div className="sticky top-8 bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black/80 backdrop-blur-xl rounded-2xl border border-blue-400/20 p-6">
+            {/* Columna derecha */}
+            <div className="xl:col-span-2 space-y-6">
+              {/* Resumen del pedido */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black/80 backdrop-blur-xl rounded-2xl border border-blue-400/20 p-6"
+              >
                 <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-400" />
                   Resumen del Pedido
@@ -215,8 +217,11 @@ export default function CartPage() {
                     <li>• Pago seguro con tarjeta o efectivo</li>
                   </ul>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+
+              {/* Vistos Recientemente */}
+              <RecentlyViewed />
+            </div>
           </div>
         )}
       </div>
