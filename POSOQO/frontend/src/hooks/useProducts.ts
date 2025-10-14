@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Product, Category, FilterState, SortOption, ViewMode } from '@/types/products';
 
 export const useProducts = () => {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,24 +44,6 @@ export const useProducts = () => {
       const response = await apiFetch<{ success: boolean; data: Category[] }>('/categories');
       if (response && response.success) {
         const cats = response.data || [];
-        console.log('📂 Categorías cargadas:', cats.length);
-        console.log('📋 Lista de categorías:', cats.map(c => ({
-          id: c.id,
-          name: c.name,
-          parent_id: (c as any).parent_id
-        })));
-        
-        // Mostrar categorías principales y subcategorías
-        const mainCategories = cats.filter(c => !(c as any).parent_id);
-        const subCategories = cats.filter(c => (c as any).parent_id);
-        console.log('🏢 Categorías principales:', mainCategories.map(c => ({ id: c.id, name: c.name })));
-        console.log('🏷️ Subcategorías:', subCategories.map(c => ({ id: c.id, name: c.name, parent_id: (c as any).parent_id })));
-        
-        // Mostrar información detallada
-        console.log('🔍 DETALLE DE CATEGORÍAS:');
-        cats.forEach((cat, index) => {
-          console.log(`  ${index + 1}. ${cat.name} (ID: ${cat.id}) - Parent: ${(cat as any).parent_id || 'Ninguno'}`);
-        });
         setCategories(cats);
       }
     } catch (err) {
@@ -71,51 +55,22 @@ export const useProducts = () => {
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
     
-    console.log('🔍 FILTRADO DE PRODUCTOS - DEBUG');
-    console.log('📦 Productos originales:', products.length);
-    console.log('🎯 Filtros aplicados:', filters);
-    
-    // Mostrar estructura de todos los productos
-    if (products.length > 0) {
-      console.log('📋 Estructura de todos los productos:', products.map(p => ({
-        id: p.id,
-        name: p.name,
-        category_id: p.category_id,
-        subcategory_id: p.subcategory_id
-      })));
-      
-      console.log('🔍 DETALLE DE PRODUCTOS:');
-      products.forEach((product, index) => {
-        console.log(`  ${index + 1}. ${product.name}`);
-        console.log(`     - ID: ${product.id}`);
-        console.log(`     - Category ID: ${product.category_id || 'undefined'}`);
-        console.log(`     - Subcategory ID: ${product.subcategory_id || 'undefined'}`);
-      });
-    }
 
     // Filtro por búsqueda
     if (filters.search) {
-      const beforeSearch = filtered.length;
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         product.description?.toLowerCase().includes(filters.search.toLowerCase())
       );
-      console.log(`🔎 Búsqueda "${filters.search}": ${beforeSearch} → ${filtered.length}`);
     }
 
     // Filtro por categoría (buscar tanto en category_id como en subcategory_id)
     if (filters.category) {
-      const beforeCategory = filtered.length;
-      console.log(`🏷️ Filtrando por categoría: ${filters.category}`);
-      
       // Buscar la categoría seleccionada para determinar si es principal o subcategoría
       const selectedCategory = categories.find(c => c.id === filters.category);
       const isSubcategory = selectedCategory && (selectedCategory as any).parent_id;
       
-      console.log(`🔍 Categoría seleccionada: ${selectedCategory?.name} (${isSubcategory ? 'Subcategoría' : 'Categoría principal'})`);
-      
-      // Mostrar qué productos coinciden
-      const matchingProducts = filtered.filter(product => {
+      filtered = filtered.filter(product => {
         if (isSubcategory) {
           // Si es subcategoría, buscar por subcategory_id O por category_id de la categoría padre
           return product.subcategory_id === filters.category || 
@@ -125,38 +80,17 @@ export const useProducts = () => {
           return product.category_id === filters.category;
         }
       });
-      
-      console.log('✅ Productos que coinciden con categoría:', matchingProducts.map(p => ({
-        name: p.name,
-        category_id: p.category_id,
-        subcategory_id: p.subcategory_id
-      })));
-      
-      filtered = matchingProducts;
-      console.log(`🏷️ Categoría: ${beforeCategory} → ${filtered.length}`);
     }
 
     // Filtro por subcategoría
     if (filters.subcategory) {
-      const beforeSubcategory = filtered.length;
-      console.log(`🏷️ Filtrando por subcategoría: ${filters.subcategory}`);
-      
-      const matchingProducts = filtered.filter(product => product.subcategory_id === filters.subcategory);
-      console.log('✅ Productos que coinciden con subcategoría:', matchingProducts.map(p => ({
-        name: p.name,
-        subcategory_id: p.subcategory_id
-      })));
-      
-      filtered = matchingProducts;
-      console.log(`🏷️ Subcategoría: ${beforeSubcategory} → ${filtered.length}`);
+      filtered = filtered.filter(product => product.subcategory_id === filters.subcategory);
     }
 
     // Filtro por rango de precio
-    const beforePrice = filtered.length;
     filtered = filtered.filter(product => 
       product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
     );
-    console.log(`💰 Rango de precio: ${beforePrice} → ${filtered.length}`);
 
     // Ordenamiento
     filtered.sort((a, b) => {
@@ -176,10 +110,6 @@ export const useProducts = () => {
       }
     });
 
-    console.log(`🎉 RESULTADO FINAL: ${filtered.length} productos`);
-    console.log('📋 Productos finales:', filtered.map(p => p.name));
-    console.log('=====================================');
-
     return filtered;
   }, [products, filters]);
 
@@ -194,6 +124,24 @@ export const useProducts = () => {
     loadProducts();
     loadCategories();
   }, []);
+
+  // Detectar filtro desde URL
+  useEffect(() => {
+    const filterParam = searchParams.get('filter');
+    if (filterParam && categories.length > 0) {
+      // Buscar la categoría que coincida con el filtro
+      const matchingCategory = categories.find(cat => 
+        cat.name.toLowerCase() === filterParam.toLowerCase()
+      );
+      
+      if (matchingCategory) {
+        setFilters(prev => ({
+          ...prev,
+          category: matchingCategory.id
+        }));
+      }
+    }
+  }, [searchParams, categories]);
 
   const updateFilters = (newFilters: Partial<FilterState>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
