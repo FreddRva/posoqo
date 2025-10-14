@@ -179,18 +179,8 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700"
                   />
                   
-                  {/* Overlay elegante con botón de ver detalle */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center p-6">
-                    <motion.button
-                      onClick={() => onProductClick?.(product)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-yellow-500/50"
-                    >
-                      <Eye className="w-5 h-5" />
-                      <span>Ver Detalle</span>
-                    </motion.button>
-                  </div>
+                  {/* Overlay sutil sin botón */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Efecto de brillo sutil */}
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
