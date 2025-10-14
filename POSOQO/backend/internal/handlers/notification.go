@@ -491,7 +491,7 @@ func CreateProductNotification(productName string, action string) error {
 	message := fmt.Sprintf("El producto '%s' ha sido %s", productName, action)
 
 	// Notificación para admin
-	err := CreateAutomaticNotification("warning", title, message, nil, nil)
+	err := CreateAutomaticNotification("info", title, message, nil, nil)
 	if err != nil {
 		fmt.Printf("Error creando notificación de producto: %v\n", err)
 	}
