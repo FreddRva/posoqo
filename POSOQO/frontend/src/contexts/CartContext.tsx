@@ -58,16 +58,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Función para limpiar carrito de productos no encontrados
   const cleanCartFromNonExistentProducts = useCallback(async (cartItems: CartItem[]) => {
+    // Lista de productos problemáticos conocidos que deben eliminarse inmediatamente
+    const problematicProducts = [
+      'd677b3bd-9c20-42ed-a213-895eca8e4957',
+      'c7d2f163-7c5f-4d45-881d-2d8b2d0d04ac'
+    ];
+
+    // Filtrar productos problemáticos conocidos primero
+    let filteredItems = cartItems.filter(item => !problematicProducts.includes(item.id));
+    
+    if (filteredItems.length !== cartItems.length) {
+      console.log(`🗑️ Eliminados ${cartItems.length - filteredItems.length} productos problemáticos conocidos`);
+    }
+
     if (!session?.accessToken) {
       // Si no hay sesión, limpiar solo localStorage
       const validItems: CartItem[] = [];
-      for (const item of cartItems) {
+      for (const item of filteredItems) {
         try {
           await apiFetch(`/products/${item.id}`);
           validItems.push(item);
         } catch (error: any) {
           if (error?.status === 404) {
-            console.warn(`Producto ${item.id} no encontrado, será eliminado del carrito local`);
+            console.warn(`❌ Producto ${item.id} no encontrado, será eliminado del carrito local`);
           } else {
             validItems.push(item);
           }
@@ -79,13 +92,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const validItems: CartItem[] = [];
     const itemsToRemove: string[] = [];
 
-    for (const item of cartItems) {
+    for (const item of filteredItems) {
       try {
         await apiFetch(`/products/${item.id}`);
         validItems.push(item);
       } catch (error: any) {
         if (error?.status === 404) {
-          console.warn(`Producto ${item.id} no encontrado, será eliminado del carrito`);
+          console.warn(`❌ Producto ${item.id} no encontrado, será eliminado del carrito`);
           itemsToRemove.push(item.id);
         } else {
           // Para otros errores, mantener el item
@@ -107,9 +120,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
             })),
           }),
         });
-        console.log(`Carrito limpiado: ${itemsToRemove.length} productos eliminados`);
+        console.log(`✅ Carrito limpiado: ${itemsToRemove.length} productos eliminados del backend`);
       } catch (cleanupError) {
-        console.warn('Error limpiando carrito:', cleanupError);
+        console.warn('⚠️ Error limpiando carrito en backend:', cleanupError);
       }
     }
 
@@ -420,6 +433,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito al montar el componente
   useEffect(() => {
+    // Limpiar productos problemáticos específicos
+    const problematicProducts = [
+      'd677b3bd-9c20-42ed-a213-895eca8e4957',
+      'c7d2f163-7c5f-4d45-881d-2d8b2d0d04ac'
+    ];
+    
+    // Limpiar localStorage de productos problemáticos
+    const cartData = localStorage.getItem('cart');
+    if (cartData) {
+      try {
+        const cart = JSON.parse(cartData);
+        const cleanedItems = cart.items?.filter((item: any) => 
+          !problematicProducts.includes(item.product_id)
+        ) || [];
+        
+        if (cleanedItems.length !== cart.items?.length) {
+          console.log('Limpiando productos problemáticos del localStorage...');
+          localStorage.setItem('cart', JSON.stringify({
+            ...cart,
+            items: cleanedItems
+          }));
+        }
+      } catch (error) {
+        console.error('Error limpiando localStorage:', error);
+      }
+    }
+    
     loadCart();
   }, [loadCart]);
 
