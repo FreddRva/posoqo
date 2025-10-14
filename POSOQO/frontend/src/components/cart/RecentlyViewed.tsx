@@ -36,15 +36,15 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black/80 backdrop-blur-xl rounded-2xl border border-blue-400/20 p-8 text-center"
+        className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center"
       >
-        <div className="w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-600/30">
-          <Clock className="w-8 h-8 text-gray-500" />
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Clock className="w-8 h-8 text-gray-400" />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
           No hay productos vistos recientemente
         </h3>
-        <p className="text-gray-400">
+        <p className="text-gray-600">
           Los productos que veas aparecerán aquí
         </p>
       </motion.div>
@@ -55,30 +55,28 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black/80 backdrop-blur-xl rounded-2xl border border-blue-400/20 p-6"
+      className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl">
+          <div className="p-2 bg-gray-900 rounded-lg">
             <Eye className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Vistos Recientemente</h3>
-            <p className="text-sm text-gray-400">
+            <h3 className="text-lg font-semibold text-gray-900">Vistos Recientemente</h3>
+            <p className="text-sm text-gray-600">
               {recentlyViewed.length} {recentlyViewed.length === 1 ? 'producto' : 'productos'}
             </p>
           </div>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <button
           onClick={clearRecentlyViewed}
-          className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
+          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
         >
           <Trash2 className="w-4 h-4" />
-        </motion.button>
+        </button>
       </div>
 
       {/* Lista de productos */}
@@ -89,15 +87,12 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="group relative bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 hover:from-gray-700/50 hover:to-gray-600/30 transition-all duration-300 border border-gray-600/20 hover:border-blue-400/30"
+            className="group relative bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200 border border-gray-200"
           >
             <div className="flex items-center gap-4">
               {/* Imagen */}
               <div className="relative flex-shrink-0">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="relative w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 border border-gray-600/30"
-                >
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                   <Image
                     src={item.image_url}
                     alt={item.name}
@@ -105,28 +100,28 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
                     className="object-cover"
                     sizes="64px"
                   />
-                </motion.div>
+                </div>
                 
                 {/* Badge de tiempo */}
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-900 rounded-full flex items-center justify-center">
                   <Clock className="w-2 h-2 text-white" />
                 </div>
               </div>
 
               {/* Información */}
               <div className="flex-1 min-w-0">
-                <h4 className="text-white font-semibold truncate group-hover:text-blue-300 transition-colors duration-300">
+                <h4 className="text-gray-900 font-semibold truncate group-hover:text-gray-700 transition-colors duration-200">
                   {item.name}
                 </h4>
                 
                 {item.category && (
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className="text-xs text-gray-600 truncate">
                     {item.category}
                   </p>
                 )}
                 
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-lg font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+                  <span className="text-lg font-bold text-gray-900">
                     S/ {item.price.toFixed(2)}
                   </span>
                   <span className="text-xs text-gray-500">
@@ -137,28 +132,21 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
 
               {/* Acciones */}
               <div className="flex items-center gap-2">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                <button
                   onClick={() => handleAddToCart(item)}
-                  className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                  className="p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                </motion.button>
+                </button>
 
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                <button
                   onClick={() => removeFromRecentlyViewed(item.id)}
-                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
+                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                 >
                   <Trash2 className="w-4 h-4" />
-                </motion.button>
+                </button>
               </div>
             </div>
-
-            {/* Línea de separación */}
-            <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-gray-600/30 to-transparent" />
           </motion.div>
         ))}
       </div>
