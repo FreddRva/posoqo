@@ -45,7 +45,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
             <Filter className="w-4 h-4 text-white" />
           </div>
-          <h3 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Filtros Inteligentes</h3>
+          <h3 className="text-xl font-bold text-white">Filtros</h3>
         </div>
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
@@ -66,9 +66,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           {/* Búsqueda inteligente */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-blue-400 flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-              Búsqueda Inteligente
+            <label className="block text-sm font-semibold text-blue-400">
+              Buscar
             </label>
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5 group-hover:text-cyan-400 transition-colors duration-300" />
@@ -76,7 +75,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 type="text"
                 value={filters.search}
                 onChange={(e) => onFiltersChange({ search: e.target.value })}
-                placeholder="Explora la galaxia de productos..."
+                placeholder="Buscar productos..."
                 className="w-full pl-12 pr-4 py-3 bg-gray-900/50 backdrop-blur-sm border border-blue-400/30 rounded-xl focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 text-white placeholder-gray-400 transition-all duration-300 hover:border-blue-400/50"
               />
               {filters.search && (
@@ -89,8 +88,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
           {/* Categoría */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-purple-400 flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <label className="block text-sm font-semibold text-purple-400">
               Categoría
             </label>
             <div className="relative group">
@@ -112,8 +110,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
           {/* Subcategoría */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-cyan-400 flex items-center gap-2">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+            <label className="block text-sm font-semibold text-cyan-400">
               Subcategoría
             </label>
             <div className="relative group">
@@ -136,8 +133,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
           {/* Ordenamiento */}
           <div className="space-y-3">
-            <label className="block text-sm font-semibold text-green-400 flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '1.5s' }} />
+            <label className="block text-sm font-semibold text-green-400">
               Ordenar por
             </label>
             <div className="relative group">
@@ -170,8 +166,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           </motion.button>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold text-gray-300 flex items-center gap-2">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+            <span className="text-sm font-semibold text-gray-300">
               Vista:
             </span>
             <div className="flex items-center gap-2">

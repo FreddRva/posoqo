@@ -123,7 +123,7 @@ function ProductsContent() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {/* Header galáctico */}
         <motion.div 
           className="text-center mb-12"
@@ -131,18 +131,12 @@ function ProductsContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full px-6 py-2 text-blue-400 text-sm font-semibold mb-6">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            <span>GALAXIA DE PRODUCTOS</span>
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-          </div>
-          
           <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent mb-4 leading-tight">
             Productos
           </h1>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Descubre una galaxia infinita de productos excepcionales diseñados para elevar tu experiencia
+            Encuentra los mejores productos para tu negocio
           </p>
         </motion.div>
 
@@ -187,7 +181,7 @@ function ProductsContent() {
               }`}
             >
               <MapPin className="w-5 h-5" />
-              <span>Mapa Galáctico</span>
+              <span>Mapa</span>
             </motion.button>
           </div>
         </motion.div>
@@ -225,7 +219,7 @@ function ProductsContent() {
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
                         <MapPin className="w-4 h-4 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Mapa Galáctico</h3>
+                      <h3 className="text-xl font-bold text-white">Ubicación</h3>
                     </div>
                     <div className="h-80 rounded-2xl overflow-hidden border border-blue-400/20">
                       <Map
@@ -267,9 +261,9 @@ export default function ProductsPage() {
             <div className="absolute inset-0 rounded-full border-4 border-purple-400/20 border-t-purple-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '3s' }}></div>
           </div>
           <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-            Explorando la Galaxia
+            Cargando Productos
           </h2>
-          <p className="text-gray-300">Cargando productos increíbles...</p>
+          <p className="text-gray-300">Por favor espera...</p>
           <div className="flex items-center justify-center gap-2 mt-4">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
