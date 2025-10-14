@@ -218,6 +218,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 		ABV         string  `json:"abv"`
 		IBU         string  `json:"ibu"`
 		Color       string  `json:"color"`
+		Stock       int     `json:"stock"`
 		IsActive    bool    `json:"is_active"`
 		IsFeatured  bool    `json:"is_featured"`
 	}
@@ -242,8 +243,8 @@ func UpdateProduct(c *fiber.Ctx) error {
 	fmt.Printf("🔍 [UPDATE] Datos recibidos: %+v\n", req)
 
 	_, err := db.DB.Exec(context.Background(),
-		`UPDATE products SET name=$1, description=$2, price=$3, image_url=$4, category_id=$5, subcategory=$6, estilo=$7, abv=$8, ibu=$9, color=$10, is_active=$11, is_featured=$12, updated_at=NOW() WHERE id=$13`,
-		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.IsActive, req.IsFeatured, id)
+		`UPDATE products SET name=$1, description=$2, price=$3, image_url=$4, category_id=$5, subcategory=$6, estilo=$7, abv=$8, ibu=$9, color=$10, stock=$11, is_active=$12, is_featured=$13, updated_at=NOW() WHERE id=$14`,
+		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.Stock, req.IsActive, req.IsFeatured, id)
 	if err != nil {
 		fmt.Printf("❌ [UPDATE] Error actualizando producto: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Error al actualizar producto"})
@@ -255,7 +256,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 	_, err = db.DB.Exec(context.Background(),
 		`INSERT INTO notifications (title, message, type, is_read, created_at)
 		 VALUES ($1, $2, $3, false, NOW())`,
-		title, message, "product")
+		title, message, "info")
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)

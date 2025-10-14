@@ -133,9 +133,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (session?.accessToken) {
         try {
           // Limpiar carrito del backend primero
-          await apiFetch('/protected/cart/clear', {
-            method: 'DELETE',
+          await apiFetch('/protected/cart', {
+            method: 'POST',
             authToken: session.accessToken,
+            body: JSON.stringify({ items: [] }),
           });
           
           // Luego cargar desde backend (debería estar vacío)
@@ -197,9 +198,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
 
-      // Validar que el producto existe antes de agregarlo
+      // Validar que el producto existe y tiene stock antes de agregarlo
       try {
-        await apiFetch(`/products/${product.id}`);
+        const productData = await apiFetch(`/products/${product.id}`);
+        if (productData.stock <= 0) {
+          showNotification('El producto no tiene stock disponible', 'error');
+          return;
+        }
       } catch (validationError: any) {
         if (validationError?.status === 404) {
           console.warn(`Producto ${product.id} no encontrado - no se puede agregar al carrito`);
@@ -390,9 +395,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Sincronizar con backend
       if (session?.accessToken) {
         try {
-          await apiFetch('/protected/cart/clear', {
-            method: 'DELETE',
+          await apiFetch('/protected/cart', {
+            method: 'POST',
             authToken: session.accessToken,
+            body: JSON.stringify({ items: [] }),
           });
         } catch (backendError) {
           console.warn('Error limpiando carrito en backend:', backendError);

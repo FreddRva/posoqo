@@ -11,13 +11,12 @@ import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NavLogo } from "./navbar/NavLogo";
 import { NavLinks } from "./navbar/NavLinks";
-import { Trash2 } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user as any;
-  const { summary, clearCart } = useCart();
+  const { summary } = useCart();
   const { notifications, stats, markAsRead } = useNotifications();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -175,16 +174,6 @@ export default function Navbar() {
                 )}
               </a>
 
-              {/* Botón temporal para limpiar carrito */}
-              {summary.itemCount > 0 && (
-                <button
-                  onClick={clearCart}
-                  className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-lg transition-colors duration-200"
-                  title="Limpiar carrito completamente"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
 
 
               {/* Usuario */}

@@ -135,7 +135,6 @@ func main() {
 	protected.Get("/cart", handlers.GetCart)
 	protected.Post("/cart", handlers.SaveCart)
 	protected.Post("/cart/add", handlers.AddToCart)
-	protected.Delete("/cart/clear", handlers.ClearCart)
 
 	// Rutas de favoritos (protegidas)
 	protected.Get("/favorites", handlers.ListFavorites)

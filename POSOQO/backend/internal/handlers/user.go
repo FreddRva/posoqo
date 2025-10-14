@@ -199,7 +199,7 @@ func RegisterUser(c *fiber.Ctx) error {
 	_, err = db.DB.Exec(context.Background(),
 		`INSERT INTO notifications (title, message, type, is_read, created_at)
 		 VALUES ($1, $2, $3, false, NOW())`,
-		title, message, "user")
+		title, message, "info")
 
 	if err != nil {
 		fmt.Printf("Error creando notificación: %v\n", err)
