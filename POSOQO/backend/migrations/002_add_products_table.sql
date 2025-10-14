@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS products (
     abv TEXT,
     ibu TEXT,
     color TEXT,
+    stock INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

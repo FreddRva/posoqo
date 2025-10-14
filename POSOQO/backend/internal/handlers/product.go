@@ -118,12 +118,12 @@ func GetProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var p Product
 	err := db.DB.QueryRow(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
+		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
 		WHERE id = $1 AND is_active = true
 	`, id).Scan(
 		&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
-		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
+		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.Stock, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
 		&p.Estilo, &p.ABV, &p.IBU, &p.Color,
 	)
 	if err != nil {
@@ -142,7 +142,7 @@ func GetProduct(c *fiber.Ctx) error {
 		CategoryID:  nullableToString(p.CategoryID),
 		IsActive:    p.IsActive,
 		IsFeatured:  p.IsFeatured,
-		Stock:       0, // Valor por defecto ya que no existe la columna
+		Stock:       p.Stock,
 		CreatedAt:   p.CreatedAt,
 		UpdatedAt:   p.UpdatedAt,
 		Subcategory: nullableToString(p.Subcategory),
