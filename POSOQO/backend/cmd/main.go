@@ -190,8 +190,7 @@ func main() {
 	admin.Put("/categories/:id", handlers.UpdateCategory)
 	admin.Delete("/categories/:id", handlers.DeleteCategory)
 
-	// Upload de imágenes a Cloudinary (protegido)
-	admin.Post("/upload", handlers.CloudinaryUploadHandler)
+	// Upload de imágenes se maneja directamente desde el frontend con Cloudinary
 
 	// Gestión de reclamos (solo admin)
 	admin.Get("/complaints", handlers.ListComplaints)
@@ -323,8 +322,7 @@ func main() {
 	// Servir archivos estáticos de la carpeta uploads
 	app.Static("/uploads", "./uploads")
 
-	// Endpoint para subir imágenes
-	api.Post("/upload", handlers.UploadImageHandler)
+	// Upload de imágenes se maneja directamente desde el frontend con Cloudinary
 
 	// Endpoints de geocoding
 	api.Get("/geocoding/search", handlers.SearchAddress)
