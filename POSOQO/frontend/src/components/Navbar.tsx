@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
-  Beer, Utensils, Wine, Calendar, Users as UsersIcon
+  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Trash2
 } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -16,7 +16,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user as any;
-  const { itemCount } = useCart();
+  const { itemCount, cleanCart } = useCart();
   const { notifications, stats, markAsRead } = useNotifications();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -174,6 +174,17 @@ export default function Navbar() {
                 )}
               </a>
 
+              {/* Limpiar carrito */}
+              {itemCount > 0 && (
+                <button
+                  onClick={cleanCart}
+                  className="p-2 text-gray-400 hover:text-red-400 transition-colors duration-200"
+                  title="Limpiar carrito de productos no encontrados"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
+
               {/* Usuario */}
               {user ? (
                 <div className="relative" ref={userMenuRef}>
@@ -244,6 +255,17 @@ export default function Navbar() {
                   </span>
                 )}
               </a>
+
+              {/* Limpiar carrito móvil */}
+              {itemCount > 0 && (
+                <button
+                  onClick={cleanCart}
+                  className="p-2 text-gray-400 hover:text-red-400 transition-colors duration-200"
+                  title="Limpiar carrito"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
               
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

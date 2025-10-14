@@ -45,6 +45,7 @@ interface CartContextType {
   syncCart: () => Promise<void>;
   validateCart: () => boolean;
   getCartSummary: () => any;
+  cleanCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -55,6 +56,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Función para limpiar carrito de productos no encontrados
+  const cleanCartFromNonExistentProducts = useCallback(async (cartItems: CartItem[]) => {
+    if (!session?.accessToken) return cartItems;
+
+    const validItems: CartItem[] = [];
+    const itemsToRemove: string[] = [];
+
+    for (const item of cartItems) {
+      try {
+        await apiFetch(`/products/${item.id}`);
+        validItems.push(item);
+      } catch (error: any) {
+        if (error?.status === 404) {
+          console.warn(`Producto ${item.id} no encontrado, será eliminado del carrito`);
+          itemsToRemove.push(item.id);
+        } else {
+          // Para otros errores, mantener el item
+          validItems.push(item);
+        }
+      }
+    }
+
+    // Si hay items para remover, actualizar el backend
+    if (itemsToRemove.length > 0) {
+      try {
+        await apiFetch('/protected/cart', {
+          method: 'POST',
+          authToken: session.accessToken,
+          body: JSON.stringify({
+            items: validItems.map(item => ({
+              product_id: item.id,
+              quantity: item.quantity,
+            })),
+          }),
+        });
+        console.log(`Carrito limpiado: ${itemsToRemove.length} productos eliminados`);
+      } catch (cleanupError) {
+        console.warn('Error limpiando carrito:', cleanupError);
+      }
+    }
+
+    return validItems;
+  }, [session?.accessToken]);
+
   // Cargar carrito desde el backend
   const loadCart = useCallback(async () => {
     try {
@@ -63,7 +108,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Cargar carrito local primero
       const localCart = loadCartFromLocalStorage();
-      setCart(localCart);
+      
+      // Limpiar productos no encontrados del localStorage también
+      const cleanedLocalCart = await cleanCartFromNonExistentProducts(localCart);
+      setCart(cleanedLocalCart);
 
       if (!session?.accessToken) {
         // Si no hay sesión, usar solo localStorage
@@ -89,12 +137,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 quantity: item.quantity,
               };
             } catch (prodError: any) {
-              // Si el producto no existe (404), no incluirlo en el carrito
-              if (prodError?.status === 404) {
-                console.warn(`Producto ${item.product_id} no encontrado, será eliminado del carrito`);
-                return null; // Marcar para eliminación
-              }
-              
               handleError(prodError, `Error fetching product ${item.product_id}`, {
                 showNotification: false,
                 logToConsole: true,
@@ -110,8 +152,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           })
         );
 
-        // Filtrar productos nulos (que no existen)
-        const validItems = itemsWithDetails.filter(item => item !== null);
+        // Limpiar productos no encontrados
+        const cleanedItems = await cleanCartFromNonExistentProducts(itemsWithDetails);
 
         // Sincronizar carritos
         const syncResult = await syncCartWithServer(localCart, response.items);
@@ -120,31 +162,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           setCart(syncResult.syncedItems);
           persistCartToLocalStorage(syncResult.syncedItems);
         } else {
-          // Usar solo los productos válidos (que existen)
-          setCart(validItems);
-          persistCartToLocalStorage(validItems);
-        }
-
-        // Si hay productos que no existen, limpiarlos del backend
-        if (validItems.length < response.items.length) {
-          try {
-            await apiFetch('/protected/cart', {
-              method: 'POST',
-              authToken: session.accessToken,
-              body: JSON.stringify({
-                items: validItems.map(item => ({
-                  product_id: item.id,
-                  quantity: item.quantity,
-                })),
-              }),
-            });
-            console.log('Carrito limpiado de productos no encontrados');
-          } catch (cleanupError) {
-            console.warn('Error limpiando carrito:', cleanupError);
-          }
+          setCart(cleanedItems);
+          persistCartToLocalStorage(cleanedItems);
         }
       } else {
-        // Si el backend está vacío, mantener localStorage
+        // Si el backend está vacío, limpiar también el localStorage
+        const cleanedLocalCart = await cleanCartFromNonExistentProducts(localCart);
+        setCart(cleanedLocalCart);
+        persistCartToLocalStorage(cleanedLocalCart);
       }
     } catch (err) {
       handleError(err, 'loadCart', {
@@ -346,6 +371,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return generateCartSummary(cart);
   }, [cart]);
 
+  // Limpiar carrito de productos no encontrados
+  const cleanCart = useCallback(async () => {
+    try {
+      const cleanedItems = await cleanCartFromNonExistentProducts(cart);
+      setCart(cleanedItems);
+      persistCartToLocalStorage(cleanedItems);
+      console.log('Carrito limpiado manualmente');
+    } catch (error) {
+      console.error('Error limpiando carrito:', error);
+    }
+  }, [cart, cleanCartFromNonExistentProducts]);
+
   // Calcular total
   const total = calculateCartTotal(cart);
 
@@ -381,11 +418,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addToCart,
         updateQuantity,
         removeFromCart,
-        clearCart,
-        loadCart,
-        syncCart,
-        validateCart,
-        getCartSummary,
+    clearCart,
+    loadCart,
+    syncCart,
+    validateCart,
+    getCartSummary,
+    cleanCart,
       }}
     >
       {children}
