@@ -58,7 +58,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Función para limpiar carrito de productos no encontrados
   const cleanCartFromNonExistentProducts = useCallback(async (cartItems: CartItem[]) => {
-    if (!session?.accessToken) return cartItems;
+    if (!session?.accessToken) {
+      // Si no hay sesión, limpiar solo localStorage
+      const validItems: CartItem[] = [];
+      for (const item of cartItems) {
+        try {
+          await apiFetch(`/products/${item.id}`);
+          validItems.push(item);
+        } catch (error: any) {
+          if (error?.status === 404) {
+            console.warn(`Producto ${item.id} no encontrado, será eliminado del carrito local`);
+          } else {
+            validItems.push(item);
+          }
+        }
+      }
+      return validItems;
+    }
 
     const validItems: CartItem[] = [];
     const itemsToRemove: string[] = [];
