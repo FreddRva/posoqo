@@ -129,16 +129,26 @@ export const useProducts = () => {
   useEffect(() => {
     const filterParam = searchParams.get('filter');
     if (filterParam && categories.length > 0) {
-      // Buscar la categoría que coincida con el filtro
-      const matchingCategory = categories.find(cat => 
-        cat.name.toLowerCase() === filterParam.toLowerCase()
-      );
+      // Mapeo de filtros de URL a nombres de categorías
+      const filterMap: { [key: string]: string } = {
+        'cerveza': 'Cerveza',
+        'comidas': 'Comidas', 
+        'refrescos': 'Refrescos'
+      };
       
-      if (matchingCategory) {
-        setFilters(prev => ({
-          ...prev,
-          category: matchingCategory.id
-        }));
+      const categoryName = filterMap[filterParam.toLowerCase()];
+      if (categoryName) {
+        // Buscar la categoría que coincida con el filtro
+        const matchingCategory = categories.find(cat => 
+          cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        
+        if (matchingCategory) {
+          setFilters(prev => ({
+            ...prev,
+            category: matchingCategory.id
+          }));
+        }
       }
     }
   }, [searchParams, categories]);
