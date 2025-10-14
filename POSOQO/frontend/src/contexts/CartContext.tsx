@@ -122,16 +122,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
 
-      // 1. Limpiar localStorage completamente para evitar productos problemáticos
+      // 1. Limpiar completamente localStorage y sessionStorage
       localStorage.removeItem('posoqo_cart');
       sessionStorage.removeItem('posoqo_cart');
       
       // 2. Inicializar carrito vacío
       setCart([]);
 
-      // 3. Si hay sesión, cargar desde backend
+      // 3. Si hay sesión, limpiar backend primero y luego cargar
       if (session?.accessToken) {
         try {
+          // Limpiar carrito del backend primero
+          await apiFetch('/protected/cart', {
+            method: 'POST',
+            authToken: session.accessToken,
+            body: JSON.stringify({ items: [] }),
+          });
+          
+          // Luego cargar desde backend (debería estar vacío)
           const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
             authToken: session.accessToken,
           });

@@ -88,27 +88,15 @@ export const useHomeData = (): UseHomeDataReturn => {
         const catData = await categoriesResponse.value.json();
         const categories = catData.data || [];
         
-        console.log('Categorías recibidas:', categories);
-        console.log('Productos recibidos:', products);
-        console.log('Producto completo:', products[0]);
-        
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
         const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
         const cervezaSubcategory = categories.find((c: any) => c.name === "Cerveza" && c.parent_id);
         const comidasCategory = categories.find((c: any) => c.name === "Comidas");
         
-        console.log('Cerveza Category:', cervezaCategory);
-        console.log('Cerveza Subcategory:', cervezaSubcategory);
-        console.log('Comidas Category:', comidasCategory);
-        
         // Filtrar cervezas: productos de subcategoría "Cerveza" (destacados o todos)
         if (cervezaSubcategory) {
-          console.log('ID de subcategoría Cerveza:', cervezaSubcategory.id);
-          
           // Buscar productos que tengan subcategory_id = cervezaSubcategory.id O category_id = cervezaCategory.id
           featuredCervezas = products.filter((p: Product) => {
-            console.log(`Producto ${p.name}: subcategory_id=${p.subcategory_id}, category_id=${p.category_id}, is_featured=${p.is_featured}`);
-            
             // Solo mostrar productos destacados
             const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
@@ -117,7 +105,6 @@ export const useHomeData = (): UseHomeDataReturn => {
           });
           
           featuredCervezas = featuredCervezas.slice(0, 4);
-          console.log('Cervezas filtradas final:', featuredCervezas);
         } else {
           featuredCervezas = [];
         }
@@ -130,7 +117,6 @@ export const useHomeData = (): UseHomeDataReturn => {
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
             return !isCerveza && p.is_featured === true;
           }).slice(0, 4);
-          console.log('Comidas filtradas (no cerveza, destacadas):', featuredComidas);
         } else {
           featuredComidas = [];
         }
@@ -142,10 +128,8 @@ export const useHomeData = (): UseHomeDataReturn => {
       // Procesar servicios - solo servicios activos
       if (servicesResponse.status === 'fulfilled') {
         const servicesData = await servicesResponse.value.json();
-        console.log('Servicios recibidos:', servicesData);
         if (servicesData.success && servicesData.data) {
           services = servicesData.data.filter((s: Service) => s.is_active === true);
-          console.log('Servicios activos filtrados:', services);
         } else {
           services = [];
         }
