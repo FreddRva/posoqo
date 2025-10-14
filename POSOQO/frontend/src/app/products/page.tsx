@@ -25,8 +25,8 @@ export default function ProductsPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const { showSuccess, showError } = useToast();
-  const { addItem: addToRecentlyViewed } = useRecentlyViewed();
-  const { addItem: addToCart } = useCart();
+  const { updateRecentlyViewed: addToRecentlyViewed } = useRecentlyViewed();
+  const { addToCart } = useCart();
 
   const {
     products,
@@ -64,9 +64,14 @@ export default function ProductsPage() {
     }
   }, [searchParams, updateFilters]);
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = async (product: any) => {
     try {
-      addToCart({ product, quantity: 1 });
+      await addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image_url: product.image_url || product.image || ''
+      });
       showSuccess('Producto agregado', `${product.name} agregado al carrito`);
     } catch (error) {
       showError('Error', 'No se pudo agregar el producto al carrito');
