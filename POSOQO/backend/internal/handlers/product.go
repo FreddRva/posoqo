@@ -54,7 +54,7 @@ type ProductResponse struct {
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
 	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, COALESCE(stock, 0) as stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
 		WHERE is_active = true
 		ORDER BY id
@@ -78,7 +78,7 @@ func GetProducts(c *fiber.Ctx) error {
 		var stock int
 		err := rows.Scan(
 			&id, &name, &description, &price, &imageURL,
-			&categoryID, &isActive, &isFeatured, &stock, &createdAt, &updatedAt, &subcategory,
+			&categoryID, &isActive, &isFeatured, &createdAt, &updatedAt, &subcategory,
 			&estilo, &abv, &ibu, &color,
 		)
 		if err != nil {
@@ -96,7 +96,7 @@ func GetProducts(c *fiber.Ctx) error {
 			CategoryID:  categoryID,
 			IsActive:    isActive,
 			IsFeatured:  isFeatured,
-			Stock:       stock,
+			Stock:       0, // Valor por defecto
 			CreatedAt:   createdAt,
 			UpdatedAt:   updatedAt,
 			Subcategory: subcategory.String,
@@ -119,12 +119,12 @@ func GetProduct(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var p Product
 	err := db.DB.QueryRow(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, COALESCE(stock, 0) as stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
+		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
 		WHERE id = $1
 	`, id).Scan(
 		&p.ID, &p.Name, &p.Description, &p.Price, &p.Image,
-		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.Stock, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
+		&p.CategoryID, &p.IsActive, &p.IsFeatured, &p.CreatedAt, &p.UpdatedAt, &p.Subcategory,
 		&p.Estilo, &p.ABV, &p.IBU, &p.Color,
 	)
 	if err != nil {
@@ -143,7 +143,7 @@ func GetProduct(c *fiber.Ctx) error {
 		CategoryID:  nullableToString(p.CategoryID),
 		IsActive:    p.IsActive,
 		IsFeatured:  p.IsFeatured,
-		Stock:       p.Stock,
+		Stock:       0, // Valor por defecto
 		CreatedAt:   p.CreatedAt,
 		UpdatedAt:   p.UpdatedAt,
 		Subcategory: nullableToString(p.Subcategory),
