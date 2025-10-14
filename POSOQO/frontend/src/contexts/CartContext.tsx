@@ -181,7 +181,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
               quantity: 1,
             }),
           });
-        } catch (err) {
+        } catch (err: any) {
+          // Si el producto no existe (404), revertir el cambio local
+          if (err?.status === 404) {
+            console.warn(`Producto ${product.id} no encontrado, revirtiendo cambio local`);
+            setCart(prevCart => {
+              const revertedCart = removeCartItem(prevCart, product.id);
+              persistCartToLocalStorage(revertedCart);
+              return revertedCart;
+            });
+            throw new Error('Producto no encontrado o no disponible');
+          }
+          
           handleError(err, 'addToCart backend sync', {
             showNotification: false,
             logToConsole: true,

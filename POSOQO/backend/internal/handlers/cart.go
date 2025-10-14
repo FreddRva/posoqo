@@ -130,6 +130,15 @@ func AddToCart(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Cantidad debe ser mayor a 0"})
 	}
 
+	// Verificar que el producto existe y está activo
+	var productExists bool
+	err := db.DB.QueryRow(context.Background(), `
+		SELECT EXISTS(SELECT 1 FROM products WHERE id = $1 AND is_active = true)
+	`, req.ProductID).Scan(&productExists)
+	if err != nil || !productExists {
+		return c.Status(404).JSON(fiber.Map{"error": "Producto no encontrado o no disponible"})
+	}
+
 	tx, err := db.DB.Begin(context.Background())
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error interno"})
