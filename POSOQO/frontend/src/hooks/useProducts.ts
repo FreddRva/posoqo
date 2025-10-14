@@ -46,7 +46,7 @@ export const useProducts = () => {
         console.log('📋 Lista de categorías:', cats.map(c => ({
           id: c.id,
           name: c.name,
-          parent_id: c.parent_id
+          parent_id: (c as any).parent_id
         })));
         setCategories(cats);
       }
