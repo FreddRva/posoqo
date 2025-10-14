@@ -421,7 +421,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Cargar carrito al montar el componente
   useEffect(() => {
     // TEMPORAL: Limpiar localStorage completamente para eliminar productos problemáticos
+    console.log('Limpiando localStorage completamente...');
     localStorage.clear();
+    // También limpiar sessionStorage por si acaso
+    sessionStorage.clear();
     loadCart();
   }, [loadCart]);
 
