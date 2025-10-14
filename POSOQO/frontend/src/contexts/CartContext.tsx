@@ -420,8 +420,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito al montar el componente
   useEffect(() => {
-    // TEMPORAL: Limpiar localStorage para eliminar productos problemáticos
-    localStorage.removeItem('posoqo_cart');
+    // TEMPORAL: Limpiar localStorage completamente para eliminar productos problemáticos
+    localStorage.clear();
     loadCart();
   }, [loadCart]);
 
