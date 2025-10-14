@@ -74,6 +74,17 @@ func ClearCart(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Carrito limpiado completamente"})
 }
 
+// DELETE /api/cart/cleanup - Limpiar producto problemático específico
+func CleanupProblematicProduct(c *fiber.Ctx) error {
+	// Eliminar directamente el producto problemático de todos los carritos
+	_, err := db.DB.Exec(context.Background(), "DELETE FROM cart_items WHERE product_id = 'c7d2f163-7c5f-4d45-881d-2d8b2d0d04ac'")
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error eliminando producto problemático"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Producto problemático eliminado de todos los carritos"})
+}
+
 // POST /api/cart
 func SaveCart(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
