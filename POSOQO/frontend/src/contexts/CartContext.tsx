@@ -133,10 +133,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (session?.accessToken) {
         try {
           // Limpiar carrito del backend primero
-          await apiFetch('/protected/cart', {
-            method: 'POST',
+          await apiFetch('/protected/cart/clear', {
+            method: 'DELETE',
             authToken: session.accessToken,
-            body: JSON.stringify({ items: [] }),
           });
           
           // Luego cargar desde backend (debería estar vacío)
@@ -391,10 +390,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Sincronizar con backend
       if (session?.accessToken) {
         try {
-          await apiFetch('/protected/cart', {
-            method: 'POST',
+          await apiFetch('/protected/cart/clear', {
+            method: 'DELETE',
             authToken: session.accessToken,
-            body: JSON.stringify({ items: [] }),
           });
         } catch (backendError) {
           console.warn('Error limpiando carrito en backend:', backendError);
