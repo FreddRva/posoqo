@@ -108,11 +108,23 @@ export const useProducts = () => {
       const beforeCategory = filtered.length;
       console.log(`🏷️ Filtrando por categoría: ${filters.category}`);
       
+      // Buscar la categoría seleccionada para determinar si es principal o subcategoría
+      const selectedCategory = categories.find(c => c.id === filters.category);
+      const isSubcategory = selectedCategory && (selectedCategory as any).parent_id;
+      
+      console.log(`🔍 Categoría seleccionada: ${selectedCategory?.name} (${isSubcategory ? 'Subcategoría' : 'Categoría principal'})`);
+      
       // Mostrar qué productos coinciden
-      const matchingProducts = filtered.filter(product => 
-        product.category_id === filters.category || 
-        product.subcategory_id === filters.category
-      );
+      const matchingProducts = filtered.filter(product => {
+        if (isSubcategory) {
+          // Si es subcategoría, buscar por subcategory_id O por category_id de la categoría padre
+          return product.subcategory_id === filters.category || 
+                 product.category_id === (selectedCategory as any).parent_id;
+        } else {
+          // Si es categoría principal, buscar por category_id
+          return product.category_id === filters.category;
+        }
+      });
       
       console.log('✅ Productos que coinciden con categoría:', matchingProducts.map(p => ({
         name: p.name,
