@@ -59,7 +59,7 @@ export const useProducts = () => {
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
     
-    console.log('🔍 FILTRADO DE PRODUCTOS');
+    console.log('🔍 FILTRADO DE PRODUCTOS - DEBUG');
     console.log('📦 Productos originales:', products.length);
     console.log('🎯 Filtros aplicados:', filters);
     
