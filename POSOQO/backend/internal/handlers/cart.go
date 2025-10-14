@@ -52,6 +52,28 @@ func GetCart(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"items": items})
 }
 
+// DELETE /api/cart/clear - Limpiar completamente el carrito
+func ClearCart(c *fiber.Ctx) error {
+	claims := c.Locals("user").(jwt.MapClaims)
+	userID := int64(claims["id"].(float64))
+
+	// Obtener cart_id
+	var cartID string
+	err := db.DB.QueryRow(context.Background(), "SELECT id FROM carts WHERE user_id=$1", userID).Scan(&cartID)
+	if err != nil {
+		// Si no existe carrito, devolver éxito
+		return c.JSON(fiber.Map{"message": "Carrito ya está vacío"})
+	}
+
+	// Eliminar todos los items del carrito
+	_, err = db.DB.Exec(context.Background(), "DELETE FROM cart_items WHERE cart_id=$1", cartID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error al limpiar carrito"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Carrito limpiado completamente"})
+}
+
 // POST /api/cart
 func SaveCart(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
