@@ -193,7 +193,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       } catch (validationError: any) {
         if (validationError?.status === 404) {
           console.warn(`Producto ${product.id} no encontrado - no se puede agregar al carrito`);
-          showNotification('Error', 'El producto no está disponible');
+          showNotification('El producto no está disponible', 'error');
           return;
         }
         // Para otros errores, continuar (puede ser problema de red)
