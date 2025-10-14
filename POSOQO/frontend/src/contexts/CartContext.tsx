@@ -128,6 +128,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Limpiar productos no encontrados del localStorage también
       const cleanedLocalCart = await cleanCartFromNonExistentProducts(localCart);
       setCart(cleanedLocalCart);
+      
+      // Persistir el carrito limpio en localStorage
+      persistCartToLocalStorage(cleanedLocalCart);
 
       if (!session?.accessToken) {
         // Si no hay sesión, usar solo localStorage
@@ -418,6 +421,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Cargar carrito al montar el componente
   useEffect(() => {
     loadCart();
+  }, [loadCart]);
+
+  // Efecto para limpiar carrito cuando se detecta un error 404
+  useEffect(() => {
+    const handle404Error = (event: CustomEvent) => {
+      const error = event.detail;
+      if (error?.status === 404 && error?.url?.includes('/products/')) {
+        console.warn('Error 404 detectado, limpiando carrito automáticamente');
+        loadCart(); // Recargar y limpiar el carrito
+      }
+    };
+
+    // Escuchar eventos de error 404
+    window.addEventListener('apiError404', handle404Error as EventListener);
+    
+    return () => {
+      window.removeEventListener('apiError404', handle404Error as EventListener);
+    };
   }, [loadCart]);
 
   return (

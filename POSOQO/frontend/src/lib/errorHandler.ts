@@ -79,6 +79,17 @@ class ErrorHandler {
       console.error(`[ErrorHandler] ${context || 'Unknown'}:`, errorInfo);
     }
 
+    // Disparar evento para error 404 de productos
+    if (errorInfo.status === 404 && context?.includes('product')) {
+      window.dispatchEvent(new CustomEvent('apiError404', {
+        detail: {
+          status: 404,
+          url: context,
+          message: errorInfo.message
+        }
+      }));
+    }
+
     // Agregar al log interno
     this.addToLog(errorInfo);
 
