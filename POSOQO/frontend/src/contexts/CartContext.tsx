@@ -118,10 +118,69 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // ===== CARGAR CARRITO =====
   const loadCart = useCallback(async () => {
-    // FUNCIÓN DESHABILITADA - El carrito se mantiene limpio
-    console.log('⚠️ loadCart deshabilitado - Carrito se mantiene limpio');
-    setCart([]);
-  }, []);
+    try {
+      setLoading(true);
+      setError(null);
+
+      // 1. Cargar desde localStorage primero
+      const localCart = loadFromLocalStorage();
+      setCart(localCart);
+
+      // 2. Si hay sesión, sincronizar con backend
+      if (session?.accessToken) {
+        try {
+          const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
+            authToken: session.accessToken,
+          });
+
+          if (response.items?.length > 0) {
+            // Obtener detalles de productos del backend
+            const backendItems = await Promise.all(
+              response.items.map(async (item) => {
+                try {
+                  const product = await apiFetch<any>(`/products/${item.product_id}`);
+                  return {
+                    id: item.product_id,
+                    name: product.name || "Producto",
+                    price: product.price || 0,
+                    image_url: getImageUrl(product.image_url),
+                    quantity: item.quantity,
+                    category: product.category?.name,
+                    description: product.description
+                  };
+                } catch (error) {
+                  console.warn(`Producto ${item.product_id} no encontrado`);
+                  return null;
+                }
+              })
+            );
+
+            // Filtrar productos válidos
+            const validItems = backendItems.filter(item => item !== null) as CartItem[];
+            
+            // Usar el carrito del backend si es más reciente
+            if (validItems.length > 0) {
+              setCart(validItems);
+              saveToLocalStorage(validItems);
+            }
+          }
+        } catch (backendError) {
+          console.warn('Error cargando carrito del backend:', backendError);
+          // Mantener carrito local si hay error en backend
+        }
+      }
+
+    } catch (error) {
+      const errorMessage = 'Error cargando carrito';
+      setError(errorMessage);
+      handleError(error, 'loadCart', {
+        showNotification: true,
+        logToConsole: true,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.accessToken, loadFromLocalStorage, saveToLocalStorage]);
 
   // ===== AGREGAR AL CARRITO =====
   const addToCart = useCallback(async (product: Omit<CartItem, 'quantity'>) => {
@@ -351,32 +410,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // ===== EFECTOS =====
   useEffect(() => {
-    // SOLUCIÓN RADICAL: Limpiar TODO y empezar de cero
-    console.log('🧹 LIMPIEZA RADICAL - Eliminando TODOS los datos del carrito');
-    
-    // 1. Limpiar localStorage completamente
-    localStorage.removeItem('cart');
-    localStorage.removeItem('posoqo_cart');
-    localStorage.removeItem('recentlyViewed');
-    sessionStorage.clear();
-    
-    // 2. Limpiar estado local
-    setCart([]);
-    setError(null);
-    
-    // 3. Limpiar backend si hay sesión
-    if (session?.accessToken) {
-      apiFetch('/protected/cart', {
-        method: 'POST',
-        authToken: session.accessToken,
-        body: JSON.stringify({ items: [] })
-      }).catch(() => {
-        // Ignorar errores
-      });
-    }
-    
-    console.log('✅ Carrito completamente limpio - Sin productos problemáticos');
-  }, [session?.accessToken]);
+    // Cargar carrito normal sin limpieza radical
+    loadCart();
+  }, [loadCart]);
 
   // ===== VALOR DEL CONTEXTO =====
   const contextValue: CartContextType = {
