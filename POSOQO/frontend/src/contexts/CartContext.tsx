@@ -426,7 +426,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // También limpiar sessionStorage por si acaso
     sessionStorage.clear();
     loadCart();
-  }, [loadCart]);
+  }, []); // Solo ejecutar una vez al montar
 
   // Efecto para limpiar carrito cuando se detecta un error 404
   useEffect(() => {
