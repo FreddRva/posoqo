@@ -168,12 +168,9 @@ function ProductsContent() {
                 <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
                 <span className="text-blue-400 font-semibold">Productos Encontrados</span>
                 <div className="text-2xl font-bold text-white">
-                  {filteredProducts.length}
-                </div>
-                <div className="text-gray-400">de</div>
-                <div className="text-2xl font-bold text-purple-400">
                   {products.length}
                 </div>
+                <div className="text-gray-400">productos</div>
               </div>
             </div>
           </div>
