@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -21,7 +21,7 @@ const Map = dynamic(() => import("@/components/OrderMap"), {
   loading: () => <div className="h-64 bg-stone-800 rounded-lg animate-pulse"></div>
 });
 
-export default function ProductsPage() {
+function ProductsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const { showSuccess, showError } = useToast();
@@ -84,7 +84,7 @@ export default function ProductsPage() {
       if (isFavorite) {
         showSuccess('Eliminado', `${product.name} eliminado de favoritos`);
         return prev.filter(id => id !== product.id);
-      } else {
+          } else {
         showSuccess('Agregado', `${product.name} agregado a favoritos`);
         return [...prev, product.id];
       }
@@ -103,18 +103,18 @@ export default function ProductsPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Error al cargar productos</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button
+        <button 
             onClick={refetch}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Reintentar
-          </button>
-        </div>
+        >
+          Reintentar
+        </button>
       </div>
-    );
+    </div>
+  );
   }
 
-  return (
+    return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -141,7 +141,7 @@ export default function ProductsPage() {
               {products.length} producto{products.length !== 1 ? 's' : ''} encontrado{products.length !== 1 ? 's' : ''}
             </span>
           </div>
-
+          
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMap(!showMap)}
@@ -169,8 +169,8 @@ export default function ProductsPage() {
               onToggleFavorite={handleToggleFavorite}
               onViewDetails={handleViewDetails}
               favorites={favorites}
-            />
-          </div>
+              />
+            </div>
 
           {/* Mapa */}
           {showMap && (
@@ -197,5 +197,20 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando productos...</p>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }
