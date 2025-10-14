@@ -200,7 +200,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Validar que el producto existe y tiene stock antes de agregarlo
       try {
-        const productData = await apiFetch(`/products/${product.id}`);
+        const productData = await apiFetch<any>(`/products/${product.id}`);
         if (productData.stock <= 0) {
           showNotification('El producto no tiene stock disponible', 'error');
           return;
