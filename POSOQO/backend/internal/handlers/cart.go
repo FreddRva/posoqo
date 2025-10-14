@@ -152,8 +152,7 @@ func AddToCart(c *fiber.Ctx) error {
 		INSERT INTO cart_items (cart_id, product_id, quantity)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (cart_id, product_id) DO UPDATE SET 
-			quantity = cart_items.quantity + EXCLUDED.quantity,
-			updated_at = NOW()
+			quantity = cart_items.quantity + EXCLUDED.quantity
 	`, cartID, req.ProductID, req.Quantity)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo agregar producto al carrito"})
