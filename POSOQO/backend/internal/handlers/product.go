@@ -53,6 +53,47 @@ type ProductResponse struct {
 
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
+	// Primero verificar si la tabla existe
+	var tableExists bool
+	err := db.DB.QueryRow(context.Background(), `
+		SELECT EXISTS (
+			SELECT 1 FROM information_schema.tables 
+			WHERE table_name = 'products'
+		)
+	`).Scan(&tableExists)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error verificando tabla: " + err.Error(),
+		})
+	}
+	
+	if !tableExists {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Tabla products no existe",
+		})
+	}
+
+	// Contar productos
+	var count int
+	err = db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM products`).Scan(&count)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error contando productos: " + err.Error(),
+		})
+	}
+
+	// Si no hay productos, devolver array vacío
+	if count == 0 {
+		return c.JSON(fiber.Map{
+			"success": true,
+			"data":    []ProductResponse{},
+			"total":   0,
+		})
+	}
+
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
