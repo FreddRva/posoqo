@@ -60,9 +60,12 @@ export const useProducts = () => {
       );
     }
 
-    // Filtro por categoría
+    // Filtro por categoría (buscar tanto en category_id como en subcategory_id)
     if (filters.category) {
-      filtered = filtered.filter(product => product.category_id === filters.category);
+      filtered = filtered.filter(product => 
+        product.category_id === filters.category || 
+        product.subcategory_id === filters.category
+      );
     }
 
     // Filtro por subcategoría

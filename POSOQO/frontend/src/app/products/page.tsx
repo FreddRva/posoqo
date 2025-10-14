@@ -136,7 +136,7 @@ function ProductsContent() {
           </h1>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Encuentra los mejores productos para tu negocio
+            Encuentra los mejores productos
           </p>
         </motion.div>
 
