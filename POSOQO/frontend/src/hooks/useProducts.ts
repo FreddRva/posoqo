@@ -54,6 +54,12 @@ export const useProducts = () => {
         const subCategories = cats.filter(c => (c as any).parent_id);
         console.log('🏢 Categorías principales:', mainCategories.map(c => ({ id: c.id, name: c.name })));
         console.log('🏷️ Subcategorías:', subCategories.map(c => ({ id: c.id, name: c.name, parent_id: (c as any).parent_id })));
+        
+        // Mostrar información detallada
+        console.log('🔍 DETALLE DE CATEGORÍAS:');
+        cats.forEach((cat, index) => {
+          console.log(`  ${index + 1}. ${cat.name} (ID: ${cat.id}) - Parent: ${(cat as any).parent_id || 'Ninguno'}`);
+        });
         setCategories(cats);
       }
     } catch (err) {
@@ -77,6 +83,14 @@ export const useProducts = () => {
         category_id: p.category_id,
         subcategory_id: p.subcategory_id
       })));
+      
+      console.log('🔍 DETALLE DE PRODUCTOS:');
+      products.forEach((product, index) => {
+        console.log(`  ${index + 1}. ${product.name}`);
+        console.log(`     - ID: ${product.id}`);
+        console.log(`     - Category ID: ${product.category_id || 'undefined'}`);
+        console.log(`     - Subcategory ID: ${product.subcategory_id || 'undefined'}`);
+      });
     }
 
     // Filtro por búsqueda
