@@ -76,9 +76,16 @@ export const useDashboardProducts = () => {
       const method = editingProduct ? 'PUT' : 'POST';
       const url = editingProduct ? `/admin/products/${editingProduct.id}` : '/admin/products';
       
+      // Convertir subcategory_id a subcategory para el backend
+      const backendData = {
+        ...productData,
+        subcategory: productData.subcategory_id
+      };
+      delete (backendData as any).subcategory_id;
+      
       const response = await apiFetch(url, {
         method,
-        body: JSON.stringify(productData)
+        body: JSON.stringify(backendData)
       });
 
       if (response) {
