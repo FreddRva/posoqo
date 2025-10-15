@@ -114,7 +114,6 @@ func GetProducts(c *fiber.Ctx) error {
 	})
 }
 
-
 // GetProduct devuelve un producto específico por ID desde la base de datos
 func GetProduct(c *fiber.Ctx) error {
 	id := c.Params("id")

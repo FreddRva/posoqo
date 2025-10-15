@@ -200,23 +200,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Validar que el producto existe y está activo antes de agregarlo
       try {
+        console.log('🔍 Validando producto:', product.id);
         const productData = await apiFetch<any>(`/products/${product.id}`);
+        console.log('🔍 Datos del producto:', productData);
+        
         if (!productData.is_active) {
+          console.log('❌ Producto no activo');
           showNotification('El producto no está disponible', 'error');
           return;
         }
         // Solo validar stock si es 0 o negativo
         if (productData.stock <= 0) {
+          console.log('❌ Producto sin stock:', productData.stock);
           showNotification('El producto no tiene stock disponible', 'error');
           return;
         }
+        console.log('✅ Producto válido, stock:', productData.stock);
       } catch (validationError: any) {
+        console.log('❌ Error validando producto:', validationError);
         if (validationError?.status === 404) {
           console.warn(`Producto ${product.id} no encontrado - no se puede agregar al carrito`);
           showNotification('El producto no está disponible', 'error');
           return;
         }
         // Para otros errores, continuar (puede ser problema de red)
+        console.log('⚠️ Error de red, continuando...');
       }
 
       // Normalizar producto
