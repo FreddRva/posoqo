@@ -1,0 +1,5 @@
+[33m1fc11aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: agregar onMouseDown, onClick y onTouchStart para asegurar que funcione el clic en resultados
+[33m8835f06[m fix: cambiar button a div y simplificar selectSearchResult para que funcione el clic
+[33m3782781[m fix: simplificar dropdown - no cerrar automaticamente y agregar boton cerrar
+[33m5e92389[m fix: evitar cierre rápido del dropdown agregando hover state y reduciendo debounce
+[33m35e2be8[m fix: arreglar dropdown de búsqueda y hacer el mapa más grande (max-w-6xl, h-90vh)
