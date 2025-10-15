@@ -28,6 +28,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Cargar Leaflet
   useEffect(() => {
@@ -73,6 +74,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Cleanup timeout al desmontar
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -316,11 +326,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   // Limpiar timeout anterior
-                  if (window.searchTimeout) {
-                    clearTimeout(window.searchTimeout);
+                  if (searchTimeoutRef.current) {
+                    clearTimeout(searchTimeoutRef.current);
                   }
                   // Nuevo timeout
-                  window.searchTimeout = setTimeout(() => {
+                  searchTimeoutRef.current = setTimeout(() => {
                     searchLocation(e.target.value);
                   }, 500);
                 }}
