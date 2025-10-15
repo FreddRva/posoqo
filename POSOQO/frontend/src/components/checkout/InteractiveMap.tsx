@@ -232,12 +232,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   };
 
-  // Seleccionar resultado de búsqueda mejorado
+  // Seleccionar resultado de búsqueda - VERSIÓN SIMPLE
   const selectSearchResult = (result: any) => {
-    console.log('🚀 INICIANDO selectSearchResult');
-    console.log('🔍 Resultado seleccionado:', result);
-    console.log('🔍 Estado actual del marcador:', markerRef.current);
-    console.log('🔍 Estado actual del mapa:', mapInstance.current);
+    console.log('🚀 CLIC FUNCIONA! Resultado:', result);
     
     const lat = result.geometry.lat;
     const lng = result.geometry.lng;
@@ -246,60 +243,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     console.log('📍 Coordenadas:', { lat, lng });
     console.log('📍 Dirección:', address);
     
-    // Actualizar estado
+    // Actualizar estado inmediatamente
     setSelectedPosition([lat, lng]);
     setAddress(address);
     
-    // Actualizar marcador con delay para asegurar que el mapa esté listo
-    setTimeout(() => {
-      console.log('🔍 Verificando marcador y mapa...');
-      console.log('🔍 markerRef.current:', markerRef.current);
-      console.log('🔍 mapInstance.current:', mapInstance.current);
-      
-      if (markerRef.current) {
-        console.log('🎯 Actualizando marcador a:', [lat, lng]);
-        markerRef.current.setLatLng([lat, lng]);
-        markerRef.current.update();
-        console.log('✅ Marcador actualizado');
-      } else {
-        console.warn('⚠️ Marcador no encontrado - creando nuevo marcador');
-        // Crear nuevo marcador si no existe
-        if (mapInstance.current && window.L) {
-          const newMarker = window.L.marker([lat, lng], {
-            draggable: true
-          }).addTo(mapInstance.current);
-          
-          newMarker.on('dragend', (e: any) => {
-            const newPos = e.target.getLatLng();
-            setSelectedPosition([newPos.lat, newPos.lng]);
-            getAddressFromCoordinates(newPos.lat, newPos.lng);
-          });
-          
-          markerRef.current = newMarker;
-          console.log('✅ Nuevo marcador creado');
-        }
-      }
-      
-      // Centrar mapa en la nueva ubicación
-      if (mapInstance.current) {
-        console.log('🗺️ Centrando mapa en:', [lat, lng]);
-        mapInstance.current.setView([lat, lng], 16, {
-          animate: true,
-          duration: 1.5
-        });
-        console.log('✅ Mapa centrado');
-      } else {
-        console.warn('⚠️ Mapa no encontrado');
-      }
-    }, 100);
+    // Actualizar marcador y mapa
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+    }
     
-    // ✅ NO llamar a onLocationSelect automáticamente - dejar que el usuario confirme
-    // onLocationSelect(lat, lng, address);
+    if (mapInstance.current) {
+      mapInstance.current.setView([lat, lng], 16, {
+        animate: true,
+        duration: 1.5
+      });
+    }
     
-    // Cerrar dropdown pero mantener el query para que el usuario pueda ver qué seleccionó
+    // Cerrar dropdown
     setShowSearchResults(false);
-    setIsHoveringResults(false);
-    // setSearchQuery(''); // No limpiar el query inmediatamente
+    
+    console.log('✅ RESULTADO SELECCIONADO CORRECTAMENTE');
   };
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
@@ -470,16 +433,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             {searchResults.length > 0 ? (
               <div className="max-h-60 overflow-y-auto">
                 {searchResults.map((result, index) => (
-                  <button
+                  <div
                     key={index}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                    onClick={() => {
                       console.log('🖱️ CLIC EN RESULTADO:', result);
                       selectSearchResult(result);
                     }}
-                    className="w-full px-6 py-4 text-left hover:bg-blue-100 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer text-left"
-                    style={{ pointerEvents: 'auto', zIndex: 100000 }}
+                    className="w-full px-6 py-4 text-left hover:bg-blue-100 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
+                    style={{ 
+                      pointerEvents: 'auto', 
+                      zIndex: 100000,
+                      position: 'relative'
+                    }}
                   >
                     <div className="flex items-start gap-3">
                       <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -492,7 +457,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                         </p>
                       </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             ) : searchQuery.trim() && !isSearching ? (
