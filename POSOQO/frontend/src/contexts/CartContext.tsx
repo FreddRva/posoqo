@@ -122,24 +122,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
 
-      // 1. Limpiar completamente localStorage y sessionStorage
-      localStorage.removeItem('posoqo_cart');
-      sessionStorage.removeItem('posoqo_cart');
-      
-      // 2. Inicializar carrito vacío
-      setCart([]);
+      // Cargar carrito desde localStorage
+      const localCart = loadFromLocalStorage();
+      setCart(localCart);
 
-      // 3. Si hay sesión, limpiar backend primero y luego cargar
+      // Si hay sesión, sincronizar con backend
       if (session?.accessToken) {
         try {
-          // Limpiar carrito del backend primero
-          await apiFetch('/protected/cart', {
-            method: 'POST',
-            authToken: session.accessToken,
-            body: JSON.stringify({ items: [] }),
-          });
-          
-          // Luego cargar desde backend (debería estar vacío)
           const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
             authToken: session.accessToken,
           });
@@ -149,7 +138,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             const backendItems = await Promise.all(
               response.items.map(async (item) => {
                 try {
-                  const product = await apiFetch<any>(`/products/${item.product_id}`);
+                  const productResponse = await apiFetch<any>(`/products/${item.product_id}`);
+                  const product = productResponse.data || productResponse;
                   return {
                     id: item.product_id,
                     name: product.name || "Producto",
@@ -177,7 +167,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }
         } catch (backendError) {
           console.warn('Error cargando carrito del backend:', backendError);
-          // Mantener carrito vacío si hay error en backend
+          // Mantener carrito local si hay error en backend
         }
       }
 
