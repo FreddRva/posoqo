@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -42,8 +43,13 @@ func SearchLocation(c *fiber.Ctx) error {
 		})
 	}
 
-	// Construir URL de Nominatim
-	url := fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1", req.Query)
+	// Construir URL de Nominatim con encoding correcto
+	encodedQuery := url.QueryEscape(req.Query)
+	apiUrl := fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1", encodedQuery)
+	
+	// Log para debug
+	fmt.Printf("🔍 Buscando: %s\n", req.Query)
+	fmt.Printf("🌐 URL: %s\n", apiUrl)
 
 	// Crear cliente HTTP con timeout
 	client := &http.Client{
@@ -51,7 +57,7 @@ func SearchLocation(c *fiber.Ctx) error {
 	}
 
 	// Crear request
-	httpReq, err := http.NewRequest("GET", url, nil)
+	httpReq, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
 		return c.Status(500).JSON(GeocodingResponse{
 			Success: false,
@@ -115,7 +121,7 @@ func ReverseGeocoding(c *fiber.Ctx) error {
 	}
 
 	// Construir URL de Nominatim para reverse geocoding
-	url := fmt.Sprintf("https://nominatim.openstreetmap.org/reverse?lat=%s&lon=%s&format=json&addressdetails=1", req.Lat, req.Lng)
+	apiUrl := fmt.Sprintf("https://nominatim.openstreetmap.org/reverse?lat=%s&lon=%s&format=json&addressdetails=1", req.Lat, req.Lng)
 
 	// Crear cliente HTTP con timeout
 	client := &http.Client{
@@ -123,7 +129,7 @@ func ReverseGeocoding(c *fiber.Ctx) error {
 	}
 
 	// Crear request
-	httpReq, err := http.NewRequest("GET", url, nil)
+	httpReq, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
 		return c.Status(500).JSON(GeocodingResponse{
 			Success: false,
