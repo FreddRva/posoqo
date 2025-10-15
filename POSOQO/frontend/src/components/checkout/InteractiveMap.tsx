@@ -146,7 +146,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setIsLoading(false);
   };
 
-  // Función de búsqueda mejorada
+  // Función de búsqueda mejorada con mejor cobertura
   const searchLocation = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -158,10 +158,24 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setShowSearchResults(true);
     
     try {
-      // Usar múltiples APIs para mejor cobertura
+      // Usar Nominatim como API principal (mejor cobertura de ciudades peruanas)
       const searchPromises = [];
       
-      // 1. OpenCage API (principal)
+      // 1. Nominatim con búsqueda amplia en Perú
+      searchPromises.push(
+        fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Peru')}&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1`
+        ).then(res => res.ok ? res.json() : null)
+      );
+      
+      // 2. Nominatim con búsqueda específica de ciudades
+      searchPromises.push(
+        fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=pe&addressdetails=1&featuretype=city`
+        ).then(res => res.ok ? res.json() : null)
+      );
+      
+      // 3. OpenCage API como respaldo si está disponible
       if (process.env.NEXT_PUBLIC_OPENCAGE_API_KEY) {
         searchPromises.push(
           fetch(
@@ -170,74 +184,76 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         );
       }
       
-      // 2. Nominatim (OpenStreetMap) como fallback
-      searchPromises.push(
-        fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Peru')}&format=json&limit=5&countrycodes=pe&addressdetails=1`
-        ).then(res => res.ok ? res.json() : null)
-      );
-      
       const results = await Promise.allSettled(searchPromises);
       let allResults = [];
       
-      // Procesar resultados de OpenCage
-      if (results[0].status === 'fulfilled' && results[0].value?.results) {
-        allResults = results[0].value.results.map((result: any) => ({
-          formatted: result.formatted,
-          geometry: result.geometry,
-          components: result.components,
-          source: 'opencage'
-        }));
-      }
-      
-      // Procesar resultados de Nominatim si no hay suficientes
-      if (allResults.length < 3 && results[1].status === 'fulfilled' && results[1].value) {
-        const nominatimResults = results[1].value.map((result: any) => ({
+      // Procesar resultados de Nominatim (búsqueda amplia)
+      if (results[0].status === 'fulfilled' && results[0].value) {
+        const nominatimResults = results[0].value.map((result: any) => ({
           formatted: result.display_name,
           geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
           components: {
-            city: result.address?.city || result.address?.town || result.address?.village,
-            state: result.address?.state,
+            city: result.address?.city || result.address?.town || result.address?.village || result.address?.municipality,
+            state: result.address?.state || result.address?.region,
             country: result.address?.country
           },
-          source: 'nominatim'
+          source: 'nominatim',
+          importance: result.importance || 0
+        }));
+        allResults = [...allResults, ...nominatimResults];
+      }
+      
+      // Procesar resultados de Nominatim (ciudades específicas)
+      if (results[1].status === 'fulfilled' && results[1].value) {
+        const cityResults = results[1].value.map((result: any) => ({
+          formatted: result.display_name,
+          geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
+          components: {
+            city: result.address?.city || result.address?.town || result.address?.village || result.address?.municipality,
+            state: result.address?.state || result.address?.region,
+            country: result.address?.country
+          },
+          source: 'nominatim_city',
+          importance: result.importance || 0
         }));
         
         // Combinar resultados únicos
         const existingCoords = new Set(allResults.map((r: any) => `${r.geometry.lat},${r.geometry.lng}`));
-        const newResults = nominatimResults.filter((r: any) => 
+        const newCityResults = cityResults.filter((r: any) => 
           !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
         );
-        allResults = [...allResults, ...newResults];
+        allResults = [...allResults, ...newCityResults];
       }
       
-      // Si no hay resultados, usar ubicaciones populares de Perú
-      if (allResults.length === 0) {
-        const popularPeruLocations = [
-          { name: 'Lima Centro', city: 'Lima', lat: -12.0464, lng: -77.0428 },
-          { name: 'Miraflores', city: 'Lima', lat: -12.1201, lng: -77.0342 },
-          { name: 'San Isidro', city: 'Lima', lat: -12.0983, lng: -77.0305 },
-          { name: 'Arequipa Centro', city: 'Arequipa', lat: -16.4090, lng: -71.5375 },
-          { name: 'Cusco Centro', city: 'Cusco', lat: -13.5319, lng: -71.9675 },
-          { name: 'Trujillo Centro', city: 'Trujillo', lat: -8.1116, lng: -79.0289 },
-          { name: 'Chiclayo Centro', city: 'Chiclayo', lat: -6.7714, lng: -79.8409 },
-          { name: 'Piura Centro', city: 'Piura', lat: -5.1945, lng: -80.6328 }
-        ];
+      // Procesar resultados de OpenCage si está disponible
+      if (results[2] && results[2].status === 'fulfilled' && results[2].value?.results) {
+        const opencageResults = results[2].value.results.map((result: any) => ({
+          formatted: result.formatted,
+          geometry: result.geometry,
+          components: result.components,
+          source: 'opencage',
+          importance: 0.5
+        }));
         
-        allResults = popularPeruLocations
-          .filter((location: any) => 
-            location.name.toLowerCase().includes(query.toLowerCase()) ||
-            location.city.toLowerCase().includes(query.toLowerCase())
-          )
-          .map((location: any) => ({
-            formatted: `${location.name}, ${location.city}, Perú`,
-            geometry: { lat: location.lat, lng: location.lng },
-            components: { city: location.city, state: location.city },
-            source: 'popular'
-          }));
+        // Combinar resultados únicos
+        const existingCoords = new Set(allResults.map((r: any) => `${r.geometry.lat},${r.geometry.lng}`));
+        const newOpencageResults = opencageResults.filter((r: any) => 
+          !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
+        );
+        allResults = [...allResults, ...newOpencageResults];
       }
       
-      setSearchResults(allResults.slice(0, 8)); // Máximo 8 resultados
+      // Ordenar por importancia y relevancia
+      allResults.sort((a: any, b: any) => {
+        // Priorizar resultados de ciudades
+        if (a.source === 'nominatim_city' && b.source !== 'nominatim_city') return -1;
+        if (b.source === 'nominatim_city' && a.source !== 'nominatim_city') return 1;
+        
+        // Luego por importancia
+        return (b.importance || 0) - (a.importance || 0);
+      });
+      
+      setSearchResults(allResults.slice(0, 10)); // Máximo 10 resultados
       
     } catch (error) {
       console.error('Error en búsqueda:', error);
