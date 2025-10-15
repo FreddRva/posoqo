@@ -53,66 +53,6 @@ type ProductResponse struct {
 
 // GetProducts devuelve todos los productos desde la base de datos
 func GetProducts(c *fiber.Ctx) error {
-	fmt.Println("🔍 [DEBUG] GetProducts iniciado")
-
-	// Verificar conexión a la base de datos
-	err := db.DB.Ping(context.Background())
-	if err != nil {
-		fmt.Printf("❌ [DEBUG] Error de conexión a BD: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error de conexión a base de datos: " + err.Error(),
-		})
-	}
-	fmt.Println("✅ [DEBUG] Conexión a BD OK")
-
-	// Verificar si la tabla existe
-	var tableExists bool
-	err = db.DB.QueryRow(context.Background(), `
-		SELECT EXISTS (
-			SELECT 1 FROM information_schema.tables 
-			WHERE table_name = 'products'
-		)
-	`).Scan(&tableExists)
-	if err != nil {
-		fmt.Printf("❌ [DEBUG] Error verificando tabla: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error verificando tabla: " + err.Error(),
-		})
-	}
-	fmt.Printf("🔍 [DEBUG] Tabla products existe: %v\n", tableExists)
-
-	if !tableExists {
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Tabla products no existe",
-		})
-	}
-
-	// Contar productos
-	var count int
-	err = db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM products`).Scan(&count)
-	if err != nil {
-		fmt.Printf("❌ [DEBUG] Error contando productos: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error contando productos: " + err.Error(),
-		})
-	}
-	fmt.Printf("🔍 [DEBUG] Total productos: %d\n", count)
-
-	// Si no hay productos, devolver array vacío
-	if count == 0 {
-		fmt.Println("✅ [DEBUG] No hay productos, devolviendo array vacío")
-		return c.JSON(fiber.Map{
-			"success": true,
-			"data":    []ProductResponse{},
-			"total":   0,
-		})
-	}
-
-	fmt.Println("🔍 [DEBUG] Iniciando consulta de productos")
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
 		FROM products
@@ -120,7 +60,6 @@ func GetProducts(c *fiber.Ctx) error {
 		ORDER BY id
 	`)
 	if err != nil {
-		fmt.Printf("❌ [DEBUG] Error en consulta SQL: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
 			"error":   "Error consultando productos: " + err.Error(),
@@ -128,7 +67,6 @@ func GetProducts(c *fiber.Ctx) error {
 	}
 	defer rows.Close()
 
-	fmt.Println("🔍 [DEBUG] Procesando filas de productos")
 	var products []ProductResponse
 	for rows.Next() {
 		var id, name, description, categoryID string
@@ -136,15 +74,14 @@ func GetProducts(c *fiber.Ctx) error {
 		var price float64
 		var isActive, isFeatured bool
 		var createdAt, updatedAt time.Time
-
 		var stock int
+		
 		err := rows.Scan(
 			&id, &name, &description, &price, &imageURL,
 			&categoryID, &isActive, &isFeatured, &stock, &createdAt, &updatedAt, &subcategory,
 			&estilo, &abv, &ibu, &color,
 		)
 		if err != nil {
-			fmt.Printf("❌ [DEBUG] Error escaneando fila: %v\n", err)
 			return c.Status(500).JSON(fiber.Map{
 				"success": false,
 				"error":   "Error leyendo producto: " + err.Error(),
@@ -170,7 +107,6 @@ func GetProducts(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Printf("✅ [DEBUG] Productos procesados: %d\n", len(products))
 	return c.JSON(fiber.Map{
 		"success": true,
 		"data":    products,
@@ -242,7 +178,6 @@ func CreateProduct(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
 	}
 
-	fmt.Printf("🔍 [CREATE] Creando producto con datos: %+v\n", req)
 	var categoryID sql.NullString
 	if req.CategoryID != "" {
 		categoryID = sql.NullString{String: req.CategoryID, Valid: true}
@@ -305,14 +240,11 @@ func UpdateProduct(c *fiber.Ctx) error {
 		subcategoryID = sql.NullString{Valid: false}
 	}
 
-	fmt.Printf("🔍 [UPDATE] Actualizando producto ID: %s\n", id)
-	fmt.Printf("🔍 [UPDATE] Datos recibidos: %+v\n", req)
 
 	_, err := db.DB.Exec(context.Background(),
 		`UPDATE products SET name=$1, description=$2, price=$3, image_url=$4, category_id=$5, subcategory=$6, estilo=$7, abv=$8, ibu=$9, color=$10, stock=$11, is_active=$12, is_featured=$13, updated_at=NOW() WHERE id=$14`,
 		req.Name, req.Description, req.Price, req.ImageURL, categoryID, subcategoryID, req.Estilo, req.ABV, req.IBU, req.Color, req.Stock, req.IsActive, req.IsFeatured, id)
 	if err != nil {
-		fmt.Printf("❌ [UPDATE] Error actualizando producto: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Error al actualizar producto"})
 	}
 

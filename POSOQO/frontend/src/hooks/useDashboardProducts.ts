@@ -43,22 +43,16 @@ export const useDashboardProducts = () => {
   // Cargar categorías
   const loadCategories = async () => {
     try {
-      console.log('Cargando categorías...');
       const response = await apiFetch<{ success: boolean; data: Category[] }>("/categories");
-      console.log('Respuesta de categorías:', response);
       
       if (response && typeof response === 'object' && 'success' in response && response.success) {
         const cats = response.data || [];
-        console.log('Categorías recibidas:', cats);
         const mainCats = cats.filter((c: Category) => !c.parent_id);
         const subCats = cats.filter((c: Category) => c.parent_id);
-        console.log('Categorías principales:', mainCats);
-        console.log('Subcategorías:', subCats);
         setCategories(mainCats);
         setAllCategories(mainCats);
         setAllSubcategories(subCats);
       } else {
-        console.log('No se encontraron categorías en la respuesta');
         setCategories([]);
         setAllCategories([]);
         setAllSubcategories([]);
