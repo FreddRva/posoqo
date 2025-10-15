@@ -10,6 +10,7 @@ import { Grid3X3, List, MapPin } from "lucide-react";
 // Componentes
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductList } from "@/components/products/ProductList";
+import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/contexts/CartContext";
@@ -40,6 +41,8 @@ function ProductsContent() {
 
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showMap, setShowMap] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Cargar favoritos del localStorage
   useEffect(() => {
@@ -94,17 +97,14 @@ function ProductsContent() {
     // Agregar a visto recientemente
     addToRecentlyViewed(product);
     
-    // Mostrar información del producto en un modal o alert
-    const productInfo = `
-      ${product.name}
-      
-      Precio: S/ ${product.price}
-      ${product.description ? `\nDescripción: ${product.description}` : ''}
-      ${product.stock ? `\nStock: ${product.stock} unidades` : ''}
-      ${product.category ? `\nCategoría: ${product.category}` : ''}
-    `;
-    
-    alert(productInfo);
+    // Mostrar modal profesional
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
   };
 
   if (error) {
@@ -250,6 +250,16 @@ function ProductsContent() {
           )}
         </div>
       </div>
+
+      {/* Modal de detalles del producto */}
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onAddToCart={handleAddToCart}
+        onToggleFavorite={handleToggleFavorite}
+        isFavorite={selectedProduct ? favorites.includes(selectedProduct.id) : false}
+      />
     </div>
   );
 }
