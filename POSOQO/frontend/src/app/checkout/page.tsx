@@ -170,14 +170,14 @@ export default function CheckoutPage() {
 
   // Guardar dirección actual
   const saveCurrentAddress = () => {
-    if (!address) return;
+    if (!addressHook.address) return;
 
     const newAddress = {
       id: Date.now().toString(),
       name: `Dirección ${new Date().toLocaleDateString()}`,
-      address,
-      addressRef,
-      streetNumber,
+      address: addressHook.address,
+      addressRef: addressHook.addressRef,
+      streetNumber: addressHook.streetNumber,
       lat: markerPosition[0],
       lng: markerPosition[1],
       isDefault: false
