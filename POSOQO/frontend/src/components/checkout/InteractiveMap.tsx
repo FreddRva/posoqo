@@ -205,8 +205,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         processedResults.sort((a: any, b: any) => (b.importance || 0) - (a.importance || 0));
         
         setSearchResults(processedResults.slice(0, 10));
+        console.log('✅ Resultados establecidos:', processedResults.slice(0, 10).length, 'elementos');
       } else {
         setSearchResults([]);
+        console.log('❌ No hay resultados');
       }
       
     } catch (error) {
@@ -434,17 +436,25 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
         {/* Dropdown de resultados - Fuera del header */}
         {showSearchResults && (
-          <div className="relative z-[9999] bg-white border-b border-gray-200">
+          <div 
+            className="absolute top-full left-0 right-0 z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
+            onClick={(e) => {
+              console.log('🖱️ CLIC EN DROPDOWN:', e.target);
+            }}
+          >
             {searchResults.length > 0 ? (
               <div className="max-h-60 overflow-y-auto">
                 {searchResults.map((result, index) => (
                   <button
                     key={index}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       console.log('🖱️ CLIC EN RESULTADO:', result);
                       selectSearchResult(result);
                     }}
-                    className="w-full px-6 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                    className="w-full px-6 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
+                    style={{ pointerEvents: 'auto' }}
                   >
                     <div className="flex items-start gap-3">
                       <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
