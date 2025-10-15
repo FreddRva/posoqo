@@ -11,6 +11,8 @@ import StripeElementsForm from "./StripeElementsForm";
 import { ProfileFormComponent } from "@/components/checkout/ProfileForm";
 import AddressForm from "@/components/checkout/AddressForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import AddressSelector from "@/components/checkout/AddressSelector";
+import InteractiveMap from "@/components/checkout/InteractiveMap";
 import { useCheckoutProfile } from "@/hooks/useCheckoutProfile";
 import { useCheckoutAddress } from "@/hooks/useCheckoutAddress";
 import { apiFetch } from "@/lib/api";
@@ -48,6 +50,9 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState<1 | 2>(1);
   const [isClient, setIsClient] = useState(false);
+  const [addressMode, setAddressMode] = useState<'select' | 'create' | 'map'>('select');
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -139,6 +144,61 @@ export default function CheckoutPage() {
     );
   }
 
+  // Manejar selección de dirección guardada
+  const handleSelectAddress = (address: any) => {
+    setSelectedAddress(address);
+    setAddress(address.address);
+    setAddressRef(address.addressRef);
+    setStreetNumber(address.streetNumber);
+    setMarkerPosition([address.lat, address.lng]);
+    setAddressMode('select');
+  };
+
+  // Manejar nueva dirección
+  const handleNewAddress = () => {
+    setAddressMode('create');
+    setSelectedAddress(null);
+  };
+
+  // Manejar selección desde mapa
+  const handleMapLocationSelect = (lat: number, lng: number, address: string) => {
+    setMarkerPosition([lat, lng]);
+    setAddress(address);
+    setAddressMode('create');
+    setShowMap(false);
+  };
+
+  // Guardar dirección actual
+  const saveCurrentAddress = () => {
+    if (!address) return;
+
+    const newAddress = {
+      id: Date.now().toString(),
+      name: `Dirección ${new Date().toLocaleDateString()}`,
+      address,
+      addressRef,
+      streetNumber,
+      lat: markerPosition[0],
+      lng: markerPosition[1],
+      isDefault: false
+    };
+
+    try {
+      const saved = localStorage.getItem('savedAddresses');
+      const addresses = saved ? JSON.parse(saved) : [];
+      addresses.unshift(newAddress);
+      localStorage.setItem('savedAddresses', JSON.stringify(addresses));
+      
+      // También guardar en userAddress para compatibilidad
+      addressHook.saveAddressToLocalStorage();
+      
+      setSelectedAddress(newAddress);
+      setAddressMode('select');
+    } catch (error) {
+      console.error('Error saving address:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-neutral-900 text-white py-12 px-4 sm:px-6 lg:px-8">
       <Script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places" strategy="beforeInteractive" />
@@ -196,17 +256,59 @@ export default function CheckoutPage() {
                   onSave={saveProfile}
                   onCancel={() => {}}
                 />
-                <AddressForm 
-                  address={addressHook.address}
-                  setAddress={addressHook.setAddress}
-                  addressRef={addressHook.addressRef}
-                  setAddressRef={addressHook.setAddressRef}
-                  streetNumber={addressHook.streetNumber}
-                  setStreetNumber={addressHook.setStreetNumber}
-                  location={location}
-                  markerPosition={markerPosition}
-                  onMapClick={() => {}}
-                  onAddressFromCoords={() => fetchAddressFromCoordinates(markerPosition[0], markerPosition[1])}
+                {/* Selector de direcciones */}
+                {addressMode === 'select' && (
+                  <AddressSelector
+                    onSelectAddress={handleSelectAddress}
+                    onNewAddress={handleNewAddress}
+                    selectedAddressId={selectedAddress?.id}
+                  />
+                )}
+
+                {/* Formulario de nueva dirección */}
+                {addressMode === 'create' && (
+                  <div className="space-y-6">
+                    <AddressForm 
+                      address={addressHook.address}
+                      setAddress={addressHook.setAddress}
+                      addressRef={addressHook.addressRef}
+                      setAddressRef={addressHook.setAddressRef}
+                      streetNumber={addressHook.streetNumber}
+                      setStreetNumber={addressHook.setStreetNumber}
+                      location={location}
+                      markerPosition={markerPosition}
+                      onMapClick={() => setShowMap(true)}
+                      onAddressFromCoords={() => fetchAddressFromCoordinates(markerPosition[0], markerPosition[1])}
+                    />
+                    
+                    <div className="flex gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={saveCurrentAddress}
+                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                      >
+                        Guardar Dirección
+                      </motion.button>
+                      
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setAddressMode('select')}
+                        className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
+                      >
+                        Cancelar
+                      </motion.button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mapa interactivo */}
+                <InteractiveMap
+                  initialPosition={markerPosition}
+                  onLocationSelect={handleMapLocationSelect}
+                  onClose={() => setShowMap(false)}
+                  isOpen={showMap}
                 />
               </div>
               <div>

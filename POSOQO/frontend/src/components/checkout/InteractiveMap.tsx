@@ -1,0 +1,269 @@
+"use client";
+
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { MapPin, Navigation, Check, X } from 'lucide-react';
+
+interface InteractiveMapProps {
+  initialPosition: [number, number];
+  onLocationSelect: (lat: number, lng: number, address: string) => void;
+  onClose: () => void;
+  isOpen: boolean;
+}
+
+export const InteractiveMap: React.FC<InteractiveMapProps> = ({
+  initialPosition,
+  onLocationSelect,
+  onClose,
+  isOpen
+}) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<any>(null);
+  const markerRef = useRef<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedPosition, setSelectedPosition] = useState<[number, number]>(initialPosition);
+  const [address, setAddress] = useState<string>('');
+
+  // Cargar Leaflet
+  useEffect(() => {
+    if (!isOpen || !mapRef.current) return;
+
+    const loadLeaflet = async () => {
+      try {
+        // Cargar CSS
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        // Cargar JS
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = () => {
+          initializeMap();
+        };
+        document.head.appendChild(script);
+
+        return () => {
+          document.head.removeChild(link);
+          document.head.removeChild(script);
+        };
+      } catch (error) {
+        console.error('Error loading Leaflet:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadLeaflet();
+  }, [isOpen]);
+
+  const initializeMap = () => {
+    if (!mapRef.current || typeof window === 'undefined' || !(window as any).L) return;
+
+    const L = (window as any).L;
+
+    // Crear mapa
+    mapInstance.current = L.map(mapRef.current).setView(initialPosition, 15);
+
+    // Agregar capa de tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(mapInstance.current);
+
+    // Crear marcador
+    markerRef.current = L.marker(initialPosition, {
+      draggable: true
+    }).addTo(mapInstance.current);
+
+    // Evento de arrastrar marcador
+    markerRef.current.on('dragend', (e: any) => {
+      const lat = e.target.getLatLng().lat;
+      const lng = e.target.getLatLng().lng;
+      setSelectedPosition([lat, lng]);
+      getAddressFromCoordinates(lat, lng);
+    });
+
+    // Evento de click en el mapa
+    mapInstance.current.on('click', (e: any) => {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      setSelectedPosition([lat, lng]);
+      markerRef.current.setLatLng([lat, lng]);
+      getAddressFromCoordinates(lat, lng);
+    });
+
+    // Obtener dirección inicial
+    getAddressFromCoordinates(initialPosition[0], initialPosition[1]);
+    setIsLoading(false);
+  };
+
+  const getAddressFromCoordinates = async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Error en reverse geocoding');
+      }
+      
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        const result = data.results[0];
+        const components = result.components;
+        
+        const addressParts = [
+          components.road,
+          components.house_number,
+          components.suburb,
+          components.city,
+          components.state
+        ].filter(Boolean);
+        
+        const fullAddress = addressParts.join(', ');
+        setAddress(fullAddress);
+      }
+    } catch (error) {
+      console.error('Error al obtener dirección:', error);
+      setAddress('Dirección no encontrada');
+    }
+  };
+
+  const handleConfirmLocation = () => {
+    onLocationSelect(selectedPosition[0], selectedPosition[1], address);
+    onClose();
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocalización no soportada por este navegador');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setSelectedPosition([lat, lng]);
+        
+        if (markerRef.current) {
+          markerRef.current.setLatLng([lat, lng]);
+        }
+        if (mapInstance.current) {
+          mapInstance.current.setView([lat, lng], 15);
+        }
+        
+        getAddressFromCoordinates(lat, lng);
+      },
+      (error) => {
+        console.error('Error obteniendo ubicación:', error);
+        alert('No se pudo obtener tu ubicación actual');
+      }
+    );
+  };
+
+  // Limpiar mapa al cerrar
+  useEffect(() => {
+    if (!isOpen && mapInstance.current) {
+      mapInstance.current.remove();
+      mapInstance.current = null;
+      markerRef.current = null;
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        className="bg-white rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+              <MapPin className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Seleccionar Ubicación</h2>
+              <p className="text-gray-600">Arrastra el marcador o haz clic en el mapa</p>
+            </div>
+          </div>
+          
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Mapa */}
+        <div className="flex-1 relative">
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                <p className="text-gray-600">Cargando mapa...</p>
+              </div>
+            </div>
+          )}
+          <div ref={mapRef} className="w-full h-full rounded-b-2xl" />
+        </div>
+
+        {/* Información de la ubicación */}
+        <div className="p-6 border-t border-gray-200">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Dirección seleccionada:
+              </label>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-gray-900">{address || 'Cargando...'}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Lat: {selectedPosition[0].toFixed(6)}, Lng: {selectedPosition[1].toFixed(6)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleUseCurrentLocation}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              >
+                <Navigation className="w-4 h-4" />
+                Usar Mi Ubicación
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleConfirmLocation}
+                disabled={!address}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Check className="w-4 h-4" />
+                Confirmar Ubicación
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default InteractiveMap;
