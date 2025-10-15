@@ -203,6 +203,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.log('🔍 Validando producto:', product.id);
         const productData = await apiFetch<any>(`/products/${product.id}`);
         console.log('🔍 Datos del producto:', productData);
+        console.log('🔍 is_active:', productData.is_active, 'tipo:', typeof productData.is_active);
         
         if (!productData.is_active) {
           console.log('❌ Producto no activo - NO AGREGANDO AL CARRITO');
