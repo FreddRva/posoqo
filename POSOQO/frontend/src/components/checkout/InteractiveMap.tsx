@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, Check, X } from 'lucide-react';
+import { MapPin, Navigation, Check, X, Search } from 'lucide-react';
 
 interface InteractiveMapProps {
   initialPosition: [number, number];
@@ -23,6 +23,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>(initialPosition);
   const [address, setAddress] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   // Cargar Leaflet
   useEffect(() => {
@@ -62,8 +66,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
     const L = (window as any).L;
 
-    // Crear mapa
-    mapInstance.current = L.map(mapRef.current).setView(initialPosition, 15);
+    // Posición inicial en Lima, Perú
+    const limaPosition: [number, number] = [-12.0464, -77.0428];
+    
+    // Crear mapa centrado en Lima
+    mapInstance.current = L.map(mapRef.current).setView(limaPosition, 13);
 
     // Agregar capa de tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -93,8 +100,64 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     });
 
     // Obtener dirección inicial
-    getAddressFromCoordinates(initialPosition[0], initialPosition[1]);
+    getAddressFromCoordinates(limaPosition[0], limaPosition[1]);
     setIsLoading(false);
+  };
+
+  // Función de búsqueda
+  const searchLocation = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query + ', Peru')}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}&limit=5`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Error en búsqueda');
+      }
+      
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        setSearchResults(data.results);
+        setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
+      }
+    } catch (error) {
+      console.error('Error en búsqueda:', error);
+      setSearchResults([]);
+      setShowSearchResults(false);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Seleccionar resultado de búsqueda
+  const selectSearchResult = (result: any) => {
+    const lat = result.geometry.lat;
+    const lng = result.geometry.lng;
+    const address = result.formatted;
+    
+    setSelectedPosition([lat, lng]);
+    setAddress(address);
+    
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+    }
+    if (mapInstance.current) {
+      mapInstance.current.setView([lat, lng], 16);
+    }
+    
+    setShowSearchResults(false);
+    setSearchQuery('');
   };
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
@@ -190,23 +253,75 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-blue-600" />
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Seleccionar Ubicación</h2>
+                <p className="text-gray-600">Busca, arrastra el marcador o haz clic en el mapa</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Seleccionar Ubicación</h2>
-              <p className="text-gray-600">Arrastra el marcador o haz clic en el mapa</p>
-            </div>
+            
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
-          
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
+
+          {/* Buscador */}
+          <div className="relative">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  const timeoutId = setTimeout(() => {
+                    searchLocation(e.target.value);
+                  }, 500);
+                  return () => clearTimeout(timeoutId);
+                }}
+                placeholder="Buscar ubicación en Perú (ej: Miraflores, Lima)"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              />
+              {isSearching && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+                </div>
+              )}
+            </div>
+
+            {/* Resultados de búsqueda */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
+                {searchResults.map((result, index) => (
+                  <button
+                    key={index}
+                    onClick={() => selectSearchResult(result)}
+                    className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                  >
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {result.formatted}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {result.components.city}, {result.components.state}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mapa */}
