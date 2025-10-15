@@ -161,7 +161,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.log('🔍 Buscando:', query);
       
       // Usar proxy del backend para evitar CORS
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/geocoding/search-location`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/search-location`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +257,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       console.log('🔄 Obteniendo dirección para:', { lat, lng });
       
       // Usar proxy del backend para evitar CORS
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/geocoding/reverse-geocoding`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/reverse-geocoding`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
