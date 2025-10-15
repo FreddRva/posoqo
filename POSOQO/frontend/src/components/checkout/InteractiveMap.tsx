@@ -251,7 +251,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             draggable: true
           }).addTo(mapInstance.current);
           
-          newMarker.on('dragend', (e) => {
+          newMarker.on('dragend', (e: any) => {
             const newPos = e.target.getLatLng();
             setSelectedPosition([newPos.lat, newPos.lng]);
             getAddressFromCoordinates(newPos.lat, newPos.lng);
