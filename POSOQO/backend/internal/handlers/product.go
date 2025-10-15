@@ -114,67 +114,6 @@ func GetProducts(c *fiber.Ctx) error {
 	})
 }
 
-// GetAdminProductsListPublic devuelve todos los productos para el panel admin
-func GetAdminProductsListPublic(c *fiber.Ctx) error {
-	rows, err := db.DB.Query(context.Background(), `
-		SELECT id, name, description, price, image_url, category_id, is_active, is_featured, stock, created_at, updated_at, subcategory, estilo, abv, ibu, color
-		FROM products
-		ORDER BY id
-	`)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error consultando productos: " + err.Error(),
-		})
-	}
-	defer rows.Close()
-
-	var products []ProductResponse
-	for rows.Next() {
-		var id, name, description, categoryID string
-		var imageURL, subcategory, estilo, abv, ibu, color sql.NullString
-		var price float64
-		var isActive, isFeatured bool
-		var createdAt, updatedAt time.Time
-		var stock int
-		
-		err := rows.Scan(
-			&id, &name, &description, &price, &imageURL,
-			&categoryID, &isActive, &isFeatured, &stock, &createdAt, &updatedAt, &subcategory,
-			&estilo, &abv, &ibu, &color,
-		)
-		if err != nil {
-			return c.Status(500).JSON(fiber.Map{
-				"success": false,
-				"error":   "Error leyendo producto: " + err.Error(),
-			})
-		}
-		products = append(products, ProductResponse{
-			ID:          id,
-			Name:        name,
-			Description: description,
-			Price:       price,
-			ImageURL:    imageURL.String,
-			CategoryID:  categoryID,
-			IsActive:    isActive,
-			IsFeatured:  isFeatured,
-			Stock:       stock,
-			CreatedAt:   createdAt,
-			UpdatedAt:   updatedAt,
-			Subcategory: subcategory.String,
-			Estilo:      estilo.String,
-			ABV:         abv.String,
-			IBU:         ibu.String,
-			Color:       color.String,
-		})
-	}
-
-	return c.JSON(fiber.Map{
-		"success": true,
-		"data":    products,
-		"total":   len(products),
-	})
-}
 
 // GetProduct devuelve un producto específico por ID desde la base de datos
 func GetProduct(c *fiber.Ctx) error {
