@@ -317,7 +317,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </div>
 
           {/* Buscador */}
-          <div className="relative z-50" ref={searchRef}>
+          <div className="relative" ref={searchRef}>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -343,15 +343,19 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 </div>
               )}
             </div>
+          </div>
+        </div>
 
-            {/* Resultados de búsqueda */}
-            {showSearchResults && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] max-h-60 overflow-y-auto">
+        {/* Dropdown de resultados - Fuera del header */}
+        {showSearchResults && (
+          <div className="relative z-[9999] bg-white border-b border-gray-200">
+            {searchResults.length > 0 ? (
+              <div className="max-h-60 overflow-y-auto">
                 {searchResults.map((result, index) => (
                   <button
                     key={index}
                     onClick={() => selectSearchResult(result)}
-                    className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 first:rounded-t-xl last:rounded-b-xl"
+                    className="w-full px-6 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
                   >
                     <div className="flex items-start gap-3">
                       <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -367,18 +371,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   </button>
                 ))}
               </div>
-            )}
-
-            {/* Mensaje cuando no hay resultados */}
-            {showSearchResults && searchResults.length === 0 && searchQuery.trim() && !isSearching && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] p-4">
+            ) : searchQuery.trim() && !isSearching ? (
+              <div className="px-6 py-4">
                 <p className="text-sm text-gray-500 text-center">
                   No se encontraron ubicaciones para "{searchQuery}"
                 </p>
               </div>
-            )}
+            ) : null}
           </div>
-        </div>
+        )}
 
         {/* Mapa */}
         <div className="flex-1 relative">
