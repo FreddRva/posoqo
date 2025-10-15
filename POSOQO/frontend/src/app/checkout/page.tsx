@@ -165,7 +165,8 @@ export default function CheckoutPage() {
     setMarkerPosition([lat, lng]);
     setAddress(address);
     setAddressMode('create');
-    setShowMap(false);
+    // ✅ NO cerrar el mapa automáticamente - dejar que el usuario lo cierre manualmente
+    // setShowMap(false);
   };
 
   // Guardar dirección actual

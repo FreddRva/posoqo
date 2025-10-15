@@ -247,8 +247,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
     }, 100);
     
-    // ✅ IMPORTANTE: Llamar a la función del componente padre
-    onLocationSelect(lat, lng, address);
+    // ✅ NO llamar a onLocationSelect automáticamente - dejar que el usuario confirme
+    // onLocationSelect(lat, lng, address);
     
     // Cerrar dropdown
     setShowSearchResults(false);
