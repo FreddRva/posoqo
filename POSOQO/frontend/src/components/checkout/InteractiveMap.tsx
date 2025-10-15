@@ -220,6 +220,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Seleccionar resultado de búsqueda mejorado
   const selectSearchResult = (result: any) => {
     console.log('🔍 Resultado seleccionado:', result);
+    console.log('🔍 Estado actual del marcador:', markerRef.current);
+    console.log('🔍 Estado actual del mapa:', mapInstance.current);
     
     const lat = result.geometry.lat;
     const lng = result.geometry.lng;
@@ -278,9 +280,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // ✅ NO llamar a onLocationSelect automáticamente - dejar que el usuario confirme
     // onLocationSelect(lat, lng, address);
     
-    // Cerrar dropdown
+    // Cerrar dropdown pero mantener el query para que el usuario pueda ver qué seleccionó
     setShowSearchResults(false);
-    setSearchQuery('');
+    // setSearchQuery(''); // No limpiar el query inmediatamente
   };
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
