@@ -94,7 +94,7 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
               <div className="relative flex-shrink-0">
                 <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                   <Image
-                    src={item.image_url}
+                    src={item.image_url || '/placeholder-product.jpg'}
                     alt={item.name}
                     fill
                     className="object-cover"
