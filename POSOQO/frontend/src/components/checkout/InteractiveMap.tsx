@@ -185,7 +185,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
       
       const results = await Promise.allSettled(searchPromises);
-      let allResults = [];
+      let allResults: any[] = [];
       
       // Procesar resultados de Nominatim (búsqueda amplia)
       if (results[0].status === 'fulfilled' && results[0].value) {
