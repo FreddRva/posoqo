@@ -34,8 +34,20 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isHoveringResults, setIsHoveringResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cerrar dropdown cuando no se está interactuando
+  useEffect(() => {
+    if (!isHoveringResults && !isSearching && searchQuery.trim() === '') {
+      const timer = setTimeout(() => {
+        setShowSearchResults(false);
+      }, 1000); // Esperar 1 segundo antes de cerrar
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringResults, isSearching, searchQuery]);
 
   // Cargar Leaflet
   useEffect(() => {
@@ -285,6 +297,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     
     // Cerrar dropdown pero mantener el query para que el usuario pueda ver qué seleccionó
     setShowSearchResults(false);
+    setIsHoveringResults(false);
     // setSearchQuery(''); // No limpiar el query inmediatamente
   };
 
@@ -417,10 +430,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                   if (searchTimeoutRef.current) {
                     clearTimeout(searchTimeoutRef.current);
                   }
-                  // Nuevo timeout
+                  // Nuevo timeout - reducido para respuesta más rápida
                   searchTimeoutRef.current = setTimeout(() => {
                     searchLocation(e.target.value);
-                  }, 500);
+                  }, 300);
                 }}
                 placeholder="Buscar ubicación en Perú (ej: Miraflores, Lima)"
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
@@ -438,6 +451,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {showSearchResults && (
           <div 
             className="relative z-[99999] bg-white border-b border-gray-200"
+            onMouseEnter={() => setIsHoveringResults(true)}
+            onMouseLeave={() => setIsHoveringResults(false)}
             onClick={(e) => {
               console.log('🖱️ CLIC EN DROPDOWN:', e.target);
             }}
