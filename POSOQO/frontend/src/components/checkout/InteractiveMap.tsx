@@ -219,6 +219,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // Seleccionar resultado de búsqueda mejorado
   const selectSearchResult = (result: any) => {
+    console.log('🚀 INICIANDO selectSearchResult');
     console.log('🔍 Resultado seleccionado:', result);
     console.log('🔍 Estado actual del marcador:', markerRef.current);
     console.log('🔍 Estado actual del mapa:', mapInstance.current);
@@ -439,7 +440,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 {searchResults.map((result, index) => (
                   <button
                     key={index}
-                    onClick={() => selectSearchResult(result)}
+                    onClick={() => {
+                      console.log('🖱️ CLIC EN RESULTADO:', result);
+                      selectSearchResult(result);
+                    }}
                     className="w-full px-6 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
                   >
                     <div className="flex items-start gap-3">
