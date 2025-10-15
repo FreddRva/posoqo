@@ -182,7 +182,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       
       // Procesar resultados de OpenCage
       if (results[0].status === 'fulfilled' && results[0].value?.results) {
-        allResults = results[0].value.results.map(result => ({
+        allResults = results[0].value.results.map((result: any) => ({
           formatted: result.formatted,
           geometry: result.geometry,
           components: result.components,
@@ -192,7 +192,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       
       // Procesar resultados de Nominatim si no hay suficientes
       if (allResults.length < 3 && results[1].status === 'fulfilled' && results[1].value) {
-        const nominatimResults = results[1].value.map(result => ({
+        const nominatimResults = results[1].value.map((result: any) => ({
           formatted: result.display_name,
           geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
           components: {
@@ -225,11 +225,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         ];
         
         allResults = popularPeruLocations
-          .filter(location => 
+          .filter((location: any) => 
             location.name.toLowerCase().includes(query.toLowerCase()) ||
             location.city.toLowerCase().includes(query.toLowerCase())
           )
-          .map(location => ({
+          .map((location: any) => ({
             formatted: `${location.name}, ${location.city}, Perú`,
             geometry: { lat: location.lat, lng: location.lng },
             components: { city: location.city, state: location.city },
