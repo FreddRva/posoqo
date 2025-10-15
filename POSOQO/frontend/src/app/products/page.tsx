@@ -13,7 +13,7 @@ import { ProductList } from "@/components/products/ProductList";
 import { useProducts } from "@/hooks/useProducts";
 import { useNotifications as useToast } from "@/components/NotificationSystem";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
-import { useCart } from "@/hooks/useCart";
+import { useCart } from "@/contexts/CartContext";
 
 // Componentes dinámicos
 const Map = dynamic(() => import("@/components/OrderMap"), { 
