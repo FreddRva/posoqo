@@ -4,6 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Navigation, Check, X, Search } from 'lucide-react';
 
+// Declarar L (Leaflet) para TypeScript
+declare global {
+  interface Window {
+    L: any;
+  }
+}
+
 interface InteractiveMapProps {
   initialPosition: [number, number];
   onLocationSelect: (lat: number, lng: number, address: string) => void;
@@ -227,12 +234,32 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     
     // Actualizar marcador con delay para asegurar que el mapa esté listo
     setTimeout(() => {
+      console.log('🔍 Verificando marcador y mapa...');
+      console.log('🔍 markerRef.current:', markerRef.current);
+      console.log('🔍 mapInstance.current:', mapInstance.current);
+      
       if (markerRef.current) {
         console.log('🎯 Actualizando marcador a:', [lat, lng]);
         markerRef.current.setLatLng([lat, lng]);
         markerRef.current.update();
+        console.log('✅ Marcador actualizado');
       } else {
-        console.warn('⚠️ Marcador no encontrado');
+        console.warn('⚠️ Marcador no encontrado - creando nuevo marcador');
+        // Crear nuevo marcador si no existe
+        if (mapInstance.current && window.L) {
+          const newMarker = window.L.marker([lat, lng], {
+            draggable: true
+          }).addTo(mapInstance.current);
+          
+          newMarker.on('dragend', (e) => {
+            const newPos = e.target.getLatLng();
+            setSelectedPosition([newPos.lat, newPos.lng]);
+            getAddressFromCoordinates(newPos.lat, newPos.lng);
+          });
+          
+          markerRef.current = newMarker;
+          console.log('✅ Nuevo marcador creado');
+        }
       }
       
       // Centrar mapa en la nueva ubicación
@@ -242,6 +269,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           animate: true,
           duration: 1.5
         });
+        console.log('✅ Mapa centrado');
       } else {
         console.warn('⚠️ Mapa no encontrado');
       }
