@@ -11,7 +11,6 @@ import { Grid3X3, List, MapPin } from "lucide-react";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductList } from "@/components/products/ProductList";
 import { useProducts } from "@/hooks/useProducts";
-import { useNotifications as useToast } from "@/components/NotificationSystem";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/contexts/CartContext";
 
@@ -24,7 +23,6 @@ const Map = dynamic(() => import("@/components/OrderMap"), {
 function ProductsContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const { showSuccess, showError } = useToast();
   const { updateRecentlyViewed: addToRecentlyViewed } = useRecentlyViewed();
   const { addToCart } = useCart();
 
@@ -72,24 +70,10 @@ function ProductsContent() {
         price: product.price,
         image_url: product.image_url || product.image || ''
       });
-      
-      // Mostrar notificación de éxito
-      try {
-        showSuccess('Producto agregado', `${product.name} agregado al carrito`);
-      } catch (notificationError) {
-        console.error('Error mostrando notificación:', notificationError);
-        // Fallback: mostrar alert simple
-        alert(`${product.name} agregado al carrito`);
-      }
+      // CartContext ya maneja las notificaciones, no necesitamos duplicar
     } catch (error) {
       console.error('Error agregando al carrito:', error);
-      try {
-        showError('Error', 'No se pudo agregar el producto al carrito');
-      } catch (notificationError) {
-        console.error('Error mostrando notificación de error:', notificationError);
-        // Fallback: mostrar alert simple
-        alert('Error: No se pudo agregar el producto al carrito');
-      }
+      // CartContext ya maneja las notificaciones de error
     }
   };
 
@@ -117,9 +101,20 @@ function ProductsContent() {
   };
 
   const handleViewDetails = (product: any) => {
+    // Agregar a visto recientemente
     addToRecentlyViewed(product);
-    // Aquí podrías navegar a una página de detalles o abrir un modal
-    console.log('Ver detalles de:', product.name);
+    
+    // Mostrar información del producto en un modal o alert
+    const productInfo = `
+      ${product.name}
+      
+      Precio: S/ ${product.price}
+      ${product.description ? `\nDescripción: ${product.description}` : ''}
+      ${product.stock ? `\nStock: ${product.stock} unidades` : ''}
+      ${product.category ? `\nCategoría: ${product.category}` : ''}
+    `;
+    
+    alert(productInfo);
   };
 
   if (error) {
