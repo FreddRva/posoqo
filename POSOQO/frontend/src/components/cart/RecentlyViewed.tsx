@@ -3,18 +3,18 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Clock, Eye, Trash2, ShoppingCart } from 'lucide-react';
-import { useRecentlyViewed, RecentlyViewedItem } from '@/hooks/useRecentlyViewed';
+import { useRecentlyViewed } from '@/lib/recentlyViewedContext';
 import { useCart } from '@/contexts/CartContext';
 
 interface RecentlyViewedProps {
-  onAddToCart?: (product: Omit<RecentlyViewedItem, 'viewedAt'>) => void;
+  onAddToCart?: (product: any) => void;
 }
 
 export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
-  const { recentlyViewed, removeFromRecentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
+  const { recentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
   const { addToCart } = useCart();
 
-  const handleAddToCart = async (product: Omit<RecentlyViewedItem, 'viewedAt'>) => {
+  const handleAddToCart = async (product: any) => {
     try {
       await addToCart({
         id: product.id,
@@ -125,7 +125,7 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
                     S/ {item.price.toFixed(2)}
                   </span>
                   <span className="text-xs text-gray-500">
-                    {new Date(item.viewedAt).toLocaleDateString()}
+                    Visto recientemente
                   </span>
                 </div>
               </div>
@@ -139,12 +139,6 @@ export default function RecentlyViewed({ onAddToCart }: RecentlyViewedProps) {
                   <ShoppingCart className="w-4 h-4" />
                 </button>
 
-                <button
-                  onClick={() => removeFromRecentlyViewed(item.id)}
-                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
               </div>
             </div>
           </motion.div>

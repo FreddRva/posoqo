@@ -66,7 +66,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Content */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* Imagen */}
                   <div className="space-y-4">

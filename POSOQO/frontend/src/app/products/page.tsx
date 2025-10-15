@@ -14,6 +14,7 @@ import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/contexts/CartContext";
+import RecentlyViewed from "@/components/cart/RecentlyViewed";
 
 // Componentes dinámicos
 const Map = dynamic(() => import("@/components/OrderMap"), { 
@@ -248,6 +249,11 @@ function ProductsContent() {
               </div>
             </motion.div>
           )}
+        </div>
+
+        {/* Visto Recientemente */}
+        <div className="mt-12">
+          <RecentlyViewed />
         </div>
       </div>
 
