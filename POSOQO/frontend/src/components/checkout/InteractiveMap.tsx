@@ -232,7 +232,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   };
 
-  // Seleccionar resultado de búsqueda - VERSIÓN SIMPLE
+  // Seleccionar resultado de búsqueda - VERSIÓN SIMPLE - DEPLOY FORZADO
   const selectSearchResult = (result: any) => {
     console.log('🚀 CLIC FUNCIONA! Resultado:', result);
     
@@ -262,7 +262,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // Cerrar dropdown
     setShowSearchResults(false);
     
-    console.log('✅ RESULTADO SELECCIONADO CORRECTAMENTE');
+    console.log('✅ RESULTADO SELECCIONADO CORRECTAMENTE - DEPLOY FORZADO FUNCIONA');
   };
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
