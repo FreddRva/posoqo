@@ -201,7 +201,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Validar que el producto existe y está activo antes de agregarlo
       try {
         console.log('🔍 Validando producto:', product.id);
-        const productData = await apiFetch<any>(`/products/${product.id}`);
+        const response = await apiFetch<any>(`/products/${product.id}`);
+        console.log('🔍 Respuesta completa:', response);
+        
+        // El backend devuelve { success: true, data: {...} }
+        const productData = response.data || response;
         console.log('🔍 Datos del producto:', productData);
         console.log('🔍 is_active:', productData.is_active, 'tipo:', typeof productData.is_active);
         
