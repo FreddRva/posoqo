@@ -14,6 +14,14 @@ export interface Product {
   subcategory?: string;
   stock?: number;
   rating?: number;
+  is_featured?: boolean;
+  is_active?: boolean;
+  estilo?: string;
+  abv?: string;
+  ibu?: string;
+  color?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Category {
