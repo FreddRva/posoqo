@@ -92,9 +92,9 @@ func main() {
 	api.Put("/admin/categories/:id", handlers.UpdateCategory)
 	api.Delete("/admin/categories/:id", handlers.DeleteCategory)
 
-	// Endpoint de geocoding (público)
-	api.Get("/geocoding/search", handlers.SearchAddress)
-	api.Get("/geocoding/reverse", handlers.ReverseAddress)
+	// Endpoint de geocoding (público) - funciones que no existen, comentadas
+	// api.Get("/geocoding/search", handlers.SearchAddress)
+	// api.Get("/geocoding/reverse", handlers.ReverseAddress)
 	
 	// Nuevos endpoints de geocoding para el mapa
 	api.Post("/geocoding/search-location", handlers.SearchLocation)
@@ -328,9 +328,9 @@ func main() {
 
 	// Upload de imágenes se maneja directamente desde el frontend con Cloudinary
 
-	// Endpoints de geocoding
-	api.Get("/geocoding/search", handlers.SearchAddress)
-	api.Get("/geocoding/reverse", handlers.ReverseAddress)
+	// Endpoints de geocoding - funciones que no existen, comentadas
+	// api.Get("/geocoding/search", handlers.SearchAddress)
+	// api.Get("/geocoding/reverse", handlers.ReverseAddress)
 
 	// Endpoints de pago
 	api.Post("/pay", handlers.CreateStripeCheckout)
