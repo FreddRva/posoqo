@@ -265,28 +265,40 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   // Seleccionar resultado de búsqueda mejorado
   const selectSearchResult = (result: any) => {
+    console.log('🔍 Resultado seleccionado:', result);
+    
     const lat = result.geometry.lat;
     const lng = result.geometry.lng;
     const address = result.formatted;
     
-    console.log('Seleccionando ubicación:', { lat, lng, address });
+    console.log('📍 Coordenadas:', { lat, lng });
+    console.log('📍 Dirección:', address);
     
+    // Actualizar estado
     setSelectedPosition([lat, lng]);
     setAddress(address);
     
-    // Actualizar marcador
-    if (markerRef.current) {
-      markerRef.current.setLatLng([lat, lng]);
-      markerRef.current.update();
-    }
-    
-    // Centrar mapa en la nueva ubicación
-    if (mapInstance.current) {
-      mapInstance.current.setView([lat, lng], 16, {
-        animate: true,
-        duration: 1
-      });
-    }
+    // Actualizar marcador con delay para asegurar que el mapa esté listo
+    setTimeout(() => {
+      if (markerRef.current) {
+        console.log('🎯 Actualizando marcador a:', [lat, lng]);
+        markerRef.current.setLatLng([lat, lng]);
+        markerRef.current.update();
+      } else {
+        console.warn('⚠️ Marcador no encontrado');
+      }
+      
+      // Centrar mapa en la nueva ubicación
+      if (mapInstance.current) {
+        console.log('🗺️ Centrando mapa en:', [lat, lng]);
+        mapInstance.current.setView([lat, lng], 16, {
+          animate: true,
+          duration: 1.5
+        });
+      } else {
+        console.warn('⚠️ Mapa no encontrado');
+      }
+    }, 100);
     
     // Cerrar dropdown
     setShowSearchResults(false);
@@ -295,8 +307,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
     try {
+      console.log('🔄 Obteniendo dirección para:', { lat, lng });
+      
+      // Usar Nominatim para geocoding inverso (más confiable)
       const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}`
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`
       );
       
       if (!response.ok) {
@@ -304,25 +319,17 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       }
       
       const data = await response.json();
+      console.log('📍 Datos de geocoding:', data);
       
-      if (data.results && data.results.length > 0) {
-        const result = data.results[0];
-        const components = result.components;
-        
-        const addressParts = [
-          components.road,
-          components.house_number,
-          components.suburb,
-          components.city,
-          components.state
-        ].filter(Boolean);
-        
-        const fullAddress = addressParts.join(', ');
-        setAddress(fullAddress);
+      if (data.display_name) {
+        setAddress(data.display_name);
+        console.log('✅ Dirección actualizada:', data.display_name);
+      } else {
+        setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
     } catch (error) {
       console.error('Error al obtener dirección:', error);
-      setAddress('Dirección no encontrada');
+      setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     }
   };
 
