@@ -102,25 +102,42 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       attribution: '© OpenStreetMap contributors'
     }).addTo(mapInstance.current);
 
-    // Crear marcador
-    markerRef.current = L.marker(initialPosition, {
-      draggable: true
+    // Crear marcador mejorado
+    markerRef.current = L.marker(limaPosition, {
+      draggable: true,
+      icon: L.divIcon({
+        className: 'custom-marker',
+        html: '<div class="w-8 h-8 bg-blue-600 rounded-full border-3 border-white shadow-xl flex items-center justify-center transform hover:scale-110 transition-transform"><div class="w-3 h-3 bg-white rounded-full"></div></div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      })
     }).addTo(mapInstance.current);
 
-    // Evento de arrastrar marcador
+    // Evento de arrastrar marcador mejorado
+    markerRef.current.on('dragstart', () => {
+      console.log('Iniciando arrastre del marcador');
+    });
+
     markerRef.current.on('dragend', (e: any) => {
       const lat = e.target.getLatLng().lat;
       const lng = e.target.getLatLng().lng;
+      console.log('Marcador arrastrado a:', { lat, lng });
       setSelectedPosition([lat, lng]);
       getAddressFromCoordinates(lat, lng);
     });
 
-    // Evento de click en el mapa
+    // Evento de click en el mapa mejorado
     mapInstance.current.on('click', (e: any) => {
       const lat = e.latlng.lat;
       const lng = e.latlng.lng;
+      console.log('Clic en mapa:', { lat, lng });
       setSelectedPosition([lat, lng]);
-      markerRef.current.setLatLng([lat, lng]);
+      
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+        markerRef.current.update();
+      }
+      
       getAddressFromCoordinates(lat, lng);
     });
 
@@ -129,7 +146,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setIsLoading(false);
   };
 
-  // Función de búsqueda
+  // Función de búsqueda mejorada
   const searchLocation = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -141,40 +158,87 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setShowSearchResults(true);
     
     try {
-      // Primero intentar con OpenCage API
-      const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query + ', Peru')}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}&limit=5&countrycode=pe`
+      // Usar múltiples APIs para mejor cobertura
+      const searchPromises = [];
+      
+      // 1. OpenCage API (principal)
+      if (process.env.NEXT_PUBLIC_OPENCAGE_API_KEY) {
+        searchPromises.push(
+          fetch(
+            `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query + ', Peru')}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}&limit=5&countrycode=pe&no_annotations=1`
+          ).then(res => res.ok ? res.json() : null)
+        );
+      }
+      
+      // 2. Nominatim (OpenStreetMap) como fallback
+      searchPromises.push(
+        fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Peru')}&format=json&limit=5&countrycodes=pe&addressdetails=1`
+        ).then(res => res.ok ? res.json() : null)
       );
       
-      if (response.ok) {
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          setSearchResults(data.results);
-        } else {
-          setSearchResults([]);
-        }
-      } else {
-        // Fallback: usar datos de ejemplo para Perú
-        const peruLocations = [
-          {
-            formatted: `${query}, Lima, Perú`,
-            geometry: { lat: -12.0464, lng: -77.0428 },
-            components: { city: 'Lima', state: 'Lima' }
-          },
-          {
-            formatted: `${query}, Arequipa, Perú`,
-            geometry: { lat: -16.4090, lng: -71.5375 },
-            components: { city: 'Arequipa', state: 'Arequipa' }
-          },
-          {
-            formatted: `${query}, Cusco, Perú`,
-            geometry: { lat: -13.5319, lng: -71.9675 },
-            components: { city: 'Cusco', state: 'Cusco' }
-          }
-        ];
-        setSearchResults(peruLocations);
+      const results = await Promise.allSettled(searchPromises);
+      let allResults = [];
+      
+      // Procesar resultados de OpenCage
+      if (results[0].status === 'fulfilled' && results[0].value?.results) {
+        allResults = results[0].value.results.map(result => ({
+          formatted: result.formatted,
+          geometry: result.geometry,
+          components: result.components,
+          source: 'opencage'
+        }));
       }
+      
+      // Procesar resultados de Nominatim si no hay suficientes
+      if (allResults.length < 3 && results[1].status === 'fulfilled' && results[1].value) {
+        const nominatimResults = results[1].value.map(result => ({
+          formatted: result.display_name,
+          geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
+          components: {
+            city: result.address?.city || result.address?.town || result.address?.village,
+            state: result.address?.state,
+            country: result.address?.country
+          },
+          source: 'nominatim'
+        }));
+        
+        // Combinar resultados únicos
+        const existingCoords = new Set(allResults.map(r => `${r.geometry.lat},${r.geometry.lng}`));
+        const newResults = nominatimResults.filter(r => 
+          !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
+        );
+        allResults = [...allResults, ...newResults];
+      }
+      
+      // Si no hay resultados, usar ubicaciones populares de Perú
+      if (allResults.length === 0) {
+        const popularPeruLocations = [
+          { name: 'Lima Centro', city: 'Lima', lat: -12.0464, lng: -77.0428 },
+          { name: 'Miraflores', city: 'Lima', lat: -12.1201, lng: -77.0342 },
+          { name: 'San Isidro', city: 'Lima', lat: -12.0983, lng: -77.0305 },
+          { name: 'Arequipa Centro', city: 'Arequipa', lat: -16.4090, lng: -71.5375 },
+          { name: 'Cusco Centro', city: 'Cusco', lat: -13.5319, lng: -71.9675 },
+          { name: 'Trujillo Centro', city: 'Trujillo', lat: -8.1116, lng: -79.0289 },
+          { name: 'Chiclayo Centro', city: 'Chiclayo', lat: -6.7714, lng: -79.8409 },
+          { name: 'Piura Centro', city: 'Piura', lat: -5.1945, lng: -80.6328 }
+        ];
+        
+        allResults = popularPeruLocations
+          .filter(location => 
+            location.name.toLowerCase().includes(query.toLowerCase()) ||
+            location.city.toLowerCase().includes(query.toLowerCase())
+          )
+          .map(location => ({
+            formatted: `${location.name}, ${location.city}, Perú`,
+            geometry: { lat: location.lat, lng: location.lng },
+            components: { city: location.city, state: location.city },
+            source: 'popular'
+          }));
+      }
+      
+      setSearchResults(allResults.slice(0, 8)); // Máximo 8 resultados
+      
     } catch (error) {
       console.error('Error en búsqueda:', error);
       setSearchResults([]);
@@ -183,22 +247,32 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   };
 
-  // Seleccionar resultado de búsqueda
+  // Seleccionar resultado de búsqueda mejorado
   const selectSearchResult = (result: any) => {
     const lat = result.geometry.lat;
     const lng = result.geometry.lng;
     const address = result.formatted;
     
+    console.log('Seleccionando ubicación:', { lat, lng, address });
+    
     setSelectedPosition([lat, lng]);
     setAddress(address);
     
+    // Actualizar marcador
     if (markerRef.current) {
       markerRef.current.setLatLng([lat, lng]);
-    }
-    if (mapInstance.current) {
-      mapInstance.current.setView([lat, lng], 16);
+      markerRef.current.update();
     }
     
+    // Centrar mapa en la nueva ubicación
+    if (mapInstance.current) {
+      mapInstance.current.setView([lat, lng], 16, {
+        animate: true,
+        duration: 1
+      });
+    }
+    
+    // Cerrar dropdown
     setShowSearchResults(false);
     setSearchQuery('');
   };
@@ -392,20 +466,39 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             </div>
           )}
           <div ref={mapRef} className="w-full h-full rounded-b-2xl" />
+          
+          {/* Estilos para el marcador personalizado */}
+          <style jsx global>{`
+            .custom-marker {
+              background: transparent !important;
+              border: none !important;
+            }
+            .custom-marker div {
+              transition: all 0.2s ease;
+            }
+            .custom-marker:hover div {
+              transform: scale(1.1);
+            }
+          `}</style>
         </div>
 
-        {/* Información de la ubicación */}
-        <div className="p-6 border-t border-gray-200">
+        {/* Información de la ubicación mejorada */}
+        <div className="p-6 border-t border-gray-200 bg-gray-50">
           <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Dirección seleccionada:
-              </label>
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-gray-900">{address || 'Cargando...'}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Lat: {selectedPosition[0].toFixed(6)}, Lng: {selectedPosition[1].toFixed(6)}
-                </p>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">Ubicación Seleccionada</h3>
+                <div className="p-3 bg-white rounded-lg border border-gray-200">
+                  <p className="text-gray-900 text-sm break-words">
+                    {address || 'Selecciona una ubicación en el mapa o busca una dirección'}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Lat: {selectedPosition[0].toFixed(6)}, Lng: {selectedPosition[1].toFixed(6)}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -414,10 +507,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleUseCurrentLocation}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
               >
                 <Navigation className="w-4 h-4" />
-                Usar Mi Ubicación
+                Mi Ubicación
               </motion.button>
               
               <motion.button
@@ -425,10 +518,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 whileTap={{ scale: 0.98 }}
                 onClick={handleConfirmLocation}
                 disabled={!address}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
                 <Check className="w-4 h-4" />
-                Confirmar Ubicación
+                Confirmar
               </motion.button>
             </div>
           </div>
