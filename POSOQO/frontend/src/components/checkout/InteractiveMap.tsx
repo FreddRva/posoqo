@@ -414,11 +414,12 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {/* Dropdown de resultados - Fuera del header */}
         {showSearchResults && (
           <div 
-            className="relative z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
+            className="absolute top-full left-0 right-0 z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
             onMouseEnter={() => setIsHoveringResults(true)}
             onMouseLeave={() => setIsHoveringResults(false)}
             onClick={(e) => {
               console.log('🖱️ CLIC EN DROPDOWN:', e.target);
+              e.stopPropagation();
             }}
           >
             {/* Botón para cerrar */}
@@ -435,8 +436,22 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 {searchResults.map((result, index) => (
                   <div
                     key={index}
-                    onClick={() => {
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🖱️ MOUSEDOWN EN RESULTADO:', result);
+                      selectSearchResult(result);
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       console.log('🖱️ CLIC EN RESULTADO:', result);
+                      selectSearchResult(result);
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🖱️ TOUCH EN RESULTADO:', result);
                       selectSearchResult(result);
                     }}
                     className="w-full px-6 py-4 text-left hover:bg-blue-100 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
