@@ -204,8 +204,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         }));
         
         // Combinar resultados únicos
-        const existingCoords = new Set(allResults.map(r => `${r.geometry.lat},${r.geometry.lng}`));
-        const newResults = nominatimResults.filter(r => 
+        const existingCoords = new Set(allResults.map((r: any) => `${r.geometry.lat},${r.geometry.lng}`));
+        const newResults = nominatimResults.filter((r: any) => 
           !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
         );
         allResults = [...allResults, ...newResults];
