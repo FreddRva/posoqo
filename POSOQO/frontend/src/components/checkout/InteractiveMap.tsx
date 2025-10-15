@@ -380,7 +380,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
-        className="bg-white rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col"
+        className="bg-white rounded-2xl w-full max-w-6xl h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -437,7 +437,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {/* Dropdown de resultados - Fuera del header */}
         {showSearchResults && (
           <div 
-            className="absolute top-full left-0 right-0 z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
+            className="relative z-[99999] bg-white border-b border-gray-200"
             onClick={(e) => {
               console.log('🖱️ CLIC EN DROPDOWN:', e.target);
             }}
