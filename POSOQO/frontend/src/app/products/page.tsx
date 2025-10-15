@@ -81,20 +81,10 @@ function ProductsContent() {
     setFavorites(prev => {
       const isFavorite = prev.includes(product.id);
       if (isFavorite) {
-        try {
-          showSuccess('Eliminado', `${product.name} eliminado de favoritos`);
-        } catch (error) {
-          console.error('Error mostrando notificación:', error);
-          alert(`${product.name} eliminado de favoritos`);
-        }
+        alert(`${product.name} eliminado de favoritos`);
         return prev.filter(id => id !== product.id);
       } else {
-        try {
-          showSuccess('Agregado', `${product.name} agregado a favoritos`);
-        } catch (error) {
-          console.error('Error mostrando notificación:', error);
-          alert(`${product.name} agregado a favoritos`);
-        }
+        alert(`${product.name} agregado a favoritos`);
         return [...prev, product.id];
       }
     });
