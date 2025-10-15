@@ -95,6 +95,10 @@ func main() {
 	// Endpoint de geocoding (público)
 	api.Get("/geocoding/search", handlers.SearchAddress)
 	api.Get("/geocoding/reverse", handlers.ReverseAddress)
+	
+	// Nuevos endpoints de geocoding para el mapa
+	api.Post("/geocoding/search-location", handlers.SearchLocation)
+	api.Post("/geocoding/reverse-geocoding", handlers.ReverseGeocoding)
 
 	// Endpoint de pago con Stripe
 	api.Post("/pay", handlers.CreateStripeCheckout)

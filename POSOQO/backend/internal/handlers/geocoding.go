@@ -3,97 +3,168 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
-	"net/url"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// GeocodingResponse representa la respuesta de Nominatim
+// GeocodingRequest representa la petición de geocoding
+type GeocodingRequest struct {
+	Query string `json:"query"`
+	Type  string `json:"type"` // "search" o "reverse"
+	Lat   string `json:"lat,omitempty"`
+	Lng   string `json:"lng,omitempty"`
+}
+
+// GeocodingResponse representa la respuesta de geocoding
 type GeocodingResponse struct {
-	PlaceID     int    `json:"place_id"`
-	DisplayName string `json:"display_name"`
-	Lat         string `json:"lat"`
-	Lon         string `json:"lon"`
-	Type        string `json:"type"`
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
 }
 
-// SearchAddress busca direcciones usando Nominatim
-func SearchAddress(c *fiber.Ctx) error {
-	query := c.Query("q")
-	if query == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "Query parameter 'q' is required"})
+// SearchLocation busca ubicaciones usando Nominatim
+func SearchLocation(c *fiber.Ctx) error {
+	var req GeocodingRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error parsing request body",
+		})
 	}
 
-	// Construir URL para Nominatim
-	baseURL := "https://nominatim.openstreetmap.org/search"
-	params := url.Values{}
-	params.Add("format", "json")
-	params.Add("q", query)
-	params.Add("countrycodes", "PE")
-	params.Add("limit", "5")
+	if req.Query == "" {
+		return c.Status(400).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Query parameter is required",
+		})
+	}
 
-	// Hacer la petición a Nominatim
-	resp, err := http.Get(fmt.Sprintf("%s?%s", baseURL, params.Encode()))
+	// Construir URL de Nominatim
+	url := fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1", req.Query)
+
+	// Crear cliente HTTP con timeout
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	// Crear request
+	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al buscar dirección"})
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error creating request",
+		})
+	}
+
+	// Agregar headers necesarios
+	httpReq.Header.Set("User-Agent", "POSOQO/1.0")
+	httpReq.Header.Set("Accept", "application/json")
+
+	// Hacer request
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error making request to Nominatim",
+		})
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return c.Status(500).JSON(fiber.Map{"error": "Error en el servicio de geocoding"})
-	}
-
-	// Decodificar la respuesta
-	var results []GeocodingResponse
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al procesar respuesta"})
-	}
-
-	return c.JSON(results)
-}
-
-// ReverseGeocodingResponse representa la respuesta de Nominatim para reverse geocoding
-type ReverseGeocodingResponse struct {
-	PlaceID     int    `json:"place_id"`
-	DisplayName string `json:"display_name"`
-	Lat         string `json:"lat"`
-	Lon         string `json:"lon"`
-	Type        string `json:"type"`
-}
-
-// ReverseAddress busca la dirección usando coordenadas
-func ReverseAddress(c *fiber.Ctx) error {
-	lat := c.Query("lat")
-	lon := c.Query("lon")
-	if lat == "" || lon == "" {
-		return c.Status(400).JSON(fiber.Map{"error": "Los parámetros 'lat' y 'lon' son requeridos"})
-	}
-
-	// Construir URL para Nominatim reverse geocoding
-	baseURL := "https://nominatim.openstreetmap.org/reverse"
-	params := url.Values{}
-	params.Add("format", "jsonv2")
-	params.Add("lat", lat)
-	params.Add("lon", lon)
-	params.Add("countrycodes", "PE")
-
-	// Hacer la petición a Nominatim
-	resp, err := http.Get(fmt.Sprintf("%s?%s", baseURL, params.Encode()))
+	// Leer respuesta
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al buscar dirección"})
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error reading response",
+		})
+	}
+
+	// Parsear JSON
+	var data interface{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error parsing JSON response",
+		})
+	}
+
+	return c.JSON(GeocodingResponse{
+		Success: true,
+		Data:    data,
+	})
+}
+
+// ReverseGeocoding hace geocoding inverso usando Nominatim
+func ReverseGeocoding(c *fiber.Ctx) error {
+	var req GeocodingRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error parsing request body",
+		})
+	}
+
+	if req.Lat == "" || req.Lng == "" {
+		return c.Status(400).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Lat and Lng parameters are required",
+		})
+	}
+
+	// Construir URL de Nominatim para reverse geocoding
+	url := fmt.Sprintf("https://nominatim.openstreetmap.org/reverse?lat=%s&lon=%s&format=json&addressdetails=1", req.Lat, req.Lng)
+
+	// Crear cliente HTTP con timeout
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	// Crear request
+	httpReq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error creating request",
+		})
+	}
+
+	// Agregar headers necesarios
+	httpReq.Header.Set("User-Agent", "POSOQO/1.0")
+	httpReq.Header.Set("Accept", "application/json")
+
+	// Hacer request
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error making request to Nominatim",
+		})
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return c.Status(500).JSON(fiber.Map{"error": "Error en el servicio de geocoding"})
+	// Leer respuesta
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error reading response",
+		})
 	}
 
-	// Decodificar la respuesta
-	var result ReverseGeocodingResponse
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al procesar respuesta"})
+	// Parsear JSON
+	var data interface{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		return c.Status(500).JSON(GeocodingResponse{
+			Success: false,
+			Error:   "Error parsing JSON response",
+		})
 	}
 
-	return c.JSON(result)
+	return c.JSON(GeocodingResponse{
+		Success: true,
+		Data:    data,
+	})
 }

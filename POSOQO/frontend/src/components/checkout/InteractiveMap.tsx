@@ -146,7 +146,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setIsLoading(false);
   };
 
-  // Función de búsqueda mejorada con mejor cobertura
+  // Función de búsqueda usando proxy del backend
   const searchLocation = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -158,38 +158,31 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setShowSearchResults(true);
     
     try {
-      // Usar Nominatim como API principal (mejor cobertura de ciudades peruanas)
-      const searchPromises = [];
+      console.log('🔍 Buscando:', query);
       
-      // 1. Nominatim con búsqueda amplia en Perú
-      searchPromises.push(
-        fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ', Peru')}&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1`
-        ).then(res => res.ok ? res.json() : null)
-      );
+      // Usar proxy del backend para evitar CORS
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/geocoding/search-location`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: query + ', Peru',
+          type: 'search'
+        })
+      });
       
-      // 2. Nominatim con búsqueda específica de ciudades
-      searchPromises.push(
-        fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=pe&addressdetails=1&featuretype=city`
-        ).then(res => res.ok ? res.json() : null)
-      );
-      
-      // 3. OpenCage API como respaldo si está disponible
-      if (process.env.NEXT_PUBLIC_OPENCAGE_API_KEY) {
-        searchPromises.push(
-          fetch(
-            `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(query + ', Peru')}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY}&limit=5&countrycode=pe&no_annotations=1`
-          ).then(res => res.ok ? res.json() : null)
-        );
+      if (!response.ok) {
+        throw new Error('Error en búsqueda');
       }
       
-      const results = await Promise.allSettled(searchPromises);
-      let allResults: any[] = [];
+      const data = await response.json();
+      console.log('📍 Resultados de búsqueda:', data);
       
-      // Procesar resultados de Nominatim (búsqueda amplia)
-      if (results[0].status === 'fulfilled' && results[0].value) {
-        const nominatimResults = results[0].value.map((result: any) => ({
+      if (data.success && data.data) {
+        const results = Array.isArray(data.data) ? data.data : [];
+        
+        const processedResults = results.map((result: any) => ({
           formatted: result.display_name,
           geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
           components: {
@@ -200,60 +193,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           source: 'nominatim',
           importance: result.importance || 0
         }));
-        allResults = [...allResults, ...nominatimResults];
-      }
-      
-      // Procesar resultados de Nominatim (ciudades específicas)
-      if (results[1].status === 'fulfilled' && results[1].value) {
-        const cityResults = results[1].value.map((result: any) => ({
-          formatted: result.display_name,
-          geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
-          components: {
-            city: result.address?.city || result.address?.town || result.address?.village || result.address?.municipality,
-            state: result.address?.state || result.address?.region,
-            country: result.address?.country
-          },
-          source: 'nominatim_city',
-          importance: result.importance || 0
-        }));
         
-        // Combinar resultados únicos
-        const existingCoords = new Set(allResults.map((r: any) => `${r.geometry.lat},${r.geometry.lng}`));
-        const newCityResults = cityResults.filter((r: any) => 
-          !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
-        );
-        allResults = [...allResults, ...newCityResults];
-      }
-      
-      // Procesar resultados de OpenCage si está disponible
-      if (results[2] && results[2].status === 'fulfilled' && results[2].value?.results) {
-        const opencageResults = results[2].value.results.map((result: any) => ({
-          formatted: result.formatted,
-          geometry: result.geometry,
-          components: result.components,
-          source: 'opencage',
-          importance: 0.5
-        }));
+        // Ordenar por importancia
+        processedResults.sort((a: any, b: any) => (b.importance || 0) - (a.importance || 0));
         
-        // Combinar resultados únicos
-        const existingCoords = new Set(allResults.map((r: any) => `${r.geometry.lat},${r.geometry.lng}`));
-        const newOpencageResults = opencageResults.filter((r: any) => 
-          !existingCoords.has(`${r.geometry.lat},${r.geometry.lng}`)
-        );
-        allResults = [...allResults, ...newOpencageResults];
+        setSearchResults(processedResults.slice(0, 10));
+      } else {
+        setSearchResults([]);
       }
-      
-      // Ordenar por importancia y relevancia
-      allResults.sort((a: any, b: any) => {
-        // Priorizar resultados de ciudades
-        if (a.source === 'nominatim_city' && b.source !== 'nominatim_city') return -1;
-        if (b.source === 'nominatim_city' && a.source !== 'nominatim_city') return 1;
-        
-        // Luego por importancia
-        return (b.importance || 0) - (a.importance || 0);
-      });
-      
-      setSearchResults(allResults.slice(0, 10)); // Máximo 10 resultados
       
     } catch (error) {
       console.error('Error en búsqueda:', error);
@@ -309,10 +256,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     try {
       console.log('🔄 Obteniendo dirección para:', { lat, lng });
       
-      // Usar Nominatim para geocoding inverso (más confiable)
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`
-      );
+      // Usar proxy del backend para evitar CORS
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/geocoding/reverse-geocoding`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lat: lat.toString(),
+          lng: lng.toString(),
+          type: 'reverse'
+        })
+      });
       
       if (!response.ok) {
         throw new Error('Error en reverse geocoding');
@@ -321,9 +276,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const data = await response.json();
       console.log('📍 Datos de geocoding:', data);
       
-      if (data.display_name) {
-        setAddress(data.display_name);
-        console.log('✅ Dirección actualizada:', data.display_name);
+      if (data.success && data.data && data.data.display_name) {
+        setAddress(data.data.display_name);
+        console.log('✅ Dirección actualizada:', data.data.display_name);
       } else {
         setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
