@@ -38,16 +38,16 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const searchRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cerrar dropdown cuando no se está interactuando
-  useEffect(() => {
-    if (!isHoveringResults && !isSearching && searchQuery.trim() === '') {
-      const timer = setTimeout(() => {
-        setShowSearchResults(false);
-      }, 1000); // Esperar 1 segundo antes de cerrar
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isHoveringResults, isSearching, searchQuery]);
+  // NO cerrar automáticamente el dropdown - solo cerrar manualmente
+  // useEffect(() => {
+  //   if (!isHoveringResults && !isSearching && searchQuery.trim() === '') {
+  //     const timer = setTimeout(() => {
+  //       setShowSearchResults(false);
+  //     }, 1000);
+  //     
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isHoveringResults, isSearching, searchQuery]);
 
   // Cargar Leaflet
   useEffect(() => {
@@ -169,7 +169,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const searchLocation = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
-      setShowSearchResults(false);
+      // NO cerrar el dropdown automáticamente
+      // setShowSearchResults(false);
       return;
     }
 
@@ -450,13 +451,22 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {/* Dropdown de resultados - Fuera del header */}
         {showSearchResults && (
           <div 
-            className="relative z-[99999] bg-white border-b border-gray-200"
+            className="relative z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
             onMouseEnter={() => setIsHoveringResults(true)}
             onMouseLeave={() => setIsHoveringResults(false)}
             onClick={(e) => {
               console.log('🖱️ CLIC EN DROPDOWN:', e.target);
             }}
           >
+            {/* Botón para cerrar */}
+            <div className="flex justify-end p-2 border-b border-gray-200">
+              <button
+                onClick={() => setShowSearchResults(false)}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
             {searchResults.length > 0 ? (
               <div className="max-h-60 overflow-y-auto">
                 {searchResults.map((result, index) => (
@@ -468,8 +478,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                       console.log('🖱️ CLIC EN RESULTADO:', result);
                       selectSearchResult(result);
                     }}
-                    className="w-full px-6 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
-                    style={{ pointerEvents: 'auto' }}
+                    className="w-full px-6 py-4 text-left hover:bg-blue-100 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer text-left"
+                    style={{ pointerEvents: 'auto', zIndex: 100000 }}
                   >
                     <div className="flex items-start gap-3">
                       <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
