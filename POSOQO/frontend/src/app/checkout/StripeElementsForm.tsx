@@ -28,6 +28,14 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
     apellidoPaterno?: string;
     apellidoMaterno?: string;
   } | null>(null);
+  const [stripeLoaded, setStripeLoaded] = useState(false);
+
+  // Verificar que Stripe esté cargado
+  React.useEffect(() => {
+    if (stripe && elements) {
+      setStripeLoaded(true);
+    }
+  }, [stripe, elements]);
 
   // Validar DNI peruano
   const validateDNI = (dni: string) => {
@@ -177,6 +185,18 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
     }
   };
 
+  if (!stripe || !elements || !stripeLoaded) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando formulario de pago...</p>
+          <p className="text-sm text-gray-500 mt-2">Inicializando Stripe...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pt-24 pb-16 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
@@ -218,11 +238,13 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                           base: {
                             fontSize: '16px',
                             color: '#374151',
+                            fontFamily: 'system-ui, -apple-system, sans-serif',
                             '::placeholder': {
                               color: '#9CA3AF',
                             },
                           },
                         },
+                        placeholder: '1234 5678 9012 3456',
                       }}
                     />
                   </div>
@@ -252,11 +274,13 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                             base: {
                               fontSize: '16px',
                               color: '#374151',
+                              fontFamily: 'system-ui, -apple-system, sans-serif',
                               '::placeholder': {
                                 color: '#9CA3AF',
                               },
                             },
                           },
+                          placeholder: 'MM/AA',
                         }}
                       />
                     </div>
@@ -271,11 +295,13 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                             base: {
                               fontSize: '16px',
                               color: '#374151',
+                              fontFamily: 'system-ui, -apple-system, sans-serif',
                               '::placeholder': {
                                 color: '#9CA3AF',
                               },
                             },
                           },
+                          placeholder: '123',
                         }}
                       />
                     </div>
