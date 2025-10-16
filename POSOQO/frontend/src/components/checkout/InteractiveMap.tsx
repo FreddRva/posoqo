@@ -225,7 +225,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </div>
           
           {/* Búsqueda */}
-          <div className="relative">
+          <div className="relative z-50">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -236,7 +236,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                 return () => clearTimeout(timeout);
               }}
               placeholder="Buscar ubicación..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
             />
             {isSearching && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -248,7 +248,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
         {/* Resultados de búsqueda */}
         {showSearchResults && searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 shadow-lg rounded-b-xl max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 z-[9999] bg-white border border-gray-200 shadow-lg rounded-b-xl max-h-60 overflow-y-auto">
             {searchResults.map((result, index) => (
               <div
                 key={index}
