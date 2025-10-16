@@ -165,12 +165,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setIsLoading(false);
   };
 
-  // Función de búsqueda usando proxy del backend
+  // Función de búsqueda SIMPLIFICADA
   const searchLocation = async (query: string) => {
+    console.log('🔍 BÚSQUEDA INICIADA:', query);
+    
     if (!query.trim()) {
       setSearchResults([]);
-      // NO cerrar el dropdown automáticamente
-      // setShowSearchResults(false);
+      setShowSearchResults(false);
       return;
     }
 
@@ -178,9 +179,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setShowSearchResults(true);
     
     try {
-      console.log('🔍 Buscando:', query);
+      console.log('🔍 Enviando petición para:', query);
       
-      // Usar proxy del backend para evitar CORS
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/search-location`, {
         method: 'POST',
         headers: {
@@ -192,67 +192,81 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         })
       });
       
+      console.log('📡 Respuesta recibida:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Error en búsqueda');
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
       
       const data = await response.json();
-      console.log('📍 Resultados de búsqueda:', data);
+      console.log('📍 Datos completos:', data);
       
-      if (data.success && data.data) {
-        const results = Array.isArray(data.data) ? data.data : [];
-        
-        const processedResults = results.map((result: any) => ({
-          formatted: result.display_name,
-          geometry: { lat: parseFloat(result.lat), lng: parseFloat(result.lon) },
+      if (data.success && data.data && Array.isArray(data.data)) {
+        const results = data.data.map((result: any) => ({
+          formatted: result.display_name || 'Sin nombre',
+          geometry: { 
+            lat: parseFloat(result.lat) || 0, 
+            lng: parseFloat(result.lon) || 0 
+          },
           components: {
-            city: result.address?.city || result.address?.town || result.address?.village || result.address?.municipality,
-            state: result.address?.state || result.address?.region,
-            country: result.address?.country
+            city: result.address?.city || result.address?.town || 'Perú',
+            state: result.address?.state || 'Perú',
+            country: 'Perú'
           },
           source: 'nominatim',
           importance: result.importance || 0
         }));
         
-        // Ordenar por importancia
-        processedResults.sort((a: any, b: any) => (b.importance || 0) - (a.importance || 0));
-        
-        setSearchResults(processedResults.slice(0, 10));
-        console.log('✅ Resultados establecidos:', processedResults.slice(0, 10).length, 'elementos');
+        console.log('✅ Resultados procesados:', results.length);
+        setSearchResults(results.slice(0, 10));
       } else {
+        console.log('❌ No hay datos válidos en la respuesta');
         setSearchResults([]);
-        console.log('❌ No hay resultados');
       }
       
     } catch (error) {
-      console.error('Error en búsqueda:', error);
+      console.error('❌ Error en búsqueda:', error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  // Seleccionar resultado de búsqueda - VERSIÓN SIMPLE - DEPLOY FORZADO
+  // Seleccionar resultado de búsqueda - VERSIÓN ULTRA SIMPLE
   const selectSearchResult = (result: any) => {
-    console.log('🚀 CLIC FUNCIONA! Resultado:', result);
+    console.log('🚀 CLIC DETECTADO! Resultado:', result);
+    
+    if (!result || !result.geometry) {
+      console.log('❌ Resultado inválido');
+      return;
+    }
     
     const lat = result.geometry.lat;
     const lng = result.geometry.lng;
-    const address = result.formatted;
+    const address = result.formatted || 'Dirección no disponible';
     
     console.log('📍 Coordenadas:', { lat, lng });
     console.log('📍 Dirección:', address);
     
-    // Actualizar estado inmediatamente
+    // Actualizar estado
     setSelectedPosition([lat, lng]);
     setAddress(address);
     
-    // Actualizar marcador y mapa
+    // Actualizar marcador
     if (markerRef.current) {
+      console.log('🎯 Actualizando marcador existente');
       markerRef.current.setLatLng([lat, lng]);
+    } else if (mapInstance.current && window.L) {
+      console.log('🎯 Creando nuevo marcador');
+      const newMarker = window.L.marker([lat, lng], {
+        draggable: true
+      }).addTo(mapInstance.current);
+      markerRef.current = newMarker;
     }
     
+    // Centrar mapa
     if (mapInstance.current) {
+      console.log('🗺️ Centrando mapa');
       mapInstance.current.setView([lat, lng], 16, {
         animate: true,
         duration: 1.5
@@ -262,7 +276,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     // Cerrar dropdown
     setShowSearchResults(false);
     
-    console.log('✅ RESULTADO SELECCIONADO CORRECTAMENTE - DEPLOY FORZADO FUNCIONA');
+    console.log('✅ SELECCIÓN COMPLETADA');
   };
 
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
