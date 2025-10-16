@@ -4,13 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Navigation, Check, X, Search } from 'lucide-react';
 
-// Declarar L (Leaflet) para TypeScript
-declare global {
-  interface Window {
-    L: any;
-  }
-}
-
 interface InteractiveMapProps {
   initialPosition: [number, number];
   onLocationSelect: (lat: number, lng: number, address: string) => void;
@@ -34,109 +27,65 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [isHoveringResults, setIsHoveringResults] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cargar Leaflet
+  // Cargar Leaflet de forma simple
   useEffect(() => {
     if (!isOpen || !mapRef.current) return;
 
-    const loadLeaflet = async () => {
+    const loadMap = async () => {
       try {
         // Cargar CSS
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
+        if (!document.querySelector('link[href*="leaflet"]')) {
+          const link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          document.head.appendChild(link);
+        }
 
         // Cargar JS
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        script.onload = () => {
-          initializeMap();
-        };
-        document.head.appendChild(script);
+        if (!window.L) {
+          await import('leaflet');
+        }
+
+        // Inicializar mapa
+        const map = window.L.map(mapRef.current!, {
+          center: initialPosition,
+          zoom: 13
+        });
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Crear marcador
+        const marker = window.L.marker(initialPosition, {
+          draggable: true
+        }).addTo(map);
+
+        // Eventos
+        marker.on('dragend', (e: any) => {
+          const pos = e.target.getLatLng();
+          setSelectedPosition([pos.lat, pos.lng]);
+          getAddressFromCoordinates(pos.lat, pos.lng);
+        });
+
+        map.on('click', (e: any) => {
+          marker.setLatLng(e.latlng);
+          setSelectedPosition([e.latlng.lat, e.latlng.lng]);
+          getAddressFromCoordinates(e.latlng.lat, e.latlng.lng);
+        });
+
+        mapInstance.current = map;
+        markerRef.current = marker;
+        setIsLoading(false);
+
       } catch (error) {
-        console.error('Error cargando Leaflet:', error);
+        console.error('Error cargando mapa:', error);
         setIsLoading(false);
       }
     };
 
-    const initializeMap = () => {
-      if (!window.L || !mapRef.current) return;
-
-      const map = window.L.map(mapRef.current, {
-        center: initialPosition,
-        zoom: 13,
-        zoomControl: true,
-        scrollWheelZoom: true,
-        doubleClickZoom: true,
-        boxZoom: true,
-        keyboard: true,
-        dragging: true,
-        touchZoom: true
-      });
-
-      // Agregar capa de tiles
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19
-      }).addTo(map);
-
-      // Crear marcador personalizado
-      const customIcon = window.L.divIcon({
-        html: `
-          <div style="
-            width: 30px;
-            height: 30px;
-            background: #3b82f6;
-            border: 3px solid white;
-            border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          ">
-            <div style="
-              width: 8px;
-              height: 8px;
-              background: white;
-              border-radius: 50%;
-            "></div>
-          </div>
-        `,
-        className: 'custom-marker',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
-
-      // Crear marcador
-      const marker = window.L.marker(initialPosition, {
-        icon: customIcon,
-        draggable: true
-      }).addTo(map);
-
-      // Evento de arrastre del marcador
-      marker.on('dragend', (e: any) => {
-        const newPos = e.target.getLatLng();
-        setSelectedPosition([newPos.lat, newPos.lng]);
-        getAddressFromCoordinates(newPos.lat, newPos.lng);
-      });
-
-      // Evento de clic en el mapa
-      map.on('click', (e: any) => {
-        marker.setLatLng(e.latlng);
-        setSelectedPosition([e.latlng.lat, e.latlng.lng]);
-        getAddressFromCoordinates(e.latlng.lat, e.latlng.lng);
-      });
-
-      mapInstance.current = map;
-      markerRef.current = marker;
-      setIsLoading(false);
-    };
-
-    loadLeaflet();
+    loadMap();
 
     return () => {
       if (mapInstance.current) {
@@ -147,10 +96,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     };
   }, [isOpen, initialPosition]);
 
-  // Función de búsqueda SIMPLIFICADA
+  // Búsqueda simple
   const searchLocation = async (query: string) => {
-    console.log('🔍 BÚSQUEDA INICIADA:', query);
-    
     if (!query.trim()) {
       setSearchResults([]);
       setShowSearchResults(false);
@@ -161,152 +108,77 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     setShowSearchResults(true);
     
     try {
-      console.log('🔍 Enviando petición para:', query);
-      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/search-location`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: query + ', Peru',
-          type: 'search'
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query + ', Peru' })
       });
       
-      console.log('📡 Respuesta recibida:', response.status);
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      
       const data = await response.json();
-      console.log('📍 Datos completos:', data);
       
-      if (data.success && data.data && Array.isArray(data.data)) {
-        const results = data.data.map((result: any) => ({
-          formatted: result.display_name || 'Sin nombre',
-          geometry: { 
-            lat: parseFloat(result.lat) || 0, 
-            lng: parseFloat(result.lon) || 0 
-          },
-          components: {
-            city: result.address?.city || result.address?.town || 'Perú',
-            state: result.address?.state || 'Perú',
-            country: 'Perú'
-          },
-          source: 'nominatim',
-          importance: result.importance || 0
-        }));
-        
-        console.log('✅ Resultados procesados:', results.length);
-        setSearchResults(results.slice(0, 10));
+      if (data.success && data.data) {
+        setSearchResults(data.data.slice(0, 5));
       } else {
-        console.log('❌ No hay datos válidos en la respuesta');
         setSearchResults([]);
       }
-      
     } catch (error) {
-      console.error('❌ Error en búsqueda:', error);
+      console.error('Error en búsqueda:', error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
 
-  // Seleccionar resultado de búsqueda - VERSIÓN ULTRA SIMPLE
-  const selectSearchResult = (result: any) => {
-    console.log('🚀 CLIC DETECTADO! Resultado:', result);
+  // Seleccionar resultado
+  const selectResult = (result: any) => {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
     
-    if (!result || !result.geometry) {
-      console.log('❌ Resultado inválido');
-      return;
+    if (!isNaN(lat) && !isNaN(lng)) {
+      setSelectedPosition([lat, lng]);
+      setAddress(result.display_name || 'Dirección no disponible');
+      
+      if (markerRef.current) {
+        markerRef.current.setLatLng([lat, lng]);
+      }
+      
+      if (mapInstance.current) {
+        mapInstance.current.setView([lat, lng], 16);
+      }
     }
     
-    const lat = result.geometry.lat;
-    const lng = result.geometry.lng;
-    const address = result.formatted || 'Dirección no disponible';
-    
-    console.log('📍 Coordenadas:', { lat, lng });
-    console.log('📍 Dirección:', address);
-    
-    // Actualizar estado
-    setSelectedPosition([lat, lng]);
-    setAddress(address);
-    
-    // Actualizar marcador
-    if (markerRef.current) {
-      console.log('🎯 Actualizando marcador existente');
-      markerRef.current.setLatLng([lat, lng]);
-    } else if (mapInstance.current && window.L) {
-      console.log('🎯 Creando nuevo marcador');
-      const newMarker = window.L.marker([lat, lng], {
-        draggable: true
-      }).addTo(mapInstance.current);
-      markerRef.current = newMarker;
-    }
-    
-    // Centrar mapa
-    if (mapInstance.current) {
-      console.log('🗺️ Centrando mapa');
-      mapInstance.current.setView([lat, lng], 16, {
-        animate: true,
-        duration: 1.5
-      });
-    }
-    
-    // Cerrar dropdown
     setShowSearchResults(false);
-    
-    console.log('✅ SELECCIÓN COMPLETADA');
   };
 
+  // Obtener dirección
   const getAddressFromCoordinates = async (lat: number, lng: number) => {
     try {
-      console.log('🔄 Obteniendo dirección para:', { lat, lng });
-      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/reverse-geocoding`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          lat: lat.toString(),
-          lng: lng.toString()
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat: lat.toString(), lng: lng.toString() })
       });
 
-      if (!response.ok) {
-        throw new Error('Error en reverse geocoding');
-      }
-
       const data = await response.json();
-      console.log('📍 Datos de geocoding:', data);
       
       if (data.success && data.data) {
-        const address = data.data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-        setAddress(address);
-        console.log('✅ Dirección actualizada:', address);
+        setAddress(data.data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       } else {
         setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
     } catch (error) {
-      console.error('Error al obtener dirección:', error);
       setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     }
   };
 
-  const handleConfirmLocation = () => {
+  const handleConfirm = () => {
     onLocationSelect(selectedPosition[0], selectedPosition[1], address);
     onClose();
   };
 
-  const handleUseCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocalización no soportada por este navegador');
-      return;
-    }
-
+  const handleCurrentLocation = () => {
+    if (!navigator.geolocation) return;
+    
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -322,10 +194,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         
         getAddressFromCoordinates(latitude, longitude);
       },
-      (error) => {
-        console.error('Error obteniendo ubicación:', error);
-        alert('No se pudo obtener tu ubicación actual');
-      }
+      (error) => console.error('Error:', error)
     );
   };
 
@@ -343,122 +212,59 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
-        className="bg-white rounded-2xl w-full max-w-6xl h-[90vh] flex flex-col"
+        className="bg-white rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-900">Seleccionar Ubicación</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
               <X size={24} />
             </button>
           </div>
           
           {/* Búsqueda */}
           <div className="relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  // Limpiar timeout anterior
-                  if (searchTimeoutRef.current) {
-                    clearTimeout(searchTimeoutRef.current);
-                  }
-                  // Nuevo timeout - reducido para respuesta más rápida
-                  searchTimeoutRef.current = setTimeout(() => {
-                    searchLocation(e.target.value);
-                  }, 300);
-                }}
-                placeholder="Buscar ubicación en Perú (ej: Miraflores, Lima)"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
-              />
-              {isSearching && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
-                </div>
-              )}
-            </div>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                const timeout = setTimeout(() => searchLocation(e.target.value), 500);
+                return () => clearTimeout(timeout);
+              }}
+              placeholder="Buscar ubicación..."
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Dropdown de resultados - Fuera del header */}
-        {showSearchResults && (
-          <div 
-            className="absolute top-full left-0 right-0 z-[99999] bg-white border border-gray-200 shadow-lg rounded-b-xl"
-            onMouseEnter={() => setIsHoveringResults(true)}
-            onMouseLeave={() => setIsHoveringResults(false)}
-            onClick={(e) => {
-              console.log('🖱️ CLIC EN DROPDOWN:', e.target);
-              e.stopPropagation();
-            }}
-          >
-            {/* Botón para cerrar */}
-            <div className="flex justify-end p-2 border-b border-gray-200">
-              <button
-                onClick={() => setShowSearchResults(false)}
-                className="text-gray-400 hover:text-gray-600 p-1"
+        {/* Resultados de búsqueda */}
+        {showSearchResults && searchResults.length > 0 && (
+          <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 shadow-lg rounded-b-xl max-h-60 overflow-y-auto">
+            {searchResults.map((result, index) => (
+              <div
+                key={index}
+                onClick={() => selectResult(result)}
+                className="px-6 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
               >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {searchResults.length > 0 ? (
-              <div className="max-h-60 overflow-y-auto">
-                {searchResults.map((result, index) => (
-                  <div
-                    key={index}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('🖱️ MOUSEDOWN EN RESULTADO (NUEVO DEPLOY):', result);
-                      selectSearchResult(result);
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('🖱️ CLIC EN RESULTADO:', result);
-                      selectSearchResult(result);
-                    }}
-                    onTouchStart={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('🖱️ TOUCH EN RESULTADO:', result);
-                      selectSearchResult(result);
-                    }}
-                    className="w-full px-6 py-4 text-left hover:bg-blue-100 transition-colors border-b border-gray-100 last:border-b-0 cursor-pointer"
-                    style={{ 
-                      pointerEvents: 'auto', 
-                      zIndex: 100000,
-                      position: 'relative'
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {result.formatted}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {result.components?.city || result.components?.town || 'Perú'}, {result.components?.state || 'Perú'}
-                        </p>
-                      </div>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 text-blue-500 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {result.display_name}
+                    </p>
                   </div>
-                ))}
+                </div>
               </div>
-            ) : searchQuery.trim() && !isSearching ? (
-              <div className="px-6 py-4">
-                <p className="text-sm text-gray-500 text-center">
-                  No se encontraron ubicaciones para "{searchQuery}"
-                </p>
-              </div>
-            ) : null}
+            ))}
           </div>
         )}
 
@@ -472,64 +278,35 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
               </div>
             </div>
           )}
-          <div ref={mapRef} className="w-full h-full rounded-b-2xl" />
-          
-          {/* Estilos para el marcador personalizado */}
-          <style jsx global>{`
-            .custom-marker {
-              background: transparent !important;
-              border: none !important;
-            }
-            .custom-marker div {
-              transition: all 0.2s ease;
-            }
-            .custom-marker:hover div {
-              transform: scale(1.1);
-            }
-          `}</style>
+          <div ref={mapRef} className="w-full h-full" />
         </div>
 
-        {/* Información de la ubicación mejorada */}
+        {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">Ubicación Seleccionada</h3>
-                <div className="p-3 bg-white rounded-lg border border-gray-200">
-                  <p className="text-gray-900 text-sm break-words">
-                    {address || 'Selecciona una ubicación en el mapa o busca una dirección'}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Lat: {selectedPosition[0].toFixed(6)}, Lng: {selectedPosition[1].toFixed(6)}
-                  </p>
-                </div>
-              </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Ubicación Seleccionada</h3>
+              <p className="text-sm text-gray-600 bg-white p-3 rounded-lg border">
+                {address || 'Selecciona una ubicación en el mapa'}
+              </p>
             </div>
-
+            
             <div className="flex gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleUseCurrentLocation}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold"
+              <button
+                onClick={handleCurrentLocation}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
               >
                 <Navigation className="w-4 h-4" />
                 Mi Ubicación
-              </motion.button>
+              </button>
               
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleConfirmLocation}
-                disabled={!address}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              <button
+                onClick={handleConfirm}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
               >
                 <Check className="w-4 h-4" />
                 Confirmar
-              </motion.button>
+              </button>
             </div>
           </div>
         </div>
