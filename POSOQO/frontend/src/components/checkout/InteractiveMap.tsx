@@ -38,17 +38,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const searchRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // NO cerrar automáticamente el dropdown - solo cerrar manualmente
-  // useEffect(() => {
-  //   if (!isHoveringResults && !isSearching && searchQuery.trim() === '') {
-  //     const timer = setTimeout(() => {
-  //       setShowSearchResults(false);
-  //     }, 1000);
-  //     
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [isHoveringResults, isSearching, searchQuery]);
-
   // Cargar Leaflet
   useEffect(() => {
     if (!isOpen || !mapRef.current) return;
@@ -68,102 +57,95 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           initializeMap();
         };
         document.head.appendChild(script);
-
-        return () => {
-          document.head.removeChild(link);
-          document.head.removeChild(script);
-        };
       } catch (error) {
-        console.error('Error loading Leaflet:', error);
+        console.error('Error cargando Leaflet:', error);
         setIsLoading(false);
       }
     };
 
-    loadLeaflet();
-  }, [isOpen]);
+    const initializeMap = () => {
+      if (!window.L || !mapRef.current) return;
 
-  // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setShowSearchResults(false);
-      }
-    };
+      const map = window.L.map(mapRef.current, {
+        center: initialPosition,
+        zoom: 13,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        boxZoom: true,
+        keyboard: true,
+        dragging: true,
+        touchZoom: true
+      });
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      // Agregar capa de tiles
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }).addTo(map);
 
-  // Cleanup timeout al desmontar
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const initializeMap = () => {
-    if (!mapRef.current || typeof window === 'undefined' || !(window as any).L) return;
-
-    const L = (window as any).L;
-
-    // Posición inicial en Lima, Perú
-    const limaPosition: [number, number] = [-12.0464, -77.0428];
-    
-    // Crear mapa centrado en Lima
-    mapInstance.current = L.map(mapRef.current).setView(limaPosition, 13);
-
-    // Agregar capa de tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(mapInstance.current);
-
-    // Crear marcador mejorado
-    markerRef.current = L.marker(limaPosition, {
-      draggable: true,
-      icon: L.divIcon({
+      // Crear marcador personalizado
+      const customIcon = window.L.divIcon({
+        html: `
+          <div style="
+            width: 30px;
+            height: 30px;
+            background: #3b82f6;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <div style="
+              width: 8px;
+              height: 8px;
+              background: white;
+              border-radius: 50%;
+            "></div>
+          </div>
+        `,
         className: 'custom-marker',
-        html: '<div class="w-8 h-8 bg-blue-600 rounded-full border-3 border-white shadow-xl flex items-center justify-center transform hover:scale-110 transition-transform"><div class="w-3 h-3 bg-white rounded-full"></div></div>',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      })
-    }).addTo(mapInstance.current);
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+      });
 
-    // Evento de arrastrar marcador mejorado
-    markerRef.current.on('dragstart', () => {
-      console.log('Iniciando arrastre del marcador');
-    });
+      // Crear marcador
+      const marker = window.L.marker(initialPosition, {
+        icon: customIcon,
+        draggable: true
+      }).addTo(map);
 
-    markerRef.current.on('dragend', (e: any) => {
-      const lat = e.target.getLatLng().lat;
-      const lng = e.target.getLatLng().lng;
-      console.log('Marcador arrastrado a:', { lat, lng });
-      setSelectedPosition([lat, lng]);
-      getAddressFromCoordinates(lat, lng);
-    });
+      // Evento de arrastre del marcador
+      marker.on('dragend', (e: any) => {
+        const newPos = e.target.getLatLng();
+        setSelectedPosition([newPos.lat, newPos.lng]);
+        getAddressFromCoordinates(newPos.lat, newPos.lng);
+      });
 
-    // Evento de click en el mapa mejorado
-    mapInstance.current.on('click', (e: any) => {
-      const lat = e.latlng.lat;
-      const lng = e.latlng.lng;
-      console.log('Clic en mapa:', { lat, lng });
-      setSelectedPosition([lat, lng]);
-      
-      if (markerRef.current) {
-        markerRef.current.setLatLng([lat, lng]);
-        markerRef.current.update();
+      // Evento de clic en el mapa
+      map.on('click', (e: any) => {
+        marker.setLatLng(e.latlng);
+        setSelectedPosition([e.latlng.lat, e.latlng.lng]);
+        getAddressFromCoordinates(e.latlng.lat, e.latlng.lng);
+      });
+
+      mapInstance.current = map;
+      markerRef.current = marker;
+      setIsLoading(false);
+    };
+
+    loadLeaflet();
+
+    return () => {
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+        markerRef.current = null;
       }
-      
-      getAddressFromCoordinates(lat, lng);
-    });
-
-    // Obtener dirección inicial
-    getAddressFromCoordinates(limaPosition[0], limaPosition[1]);
-    setIsLoading(false);
-  };
+    };
+  }, [isOpen, initialPosition]);
 
   // Función de búsqueda SIMPLIFICADA
   const searchLocation = async (query: string) => {
@@ -283,7 +265,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     try {
       console.log('🔄 Obteniendo dirección para:', { lat, lng });
       
-      // Usar proxy del backend para evitar CORS
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/geocoding/reverse-geocoding`, {
         method: 'POST',
         headers: {
@@ -291,21 +272,21 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         },
         body: JSON.stringify({
           lat: lat.toString(),
-          lng: lng.toString(),
-          type: 'reverse'
+          lng: lng.toString()
         })
       });
-      
+
       if (!response.ok) {
         throw new Error('Error en reverse geocoding');
       }
-      
+
       const data = await response.json();
       console.log('📍 Datos de geocoding:', data);
       
-      if (data.success && data.data && data.data.display_name) {
-        setAddress(data.data.display_name);
-        console.log('✅ Dirección actualizada:', data.data.display_name);
+      if (data.success && data.data) {
+        const address = data.data.display_name || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        setAddress(address);
+        console.log('✅ Dirección actualizada:', address);
       } else {
         setAddress(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
@@ -328,18 +309,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        setSelectedPosition([lat, lng]);
+        const { latitude, longitude } = position.coords;
+        setSelectedPosition([latitude, longitude]);
         
         if (markerRef.current) {
-          markerRef.current.setLatLng([lat, lng]);
-        }
-        if (mapInstance.current) {
-          mapInstance.current.setView([lat, lng], 15);
+          markerRef.current.setLatLng([latitude, longitude]);
         }
         
-        getAddressFromCoordinates(lat, lng);
+        if (mapInstance.current) {
+          mapInstance.current.setView([latitude, longitude], 16);
+        }
+        
+        getAddressFromCoordinates(latitude, longitude);
       },
       (error) => {
         console.error('Error obteniendo ubicación:', error);
@@ -348,15 +329,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     );
   };
 
-  // Limpiar mapa al cerrar
-  useEffect(() => {
-    if (!isOpen && mapInstance.current) {
-      mapInstance.current.remove();
-      mapInstance.current = null;
-      markerRef.current = null;
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return (
@@ -364,7 +336,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <motion.div
@@ -377,26 +349,17 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Seleccionar Ubicación</h2>
-                <p className="text-gray-600">Busca, arrastra el marcador o haz clic en el mapa</p>
-              </div>
-            </div>
-            
+            <h2 className="text-2xl font-bold text-gray-900">Seleccionar Ubicación</h2>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <X className="w-6 h-6" />
+              <X size={24} />
             </button>
           </div>
-
-          {/* Buscador */}
-          <div className="relative" ref={searchRef}>
+          
+          {/* Búsqueda */}
+          <div className="relative">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
