@@ -246,9 +246,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           </div>
         </div>
 
-        {/* Resultados de búsqueda */}
+        {/* Resultados de búsqueda - FUERA del header */}
         {showSearchResults && searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 z-[9999] bg-white border border-gray-200 shadow-lg rounded-b-xl max-h-60 overflow-y-auto">
+          <div className="relative z-[9999] bg-white border border-gray-200 shadow-lg rounded-b-xl max-h-60 overflow-y-auto mx-6 -mt-2">
             {searchResults.map((result, index) => (
               <div
                 key={index}
