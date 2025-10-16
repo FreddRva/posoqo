@@ -12,6 +12,7 @@ interface OrderSummaryProps {
   addressData: AddressData;
   onProceedToPayment: () => void;
   loading?: boolean;
+  showProceedButton?: boolean;
 }
 
 export const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
@@ -20,7 +21,8 @@ export const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
   profile,
   addressData,
   onProceedToPayment,
-  loading = false
+  loading = false,
+  showProceedButton = true
 }) => {
   const isProfileComplete = profile && profile.name && profile.last_name && profile.dni && profile.phone;
   const isAddressComplete = addressData.address && addressData.addressRef;
@@ -117,25 +119,27 @@ export const OrderSummaryComponent: React.FC<OrderSummaryProps> = ({
       </div>
 
       {/* Botón de pago */}
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={onProceedToPayment}
-        disabled={!isProfileComplete || !isAddressComplete || loading}
-        className="w-full mt-6 bg-green-600 text-white py-4 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200"
-      >
-        {loading ? (
-          <>
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Procesando...
-          </>
-        ) : (
-          <>
-            <CreditCard className="w-5 h-5" />
-            Proceder al Pago
-          </>
-        )}
-      </motion.button>
+      {showProceedButton && (
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onProceedToPayment}
+          disabled={!isProfileComplete || !isAddressComplete || loading}
+          className="w-full mt-6 bg-green-600 text-white py-4 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200"
+        >
+          {loading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Procesando...
+            </>
+          ) : (
+            <>
+              <CreditCard className="w-5 h-5" />
+              Proceder al Pago
+            </>
+          )}
+        </motion.button>
+      )}
     </motion.div>
   );
 };

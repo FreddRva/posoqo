@@ -365,8 +365,9 @@ export default function CheckoutPage() {
                     lat: addressHook.markerPosition[0],
                     lng: addressHook.markerPosition[1]
                   }}
-                  onProceedToPayment={handlePlaceOrder}
+                  onProceedToPayment={() => {}} // No hacer nada en paso 2
                   loading={cartLoading}
+                  showProceedButton={false} // No mostrar botón en paso 2
                 />
               </div>
             </motion.div>
