@@ -32,12 +32,10 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
 
   // Verificar que Stripe esté cargado
   useEffect(() => {
-    console.log('🔍 Stripe Debug:', { stripe: !!stripe, elements: !!elements, stripeLoaded });
     if (stripe && elements) {
       setStripeLoaded(true);
-      console.log('✅ Stripe cargado correctamente');
     }
-  }, [stripe, elements, stripeLoaded]);
+  }, [stripe, elements]);
 
   // Validar DNI peruano
   const validateDNI = (dni: string) => {
@@ -149,12 +147,6 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         throw new Error("Stripe no está inicializado");
       }
 
-      console.log('🔍 Creando PaymentIntent con:', { amount, currency: "pen", metadata: {
-        document_type: documentType,
-        document_number: documentNumber.replace(/[\s.-]/g, ''),
-        cardholder_name: cardholderName.trim()
-      }});
-
       const data = await apiFetch<{clientSecret: string}>("/create-payment-intent", {
         method: "POST",
         body: JSON.stringify({ 
@@ -168,13 +160,9 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         }),
       });
 
-      console.log('🔍 Respuesta PaymentIntent:', data);
-
       if (!data.clientSecret) {
         throw new Error("No se pudo crear el PaymentIntent. El sistema de pagos no está disponible.");
       }
-
-      console.log('🔍 Confirmando pago con clientSecret:', data.clientSecret);
 
       const result = await stripe?.confirmCardPayment((data as any).clientSecret, {
         payment_method: {
@@ -185,14 +173,9 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         },
       });
 
-      console.log('🔍 Resultado del pago:', result);
-
       if (result?.error) {
-        console.error('❌ Error en el pago:', result.error);
         throw new Error(result.error.message || "Error al procesar el pago");
       }
-
-      console.log('✅ Pago exitoso!');
       setSuccess("¡Pago procesado exitosamente!");
       setProcessing(false);
     } catch (err: any) {
@@ -208,6 +191,38 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando formulario de pago...</p>
           <p className="text-sm text-gray-500 mt-2">Inicializando Stripe...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si el pago fue exitoso, mostrar mensaje de éxito
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-24 pb-16 px-4 sm:px-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">¡Pago Confirmado!</h2>
+            <p className="text-gray-600 mb-6">{success}</p>
+            <div className="space-y-4">
+              <button
+                onClick={() => window.location.href = '/products'}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Package className="w-5 h-5" />
+                Continuar Comprando
+              </button>
+              <button
+                onClick={() => window.location.href = '/'}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200"
+              >
+                Volver al Inicio
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -243,6 +258,20 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
                 <h2 className="text-xl font-bold text-gray-900">Información de Pago</h2>
               </div>
               
+              {/* Mensaje de error */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="w-5 h-5 text-red-500" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Número de tarjeta */}
                 <div className="space-y-2">
@@ -540,12 +569,6 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
 }
 
 export default function StripeElementsForm({ amount }: { amount: number }) {
-  console.log('🔍 StripeElementsForm Debug:', { 
-    amount, 
-    stripeKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    stripePromise: !!stripePromise 
-  });
-  
   return (
     <Elements stripe={stripePromise}>
       <CheckoutForm amount={amount} />
