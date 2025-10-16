@@ -5,7 +5,7 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { apiFetch } from "@/lib/api";
 import { CreditCard, Package, CheckCircle, AlertCircle } from "lucide-react";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RcbC4CL70N5NrKOIPYs3SiN0fsiVUf903Vp94tDj6yyu56QHx3MrMn0K6JIBvZ4vVvgzjgbihX5cRfRCi40I25G00lqp7TAxk');
 
 interface StripeElementsFormProps {
   amount: number;
@@ -32,10 +32,12 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
 
   // Verificar que Stripe esté cargado
   useEffect(() => {
+    console.log('🔍 Stripe Debug:', { stripe: !!stripe, elements: !!elements, stripeLoaded });
     if (stripe && elements) {
       setStripeLoaded(true);
+      console.log('✅ Stripe cargado correctamente');
     }
-  }, [stripe, elements]);
+  }, [stripe, elements, stripeLoaded]);
 
   // Validar DNI peruano
   const validateDNI = (dni: string) => {
@@ -524,6 +526,12 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
 }
 
 export default function StripeElementsForm({ amount }: { amount: number }) {
+  console.log('🔍 StripeElementsForm Debug:', { 
+    amount, 
+    stripeKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    stripePromise: !!stripePromise 
+  });
+  
   return (
     <Elements stripe={stripePromise}>
       <CheckoutForm amount={amount} />
