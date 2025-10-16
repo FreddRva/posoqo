@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, CreditCard, Package, User, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
@@ -204,7 +203,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-      <Script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places" strategy="beforeInteractive" />
       <div className="max-w-7xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
