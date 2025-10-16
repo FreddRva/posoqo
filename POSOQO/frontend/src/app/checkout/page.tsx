@@ -127,9 +127,11 @@ export default function CheckoutPage() {
       });
 
       if (response && typeof response === 'object' && 'clientSecret' in response) {
-        router.push(`/checkout/payment?client_secret=${(response as any).clientSecret}`);
+        // Ir al paso 2 del checkout
+        setStep(2);
       } else {
         // Handle error
+        console.error('Error creating payment intent');
       }
     } catch (err) {
       // Handle error
@@ -327,15 +329,6 @@ export default function CheckoutPage() {
                   onProceedToPayment={handlePlaceOrder}
                   loading={cartLoading}
                 />
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setStep(2)}
-                  disabled={!profileComplete || !location}
-                  className="mt-8 w-full bg-green-600 text-white font-bold py-4 px-8 rounded-xl hover:bg-green-700 transition-colors duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Continuar al Pago <ChevronLeft className="transform rotate-180 ml-2" size={20} />
-                </motion.button>
               </div>
             </motion.div>
           )}

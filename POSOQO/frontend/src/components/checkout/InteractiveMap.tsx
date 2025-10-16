@@ -315,4 +315,15 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   );
 };
 
-export default InteractiveMap;
+export default InteractiveMap;page-f35ae82145e72c54.js:1 
+ 
+ GET https://api.opencagedata.com/geocode/v1/json?q=-9.19+-75.0152&key=undefined 401 (Unauthorized)
+page-f35ae82145e72c54.js:1 
+ Error al obtener dirección desde coordenadas: Error: Error en reverse geocoding
+    at g (page-f35ae82145e72c54.js:1:48327)
+page-f35ae82145e72c54.js:1 
+ 
+ GET https://api.opencagedata.com/geocode/v1/json?q=-9.19+-75.0152&key=undefined 401 (Unauthorized)
+page-f35ae82145e72c54.js:1 
+ Error al obtener dirección desde coordenadas: Error: Error en reverse geocoding
+    at g (page-f35ae82145e72c54.js:1:48327)

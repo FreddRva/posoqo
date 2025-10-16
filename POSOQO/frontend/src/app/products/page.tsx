@@ -87,7 +87,7 @@ function ProductsContent() {
       if (isFavorite) {
         alert(`${product.name} eliminado de favoritos`);
         return prev.filter(id => id !== product.id);
-      } else {
+          } else {
         alert(`${product.name} agregado a favoritos`);
         return [...prev, product.id];
       }
@@ -132,7 +132,7 @@ function ProductsContent() {
         <div className="absolute top-1/4 -left-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
+        </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {/* Header galáctico */}
@@ -174,10 +174,10 @@ function ProductsContent() {
                 <span className="text-blue-400 font-semibold">Productos Encontrados</span>
                 <div className="text-2xl font-bold text-white">
                   {products.length}
-                </div>
-                <div className="text-gray-400">productos</div>
-              </div>
             </div>
+                <div className="text-gray-400">productos</div>
+          </div>
+        </div>
           </div>
           
           <div className="flex items-center gap-3">
@@ -194,7 +194,7 @@ function ProductsContent() {
               <MapPin className="w-5 h-5" />
               <span>Mapa</span>
             </motion.button>
-          </div>
+            </div>
         </motion.div>
 
         {/* Contenido principal */}
@@ -229,21 +229,21 @@ function ProductsContent() {
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
                         <MapPin className="w-4 h-4 text-white" />
-                      </div>
+            </div>
                       <h3 className="text-xl font-bold text-white">Ubicación</h3>
-                    </div>
+          </div>
                     <div className="h-80 rounded-2xl overflow-hidden border border-blue-400/20">
                       <Map
                         orderId=""
                         lat={-13.1631}
                         lng={-74.2247}
                         location="Ayacucho, Perú"
-                      />
-                    </div>
+                    />
+                  </div>
                     <div className="mt-4 flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                       <span className="text-green-400 text-sm font-medium">Ubicación Activa</span>
-                    </div>
+                </div>
                   </div>
                 </div>
               </div>
@@ -254,10 +254,10 @@ function ProductsContent() {
         {/* Visto Recientemente */}
         <div className="mt-12">
           <RecentlyViewed />
-        </div>
-      </div>
+                    </div>
+                  </div>
 
-      {/* Modal de detalles del producto */}
+        {/* Modal de detalles del producto */}
       <ProductDetailModal
         product={selectedProduct}
         isOpen={isModalOpen}

@@ -121,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-
+      
       // Cargar carrito desde localStorage
       const localCart = loadFromLocalStorage();
       setCart(localCart);
@@ -129,32 +129,32 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Si hay sesión, sincronizar con backend
       if (session?.accessToken) {
         try {
-          const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
-            authToken: session.accessToken,
-          });
+      const response = await apiFetch<{ items: { product_id: string; quantity: number }[] }>('/protected/cart', {
+        authToken: session.accessToken,
+      });
 
-          if (response.items?.length > 0) {
+      if (response.items?.length > 0) {
             // Obtener detalles de productos del backend
             const backendItems = await Promise.all(
-              response.items.map(async (item) => {
-                try {
+          response.items.map(async (item) => {
+            try {
                   const productResponse = await apiFetch<any>(`/products/${item.product_id}`);
                   const product = productResponse.data || productResponse;
-                  return {
-                    id: item.product_id,
+              return {
+                id: item.product_id,
                     name: product.name || "Producto",
                     price: product.price || 0,
                     image_url: getImageUrl(product.image_url),
-                    quantity: item.quantity,
+                quantity: item.quantity,
                     category: product.category?.name,
                     description: product.description
                   };
                 } catch (error) {
                   console.warn(`Producto ${item.product_id} no encontrado - eliminando del carrito`);
                   return null;
-                }
-              })
-            );
+            }
+          })
+        );
 
             // Filtrar productos válidos
             const validItems = backendItems.filter(item => item !== null) as CartItem[];
@@ -224,43 +224,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Normalizar producto
       const normalizedProduct: CartItem = {
-        ...product,
-        quantity: 1,
+      ...product,
+      quantity: 1,
         image_url: product.image_url || '/placeholder-product.jpg'
-      };
+    };
 
       // Actualizar estado local
-      setCart(prevCart => {
-        const existingItem = prevCart.find(item => item.id === product.id);
-        
-        if (existingItem) {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === product.id);
+      
+      if (existingItem) {
           // Si ya existe, incrementar cantidad
           const updatedCart = prevCart.map(item =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          );
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
           saveToLocalStorage(updatedCart);
           return updatedCart;
-        } else {
+      } else {
           // Si no existe, agregar nuevo item
           const updatedCart = [...prevCart, normalizedProduct];
           saveToLocalStorage(updatedCart);
           return updatedCart;
-        }
-      });
+      }
+    });
 
       // Sincronizar con backend si hay sesión
-      if (session?.accessToken) {
-        try {
-          await apiFetch('/protected/cart/add', {
-            method: 'POST',
-            authToken: session.accessToken,
-            body: JSON.stringify({
-              product_id: product.id,
-              quantity: 1,
-            }),
-          });
+    if (session?.accessToken) {
+      try {
+        await apiFetch('/protected/cart/add', {
+          method: 'POST',
+          authToken: session.accessToken,
+          body: JSON.stringify({
+            product_id: product.id,
+            quantity: 1,
+          }),
+        });
         } catch (backendError) {
           console.warn('Error sincronizando con backend:', backendError);
         }
@@ -292,29 +292,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
       
       const newQuantity = Math.max(1, Math.floor(quantity));
 
-      setCart(prevCart => {
-        const updatedCart = prevCart.map(item =>
+    setCart(prevCart => {
+      const updatedCart = prevCart.map(item => 
           item.id === productId
             ? { ...item, quantity: newQuantity }
             : item
-        );
+      );
         saveToLocalStorage(updatedCart);
-        return updatedCart;
-      });
+      return updatedCart;
+    });
 
       // Sincronizar con backend
-      if (session?.accessToken) {
-        try {
-          await apiFetch('/protected/cart', {
-            method: 'POST',
-            authToken: session.accessToken,
-            body: JSON.stringify({
+    if (session?.accessToken) {
+      try {
+        await apiFetch('/protected/cart', {
+          method: 'POST',
+          authToken: session.accessToken,
+          body: JSON.stringify({
               items: cart.map(item => ({
-                product_id: item.id,
+              product_id: item.id,
                 quantity: item.id === productId ? newQuantity : item.quantity,
-              })),
-            }),
-          });
+            })),
+          }),
+        });
         } catch (backendError) {
           console.warn('Error sincronizando cantidad con backend:', backendError);
         }
@@ -341,25 +341,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
 
-      setCart(prevCart => {
-        const updatedCart = prevCart.filter(item => item.id !== productId);
+    setCart(prevCart => {
+      const updatedCart = prevCart.filter(item => item.id !== productId);
         saveToLocalStorage(updatedCart);
-        return updatedCart;
-      });
+      return updatedCart;
+    });
 
       // Sincronizar con backend
-      if (session?.accessToken) {
-        try {
-          await apiFetch('/protected/cart', {
-            method: 'POST',
-            authToken: session.accessToken,
-            body: JSON.stringify({
+    if (session?.accessToken) {
+      try {
+        await apiFetch('/protected/cart', {
+          method: 'POST',
+          authToken: session.accessToken,
+          body: JSON.stringify({
               items: cart.filter(item => item.id !== productId).map(item => ({
-                product_id: item.id,
-                quantity: item.quantity,
-              })),
-            }),
-          });
+              product_id: item.id,
+              quantity: item.quantity,
+            })),
+          }),
+        });
         } catch (backendError) {
           console.warn('Error sincronizando eliminación con backend:', backendError);
         }
@@ -393,7 +393,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setError(null);
 
       // Limpiar estado local
-      setCart([]);
+    setCart([]);
       saveToLocalStorage([]);
       
       // Limpiar localStorage y sessionStorage completamente
@@ -456,15 +456,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // ===== VALOR DEL CONTEXTO =====
   const contextValue: CartContextType = {
-    cart,
-    loading,
-    error,
+        cart,
+        loading,
+        error,
     summary,
-    addToCart,
-    updateQuantity,
-    removeFromCart,
-    clearCart,
-    loadCart,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        clearCart,
+        loadCart,
     syncCart,
     validateCart,
     showNotification

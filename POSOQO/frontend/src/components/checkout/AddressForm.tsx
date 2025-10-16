@@ -67,7 +67,7 @@ export const AddressFormComponent: React.FC<AddressFormProps> = ({
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
               placeholder="Av. Principal 123"
             />
           </div>
@@ -80,7 +80,7 @@ export const AddressFormComponent: React.FC<AddressFormProps> = ({
             type="text"
             value={addressRef}
             onChange={(e) => setAddressRef(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
             placeholder="Frente al parque, casa azul"
           />
         </div>
@@ -92,7 +92,7 @@ export const AddressFormComponent: React.FC<AddressFormProps> = ({
             type="text"
             value={streetNumber}
             onChange={(e) => setStreetNumber(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-500"
             placeholder="123"
           />
         </div>

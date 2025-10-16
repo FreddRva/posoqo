@@ -18,13 +18,13 @@ export default function Navbar() {
   const user = session?.user as any;
   const { summary } = useCart();
   const { notifications, stats, markAsRead } = useNotifications();
-
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -123,7 +123,7 @@ export default function Navbar() {
                   </button>
 
                   <AnimatePresence>
-                    {showNotifications && (
+                  {showNotifications && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -156,7 +156,7 @@ export default function Navbar() {
                           )}
                         </div>
                       </motion.div>
-                    )}
+                      )}
                   </AnimatePresence>
                 </div>
               )}
@@ -175,7 +175,7 @@ export default function Navbar() {
               </a>
 
 
-
+              
               {/* Usuario */}
               {user ? (
                 <div className="relative" ref={userMenuRef}>
@@ -186,7 +186,7 @@ export default function Navbar() {
                     <User className="w-5 h-5" />
                     <span className="text-sm font-medium">{user.name?.split(' ')[0]}</span>
                   </button>
-                  
+
                   <AnimatePresence>
                     {showUserMenu && (
                       <motion.div
@@ -248,7 +248,7 @@ export default function Navbar() {
               </a>
 
               
-              <button
+              <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 text-gray-400 hover:text-white transition-colors duration-200"
               >
@@ -267,7 +267,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
+          onClick={() => setMobileMenuOpen(false)}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
               style={{ marginTop: '64px' }}
             />
@@ -286,12 +286,12 @@ export default function Navbar() {
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center">
                         <User className="w-5 h-5 text-gray-400" />
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p className="text-white font-medium">{user.name}</p>
                         <p className="text-gray-500 text-sm">{user.email}</p>
-                      </div>
-                    </div>
+              </div>
+            </div>
                     <div className="space-y-1">
                       {user.role === 'admin' && (
                         <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
@@ -311,14 +311,14 @@ export default function Navbar() {
                         <Heart className="w-5 h-5" />
                         <span className="text-sm">Favoritos</span>
                       </a>
-                      <button
+            <button
                         onClick={() => signOut()}
                         className="w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-gray-800 rounded-lg transition-colors"
-                      >
+            >
                         <LogOut className="w-5 h-5" />
                         <span className="text-sm">Cerrar Sesión</span>
-                      </button>
-                    </div>
+            </button>
+          </div>
                   </div>
                 ) : (
                   <a
@@ -339,7 +339,7 @@ export default function Navbar() {
                     isMobile={true}
                     onMobileClose={() => setMobileMenuOpen(false)}
                   />
-                </div>
+                  </div>
               </div>
             </motion.div>
           </>
