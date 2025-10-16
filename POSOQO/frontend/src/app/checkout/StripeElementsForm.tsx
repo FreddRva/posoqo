@@ -149,6 +149,12 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         throw new Error("Stripe no está inicializado");
       }
 
+      console.log('🔍 Creando PaymentIntent con:', { amount, currency: "pen", metadata: {
+        document_type: documentType,
+        document_number: documentNumber.replace(/[\s.-]/g, ''),
+        cardholder_name: cardholderName.trim()
+      }});
+
       const data = await apiFetch<{clientSecret: string}>("/create-payment-intent", {
         method: "POST",
         body: JSON.stringify({ 
@@ -162,9 +168,13 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         }),
       });
 
+      console.log('🔍 Respuesta PaymentIntent:', data);
+
       if (!data.clientSecret) {
         throw new Error("No se pudo crear el PaymentIntent. El sistema de pagos no está disponible.");
       }
+
+      console.log('🔍 Confirmando pago con clientSecret:', data.clientSecret);
 
       const result = await stripe?.confirmCardPayment((data as any).clientSecret, {
         payment_method: {
@@ -175,10 +185,14 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         },
       });
 
+      console.log('🔍 Resultado del pago:', result);
+
       if (result?.error) {
+        console.error('❌ Error en el pago:', result.error);
         throw new Error(result.error.message || "Error al procesar el pago");
       }
 
+      console.log('✅ Pago exitoso!');
       setSuccess("¡Pago procesado exitosamente!");
       setProcessing(false);
     } catch (err: any) {
