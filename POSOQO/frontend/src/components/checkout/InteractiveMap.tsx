@@ -439,7 +439,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      console.log('🖱️ MOUSEDOWN EN RESULTADO (FORZADO):', result);
+                      console.log('🖱️ MOUSEDOWN EN RESULTADO (NUEVO DEPLOY):', result);
                       selectSearchResult(result);
                     }}
                     onClick={(e) => {
