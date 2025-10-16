@@ -19,7 +19,7 @@ export default function OrderMap({ lat, lng, location, orderId }: OrderMapProps)
   let lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
   
   // Si las coordenadas son 0,0 pero la location contiene coordenadas, extraerlas
-  if ((latNum === 0 && lngNum === 0) && location) {
+  if ((latNum === 0 && lngNum === 0) && location && typeof location === 'string') {
     const coordMatch = location.match(/Lat:\s*(-?\d+\.?\d*),\s*Lng:\s*(-?\d+\.?\d*)/i);
     if (coordMatch) {
       latNum = parseFloat(coordMatch[1]);
