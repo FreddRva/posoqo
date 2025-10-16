@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { apiFetch } from "@/lib/api";
@@ -31,7 +31,7 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
   const [stripeLoaded, setStripeLoaded] = useState(false);
 
   // Verificar que Stripe esté cargado
-  React.useEffect(() => {
+  useEffect(() => {
     if (stripe && elements) {
       setStripeLoaded(true);
     }
