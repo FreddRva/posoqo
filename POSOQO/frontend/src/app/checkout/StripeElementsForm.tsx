@@ -5,7 +5,7 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { apiFetch } from "@/lib/api";
 import { CreditCard, Package, CheckCircle, AlertCircle } from "lucide-react";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface StripeElementsFormProps {
   amount: number;
