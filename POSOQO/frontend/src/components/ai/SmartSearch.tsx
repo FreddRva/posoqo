@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Sparkles, X, Loader2, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiFetch } from '@/lib';
-import { Product } from '@/types';
+import { HomepageProduct } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface SearchResult {
-  product: Product;
+  product: HomepageProduct;
   relevance: number;
   reason?: string;
 }
