@@ -233,9 +233,9 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
                       {/* Price */}
                       <div className="flex flex-col items-end justify-between">
                         <span className="text-lg font-bold text-gray-900">
-                          S/ {result.product.price.toFixed(2)}
+                          S/ {result.product.price?.toFixed(2) || '0.00'}
                         </span>
-                        {result.product.stock > 0 ? (
+                        {(result.product.stock ?? 0) > 0 ? (
                           <span className="text-xs text-green-600 font-medium">
                             En stock
                           </span>
