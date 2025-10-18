@@ -117,6 +117,7 @@ func main() {
 	aiAdmin := api.Group("/ai/admin")
 	aiAdmin.Use(middleware.AuthMiddleware())
 	aiAdmin.Post("/generate-description", handlers.GenerateProductDescriptionHandler)
+	aiAdmin.Get("/analytics", handlers.PredictiveAnalyticsHandler)
 
 	// Endpoint de pago con Stripe
 	api.Post("/pay", handlers.CreateStripeCheckout)

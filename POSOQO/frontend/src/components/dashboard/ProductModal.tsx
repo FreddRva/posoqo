@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Loader2 } from 'lucide-react';
 import { ProductModalProps, ProductFormData } from '@/types/dashboard';
 import { ImageUpload } from './ImageUpload';
+import { DescriptionGenerator } from '@/components/ai';
 
 export const ProductModal: React.FC<ProductModalProps> = ({
   isOpen,
@@ -214,6 +215,18 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                         <p className="text-sm text-red-600 mt-1">{errors.description}</p>
                       )}
                     </div>
+
+                    {/* Generador de Descripciones con IA */}
+                    {formData.name && formData.category_id && (
+                      <DescriptionGenerator
+                        name={formData.name}
+                        category={categories.find(c => c.id === formData.category_id)?.name || ''}
+                        estilo={formData.estilo}
+                        abv={formData.abv ? parseFloat(formData.abv) : undefined}
+                        ibu={formData.ibu ? parseInt(formData.ibu) : undefined}
+                        onDescriptionGenerated={(description) => handleInputChange('description', description)}
+                      />
+                    )}
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>

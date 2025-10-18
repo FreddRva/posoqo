@@ -5,12 +5,13 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
-  Beer, Utensils, Wine, Calendar, Users as UsersIcon
+  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles, Camera
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NavLogo } from "./navbar/NavLogo";
 import { NavLinks } from "./navbar/NavLinks";
+import { SmartSearch, PairingAssistant, ImageRecognition } from "./ai";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -24,6 +25,9 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showSmartSearch, setShowSmartSearch] = useState(false);
+  const [showPairingAssistant, setShowPairingAssistant] = useState(false);
+  const [showImageRecognition, setShowImageRecognition] = useState(false);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
@@ -160,6 +164,42 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
               )}
+
+              {/* Búsqueda Inteligente */}
+              <button
+                onClick={() => setShowSmartSearch(true)}
+                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+                title="Búsqueda Inteligente con IA"
+              >
+                <div className="relative">
+                  <Search className="w-5 h-5" />
+                  <Sparkles className="w-3 h-3 text-purple-400 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </button>
+
+              {/* Asistente de Maridaje */}
+              <button
+                onClick={() => setShowPairingAssistant(true)}
+                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+                title="Asistente de Maridaje con IA"
+              >
+                <div className="relative">
+                  <Wine className="w-5 h-5" />
+                  <Sparkles className="w-3 h-3 text-amber-400 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </button>
+
+              {/* Reconocimiento de Imágenes */}
+              <button
+                onClick={() => setShowImageRecognition(true)}
+                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200 group"
+                title="Reconocimiento de Imágenes con IA"
+              >
+                <div className="relative">
+                  <Camera className="w-5 h-5" />
+                  <Sparkles className="w-3 h-3 text-indigo-400 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </button>
 
               {/* Carrito */}
               <a
@@ -345,6 +385,20 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Modales de IA */}
+      <SmartSearch 
+        isOpen={showSmartSearch} 
+        onClose={() => setShowSmartSearch(false)} 
+      />
+      <PairingAssistant 
+        isOpen={showPairingAssistant} 
+        onClose={() => setShowPairingAssistant(false)} 
+      />
+      <ImageRecognition 
+        isOpen={showImageRecognition} 
+        onClose={() => setShowImageRecognition(false)} 
+      />
     </>
   );
 }
