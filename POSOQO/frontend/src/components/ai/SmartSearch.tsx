@@ -32,7 +32,7 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
     'Maridaje con pizza',
   ]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
