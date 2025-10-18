@@ -44,7 +44,7 @@ var AuthRateLimiter = limiter.New(limiter.Config{
 
 // CORS configurado para producción
 var CorsConfig = cors.Config{
-	AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,https://posoqo.vercel.app", // Dominios permitidos
+	AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,https://posoqo.vercel.app,https://*.vercel.app", // Dominios permitidos
 	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
 	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin",
 	AllowCredentials: true,

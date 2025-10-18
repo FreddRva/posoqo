@@ -84,7 +84,7 @@ func NewGeminiService() *GeminiService {
 
 	return &GeminiService{
 		APIKey:  apiKey,
-		BaseURL: "https://generativelanguage.googleapis.com/v1beta/models",
+		BaseURL: "https://generativelanguage.googleapis.com/v1/models",
 		Model:   "gemini-pro", // Modelo estable y gratuito
 		HTTPClient: &http.Client{
 			Timeout: 30 * time.Second,
