@@ -6,6 +6,7 @@ import { NotificationProvider } from "@/components/NotificationSystem";
 import { RecentlyViewedProvider } from "@/lib/recentlyViewedContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ErrorBoundaryProvider } from "@/components/ErrorBoundaryProvider";
+import { ChatbotWidget } from "@/components/ai";
 
 export const metadata: Metadata = {
   title: "POSOQO",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <DashboardWrapper>
                   {children}
                   </DashboardWrapper>
+                  <ChatbotWidget />
                 </RecentlyViewedProvider>
               </NotificationProvider>
             </CartProvider>

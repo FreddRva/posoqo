@@ -41,6 +41,9 @@ func main() {
 		log.Printf("⚠️ Cloudinary no disponible (usando almacenamiento local): %v", err)
 	}
 
+	// Inicializar servicio de IA (Gemini)
+	handlers.InitAIService()
+
 	// Crear aplicación Fiber
 	app := fiber.New(fiber.Config{
 		AppName: "POSOQO API",
@@ -99,6 +102,20 @@ func main() {
 	// Nuevos endpoints de geocoding para el mapa
 	api.Post("/geocoding/search-location", handlers.SearchLocation)
 	api.Post("/geocoding/reverse-geocoding", handlers.ReverseGeocoding)
+
+	// Rutas de IA (públicas)
+	ai := api.Group("/ai")
+	ai.Post("/chatbot", handlers.ChatbotHandler)
+	ai.Post("/recommend", handlers.RecommendProductsHandler)
+	ai.Post("/search", handlers.SmartSearchHandler)
+	ai.Post("/pairing", handlers.PairingAssistantHandler)
+	ai.Post("/sentiment", handlers.AnalyzeSentimentHandler)
+	
+	// Rutas de IA protegidas (solo admin)
+	aiAdmin := api.Group("/ai/admin")
+	aiAdmin.Use(middleware.AuthMiddleware())
+	aiAdmin.Use(middleware.AdminMiddleware())
+	aiAdmin.Post("/generate-description", handlers.GenerateProductDescriptionHandler)
 
 	// Endpoint de pago con Stripe
 	api.Post("/pay", handlers.CreateStripeCheckout)
