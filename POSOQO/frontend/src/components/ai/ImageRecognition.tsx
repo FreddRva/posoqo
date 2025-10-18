@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, Sparkles, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { apiFetch } from '@/lib/apiFetch';
+import { apiFetch } from '@/lib';
 import Image from 'next/image';
 import Link from 'next/link';
 

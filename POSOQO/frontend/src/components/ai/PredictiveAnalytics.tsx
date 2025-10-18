@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Package, Users, Calendar, Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { apiFetch } from '@/lib/apiFetch';
+import { apiFetch } from '@/lib';
 
 interface Prediction {
   metric: string;

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Wine, Utensils, Sparkles, X, Loader2, ChefHat } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { apiFetch } from '@/lib/apiFetch';
+import { apiFetch } from '@/lib';
 import Image from 'next/image';
 
 interface PairingAssistantProps {

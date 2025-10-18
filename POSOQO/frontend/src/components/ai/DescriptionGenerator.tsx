@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Sparkles, Loader2, Copy, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { apiFetch } from '@/lib/apiFetch';
+import { apiFetch } from '@/lib';
 
 interface DescriptionGeneratorProps {
   name: string;
