@@ -16,7 +16,7 @@ export const ChatbotWidget: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '¡Hola! 👋 Soy el asistente virtual de POSOQO. ¿En qué puedo ayudarte hoy?',
+      content: '¡Hola! 👋 Soy el asistente virtual de POSOQO con IA. Puedo ayudarte con información sobre nuestras cervezas, pedidos y servicios. ¿En qué puedo ayudarte hoy?',
       timestamp: new Date(),
     },
   ]);
@@ -81,7 +81,7 @@ export const ChatbotWidget: React.FC = () => {
       console.error('Error al enviar mensaje:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
+        content: '🔧 El asistente de IA está en configuración. Por favor, contacta al administrador para activar el servicio de Google Gemini.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
