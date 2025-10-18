@@ -33,7 +33,7 @@ func HealthCheckAI(c *fiber.Ctx) error {
 			"initialized": geminiService != nil,
 			"has_api_key": hasKey,
 			"api_key_length": len(apiKey),
-			"model": "gemini-pro",
+			"model": "gemini-1.5-flash-latest",
 			"api_version": "v1",
 		},
 	})
