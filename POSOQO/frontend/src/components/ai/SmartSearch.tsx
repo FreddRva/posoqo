@@ -235,15 +235,9 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
                         <span className="text-lg font-bold text-gray-900">
                           S/ {result.product.price?.toFixed(2) || '0.00'}
                         </span>
-                        {(result.product.stock ?? 0) > 0 ? (
-                          <span className="text-xs text-green-600 font-medium">
-                            En stock
-                          </span>
-                        ) : (
-                          <span className="text-xs text-red-600 font-medium">
-                            Agotado
-                          </span>
-                        )}
+                        <span className="text-xs text-gray-600 font-medium">
+                          Ver detalles
+                        </span>
                       </div>
                     </motion.div>
                   </Link>
