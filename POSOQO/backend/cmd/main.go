@@ -111,10 +111,9 @@ func main() {
 	ai.Post("/pairing", handlers.PairingAssistantHandler)
 	ai.Post("/sentiment", handlers.AnalyzeSentimentHandler)
 	
-	// Rutas de IA protegidas (solo admin)
+	// Rutas de IA protegidas (requiere autenticación)
 	aiAdmin := api.Group("/ai/admin")
 	aiAdmin.Use(middleware.AuthMiddleware())
-	aiAdmin.Use(middleware.AdminMiddleware())
 	aiAdmin.Post("/generate-description", handlers.GenerateProductDescriptionHandler)
 
 	// Endpoint de pago con Stripe

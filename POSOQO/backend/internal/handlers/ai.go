@@ -1,13 +1,15 @@
 package handlers
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
 
-	"github.com/FreddRva/posoqo/internal/db"
-	"github.com/FreddRva/posoqo/internal/services"
+	"github.com/posoqo/backend/internal/db"
+	"github.com/posoqo/backend/internal/services"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -372,8 +374,8 @@ Incluye los IDs de los productos recomendados.`, req.Food, formatProductsForAI(p
 Nombre: %s
 Descripción: %s
 Estilo: %s
-ABV: %.1f%%
-IBU: %d
+ABV: %s%%
+IBU: %s
 
 Recomienda qué comidas maridarían perfectamente con esta cerveza y explica por qué.`, 
 			product.Name, product.Description, product.Estilo, product.ABV, product.IBU)
@@ -488,13 +490,13 @@ func getProductsContext() (string, error) {
 func getAllProducts() ([]map[string]interface{}, error) {
 	query := `
 		SELECT id, name, description, price, category_id, image_url, stock, is_active,
-		       estilo, abv, ibu, color
+		       COALESCE(estilo, ''), COALESCE(abv, ''), COALESCE(ibu, ''), COALESCE(color, '')
 		FROM products
 		WHERE is_active = true
 		ORDER BY created_at DESC
 	`
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -502,9 +504,9 @@ func getAllProducts() ([]map[string]interface{}, error) {
 
 	var products []map[string]interface{}
 	for rows.Next() {
-		var id, name, description, categoryID, imageURL, estilo, color string
-		var price, abv float64
-		var stock, ibu int
+		var id, name, description, categoryID, imageURL, estilo, abv, ibu, color string
+		var price float64
+		var stock int
 		var isActive bool
 
 		err := rows.Scan(&id, &name, &description, &price, &categoryID, &imageURL, 
@@ -532,20 +534,22 @@ func getAllProducts() ([]map[string]interface{}, error) {
 	return products, nil
 }
 
-func getProductByID(id string) (*Product, error) {
+func getProductByID(id string) (*ProductResponse, error) {
 	query := `
-		SELECT id, name, description, price, category_id, subcategory_id, image_url, 
-		       stock, is_active, is_featured, estilo, abv, ibu, color, created_at, updated_at
+		SELECT id, name, description, price, category_id, subcategory, image_url, 
+		       stock, is_active, is_featured, 
+		       COALESCE(estilo, ''), COALESCE(abv, ''), COALESCE(ibu, ''), COALESCE(color, ''),
+		       created_at, updated_at
 		FROM products
 		WHERE id = $1 AND is_active = true
 	`
 
-	var product Product
-	var subcategoryID *string
+	var product ProductResponse
+	var categoryID, subcategory, imageURL sql.NullString
 
-	err := db.DB.QueryRow(query, id).Scan(
+	err := db.DB.QueryRow(context.Background(), query, id).Scan(
 		&product.ID, &product.Name, &product.Description, &product.Price,
-		&product.CategoryID, &subcategoryID, &product.ImageURL,
+		&categoryID, &subcategory, &imageURL,
 		&product.Stock, &product.IsActive, &product.IsFeatured,
 		&product.Estilo, &product.ABV, &product.IBU, &product.Color,
 		&product.CreatedAt, &product.UpdatedAt,
@@ -555,8 +559,14 @@ func getProductByID(id string) (*Product, error) {
 		return nil, err
 	}
 
-	if subcategoryID != nil {
-		product.SubcategoryID = *subcategoryID
+	if categoryID.Valid {
+		product.CategoryID = categoryID.String
+	}
+	if subcategory.Valid {
+		product.Subcategory = subcategory.String
+	}
+	if imageURL.Valid {
+		product.ImageURL = imageURL.String
 	}
 
 	return &product, nil
