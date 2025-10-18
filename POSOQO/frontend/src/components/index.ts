@@ -7,7 +7,6 @@ export { default as Navbar } from './Navbar';
 export { default as Footer } from './Footer';
 export { default as ProductModal } from './ProductModal';
 export { default as FeaturedFoods } from './FeaturedFoods';
-export { default as CheckoutMap } from './CheckoutMap';
 export { default as OrderMap } from './OrderMap';
 export { default as WhatsappButton } from './WhatsappButton';
 export { default as DashboardWrapper } from './DashboardWrapper';

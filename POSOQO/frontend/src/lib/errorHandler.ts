@@ -260,7 +260,7 @@ class ErrorHandler {
     // Aquí se puede integrar con servicios como Sentry, LogRocket, etc.
     if (process.env.NODE_ENV === 'production') {
       // Ejemplo de integración con servicio externo
-      console.log('Logging to external service:', errorInfo);
+      // TODO: Integrar con servicio de logging externo
     }
   };
 }
