@@ -35,7 +35,7 @@ func HealthCheckAI(c *fiber.Ctx) error {
 			"initialized": geminiService != nil,
 			"has_api_key": hasKey,
 			"api_key_length": len(apiKey),
-			"model": "gemini-1.5-flash",
+			"model": "gemini-2.5-flash",
 			"api_version": "v1beta",
 			"note": "Si sigue sin funcionar, verifica que tu API Key sea válida en https://aistudio.google.com/app/apikey",
 		},
