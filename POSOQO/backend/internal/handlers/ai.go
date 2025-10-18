@@ -367,25 +367,39 @@ Si no encuentras productos relevantes, responde "NINGUNO".`, req.Query, formatPr
 		})
 	}
 
+	// Verificar si la respuesta está vacía
+	response = strings.TrimSpace(response)
+	if response == "" {
+		log.Printf("Error en búsqueda inteligente: respuesta vacía de Gemini")
+		// Fallback: búsqueda simple por nombre/descripción
+		return performSimpleSearchForProducts(c, req.Query, products)
+	}
+
 	// Si no hay resultados
-	if strings.TrimSpace(response) == "NINGUNO" {
+	if response == "NINGUNO" {
 		return c.JSON(fiber.Map{
-			"success":  true,
-			"products": []map[string]interface{}{},
-			"count":    0,
-			"message":  "No se encontraron productos para tu búsqueda",
+			"success": true,
+			"results": []map[string]interface{}{},
+			"count":   0,
 		})
 	}
 
 	// Parsear IDs de productos encontrados
-	foundIDs := strings.Split(strings.TrimSpace(response), ",")
-	var foundProducts []map[string]interface{}
+	foundIDs := strings.Split(response, ",")
+	var results []map[string]interface{}
 
 	for _, id := range foundIDs {
 		id = strings.TrimSpace(id)
+		if id == "" {
+			continue
+		}
 		for _, product := range products {
 			if product["id"] == id {
-				foundProducts = append(foundProducts, product)
+				results = append(results, map[string]interface{}{
+					"product":   product,
+					"relevance": 1.0,
+					"reason":    "Coincide con tu búsqueda",
+				})
 				break
 			}
 		}
@@ -396,14 +410,44 @@ Si no encuentras productos relevantes, responde "NINGUNO".`, req.Query, formatPr
 	if limit == 0 {
 		limit = 10
 	}
-	if len(foundProducts) > limit {
-		foundProducts = foundProducts[:limit]
+	if len(results) > limit {
+		results = results[:limit]
 	}
 
 	return c.JSON(fiber.Map{
-		"success":  true,
-		"products": foundProducts,
-		"count":    len(foundProducts),
+		"success": true,
+		"results": results,
+		"count":   len(results),
+	})
+}
+
+// performSimpleSearchForProducts realiza una búsqueda simple como fallback
+func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[string]interface{}) error {
+	query = strings.ToLower(query)
+	var results []map[string]interface{}
+
+	for _, p := range products {
+		name := strings.ToLower(p["name"].(string))
+		description := strings.ToLower(p["description"].(string))
+
+		if strings.Contains(name, query) || strings.Contains(description, query) {
+			results = append(results, map[string]interface{}{
+				"product":   p,
+				"relevance": 0.8,
+				"reason":    "Coincide con tu búsqueda",
+			})
+		}
+	}
+
+	// Limitar a 10 resultados
+	if len(results) > 10 {
+		results = results[:10]
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"results": results,
+		"count":   len(results),
 	})
 }
 
