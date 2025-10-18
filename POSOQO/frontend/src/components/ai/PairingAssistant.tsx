@@ -35,9 +35,9 @@ export default function PairingAssistant({ isOpen, onClose, productId, productNa
       const response = await apiFetch('/api/ai/pairing', {
         method: 'POST',
         body: JSON.stringify(body),
-      });
+      }) as { success: boolean; pairing_recommendation?: string };
 
-      if (response.success) {
+      if (response.success && response.pairing_recommendation) {
         setRecommendation(response.pairing_recommendation);
       } else {
         setError('No se pudo generar la recomendación');

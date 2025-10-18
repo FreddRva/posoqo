@@ -72,10 +72,10 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
       const response = await apiFetch('/api/ai/search', {
         method: 'POST',
         body: JSON.stringify({ query }),
-      });
+      }) as { success: boolean; results?: SearchResult[] };
 
-      if (response.success) {
-        setResults(response.results || []);
+      if (response.success && response.results) {
+        setResults(response.results);
       } else {
         setError('No se encontraron resultados');
       }

@@ -47,9 +47,9 @@ export default function DescriptionGenerator({
           abv: abv || 0,
           ibu: ibu || 0,
         }),
-      });
+      }) as { success: boolean; description?: string };
 
-      if (response.success) {
+      if (response.success && response.description) {
         setDescription(response.description);
       } else {
         setError('No se pudo generar la descripción');

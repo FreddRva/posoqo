@@ -35,9 +35,9 @@ export default function PredictiveAnalytics() {
     try {
       const response = await apiFetch('/api/ai/admin/analytics', {
         method: 'GET',
-      });
+      }) as { success: boolean; data?: AnalyticsData };
 
-      if (response.success) {
+      if (response.success && response.data) {
         setData(response.data);
         setLastUpdate(new Date());
       } else {
