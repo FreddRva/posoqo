@@ -97,6 +97,9 @@ func (s *GeminiService) GenerateContent(prompt string, config *GenerationConfig)
 	if s.APIKey == "" {
 		return "", fmt.Errorf("GEMINI_API_KEY no configurada")
 	}
+	
+	fmt.Printf("[Gemini] Generando contenido con modelo: %s\n", s.Model)
+	fmt.Printf("[Gemini] BaseURL: %s\n", s.BaseURL)
 
 	// Configuración por defecto
 	if config == nil {

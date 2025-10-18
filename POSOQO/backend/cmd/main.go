@@ -105,6 +105,7 @@ func main() {
 
 	// Rutas de IA (públicas)
 	ai := api.Group("/ai")
+	ai.Get("/health", handlers.HealthCheckAI)
 	ai.Post("/chatbot", handlers.ChatbotHandler)
 	ai.Post("/recommend", handlers.RecommendProductsHandler)
 	ai.Post("/search", handlers.SmartSearchHandler)

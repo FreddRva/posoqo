@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/posoqo/backend/internal/db"
@@ -19,6 +20,23 @@ var geminiService *services.GeminiService
 func InitAIService() {
 	geminiService = services.NewGeminiService()
 	log.Println("✅ Servicio de IA Gemini inicializado")
+}
+
+// HealthCheckAI verifica el estado del servicio de IA
+func HealthCheckAI(c *fiber.Ctx) error {
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	hasKey := apiKey != ""
+	
+	return c.JSON(fiber.Map{
+		"success": true,
+		"ai_service": fiber.Map{
+			"initialized": geminiService != nil,
+			"has_api_key": hasKey,
+			"api_key_length": len(apiKey),
+			"model": "gemini-pro",
+			"api_version": "v1",
+		},
+	})
 }
 
 // ChatbotRequest representa una solicitud al chatbot
