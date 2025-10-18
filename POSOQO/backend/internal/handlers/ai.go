@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -35,7 +37,60 @@ func HealthCheckAI(c *fiber.Ctx) error {
 			"api_key_length": len(apiKey),
 			"model": "gemini-1.5-flash",
 			"api_version": "v1beta",
+			"note": "Si sigue sin funcionar, verifica que tu API Key sea válida en https://aistudio.google.com/app/apikey",
 		},
+	})
+}
+
+// ListModelsHandler lista los modelos disponibles de Gemini
+func ListModelsHandler(c *fiber.Ctx) error {
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	if apiKey == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "GEMINI_API_KEY no configurada",
+		})
+	}
+
+	// Intentar listar modelos desde la API
+	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models?key=%s", apiKey)
+	
+	resp, err := http.Get(url)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   fmt.Sprintf("Error al consultar API: %v", err),
+		})
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Error al leer respuesta",
+		})
+	}
+
+	if resp.StatusCode != 200 {
+		return c.Status(resp.StatusCode).JSON(fiber.Map{
+			"success": false,
+			"error":   string(body),
+			"note":    "Tu API Key puede no ser válida. Verifica en https://aistudio.google.com/app/apikey",
+		})
+	}
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return c.JSON(fiber.Map{
+			"success": true,
+			"raw_response": string(body),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"models":  result,
 	})
 }
 
