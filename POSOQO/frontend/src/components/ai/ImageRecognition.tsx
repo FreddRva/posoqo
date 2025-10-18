@@ -53,7 +53,7 @@ export default function ImageRecognition({ isOpen, onClose }: ImageRecognitionPr
     setError(null);
 
     try {
-      const response = await apiFetch('/api/ai/image-recognition', {
+      const response = await apiFetch('ai/image-recognition', {
         method: 'POST',
         body: JSON.stringify({ image: selectedImage }),
       }) as { success: boolean; result?: RecognitionResult };

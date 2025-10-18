@@ -69,7 +69,7 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
     setError(null);
 
     try {
-      const response = await apiFetch('/api/ai/search', {
+      const response = await apiFetch('ai/search', {
         method: 'POST',
         body: JSON.stringify({ query }),
       }) as { success: boolean; results?: SearchResult[] };

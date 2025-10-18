@@ -38,7 +38,7 @@ export default function DescriptionGenerator({
     setDescription(null);
 
     try {
-      const response = await apiFetch('/api/ai/admin/generate-description', {
+      const response = await apiFetch('ai/admin/generate-description', {
         method: 'POST',
         body: JSON.stringify({
           name,

@@ -32,7 +32,7 @@ export default function PairingAssistant({ isOpen, onClose, productId, productNa
         ? { food: input }
         : { productId: productId || input };
 
-      const response = await apiFetch('/api/ai/pairing', {
+      const response = await apiFetch('ai/pairing', {
         method: 'POST',
         body: JSON.stringify(body),
       }) as { success: boolean; pairing_recommendation?: string };

@@ -33,7 +33,7 @@ export default function PredictiveAnalytics() {
     setError(null);
 
     try {
-      const response = await apiFetch('/api/ai/admin/analytics', {
+      const response = await apiFetch('ai/admin/analytics', {
         method: 'GET',
       }) as { success: boolean; data?: AnalyticsData };
 
