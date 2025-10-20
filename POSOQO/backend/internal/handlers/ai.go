@@ -344,23 +344,23 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Crear prompt para búsqueda inteligente más robusto
-	formattedProducts := formatProductsForAI(products)
-	prompt := fmt.Sprintf(`Eres un asistente de búsqueda para POSOQO, una tienda que vende cervezas artesanales, comidas y bebidas.
+	// Crear lista compacta de productos (solo ID y nombre)
+	var productList strings.Builder
+	for i, p := range products {
+		if i >= 50 { // Limitar a 50 productos para evitar MAX_TOKENS
+			break
+		}
+		productList.WriteString(fmt.Sprintf("%s|%s\n", p["id"], p["name"]))
+	}
+	
+	// Crear prompt optimizado (más corto)
+	prompt := fmt.Sprintf(`Busca en POSOQO: "%s"
 
-El usuario busca: "%s"
-
-Aquí están nuestros productos disponibles:
+Productos (ID|Nombre):
 %s
 
-Analiza la búsqueda del usuario y encuentra los productos más relevantes (pueden ser cervezas, comidas o bebidas).
-
-IMPORTANTE: Responde ÚNICAMENTE con los IDs de los productos separados por comas.
-Formato EXACTO: id1,id2,id3
-NO agregues texto adicional, explicaciones ni espacios extra.
-Si NO encuentras productos relevantes, responde SOLO: NINGUNO
-
-Ejemplo de respuesta correcta: 123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`, req.Query, formattedProducts)
+Retorna SOLO IDs separados por comas de productos relevantes (máximo 10).
+Si no hay: NINGUNO`, req.Query, productList.String())
 
 	// Generar búsqueda con Gemini con límite de tokens aumentado
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
