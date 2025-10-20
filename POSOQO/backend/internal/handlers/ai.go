@@ -344,15 +344,23 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Crear prompt para búsqueda inteligente
-	prompt := fmt.Sprintf(`El usuario busca: "%s"
+	// Crear prompt para búsqueda inteligente más robusto
+	formattedProducts := formatProductsForAI(products)
+	prompt := fmt.Sprintf(`Eres un asistente de búsqueda para POSOQO, una tienda de cervezas artesanales.
 
-Encuentra los productos más relevantes de esta lista:
+El usuario busca: "%s"
+
+Aquí están nuestros productos disponibles:
 %s
 
-Responde SOLO con los IDs de los productos más relevantes separados por comas, ordenados por relevancia.
-Formato: id1,id2,id3
-Si no encuentras productos relevantes, responde "NINGUNO".`, req.Query, formatProductsForAI(products))
+Analiza la búsqueda del usuario y encuentra los productos más relevantes.
+
+IMPORTANTE: Responde ÚNICAMENTE con los IDs de los productos separados por comas.
+Formato EXACTO: id1,id2,id3
+NO agregues texto adicional, explicaciones ni espacios extra.
+Si NO encuentras productos relevantes, responde SOLO: NINGUNO
+
+Ejemplo de respuesta correcta: 123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`, req.Query, formattedProducts)
 
 	// Generar búsqueda con Gemini
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
@@ -375,8 +383,17 @@ Si no encuentras productos relevantes, responde "NINGUNO".`, req.Query, formatPr
 		return performSimpleSearchForProducts(c, req.Query, products)
 	}
 
+	// Limpiar la respuesta de posible texto adicional
+	// Remover comillas, saltos de línea, y texto explicativo
+	response = strings.ReplaceAll(response, "\"", "")
+	response = strings.ReplaceAll(response, "\n", "")
+	response = strings.Split(response, ".")[0] // Tomar solo la primera línea antes de un punto
+	response = strings.TrimSpace(response)
+
+	log.Printf("[Búsqueda] Query: %s | Respuesta de Gemini: %s", req.Query, response)
+
 	// Si no hay resultados
-	if response == "NINGUNO" {
+	if response == "NINGUNO" || response == "" {
 		return c.JSON(fiber.Map{
 			"success": true,
 			"results": []map[string]interface{}{},
