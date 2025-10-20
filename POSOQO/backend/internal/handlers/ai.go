@@ -362,10 +362,10 @@ Si NO encuentras productos relevantes, responde SOLO: NINGUNO
 
 Ejemplo de respuesta correcta: 123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`, req.Query, formattedProducts)
 
-	// Generar búsqueda con Gemini
+	// Generar búsqueda con Gemini con límite de tokens aumentado
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
 		Temperature:     0.2,
-		MaxOutputTokens: 256,
+		MaxOutputTokens: 512, // Aumentado para permitir más IDs en la respuesta
 	})
 	if err != nil {
 		log.Printf("Error en búsqueda inteligente: %v", err)
@@ -862,8 +862,9 @@ func getDashboardStats() (map[string]interface{}, error) {
 func formatProductsForAI(products []map[string]interface{}) string {
 	var formatted strings.Builder
 	for _, p := range products {
-		formatted.WriteString(fmt.Sprintf("ID: %s, Nombre: %s, Descripción: %s, Precio: S/ %.2f\n",
-			p["id"], p["name"], p["description"], p["price"]))
+		// Solo enviar ID y nombre para reducir tokens
+		// La descripción completa hace que el prompt sea muy largo
+		formatted.WriteString(fmt.Sprintf("ID:%s|%s\n", p["id"], p["name"]))
 	}
 	return formatted.String()
 }
