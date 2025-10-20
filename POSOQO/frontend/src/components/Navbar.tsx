@@ -64,7 +64,7 @@ export default function Navbar() {
   const handleScrollToSection = (sectionId: string) => {
     if (pathname !== '/') {
       window.location.href = `/#${sectionId}`;
-    } else {
+              } else {
       const element = document.getElementById(sectionId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -98,8 +98,8 @@ export default function Navbar() {
       <nav 
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled 
-            ? "bg-black/95 backdrop-blur-md border-b border-gray-800" 
-            : "bg-black/90 backdrop-blur-sm border-b border-gray-900"
+            ? "bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-200" 
+            : "bg-white backdrop-blur-md shadow-sm border-b border-gray-100"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -218,18 +218,12 @@ export default function Navbar() {
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-lg bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-gray-600 transition-all duration-200 group"
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 p-0.5 hover:scale-105 transition-transform duration-200"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-black font-bold text-sm">
-                      {user.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-medium text-white group-hover:text-yellow-400 transition-colors">
-                        {user.name?.split(' ')[0]}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {user.role === 'admin' ? 'Administrador' : 'Usuario'}
-                      </p>
+                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                      <span className="text-lg font-bold bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                   </button>
 
@@ -239,79 +233,78 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 top-full mt-3 w-72 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100"
                       >
-                        {/* Header del menú */}
-                        <div className="bg-gradient-to-r from-yellow-500/10 to-amber-600/10 px-4 py-3 border-b border-gray-700">
-                          <p className="text-white font-semibold text-sm">{user.name}</p>
-                          <p className="text-gray-400 text-xs">{user.email}</p>
+                        {/* Header */}
+                        <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 p-0.5">
+                              <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                                <span className="text-xl font-bold bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                                  {user.name?.charAt(0).toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-gray-900 font-bold text-base truncate">{user.name}</p>
+                              <p className="text-gray-600 text-sm truncate">{user.email}</p>
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Opciones del menú */}
+                        {/* Menu Items */}
                         <div className="p-2">
                           {user.role === 'admin' && (
                             <a 
                               href="/dashboard" 
-                              className="flex items-center gap-3 px-4 py-3 text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-all duration-200 group"
+                              className="flex items-center gap-3 px-3 py-2.5 hover:bg-amber-50 rounded-xl transition-colors group"
                             >
-                              <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
-                                <Crown className="w-5 h-5" />
+                              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                                <Crown className="w-5 h-5 text-amber-600" />
                               </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-medium">Dashboard</p>
-                                <p className="text-xs text-gray-400">Panel de administración</p>
-                              </div>
+                              <span className="text-gray-900 font-medium text-sm">Dashboard Admin</span>
                             </a>
                           )}
                           <a 
                             href="/profile" 
-                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                            className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors group"
                           >
-                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                              <User className="w-5 h-5" />
+                            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                              <User className="w-5 h-5 text-gray-700" />
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Mi Perfil</p>
-                              <p className="text-xs text-gray-400">Información personal</p>
-                            </div>
+                            <span className="text-gray-900 font-medium text-sm">Mi Perfil</span>
                           </a>
                           <a 
                             href="/orders" 
-                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                            className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors group"
                           >
-                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                              <Package className="w-5 h-5" />
+                            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                              <Package className="w-5 h-5 text-blue-600" />
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Mis Pedidos</p>
-                              <p className="text-xs text-gray-400">Historial de compras</p>
-                            </div>
+                            <span className="text-gray-900 font-medium text-sm">Mis Pedidos</span>
                           </a>
                           <a 
                             href="/favorites" 
-                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                            className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-xl transition-colors group"
                           >
-                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                              <Heart className="w-5 h-5" />
+                            <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                              <Heart className="w-5 h-5 text-red-600" />
                             </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Favoritos</p>
-                              <p className="text-xs text-gray-400">Productos guardados</p>
-                            </div>
+                            <span className="text-gray-900 font-medium text-sm">Favoritos</span>
                           </a>
                         </div>
 
-                        {/* Footer del menú */}
-                        <div className="border-t border-gray-700 p-2">
+                        {/* Footer */}
+                        <div className="border-t border-gray-100 p-2">
                           <button
                             onClick={() => signOut()}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 group"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition-colors group"
                           >
-                            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                              <LogOut className="w-5 h-5" />
+                            <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                              <LogOut className="w-5 h-5 text-red-600" />
                             </div>
-                            <span className="text-sm font-medium">Cerrar Sesión</span>
+                            <span className="text-red-600 font-medium text-sm">Cerrar Sesión</span>
                           </button>
                         </div>
                       </motion.div>
@@ -321,7 +314,7 @@ export default function Navbar() {
               ) : (
                 <a
                   href="/login"
-                  className="px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black rounded-lg transition-all duration-200 shadow-lg hover:shadow-yellow-500/50"
+                  className="px-5 py-2 text-sm font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-full transition-all duration-200"
                 >
                   Iniciar Sesión
                 </a>
@@ -342,7 +335,7 @@ export default function Navbar() {
                   </span>
                 )}
               </a>
-
+              
               {/* Botón menú hamburguesa */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -365,7 +358,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
               style={{ marginTop: '64px' }}
             />
             
@@ -374,76 +367,90 @@ export default function Navbar() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed right-0 top-16 bottom-0 w-full max-w-sm bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-l border-gray-700 z-50 overflow-y-auto shadow-2xl"
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed right-0 top-16 bottom-0 w-full max-w-sm bg-white z-50 overflow-y-auto shadow-2xl"
             >
-              <div className="p-6 space-y-6">
+              <div className="p-5 space-y-5">
                 {/* Usuario Móvil */}
                 {user ? (
-                  <div className="bg-gradient-to-br from-gray-800 to-gray-800/50 rounded-xl p-4 border border-gray-700">
+                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-100">
                     {/* Avatar y datos */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-black font-bold text-xl shadow-lg">
-                        {user.name?.charAt(0).toUpperCase()}
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 p-0.5 flex-shrink-0">
+                        <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                          <span className="text-2xl font-bold bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                            {user.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-white font-bold text-lg">{user.name}</p>
-                        <p className="text-gray-400 text-sm">{user.email}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-900 font-bold text-base truncate">{user.name}</p>
+                        <p className="text-gray-600 text-sm truncate">{user.email}</p>
                         <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
                           user.role === 'admin' 
-                            ? 'bg-yellow-500/20 text-yellow-400' 
-                            : 'bg-gray-700 text-gray-300'
+                            ? 'bg-amber-200 text-amber-800' 
+                            : 'bg-gray-200 text-gray-700'
                         }`}>
-                          {user.role === 'admin' ? 'Administrador' : 'Usuario'}
+                          {user.role === 'admin' ? 'Admin' : 'Usuario'}
                         </span>
                       </div>
                     </div>
 
                     {/* Opciones rápidas */}
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {user.role === 'admin' && (
                         <a 
                           href="/dashboard" 
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg transition-all duration-200"
+                          className="flex items-center gap-3 px-3 py-2.5 bg-amber-100 hover:bg-amber-200 rounded-xl transition-colors"
                         >
-                          <Crown className="w-5 h-5" />
-                          <span className="text-sm font-medium">Dashboard</span>
+                          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-amber-600" />
+                          </div>
+                          <span className="text-gray-900 font-medium text-sm">Dashboard</span>
                         </a>
                       )}
                       <a 
                         href="/profile" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
                       >
-                        <User className="w-5 h-5" />
-                        <span className="text-sm font-medium">Mi Perfil</span>
+                        <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+                          <User className="w-5 h-5 text-gray-700" />
+                        </div>
+                        <span className="text-gray-900 font-medium text-sm">Mi Perfil</span>
                       </a>
                       <a 
                         href="/orders" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
                       >
-                        <Package className="w-5 h-5" />
-                        <span className="text-sm font-medium">Mis Pedidos</span>
+                        <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+                          <Package className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <span className="text-gray-900 font-medium text-sm">Mis Pedidos</span>
                       </a>
                       <a 
                         href="/favorites" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
                       >
-                        <Heart className="w-5 h-5" />
-                        <span className="text-sm font-medium">Favoritos</span>
+                        <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
+                          <Heart className="w-5 h-5 text-red-600" />
+                        </div>
+                        <span className="text-gray-900 font-medium text-sm">Favoritos</span>
                       </a>
                       <button
                         onClick={() => {
                           signOut();
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all duration-200"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition-colors"
                       >
-                        <LogOut className="w-5 h-5" />
-                        <span className="text-sm font-medium">Cerrar Sesión</span>
+                        <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+                          <LogOut className="w-5 h-5 text-red-600" />
+                        </div>
+                        <span className="text-red-600 font-medium text-sm">Cerrar Sesión</span>
                       </button>
                     </div>
                   </div>
@@ -451,7 +458,7 @@ export default function Navbar() {
                   <a
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full px-6 py-4 text-center text-base font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black rounded-xl shadow-lg hover:shadow-yellow-500/50 transition-all duration-200"
+                    className="block w-full px-6 py-3.5 text-center text-base font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-2xl shadow-lg transition-all duration-200"
                   >
                     Iniciar Sesión
                   </a>
@@ -459,8 +466,8 @@ export default function Navbar() {
 
                 {/* Navegación Móvil */}
                 <div>
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-                    Navegación
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">
+                    Menú
                   </h3>
                   <div className="space-y-1">
                     <NavLinks
@@ -474,31 +481,35 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                {/* Acciones rápidas móvil */}
-                <div className="pt-6 border-t border-gray-700">
-                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                {/* Herramientas IA */}
+                <div className="pt-5 border-t border-gray-200">
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">
                     Herramientas IA
                   </h3>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => {
                         setShowSmartSearch(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="flex flex-col items-center gap-2 p-4 bg-gray-800/50 hover:bg-gray-700 rounded-lg transition-colors"
+                      className="flex flex-col items-center gap-2.5 p-4 bg-purple-50 hover:bg-purple-100 rounded-2xl transition-colors"
                     >
-                      <Search className="w-6 h-6 text-purple-400" />
-                      <span className="text-xs font-medium text-gray-300">Búsqueda</span>
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <Search className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <span className="text-xs font-semibold text-gray-900">Búsqueda</span>
                     </button>
                     <button
                       onClick={() => {
                         setShowPairingAssistant(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="flex flex-col items-center gap-2 p-4 bg-gray-800/50 hover:bg-gray-700 rounded-lg transition-colors"
+                      className="flex flex-col items-center gap-2.5 p-4 bg-amber-50 hover:bg-amber-100 rounded-2xl transition-colors"
                     >
-                      <Wine className="w-6 h-6 text-amber-400" />
-                      <span className="text-xs font-medium text-gray-300">Maridaje</span>
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <Wine className="w-6 h-6 text-amber-600" />
+                      </div>
+                      <span className="text-xs font-semibold text-gray-900">Maridaje</span>
                     </button>
                   </div>
                 </div>
