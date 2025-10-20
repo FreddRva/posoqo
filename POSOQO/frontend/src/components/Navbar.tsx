@@ -218,47 +218,102 @@ export default function Navbar() {
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 px-3 py-2 text-gray-300 hover:text-white transition-colors duration-200"
+                    className="flex items-center gap-3 px-4 py-2 rounded-lg bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-gray-600 transition-all duration-200 group"
                   >
-                    <User className="w-5 h-5" />
-                    <span className="text-sm font-medium">{user.name?.split(' ')[0]}</span>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-black font-bold text-sm">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-white group-hover:text-yellow-400 transition-colors">
+                        {user.name?.split(' ')[0]}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {user.role === 'admin' ? 'Administrador' : 'Usuario'}
+                      </p>
+                    </div>
                   </button>
 
                   <AnimatePresence>
                     {showUserMenu && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden"
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 top-full mt-3 w-72 bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
                       >
-                        {user.role === 'admin' && (
-                          <a href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200">
-                            <Crown className="w-5 h-5" />
-                            <span className="text-sm font-medium">Dashboard</span>
+                        {/* Header del menú */}
+                        <div className="bg-gradient-to-r from-yellow-500/10 to-amber-600/10 px-4 py-3 border-b border-gray-700">
+                          <p className="text-white font-semibold text-sm">{user.name}</p>
+                          <p className="text-gray-400 text-xs">{user.email}</p>
+                        </div>
+
+                        {/* Opciones del menú */}
+                        <div className="p-2">
+                          {user.role === 'admin' && (
+                            <a 
+                              href="/dashboard" 
+                              className="flex items-center gap-3 px-4 py-3 text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-all duration-200 group"
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
+                                <Crown className="w-5 h-5" />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">Dashboard</p>
+                                <p className="text-xs text-gray-400">Panel de administración</p>
+                              </div>
+                            </a>
+                          )}
+                          <a 
+                            href="/profile" 
+                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                              <User className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Mi Perfil</p>
+                              <p className="text-xs text-gray-400">Información personal</p>
+                            </div>
                           </a>
-                        )}
-                        <a href="/profile" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200">
-                          <User className="w-5 h-5" />
-                          <span className="text-sm font-medium">Mi Perfil</span>
-                        </a>
-                        <a href="/orders" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200">
-                          <Package className="w-5 h-5" />
-                          <span className="text-sm font-medium">Mis Pedidos</span>
-                        </a>
-                        <a href="/favorites" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200">
-                          <Heart className="w-5 h-5" />
-                          <span className="text-sm font-medium">Favoritos</span>
-                        </a>
-                        <div className="border-t border-gray-800"></div>
-                        <button
-                          onClick={() => signOut()}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-gray-800 transition-colors duration-200"
-                        >
-                          <LogOut className="w-5 h-5" />
-                          <span className="text-sm font-medium">Cerrar Sesión</span>
-                        </button>
+                          <a 
+                            href="/orders" 
+                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                              <Package className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Mis Pedidos</p>
+                              <p className="text-xs text-gray-400">Historial de compras</p>
+                            </div>
+                          </a>
+                          <a 
+                            href="/favorites" 
+                            className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all duration-200"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
+                              <Heart className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Favoritos</p>
+                              <p className="text-xs text-gray-400">Productos guardados</p>
+                            </div>
+                          </a>
+                        </div>
+
+                        {/* Footer del menú */}
+                        <div className="border-t border-gray-700 p-2">
+                          <button
+                            onClick={() => signOut()}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200 group"
+                          >
+                            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                              <LogOut className="w-5 h-5" />
+                            </div>
+                            <span className="text-sm font-medium">Cerrar Sesión</span>
+                          </button>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -266,7 +321,7 @@ export default function Navbar() {
               ) : (
                 <a
                   href="/login"
-                  className="px-4 py-2 text-sm font-medium bg-yellow-400 text-black rounded-lg hover:bg-yellow-500 transition-colors duration-200"
+                  className="px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black rounded-lg transition-all duration-200 shadow-lg hover:shadow-yellow-500/50"
                 >
                   Iniciar Sesión
                 </a>
@@ -274,9 +329,13 @@ export default function Navbar() {
             </div>
 
             {/* Botón Móvil */}
-            <div className="lg:hidden flex items-center gap-3">
-              <a href="/cart" className="relative p-2 text-gray-400">
-                <ShoppingCart className="w-5 h-5" />
+            <div className="lg:hidden flex items-center gap-2">
+              {/* Carrito móvil */}
+              <a 
+                href="/cart" 
+                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200"
+              >
+                <ShoppingCart className="w-6 h-6" />
                 {summary.itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
                     {summary.itemCount}
@@ -284,7 +343,7 @@ export default function Navbar() {
                 )}
               </a>
 
-              
+              {/* Botón menú hamburguesa */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 text-gray-400 hover:text-white transition-colors duration-200"
@@ -300,83 +359,149 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
+            {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-          onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
               style={{ marginTop: '64px' }}
             />
             
+            {/* Panel lateral */}
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed right-0 top-16 bottom-0 w-80 bg-gray-900 border-l border-gray-800 z-50 overflow-y-auto"
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-16 bottom-0 w-full max-w-sm bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 border-l border-gray-700 z-50 overflow-y-auto shadow-2xl"
             >
               <div className="p-6 space-y-6">
                 {/* Usuario Móvil */}
                 {user ? (
-                  <div className="pb-6 border-b border-gray-800">
+                  <div className="bg-gradient-to-br from-gray-800 to-gray-800/50 rounded-xl p-4 border border-gray-700">
+                    {/* Avatar y datos */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center">
-                        <User className="w-5 h-5 text-gray-400" />
-              </div>
-              <div>
-                        <p className="text-white font-medium">{user.name}</p>
-                        <p className="text-gray-500 text-sm">{user.email}</p>
-              </div>
-            </div>
-                    <div className="space-y-1">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-black font-bold text-xl shadow-lg">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white font-bold text-lg">{user.name}</p>
+                        <p className="text-gray-400 text-sm">{user.email}</p>
+                        <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+                          user.role === 'admin' 
+                            ? 'bg-yellow-500/20 text-yellow-400' 
+                            : 'bg-gray-700 text-gray-300'
+                        }`}>
+                          {user.role === 'admin' ? 'Administrador' : 'Usuario'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Opciones rápidas */}
+                    <div className="space-y-2">
                       {user.role === 'admin' && (
-                        <a href="/dashboard" className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                        <a 
+                          href="/dashboard" 
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 rounded-lg transition-all duration-200"
+                        >
                           <Crown className="w-5 h-5" />
-                          <span className="text-sm">Dashboard</span>
+                          <span className="text-sm font-medium">Dashboard</span>
                         </a>
                       )}
-                      <a href="/profile" className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                      <a 
+                        href="/profile" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                      >
                         <User className="w-5 h-5" />
-                        <span className="text-sm">Mi Perfil</span>
+                        <span className="text-sm font-medium">Mi Perfil</span>
                       </a>
-                      <a href="/orders" className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                      <a 
+                        href="/orders" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                      >
                         <Package className="w-5 h-5" />
-                        <span className="text-sm">Mis Pedidos</span>
+                        <span className="text-sm font-medium">Mis Pedidos</span>
                       </a>
-                      <a href="/favorites" className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+                      <a 
+                        href="/favorites" 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 bg-gray-800/50 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-all duration-200"
+                      >
                         <Heart className="w-5 h-5" />
-                        <span className="text-sm">Favoritos</span>
+                        <span className="text-sm font-medium">Favoritos</span>
                       </a>
-            <button
-                        onClick={() => signOut()}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-gray-800 rounded-lg transition-colors"
-            >
+                      <button
+                        onClick={() => {
+                          signOut();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-all duration-200"
+                      >
                         <LogOut className="w-5 h-5" />
-                        <span className="text-sm">Cerrar Sesión</span>
-            </button>
-          </div>
+                        <span className="text-sm font-medium">Cerrar Sesión</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <a
                     href="/login"
-                    className="block w-full px-4 py-3 text-center text-sm font-medium bg-yellow-400 text-black rounded-lg hover:bg-yellow-500 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full px-6 py-4 text-center text-base font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black rounded-xl shadow-lg hover:shadow-yellow-500/50 transition-all duration-200"
                   >
                     Iniciar Sesión
                   </a>
                 )}
 
                 {/* Navegación Móvil */}
-                <div className="space-y-1">
-                  <NavLinks
-                    items={navItems}
-                    activeDropdown={activeDropdown}
-                    toggleDropdown={(label) => setActiveDropdown(activeDropdown === label ? null : label)}
-                    setActiveDropdown={setActiveDropdown}
-                    isMobile={true}
-                    onMobileClose={() => setMobileMenuOpen(false)}
-                  />
+                <div>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                    Navegación
+                  </h3>
+                  <div className="space-y-1">
+                    <NavLinks
+                      items={navItems}
+                      activeDropdown={activeDropdown}
+                      toggleDropdown={(label) => setActiveDropdown(activeDropdown === label ? null : label)}
+                      setActiveDropdown={setActiveDropdown}
+                      isMobile={true}
+                      onMobileClose={() => setMobileMenuOpen(false)}
+                    />
                   </div>
+                </div>
+
+                {/* Acciones rápidas móvil */}
+                <div className="pt-6 border-t border-gray-700">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                    Herramientas IA
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setShowSmartSearch(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex flex-col items-center gap-2 p-4 bg-gray-800/50 hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <Search className="w-6 h-6 text-purple-400" />
+                      <span className="text-xs font-medium text-gray-300">Búsqueda</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowPairingAssistant(true);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex flex-col items-center gap-2 p-4 bg-gray-800/50 hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <Wine className="w-6 h-6 text-amber-400" />
+                      <span className="text-xs font-medium text-gray-300">Maridaje</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </>
