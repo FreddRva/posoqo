@@ -404,12 +404,15 @@ Ejemplo de respuesta correcta: 123e4567-e89b-12d3-a456-426614174000,223e4567-e89
 	// Parsear IDs de productos encontrados
 	foundIDs := strings.Split(response, ",")
 	var results []map[string]interface{}
+	var notFoundIDs []string
 
 	for _, id := range foundIDs {
 		id = strings.TrimSpace(id)
 		if id == "" {
 			continue
 		}
+		
+		found := false
 		for _, product := range products {
 			if product["id"] == id {
 				results = append(results, map[string]interface{}{
@@ -417,9 +420,25 @@ Ejemplo de respuesta correcta: 123e4567-e89b-12d3-a456-426614174000,223e4567-e89
 					"relevance": 1.0,
 					"reason":    "Coincide con tu búsqueda",
 				})
+				found = true
 				break
 			}
 		}
+		
+		if !found {
+			notFoundIDs = append(notFoundIDs, id)
+		}
+	}
+
+	// Log de IDs no encontrados para debugging
+	if len(notFoundIDs) > 0 {
+		log.Printf("[Búsqueda] IDs no encontrados en la base de datos: %v", notFoundIDs)
+	}
+
+	// Si no se encontró ningún producto válido, usar fallback
+	if len(results) == 0 {
+		log.Printf("[Búsqueda] Ningún ID válido encontrado, usando fallback")
+		return performSimpleSearchForProducts(c, req.Query, products)
 	}
 
 	// Limitar resultados
