@@ -382,10 +382,14 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		productList.WriteString(fmt.Sprintf("%s|%s\n", p["id"], name))
 	}
 	
-	// Prompt ultra minimalista
-	prompt := fmt.Sprintf(`Busca: "%s"
+	// Prompt balanceado (no muy largo, pero claro)
+	prompt := fmt.Sprintf(`Usuario busca: "%s"
+
+Productos disponibles:
 %s
-IDs relevantes (coma):`, req.Query, productList.String())
+
+Retorna SOLO los IDs de productos relevantes separados por comas.
+Si no hay relevantes: NINGUNO`, req.Query, productList.String())
 
 	// Generar búsqueda con Gemini con límite de tokens aumentado
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
