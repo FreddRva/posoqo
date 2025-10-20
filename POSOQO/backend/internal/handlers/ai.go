@@ -506,24 +506,60 @@ func PairingAssistantHandler(c *fiber.Ctx) error {
 	if req.Food != "" {
 		// Recomendar cerveza para una comida
 		products, _ := getAllProducts()
-		prompt = fmt.Sprintf(`El usuario quiere maridar esta comida: "%s"
+		productsInfo := formatProductsForAI(products)
+		
+		prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
 
-Productos disponibles:
+El usuario quiere maridar esta comida: "%s"
+
+Estos son los productos disponibles en POSOQO:
 %s
 
-Recomienda las mejores cervezas para maridar con esta comida y explica por qué.
-Incluye los IDs de los productos recomendados.`, req.Food, formatProductsForAI(products))
+Recomienda las mejores opciones para maridar con esta comida y explica por qué funciona bien el maridaje.
+Menciona sabores, texturas y características que complementan la comida.`, req.Food, productsInfo)
 	} else if req.ProductID != "" {
-		// Recomendar comidas para una cerveza
+		// Intentar obtener el producto por ID primero
 		product, err := getProductByID(req.ProductID)
+		
+		// Si no se encuentra por ID, buscar por nombre
 		if err != nil {
-			return c.Status(404).JSON(fiber.Map{
-				"success": false,
-				"error":   "Producto no encontrado",
-			})
-		}
+			products, _ := getAllProducts()
+			var foundProduct map[string]interface{}
+			searchTerm := strings.ToLower(req.ProductID)
+			
+			for _, p := range products {
+				productName := strings.ToLower(p["name"].(string))
+				if strings.Contains(productName, searchTerm) {
+					foundProduct = p
+					break
+				}
+			}
+			
+			// Si se encontró por nombre, usar esa información
+			if foundProduct != nil {
+				prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
 
-		prompt = fmt.Sprintf(`Esta es la cerveza:
+Esta es la cerveza que el usuario tiene:
+Nombre: %s
+Descripción: %s
+
+Recomienda qué comidas maridarían perfectamente con esta cerveza.
+Explica por qué funcionan bien juntas, considerando sabores, texturas y tradiciones culinarias.`,
+					foundProduct["name"], foundProduct["description"])
+			} else {
+				// Si no se encontró ni por ID ni por nombre, dar recomendación general
+				prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
+
+El usuario menciona: "%s"
+
+Ofrece recomendaciones generales de maridaje para este tipo de cerveza.
+Explica qué comidas funcionarían bien y por qué.`, req.ProductID)
+			}
+		} else {
+			// Producto encontrado por ID
+			prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
+
+Esta es la cerveza:
 Nombre: %s
 Descripción: %s
 Estilo: %s
@@ -531,7 +567,8 @@ ABV: %s%%
 IBU: %s
 
 Recomienda qué comidas maridarían perfectamente con esta cerveza y explica por qué.`, 
-			product.Name, product.Description, product.Estilo, product.ABV, product.IBU)
+				product.Name, product.Description, product.Estilo, product.ABV, product.IBU)
+		}
 	} else {
 		return c.Status(400).JSON(fiber.Map{
 			"success": false,
