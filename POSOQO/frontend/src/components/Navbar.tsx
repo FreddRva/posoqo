@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
-  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles, Gift
+  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -90,6 +90,7 @@ export default function Navbar() {
       ]
     },
     { label: "Contacto", onClick: () => handleScrollToSection('contacto') },
+    { label: "Chela Gratis", href: "/chela-gratis" },
   ];
 
   return (
@@ -196,16 +197,6 @@ export default function Navbar() {
                   <Sparkles className="w-3 h-3 text-amber-400 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </button>
-
-              {/* Chela Gratis */}
-              <a
-                href="/chela-gratis"
-                className="relative px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-black font-bold rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-yellow-500/50"
-                title="¡Participa y gana una chela gratis!"
-              >
-                <Gift className="w-5 h-5" />
-                <span className="hidden xl:inline">Chela Gratis</span>
-              </a>
 
               {/* Carrito */}
               <a

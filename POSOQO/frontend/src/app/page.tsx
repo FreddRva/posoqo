@@ -96,10 +96,14 @@ function HomePageContent() {
 
 
       {/* Club de miembros */}
-      <ClubSection />
+      <section id="club">
+        <ClubSection />
+      </section>
 
       {/* Sección de contacto */}
-      <ContactSection />
+      <section id="contacto">
+        <ContactSection />
+      </section>
 
       {/* Footer */}
       <Footer />
