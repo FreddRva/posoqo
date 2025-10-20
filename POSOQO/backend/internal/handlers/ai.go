@@ -346,14 +346,14 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 
 	// Crear prompt para búsqueda inteligente más robusto
 	formattedProducts := formatProductsForAI(products)
-	prompt := fmt.Sprintf(`Eres un asistente de búsqueda para POSOQO, una tienda de cervezas artesanales.
+	prompt := fmt.Sprintf(`Eres un asistente de búsqueda para POSOQO, una tienda que vende cervezas artesanales, comidas y bebidas.
 
 El usuario busca: "%s"
 
 Aquí están nuestros productos disponibles:
 %s
 
-Analiza la búsqueda del usuario y encuentra los productos más relevantes.
+Analiza la búsqueda del usuario y encuentra los productos más relevantes (pueden ser cervezas, comidas o bebidas).
 
 IMPORTANTE: Responde ÚNICAMENTE con los IDs de los productos separados por comas.
 Formato EXACTO: id1,id2,id3
