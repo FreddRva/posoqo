@@ -344,23 +344,48 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Crear lista compacta de productos (solo ID y nombre)
-	var productList strings.Builder
-	for i, p := range products {
-		if i >= 50 { // Limitar a 50 productos para evitar MAX_TOKENS
-			break
+	// Filtrar productos relevantes primero (búsqueda simple)
+	query := strings.ToLower(req.Query)
+	var relevantProducts []map[string]interface{}
+	
+	for _, p := range products {
+		name := strings.ToLower(p["name"].(string))
+		description := strings.ToLower(p["description"].(string))
+		
+		// Pre-filtrar productos que podrían ser relevantes
+		if strings.Contains(name, query) || strings.Contains(description, query) {
+			relevantProducts = append(relevantProducts, p)
+			if len(relevantProducts) >= 20 { // Máximo 20 productos pre-filtrados
+				break
+			}
 		}
-		productList.WriteString(fmt.Sprintf("%s|%s\n", p["id"], p["name"]))
 	}
 	
-	// Crear prompt optimizado (más corto)
-	prompt := fmt.Sprintf(`Busca en POSOQO: "%s"
-
-Productos (ID|Nombre):
+	// Si no hay productos pre-filtrados, usar los primeros 20
+	if len(relevantProducts) == 0 {
+		for i, p := range products {
+			if i >= 20 {
+				break
+			}
+			relevantProducts = append(relevantProducts, p)
+		}
+	}
+	
+	// Crear lista ultra compacta
+	var productList strings.Builder
+	for _, p := range relevantProducts {
+		// Solo primeras 30 caracteres del nombre para ahorrar tokens
+		name := p["name"].(string)
+		if len(name) > 30 {
+			name = name[:30] + "..."
+		}
+		productList.WriteString(fmt.Sprintf("%s|%s\n", p["id"], name))
+	}
+	
+	// Prompt ultra minimalista
+	prompt := fmt.Sprintf(`Busca: "%s"
 %s
-
-Retorna SOLO IDs separados por comas de productos relevantes (máximo 10).
-Si no hay: NINGUNO`, req.Query, productList.String())
+IDs relevantes (coma):`, req.Query, productList.String())
 
 	// Generar búsqueda con Gemini con límite de tokens aumentado
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
