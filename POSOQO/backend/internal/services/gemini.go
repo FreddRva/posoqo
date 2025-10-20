@@ -171,12 +171,28 @@ func (s *GeminiService) GenerateContent(prompt string, config *GenerationConfig)
 		return "", fmt.Errorf("error al parsear respuesta: %w", err)
 	}
 
-	// Extraer texto de la respuesta
-	if len(geminiResp.Candidates) == 0 || len(geminiResp.Candidates[0].Content.Parts) == 0 {
-		return "", fmt.Errorf("respuesta vacía de Gemini")
+	// Log de la respuesta completa para debugging
+	fmt.Printf("[Gemini] Status: %d, Candidates: %d\n", resp.StatusCode, len(geminiResp.Candidates))
+	if len(geminiResp.PromptFeedback.SafetyRatings) > 0 {
+		fmt.Printf("[Gemini] Safety Ratings: %+v\n", geminiResp.PromptFeedback.SafetyRatings)
 	}
 
-	return geminiResp.Candidates[0].Content.Parts[0].Text, nil
+	// Extraer texto de la respuesta
+	if len(geminiResp.Candidates) == 0 {
+		// Log más detallado cuando no hay candidatos
+		fmt.Printf("[Gemini] No candidates in response. Full response: %s\n", string(body))
+		return "", fmt.Errorf("respuesta vacía de Gemini: no candidates")
+	}
+	
+	if len(geminiResp.Candidates[0].Content.Parts) == 0 {
+		fmt.Printf("[Gemini] No parts in candidate. FinishReason: %s\n", geminiResp.Candidates[0].FinishReason)
+		return "", fmt.Errorf("respuesta vacía de Gemini: no parts (reason: %s)", geminiResp.Candidates[0].FinishReason)
+	}
+
+	text := geminiResp.Candidates[0].Content.Parts[0].Text
+	fmt.Printf("[Gemini] Response text length: %d characters\n", len(text))
+	
+	return text, nil
 }
 
 // GenerateChat genera una respuesta en un contexto de chat
