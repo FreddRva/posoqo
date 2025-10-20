@@ -504,19 +504,19 @@ func PairingAssistantHandler(c *fiber.Ctx) error {
 
 	var prompt string
 	if req.Food != "" {
-		// Recomendar cerveza para una comida
-		products, _ := getAllProducts()
-		productsInfo := formatProductsForAI(products)
-		
-		prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
+		// Recomendar cerveza para una comida (prompt simple sin catálogo completo)
+		prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas de POSOQO, una cervecería artesanal peruana.
 
 El usuario quiere maridar esta comida: "%s"
 
-Estos son los productos disponibles en POSOQO:
-%s
+Recomienda qué tipos o estilos de cervezas artesanales maridarían perfectamente con esta comida.
+Explica por qué funciona bien el maridaje, considerando:
+- Sabores y aromas
+- Texturas y cuerpo
+- Tradiciones culinarias
+- Balance de intensidades
 
-Recomienda las mejores opciones para maridar con esta comida y explica por qué funciona bien el maridaje.
-Menciona sabores, texturas y características que complementan la comida.`, req.Food, productsInfo)
+Sé conciso pero informativo (máximo 3-4 párrafos).`, req.Food)
 	} else if req.ProductID != "" {
 		// Intentar obtener el producto por ID primero
 		product, err := getProductByID(req.ProductID)
@@ -537,37 +537,36 @@ Menciona sabores, texturas y características que complementan la comida.`, req.
 			
 			// Si se encontró por nombre, usar esa información
 			if foundProduct != nil {
-				prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
+				prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas de POSOQO.
 
-Esta es la cerveza que el usuario tiene:
-Nombre: %s
+Cerveza: %s
 Descripción: %s
 
-Recomienda qué comidas maridarían perfectamente con esta cerveza.
-Explica por qué funcionan bien juntas, considerando sabores, texturas y tradiciones culinarias.`,
+Recomienda comidas que mariden perfectamente con esta cerveza.
+Explica por qué (sabores, texturas, balance).
+Máximo 3-4 párrafos.`,
 					foundProduct["name"], foundProduct["description"])
 			} else {
 				// Si no se encontró ni por ID ni por nombre, dar recomendación general
 				prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
 
-El usuario menciona: "%s"
+El usuario busca maridaje para: "%s"
 
-Ofrece recomendaciones generales de maridaje para este tipo de cerveza.
-Explica qué comidas funcionarían bien y por qué.`, req.ProductID)
+Recomienda comidas que funcionen bien con este tipo de cerveza.
+Explica por qué (sabores, texturas, balance).
+Máximo 3 párrafos.`, req.ProductID)
 			}
 		} else {
 			// Producto encontrado por ID
-			prompt = fmt.Sprintf(`Eres un experto en maridaje de cervezas y comidas.
+			prompt = fmt.Sprintf(`Eres un experto en maridaje de POSOQO.
 
-Esta es la cerveza:
-Nombre: %s
-Descripción: %s
-Estilo: %s
-ABV: %s%%
-IBU: %s
+Cerveza: %s (%s, ABV %s%%, IBU %s)
+%s
 
-Recomienda qué comidas maridarían perfectamente con esta cerveza y explica por qué.`, 
-				product.Name, product.Description, product.Estilo, product.ABV, product.IBU)
+Recomienda comidas que mariden perfectamente.
+Explica por qué (sabores, balance, texturas).
+Máximo 3-4 párrafos.`, 
+				product.Name, product.Estilo, product.ABV, product.IBU, product.Description)
 		}
 	} else {
 		return c.Status(400).JSON(fiber.Map{
@@ -579,7 +578,7 @@ Recomienda qué comidas maridarían perfectamente con esta cerveza y explica por
 	// Generar recomendaciones de maridaje
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
 		Temperature:     0.7,
-		MaxOutputTokens: 1024,
+		MaxOutputTokens: 2048, // Aumentado para respuestas más largas
 	})
 	if err != nil {
 		log.Printf("Error al generar maridaje: %v", err)
@@ -590,8 +589,8 @@ Recomienda qué comidas maridarían perfectamente con esta cerveza y explica por
 	}
 
 	return c.JSON(fiber.Map{
-		"success":        true,
-		"recommendation": response,
+		"success":              true,
+		"pairing_recommendation": response,
 	})
 }
 
