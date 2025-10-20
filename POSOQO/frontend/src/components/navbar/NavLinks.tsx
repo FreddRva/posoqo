@@ -8,9 +8,11 @@ import { usePathname } from 'next/navigation';
 type NavItem = {
   label: string;
   href?: string;
+  onClick?: () => void;
   dropdown?: {
     label: string;
-    href: string;
+    href?: string;
+    onClick?: () => void;
     description?: string;
     icon: any;
   }[];
@@ -70,25 +72,34 @@ export const NavLinks: React.FC<NavLinksProps> = ({
                   : "absolute left-0 top-full mt-2 w-64 bg-gray-900 border border-gray-800 rounded-lg shadow-xl overflow-hidden"
                 }
               >
-                {item.dropdown.map((subItem) => (
-                  <a
-                    key={subItem.href}
-                    href={subItem.href}
-                    onClick={() => {
-                      if (isMobile) onMobileClose?.();
-                      setActiveDropdown(null);
-                    }}
-                    className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200"
-                  >
-                    {subItem.icon && <subItem.icon className="w-5 h-5" />}
-                    <div>
-                      <div className="text-sm font-medium">{subItem.label}</div>
-                      {subItem.description && (
-                        <div className="text-xs text-gray-500">{subItem.description}</div>
-                      )}
-                    </div>
-                  </a>
-                ))}
+                {item.dropdown.map((subItem, index) => {
+                  const key = subItem.href || `dropdown-item-${index}`;
+                  const Element = subItem.href ? 'a' : 'button';
+                  const elementProps = subItem.href 
+                    ? { href: subItem.href }
+                    : { type: 'button' as const };
+                  
+                  return (
+                    <Element
+                      key={key}
+                      {...elementProps}
+                      onClick={() => {
+                        if (subItem.onClick) subItem.onClick();
+                        if (isMobile) onMobileClose?.();
+                        setActiveDropdown(null);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200 w-full text-left"
+                    >
+                      {subItem.icon && <subItem.icon className="w-5 h-5" />}
+                      <div>
+                        <div className="text-sm font-medium">{subItem.label}</div>
+                        {subItem.description && (
+                          <div className="text-xs text-gray-500">{subItem.description}</div>
+                        )}
+                      </div>
+                    </Element>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
@@ -96,21 +107,27 @@ export const NavLinks: React.FC<NavLinksProps> = ({
       );
     }
 
-    // Links normales
-    if (item.href) {
+    // Links normales o botones
+    if (item.href || item.onClick) {
+      const Element = item.href ? 'a' : 'button';
+      const elementProps = item.href 
+        ? { href: item.href }
+        : { type: 'button' as const };
+      
       return (
-        <a
-          key={item.href}
-          href={item.href}
+        <Element
+          key={item.href || item.label}
+          {...elementProps}
           className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
             isActive ? "text-yellow-400" : "text-gray-300 hover:text-white"
           }`}
           onClick={() => {
+            if (item.onClick) item.onClick();
             if (isMobile) onMobileClose?.();
           }}
         >
           {item.label}
-        </a>
+        </Element>
       );
     }
     return null;

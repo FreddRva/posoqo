@@ -345,8 +345,10 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 	}
 
 	// Filtrar productos relevantes primero (búsqueda simple)
-	query := strings.ToLower(req.Query)
+	query := strings.ToLower(strings.TrimSpace(req.Query))
 	var relevantProducts []map[string]interface{}
+	
+	log.Printf("[Búsqueda] Query limpia: '%s'", query)
 	
 	for _, p := range products {
 		name := strings.ToLower(p["name"].(string))
@@ -355,11 +357,14 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		// Pre-filtrar productos que podrían ser relevantes
 		if strings.Contains(name, query) || strings.Contains(description, query) {
 			relevantProducts = append(relevantProducts, p)
+			log.Printf("[Búsqueda] Producto pre-filtrado: %s", p["name"])
 			if len(relevantProducts) >= 20 { // Máximo 20 productos pre-filtrados
 				break
 			}
 		}
 	}
+	
+	log.Printf("[Búsqueda] Total productos pre-filtrados: %d", len(relevantProducts))
 	
 	// Si no hay productos pre-filtrados, usar los primeros 20
 	if len(relevantProducts) == 0 {

@@ -5,7 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
-  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles
+  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles, Gift
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -61,6 +61,17 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleScrollToSection = (sectionId: string) => {
+    if (pathname !== '/') {
+      window.location.href = `/#${sectionId}`;
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   const navItems = [
     { label: "Nosotros", href: "/sobre-nosotros" },
     { 
@@ -71,16 +82,14 @@ export default function Navbar() {
         { label: "Refrescos", href: "/products?filter=refrescos", icon: Wine, description: "Bebidas refrescantes" },
       ]
     },
-    { label: "Eventos", href: "/eventos" },
     { 
       label: "Comunidad",
       dropdown: [
-        { label: "Club POSOQO", href: "/club", icon: Crown, description: "Comunidad exclusiva" },
+        { label: "Club POSOQO", onClick: () => handleScrollToSection('club'), icon: Crown, description: "Comunidad exclusiva" },
         { label: "Reservas", href: "/reservas", icon: Calendar, description: "Reserva tu mesa" },
-        { label: "Miembros", href: "/club", icon: UsersIcon, description: "Eventos y actividades" },
       ]
     },
-    { label: "Contacto", href: "/contacto" },
+    { label: "Contacto", onClick: () => handleScrollToSection('contacto') },
   ];
 
   return (
@@ -188,17 +197,15 @@ export default function Navbar() {
                 </div>
               </button>
 
-              {/* Reconocimiento de Imágenes */}
-              <button
-                onClick={() => setShowImageRecognition(true)}
-                className="relative p-2 text-gray-400 hover:text-white transition-colors duration-200 group"
-                title="Reconocimiento de Imágenes con IA"
+              {/* Chela Gratis */}
+              <a
+                href="/chela-gratis"
+                className="relative px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-black font-bold rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-yellow-500/50"
+                title="¡Participa y gana una chela gratis!"
               >
-                <div className="relative">
-                  <Camera className="w-5 h-5" />
-                  <Sparkles className="w-3 h-3 text-indigo-400 absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </button>
+                <Gift className="w-5 h-5" />
+                <span className="hidden xl:inline">Chela Gratis</span>
+              </a>
 
               {/* Carrito */}
               <a
@@ -393,10 +400,6 @@ export default function Navbar() {
       <PairingAssistant 
         isOpen={showPairingAssistant} 
         onClose={() => setShowPairingAssistant(false)} 
-      />
-      <ImageRecognition 
-        isOpen={showImageRecognition} 
-        onClose={() => setShowImageRecognition(false)} 
       />
     </>
   );
