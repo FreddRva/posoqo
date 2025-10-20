@@ -5,13 +5,13 @@ import { useSession, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
-  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles, Camera
+  Beer, Utensils, Wine, Calendar, Users as UsersIcon, Search, Sparkles
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { NavLogo } from "./navbar/NavLogo";
 import { NavLinks } from "./navbar/NavLinks";
-import { SmartSearch, PairingAssistant, ImageRecognition } from "./ai";
+import { SmartSearch, PairingAssistant } from "./ai";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -27,7 +27,6 @@ export default function Navbar() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showSmartSearch, setShowSmartSearch] = useState(false);
   const [showPairingAssistant, setShowPairingAssistant] = useState(false);
-  const [showImageRecognition, setShowImageRecognition] = useState(false);
   
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);

@@ -112,7 +112,6 @@ func main() {
 	ai.Post("/search", handlers.SmartSearchHandler)
 	ai.Post("/pairing", handlers.PairingAssistantHandler)
 	ai.Post("/sentiment", handlers.AnalyzeSentimentHandler)
-	ai.Post("/image-recognition", handlers.ImageRecognitionHandler)
 	
 	// Rutas de IA protegidas (requiere autenticación)
 	aiAdmin := api.Group("/ai/admin")

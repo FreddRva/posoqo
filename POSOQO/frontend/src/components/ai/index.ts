@@ -5,5 +5,3 @@ export { default as SmartSearch } from './SmartSearch';
 export { default as PairingAssistant } from './PairingAssistant';
 export { default as DescriptionGenerator } from './DescriptionGenerator';
 export { default as PredictiveAnalytics } from './PredictiveAnalytics';
-export { default as ImageRecognition } from './ImageRecognition';
-

@@ -654,45 +654,6 @@ La descripción debe:
 	})
 }
 
-// ImageRecognitionHandler reconoce productos en imágenes (placeholder)
-func ImageRecognitionHandler(c *fiber.Ctx) error {
-	type ImageRequest struct {
-		Image string `json:"image"` // Base64 o URL de la imagen
-	}
-
-	var req ImageRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"success": false,
-			"error":   "Solicitud inválida",
-		})
-	}
-
-	if req.Image == "" {
-		return c.Status(400).JSON(fiber.Map{
-			"success": false,
-			"error":   "La imagen es requerida",
-		})
-	}
-
-	// NOTA: Gemini 1.5 Flash soporta análisis de imágenes, pero requiere
-	// una implementación más compleja con multipart/form-data
-	// Por ahora, retornamos un mensaje indicando que la función está en desarrollo
-
-	return c.JSON(fiber.Map{
-		"success": false,
-		"error":   "La función de reconocimiento de imágenes está en desarrollo. Próximamente estará disponible.",
-		"message": "Esta función requiere Gemini Vision API que estará disponible próximamente.",
-	})
-
-	// TODO: Implementar reconocimiento de imágenes con Gemini Vision
-	// 1. Convertir base64 a imagen
-	// 2. Enviar a Gemini Vision API
-	// 3. Analizar productos en la imagen
-	// 4. Buscar productos similares en la base de datos
-	// 5. Retornar productos encontrados
-}
-
 // Funciones auxiliares
 
 func getProductsContext() (string, error) {
