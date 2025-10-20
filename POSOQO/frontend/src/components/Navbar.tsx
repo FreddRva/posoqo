@@ -368,28 +368,28 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-16 bottom-0 w-full max-w-sm bg-white z-50 overflow-y-auto shadow-2xl"
+              className="fixed right-0 top-16 bottom-0 w-full max-w-sm bg-gray-900 z-50 overflow-y-auto shadow-2xl"
             >
               <div className="p-5 space-y-5">
                 {/* Usuario Móvil */}
                 {user ? (
-                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-100">
+                  <div className="bg-gradient-to-br from-gray-800 to-gray-800/80 rounded-2xl p-4 border border-gray-700">
                     {/* Avatar y datos */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 p-0.5 flex-shrink-0">
-                        <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                          <span className="text-2xl font-bold bg-gradient-to-br from-amber-500 to-orange-600 bg-clip-text text-transparent">
+                        <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                          <span className="text-2xl font-bold bg-gradient-to-br from-amber-400 to-orange-500 bg-clip-text text-transparent">
                             {user.name?.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-900 font-bold text-base truncate">{user.name}</p>
-                        <p className="text-gray-600 text-sm truncate">{user.email}</p>
+                        <p className="text-white font-bold text-base truncate">{user.name}</p>
+                        <p className="text-gray-400 text-sm truncate">{user.email}</p>
                         <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
                           user.role === 'admin' 
-                            ? 'bg-amber-200 text-amber-800' 
-                            : 'bg-gray-200 text-gray-700'
+                            ? 'bg-amber-500/20 text-amber-400' 
+                            : 'bg-gray-700 text-gray-300'
                         }`}>
                           {user.role === 'admin' ? 'Admin' : 'Usuario'}
                         </span>
@@ -402,55 +402,55 @@ export default function Navbar() {
                         <a 
                           href="/dashboard" 
                           onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-3 py-2.5 bg-amber-100 hover:bg-amber-200 rounded-xl transition-colors"
+                          className="flex items-center gap-3 px-3 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl transition-colors"
                         >
-                          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
-                            <Crown className="w-5 h-5 text-amber-600" />
+                          <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                            <Crown className="w-5 h-5 text-amber-400" />
                           </div>
-                          <span className="text-gray-900 font-medium text-sm">Dashboard</span>
+                          <span className="text-amber-400 font-medium text-sm">Dashboard</span>
                         </a>
                       )}
                       <a 
                         href="/profile" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-800 rounded-xl transition-colors"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
-                          <User className="w-5 h-5 text-gray-700" />
+                        <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center">
+                          <User className="w-5 h-5 text-gray-400" />
                         </div>
-                        <span className="text-gray-900 font-medium text-sm">Mi Perfil</span>
+                        <span className="text-gray-300 font-medium text-sm">Mi Perfil</span>
                       </a>
                       <a 
                         href="/orders" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-800 rounded-xl transition-colors"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
-                          <Package className="w-5 h-5 text-blue-600" />
+                        <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                          <Package className="w-5 h-5 text-blue-400" />
                         </div>
-                        <span className="text-gray-900 font-medium text-sm">Mis Pedidos</span>
+                        <span className="text-gray-300 font-medium text-sm">Mis Pedidos</span>
                       </a>
                       <a 
                         href="/favorites" 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+                        className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-800 rounded-xl transition-colors"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
-                          <Heart className="w-5 h-5 text-red-600" />
+                        <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
+                          <Heart className="w-5 h-5 text-red-400" />
                         </div>
-                        <span className="text-gray-900 font-medium text-sm">Favoritos</span>
+                        <span className="text-gray-300 font-medium text-sm">Favoritos</span>
                       </a>
                       <button
                         onClick={() => {
                           signOut();
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-500/10 rounded-xl transition-colors"
                       >
-                        <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
-                          <LogOut className="w-5 h-5 text-red-600" />
+                        <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
+                          <LogOut className="w-5 h-5 text-red-400" />
                         </div>
-                        <span className="text-red-600 font-medium text-sm">Cerrar Sesión</span>
+                        <span className="text-red-400 font-medium text-sm">Cerrar Sesión</span>
                       </button>
                     </div>
                   </div>
@@ -466,7 +466,7 @@ export default function Navbar() {
 
                 {/* Navegación Móvil */}
                 <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3">
                     Menú
                   </h3>
                   <div className="space-y-1">
@@ -482,8 +482,8 @@ export default function Navbar() {
                 </div>
 
                 {/* Herramientas IA */}
-                <div className="pt-5 border-t border-gray-200">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-3">
+                <div className="pt-5 border-t border-gray-800">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-3">
                     Herramientas IA
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -492,24 +492,24 @@ export default function Navbar() {
                         setShowSmartSearch(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="flex flex-col items-center gap-2.5 p-4 bg-purple-50 hover:bg-purple-100 rounded-2xl transition-colors"
+                      className="flex flex-col items-center gap-2.5 p-4 bg-purple-500/10 hover:bg-purple-500/20 rounded-2xl transition-colors border border-purple-500/20"
                     >
-                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Search className="w-6 h-6 text-purple-600" />
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                        <Search className="w-6 h-6 text-purple-400" />
                       </div>
-                      <span className="text-xs font-semibold text-gray-900">Búsqueda</span>
+                      <span className="text-xs font-semibold text-gray-300">Búsqueda</span>
                     </button>
                     <button
                       onClick={() => {
                         setShowPairingAssistant(true);
                         setMobileMenuOpen(false);
                       }}
-                      className="flex flex-col items-center gap-2.5 p-4 bg-amber-50 hover:bg-amber-100 rounded-2xl transition-colors"
+                      className="flex flex-col items-center gap-2.5 p-4 bg-amber-500/10 hover:bg-amber-500/20 rounded-2xl transition-colors border border-amber-500/20"
                     >
-                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Wine className="w-6 h-6 text-amber-600" />
+                      <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
+                        <Wine className="w-6 h-6 text-amber-400" />
                       </div>
-                      <span className="text-xs font-semibold text-gray-900">Maridaje</span>
+                      <span className="text-xs font-semibold text-gray-300">Maridaje</span>
                     </button>
                   </div>
                 </div>
