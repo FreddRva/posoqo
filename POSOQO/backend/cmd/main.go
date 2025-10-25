@@ -15,6 +15,7 @@ import (
 	"github.com/posoqo/backend/internal/db"
 	"github.com/posoqo/backend/internal/handlers"
 	"github.com/posoqo/backend/internal/middleware"
+	"github.com/posoqo/backend/internal/migrations"
 	"github.com/posoqo/backend/internal/services"
 )
 
@@ -35,6 +36,12 @@ func main() {
 		log.Fatal("Error conectando a la base de datos:", err)
 	}
 	defer db.DB.Close()
+
+	// Ejecutar migraciones automáticamente
+	if err := migrations.RunMigrations(); err != nil {
+		log.Printf("⚠️ Error ejecutando migraciones: %v", err)
+		log.Println("⚠️ El servidor continuará, pero puede haber problemas con la base de datos")
+	}
 
 	// Inicializar Cloudinary
 	if err := services.InitCloudinary(); err != nil {
