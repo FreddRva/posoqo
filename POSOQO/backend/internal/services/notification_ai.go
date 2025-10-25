@@ -33,7 +33,7 @@ func GenerateSmartNotification(ctx NotificationContext) (title, message, notific
 	// Generar contenido con Gemini
 	response, err := geminiService.GenerateContent(prompt, &GenerationConfig{
 		Temperature:     0.7,
-		MaxOutputTokens: 200,
+		MaxOutputTokens: 500,
 	})
 	
 	if err != nil || response == "" {
