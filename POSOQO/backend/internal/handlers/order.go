@@ -98,7 +98,7 @@ func CreateOrder(c *fiber.Ctx) error {
 	if req.Lat != nil && req.Lng != nil {
 		lat := *req.Lat
 		lng := *req.Lng
-		
+
 		// Validar que las coordenadas sean válidas (no 0,0 y dentro de rangos razonables)
 		if lat != 0 && lng != 0 && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 {
 			orderLat = lat
@@ -113,7 +113,7 @@ func CreateOrder(c *fiber.Ctx) error {
 		orderLat = nil
 		orderLng = nil
 	}
-	
+
 	// Si no tenemos coordenadas válidas y no hay ubicación, intentar obtener del usuario
 	if (orderLat == nil || orderLng == nil) && (orderLocation == "" || orderLocation == "Ubicación no especificada" || orderLocation == "Dirección del cliente") {
 		var userAddress, userAddressRef, userStreetNumber sql.NullString

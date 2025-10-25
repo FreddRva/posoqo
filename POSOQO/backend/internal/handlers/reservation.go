@@ -28,7 +28,7 @@ var allowedReservationStatuses = map[string]bool{
 	"pendiente":  true,
 	"confirmada": true,
 	"cancelada":  true,
-	"finalizada": true,
+	"completada": true,
 }
 
 // Crear reserva
