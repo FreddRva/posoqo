@@ -1,11 +1,8 @@
 package services
 
 import (
-	"context"
 	"fmt"
 	"strings"
-
-	"github.com/google/generative-ai-go/genai"
 )
 
 // NotificationContext contiene información contextual para generar notificaciones
@@ -23,29 +20,34 @@ type NotificationContext struct {
 
 // GenerateSmartNotification genera una notificación inteligente usando IA
 func GenerateSmartNotification(ctx NotificationContext) (title, message, notificationType string, priority int, err error) {
-	client := GetGeminiClient()
-	if client == nil {
-		// Fallback a notificaciones predefinidas si no hay IA disponible
+	geminiService := NewGeminiService()
+	
+	// Si no hay API key, usar fallback
+	if geminiService.APIKey == "" {
 		return generateFallbackNotification(ctx)
 	}
-
-	model := client.GenerativeModel("gemini-pro")
 
 	// Construir el prompt para la IA
 	prompt := buildNotificationPrompt(ctx)
 
-	resp, err := model.GenerateContent(context.Background(), genai.Text(prompt))
-	if err != nil || resp == nil || len(resp.Candidates) == 0 {
+	// Generar contenido con Gemini
+	response, err := geminiService.GenerateContent(prompt, &GenerationConfig{
+		Temperature:     0.7,
+		MaxOutputTokens: 200,
+	})
+	
+	if err != nil || response == "" {
+		// Fallback si hay error
 		return generateFallbackNotification(ctx)
 	}
 
 	// Parsear la respuesta
-	response := parseAIResponse(resp)
+	parsedResponse := parseAITextResponse(response)
 
 	// Asignar prioridad basada en el tipo y contexto
 	priority = calculatePriority(ctx)
 
-	return response.Title, response.Message, response.Type, priority, nil
+	return parsedResponse.Title, parsedResponse.Message, parsedResponse.Type, priority, nil
 }
 
 // buildNotificationPrompt construye el prompt para la IA
@@ -95,23 +97,8 @@ type AIResponse struct {
 	Type    string
 }
 
-// parseAIResponse parsea la respuesta de la IA
-func parseAIResponse(resp *genai.GenerateContentResponse) AIResponse {
-	if len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil {
-		return AIResponse{
-			Title:   "Notificación",
-			Message: "Tienes una nueva notificación",
-			Type:    "info",
-		}
-	}
-
-	text := ""
-	for _, part := range resp.Candidates[0].Content.Parts {
-		if txt, ok := part.(genai.Text); ok {
-			text += string(txt)
-		}
-	}
-
+// parseAITextResponse parsea la respuesta de texto de la IA
+func parseAITextResponse(text string) AIResponse {
 	// Parsear las líneas
 	lines := strings.Split(text, "\n")
 	result := AIResponse{
