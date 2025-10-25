@@ -390,16 +390,26 @@ func CreateRefund(c *fiber.Ctx) error {
 
 // Webhook de Stripe
 func StripeWebhook(c *fiber.Ctx) error {
+	fmt.Printf("[WEBHOOK] Recibiendo webhook de Stripe\n")
+	
 	endpointSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if endpointSecret == "" {
+		fmt.Printf("[WEBHOOK ERROR] STRIPE_WEBHOOK_SECRET no configurado\n")
 		return c.Status(500).SendString("Webhook no configurado")
 	}
+	
+	fmt.Printf("[WEBHOOK] Secret configurado: %s\n", endpointSecret[:10]+"...")
 
 	sigHeader := c.Get("Stripe-Signature")
+	fmt.Printf("[WEBHOOK] Signature header: %s\n", sigHeader[:20]+"...")
+	
 	event, err := webhook.ConstructEvent(c.Body(), sigHeader, endpointSecret)
 	if err != nil {
-		return c.Status(400).SendString("Firma inválida")
+		fmt.Printf("[WEBHOOK ERROR] Error verificando firma: %v\n", err)
+		return c.Status(400).SendString(fmt.Sprintf("Firma inválida: %v", err))
 	}
+	
+	fmt.Printf("[WEBHOOK] Evento recibido: %s\n", event.Type)
 
 	switch event.Type {
 	case "checkout.session.completed":
