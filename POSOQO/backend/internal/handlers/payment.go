@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/posoqo/backend/internal/db"
+	"github.com/posoqo/backend/internal/services"
 	"github.com/stripe/stripe-go/v78"
 	"github.com/stripe/stripe-go/v78/checkout/session"
 	"github.com/stripe/stripe-go/v78/paymentintent"
@@ -309,12 +310,43 @@ func handleCheckoutCompleted(event stripe.Event) {
 		_, _ = db.DB.Exec(context.Background(), "UPDATE reservations SET status='confirmada' WHERE id=$1", id)
 	}
 
-	// Crear notificación de pago exitoso
+	// Crear notificación de pago exitoso con IA
 	if userID > 0 {
 		userIDStr := fmt.Sprintf("%d", userID)
-		CreateAutomaticNotification("success", "Pago Exitoso",
-			fmt.Sprintf("Tu pago de S/%.2f ha sido procesado exitosamente", amount),
-			&userIDStr, orderID)
+		
+		// Obtener nombre del usuario
+		var userName string
+		db.DB.QueryRow(context.Background(), "SELECT name FROM users WHERE id=$1", userID).Scan(&userName)
+		if userName == "" {
+			userName = "Usuario"
+		}
+		
+		// Crear notificación de pago con IA
+		ctx := services.NotificationContext{
+			Type:       "payment",
+			Action:     "success",
+			UserName:   userName,
+			EntityID:   "",
+			Amount:     amount,
+			Status:     "paid",
+			IsForAdmin: false,
+		}
+		
+		title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
+		if err != nil {
+			fmt.Printf("Error generando notificación de pago con IA: %v\n", err)
+			// Fallback a notificación simple
+			CreateAutomaticNotification("success", "Pago Exitoso",
+				fmt.Sprintf("Tu pago de S/%.2f ha sido procesado exitosamente", amount),
+				&userIDStr, orderID)
+		} else {
+			CreateAutomaticNotificationWithPriority(notifType, title, message, &userIDStr, orderID, priority)
+		}
+		
+		// Si es un pedido, también crear notificación de pedido
+		if typeStr == "order" && orderID != nil {
+			CreateOrderNotification(*orderID, userIDStr, "pagado")
+		}
 	}
 }
 
