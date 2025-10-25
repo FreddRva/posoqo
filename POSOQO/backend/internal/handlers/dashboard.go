@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -586,32 +588,39 @@ func GetAdminOrdersPublic(c *fiber.Ctx) error {
 	})
 }
 
-// Endpoint temporal para usuarios (sin autenticación)
+// GetAdminUsersPublic lista todos los usuarios para el panel de admin
 func GetAdminUsersPublic(c *fiber.Ctx) error {
-	var totalUsers, activeUsers, adminUsers int
-
-	// Contar total de usuarios
-	err := db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM users`).Scan(&totalUsers)
+	rows, err := db.DB.Query(context.Background(),
+		`SELECT id, name, email, role, email_verified, created_at, updated_at FROM users ORDER BY created_at DESC`)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al contar usuarios"})
+		log.Printf("Error obteniendo usuarios: %v", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error al obtener usuarios"})
 	}
+	defer rows.Close()
 
-	// Contar usuarios activos (con email verificado)
-	err = db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM users WHERE email_verified = true`).Scan(&activeUsers)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al contar usuarios activos"})
-	}
-
-	// Contar administradores
-	err = db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM users WHERE role = 'admin'`).Scan(&adminUsers)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al contar administradores"})
+	users := []fiber.Map{}
+	for rows.Next() {
+		var id int64
+		var name, email, role string
+		var emailVerified bool
+		var createdAt, updatedAt time.Time
+		if err := rows.Scan(&id, &name, &email, &role, &emailVerified, &createdAt, &updatedAt); err != nil {
+			log.Printf("Error escaneando usuario: %v", err)
+			continue
+		}
+		users = append(users, fiber.Map{
+			"id":             id,
+			"name":           name,
+			"email":          email,
+			"role":           role,
+			"email_verified": emailVerified,
+			"created_at":     createdAt,
+			"updated_at":     updatedAt,
+		})
 	}
 
 	return c.JSON(fiber.Map{
-		"totalUsers":  totalUsers,
-		"activeUsers": activeUsers,
-		"adminUsers":  adminUsers,
+		"data": users,
 	})
 }
 
