@@ -76,8 +76,14 @@ func CreateStripeCheckout(c *fiber.Ctx) error {
 // Crear PaymentIntent para Stripe Elements
 func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	// Verificar autenticación
-	claims := c.Locals("user").(jwt.MapClaims)
+	claims, ok := c.Locals("user").(jwt.MapClaims)
+	if !ok {
+		fmt.Printf("[ERROR] No se pudo obtener claims del usuario\n")
+		return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+	}
+	
 	userID := int64(claims["id"].(float64))
+	fmt.Printf("[DEBUG] UserID: %d\n", userID)
 
 	var req struct {
 		Amount   float64 `json:"amount"`
@@ -96,28 +102,47 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		} `json:"shipping"`
 	}
 	
-	if err := c.BodyParser(&req); err != nil || req.Amount <= 0 || len(req.Items) == 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos o carrito vacío"})
+	if err := c.BodyParser(&req); err != nil {
+		fmt.Printf("[ERROR] Error parsing body: %v\n", err)
+		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos", "details": err.Error()})
 	}
+	
+	if req.Amount <= 0 {
+		fmt.Printf("[ERROR] Amount inválido: %f\n", req.Amount)
+		return c.Status(400).JSON(fiber.Map{"error": "Monto inválido"})
+	}
+	
+	if len(req.Items) == 0 {
+		fmt.Printf("[ERROR] Carrito vacío\n")
+		return c.Status(400).JSON(fiber.Map{"error": "Carrito vacío"})
+	}
+	
+	fmt.Printf("[DEBUG] Request válido. Items: %d, Amount: %f\n", len(req.Items), req.Amount)
 
 	// Iniciar transacción para crear el pedido
 	tx, err := db.DB.Begin(context.Background())
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error interno"})
+		fmt.Printf("[ERROR] No se pudo iniciar transacción: %v\n", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Error interno", "details": err.Error()})
 	}
 	defer tx.Rollback(context.Background())
 
 	// Calcular total y validar productos
 	total := 0.0
-	for _, item := range req.Items {
+	for i, item := range req.Items {
+		fmt.Printf("[DEBUG] Validando producto %d: ID=%s, Cantidad=%d\n", i+1, item.ID, item.Quantity)
 		var price float64
 		err := tx.QueryRow(context.Background(), 
 			"SELECT price FROM products WHERE id=$1 AND is_active=TRUE", item.ID).Scan(&price)
 		if err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "Producto no encontrado o inactivo"})
+			fmt.Printf("[ERROR] Producto no encontrado: %s - Error: %v\n", item.ID, err)
+			return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Producto %s no encontrado o inactivo", item.ID), "details": err.Error()})
 		}
 		total += price * float64(item.Quantity)
+		fmt.Printf("[DEBUG] Producto %s: Precio=%.2f, Subtotal=%.2f\n", item.ID, price, price*float64(item.Quantity))
 	}
+	
+	fmt.Printf("[DEBUG] Total calculado: %.2f\n", total)
 
 	// Construir la ubicación para la orden
 	orderLocation := req.Shipping.Address
@@ -135,36 +160,55 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	}
 
 	// Crear el pedido con status 'pendiente'
+	fmt.Printf("[DEBUG] Creando pedido: user_id=%d, total=%.2f, location=%s\n", userID, total, orderLocation)
 	var orderID string
 	err = tx.QueryRow(context.Background(),
 		"INSERT INTO orders (user_id, status, total, location, lat, lng) VALUES ($1, 'pendiente', $2, $3, $4, $5) RETURNING id",
 		userID, total, orderLocation, orderLat, orderLng).Scan(&orderID)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el pedido"})
+		fmt.Printf("[ERROR] No se pudo crear el pedido: %v\n", err)
+		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el pedido", "details": err.Error()})
 	}
+	
+	fmt.Printf("[DEBUG] Pedido creado con ID: %s\n", orderID)
 
 	// Insertar items del pedido
-	for _, item := range req.Items {
+	fmt.Printf("[DEBUG] Insertando %d items del pedido\n", len(req.Items))
+	for i, item := range req.Items {
 		var price float64
 		err := tx.QueryRow(context.Background(), "SELECT price FROM products WHERE id=$1", item.ID).Scan(&price)
 		if err != nil {
-			return c.Status(400).JSON(fiber.Map{"error": "Producto no encontrado"})
+			fmt.Printf("[ERROR] Producto no encontrado al insertar item: %s - Error: %v\n", item.ID, err)
+			return c.Status(400).JSON(fiber.Map{"error": "Producto no encontrado", "details": err.Error()})
 		}
 		_, err = tx.Exec(context.Background(),
 			"INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES ($1, $2, $3, $4)",
 			orderID, item.ID, item.Quantity, price)
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": "Error al guardar detalle de pedido"})
+			fmt.Printf("[ERROR] Error insertando item %d: %v\n", i+1, err)
+			return c.Status(500).JSON(fiber.Map{"error": "Error al guardar detalle de pedido", "details": err.Error()})
 		}
+		fmt.Printf("[DEBUG] Item %d insertado correctamente\n", i+1)
 	}
 
 	// Confirmar transacción
+	fmt.Printf("[DEBUG] Confirmando transacción...\n")
 	if err := tx.Commit(context.Background()); err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error al guardar pedido"})
+		fmt.Printf("[ERROR] Error al confirmar transacción: %v\n", err)
+		return c.Status(500).JSON(fiber.Map{"error": "Error al guardar pedido", "details": err.Error()})
 	}
+	
+	fmt.Printf("[DEBUG] Transacción confirmada exitosamente\n")
 
 	// Ahora crear el PaymentIntent de Stripe con el order_id
+	fmt.Printf("[DEBUG] Creando PaymentIntent de Stripe...\n")
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	if stripe.Key == "" {
+		fmt.Printf("[ERROR] STRIPE_SECRET_KEY no configurada\n")
+		db.DB.Exec(context.Background(), "UPDATE orders SET status='cancelado' WHERE id=$1", orderID)
+		return c.Status(500).JSON(fiber.Map{"error": "Stripe no configurado"})
+	}
+	
 	params := &stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(int64(req.Amount)),
 		Currency: stripe.String(req.Currency),
@@ -174,13 +218,18 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 			"user_id":  fmt.Sprintf("%d", userID),
 		},
 	}
+	
+	fmt.Printf("[DEBUG] Stripe params: Amount=%d, Currency=%s\n", int64(req.Amount), req.Currency)
 
 	pi, err := paymentintent.New(params)
 	if err != nil {
 		// Si falla el payment intent, marcar pedido como fallido
+		fmt.Printf("[ERROR] Error creando PaymentIntent: %v\n", err)
 		db.DB.Exec(context.Background(), "UPDATE orders SET status='cancelado' WHERE id=$1", orderID)
-		return c.Status(500).JSON(fiber.Map{"error": "Error creando PaymentIntent"})
+		return c.Status(500).JSON(fiber.Map{"error": "Error creando PaymentIntent", "details": err.Error()})
 	}
+	
+	fmt.Printf("[DEBUG] PaymentIntent creado exitosamente. OrderID: %s\n", orderID)
 
 	return c.JSON(fiber.Map{
 		"clientSecret": pi.ClientSecret,
