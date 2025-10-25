@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/posoqo/backend/internal/db"
+	"github.com/posoqo/backend/internal/services"
 )
 
 // Notification representa una notificación
@@ -18,6 +19,7 @@ type Notification struct {
 	Title     string    `json:"title"`
 	Message   string    `json:"message"`
 	OrderID   *string   `json:"order_id,omitempty"`
+	Priority  int       `json:"priority"` // 1=Baja, 2=Media, 3=Alta
 	IsRead    bool      `json:"is_read"`
 	CreatedAt time.Time `json:"created_at"`
 }
@@ -31,18 +33,18 @@ func GetNotifications(c *fiber.Ctx) error {
 
 	if userID != "" {
 		// Notificaciones específicas del usuario
-		query = `SELECT id, user_id, type, title, message, read_at, created_at 
+		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1), read_at, created_at 
 		         FROM notifications 
 		         WHERE user_id = $1 
-		         ORDER BY created_at DESC 
+		         ORDER BY priority DESC, created_at DESC 
 		         LIMIT 50`
 		args = []interface{}{userID}
 	} else {
 		// Notificaciones de admin (sin user_id)
-		query = `SELECT id, user_id, type, title, message, read_at, created_at 
+		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1), read_at, created_at 
 		         FROM notifications 
 		         WHERE user_id IS NULL 
-		         ORDER BY created_at DESC 
+		         ORDER BY priority DESC, created_at DESC 
 		         LIMIT 50`
 	}
 
@@ -56,7 +58,7 @@ func GetNotifications(c *fiber.Ctx) error {
 	for rows.Next() {
 		var n Notification
 		var readAt *time.Time
-		err := rows.Scan(&n.ID, &n.UserID, &n.Type, &n.Title, &n.Message, &readAt, &n.CreatedAt)
+		err := rows.Scan(&n.ID, &n.UserID, &n.Type, &n.Title, &n.Message, &n.Priority, &readAt, &n.CreatedAt)
 		if err != nil {
 			continue
 		}
@@ -381,86 +383,92 @@ func CreateNotificationsTable(c *fiber.Ctx) error {
 	})
 }
 
-// CreateAutomaticNotification crea notificaciones automáticas
+// CreateAutomaticNotification crea notificaciones automáticas (sin prioridad)
 func CreateAutomaticNotification(notificationType string, title string, message string, userID *string, orderID *string) error {
+	return CreateAutomaticNotificationWithPriority(notificationType, title, message, userID, orderID, 1)
+}
+
+// CreateAutomaticNotificationWithPriority crea notificaciones automáticas con prioridad
+func CreateAutomaticNotificationWithPriority(notificationType string, title string, message string, userID *string, orderID *string, priority int) error {
 	_, err := db.DB.Exec(context.Background(),
-		`INSERT INTO notifications (user_id, type, title, message, order_id, is_read, created_at)
-		 VALUES ($1, $2, $3, $4, $5, false, NOW())`,
-		userID, notificationType, title, message, orderID)
+		`INSERT INTO notifications (user_id, type, title, message, order_id, priority, is_read, created_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, false, NOW())`,
+		userID, notificationType, title, message, orderID, priority)
 
 	return err
 }
 
-// CreateOrderNotification crea notificación cuando se crea un pedido
+// CreateOrderNotification crea notificación cuando se crea un pedido usando IA
 func CreateOrderNotification(orderID string, userID string, status string) error {
-	// Obtener el nombre del usuario
+	// Obtener información del pedido y usuario
 	var userName string
-	err := db.DB.QueryRow(context.Background(), "SELECT name FROM users WHERE id = $1", userID).Scan(&userName)
+	var orderTotal float64
+	
+	err := db.DB.QueryRow(context.Background(), 
+		`SELECT u.name, o.total 
+		 FROM orders o 
+		 JOIN users u ON o.user_id = u.id 
+		 WHERE o.id = $1`, orderID).Scan(&userName, &orderTotal)
+	
 	if err != nil {
-		userName = "Usuario" // Fallback si no se encuentra el nombre
-	}
-
-	// Crear mensajes personalizados según el estado
-	var userTitle, userMessage, adminTitle, adminMessage string
-
-	switch status {
-	case "recibido":
-		userTitle = "🎉 ¡Pedido Recibido!"
-		userMessage = fmt.Sprintf("¡Hola %s! Tu pedido #%s ha sido recibido y está siendo procesado. ¡Gracias por tu compra!", userName, orderID[len(orderID)-8:])
-		adminTitle = "📋 Nuevo Pedido Recibido"
-		adminMessage = fmt.Sprintf("Pedido #%s de %s ha sido recibido", orderID[len(orderID)-8:], userName)
-
-	case "preparando":
-		userTitle = "👨‍🍳 ¡Tu Pedido se está Preparando!"
-		userMessage = fmt.Sprintf("¡%s! Tu pedido #%s está siendo preparado con mucho amor. ¡Estará listo pronto!", userName, orderID[len(orderID)-8:])
-		adminTitle = "👨‍🍳 Pedido en Preparación"
-		adminMessage = fmt.Sprintf("Pedido #%s de %s está siendo preparado", orderID[len(orderID)-8:], userName)
-
-	case "camino":
-		userTitle = "🚚 ¡Tu Pedido va en Camino!"
-		userMessage = fmt.Sprintf("¡%s! Tu pedido #%s ya está en camino hacia ti. ¡Prepárate para disfrutar!", userName, orderID[len(orderID)-8:])
-		adminTitle = "🚚 Pedido en Camino"
-		adminMessage = fmt.Sprintf("Pedido #%s de %s está en camino", orderID[len(orderID)-8:], userName)
-
-	case "entregado":
-		userTitle = "✅ ¡Pedido Entregado!"
-		userMessage = fmt.Sprintf("¡%s! Tu pedido #%s ha sido entregado exitosamente. ¡Esperamos que lo disfrutes!", userName, orderID[len(orderID)-8:])
-		adminTitle = "✅ Pedido Entregado"
-		adminMessage = fmt.Sprintf("Pedido #%s de %s ha sido entregado", orderID[len(orderID)-8:], userName)
-
-	case "cancelado":
-		userTitle = "❌ Pedido Cancelado"
-		userMessage = fmt.Sprintf("¡%s! Tu pedido #%s ha sido cancelado. Si tienes alguna pregunta, contáctanos.", userName, orderID[len(orderID)-8:])
-		adminTitle = "❌ Pedido Cancelado"
-		adminMessage = fmt.Sprintf("Pedido #%s de %s ha sido cancelado", orderID[len(orderID)-8:], userName)
-
-	default:
-		userTitle = fmt.Sprintf("📦 Pedido #%s %s", orderID[len(orderID)-8:], status)
-		userMessage = fmt.Sprintf("¡%s! Tu pedido #%s ha sido actualizado a: %s", userName, orderID[len(orderID)-8:], status)
-		adminTitle = fmt.Sprintf("📦 Pedido #%s %s", orderID[len(orderID)-8:], status)
-		adminMessage = fmt.Sprintf("Pedido #%s de %s ha sido actualizado a: %s", orderID[len(orderID)-8:], userName, status)
+		userName = "Usuario"
+		orderTotal = 0.0
 	}
 
 	// Crear notificaciones en paralelo para mayor velocidad
 	var wg sync.WaitGroup
 
-	// Notificación para el usuario
+	// Notificación para el usuario con IA
 	if userID != "" {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err := CreateAutomaticNotification("success", userTitle, userMessage, &userID, &orderID)
+			
+			ctx := services.NotificationContext{
+				Type:       "order",
+				Action:     status,
+				UserName:   userName,
+				EntityID:   orderID,
+				Amount:     orderTotal,
+				Status:     status,
+				IsForAdmin: false,
+			}
+			
+			title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
+			if err != nil {
+				fmt.Printf("Error generando notificación con IA: %v\n", err)
+				return
+			}
+			
+			err = CreateAutomaticNotificationWithPriority(notifType, title, message, &userID, &orderID, priority)
 			if err != nil {
 				fmt.Printf("Error creando notificación de pedido para usuario: %v\n", err)
 			}
 		}()
 	}
 
-	// Notificación para admin
+	// Notificación para admin con IA
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		err := CreateAutomaticNotification("info", adminTitle, adminMessage, nil, &orderID)
+		
+		ctx := services.NotificationContext{
+			Type:       "order",
+			Action:     status,
+			UserName:   userName,
+			EntityID:   orderID,
+			Amount:     orderTotal,
+			Status:     status,
+			IsForAdmin: true,
+		}
+		
+		title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
+		if err != nil {
+			fmt.Printf("Error generando notificación con IA: %v\n", err)
+			return
+		}
+		
+		err = CreateAutomaticNotificationWithPriority(notifType, title, message, nil, &orderID, priority)
 		if err != nil {
 			fmt.Printf("Error creando notificación de pedido para admin: %v\n", err)
 		}
