@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -81,7 +82,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		fmt.Printf("[ERROR] No se pudo obtener claims del usuario\n")
 		return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
 	}
-	
+
 	userID := int64(claims["id"].(float64))
 	fmt.Printf("[DEBUG] UserID: %d\n", userID)
 
@@ -101,22 +102,22 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 			Lng          *float64 `json:"lng"`
 		} `json:"shipping"`
 	}
-	
+
 	if err := c.BodyParser(&req); err != nil {
 		fmt.Printf("[ERROR] Error parsing body: %v\n", err)
 		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos", "details": err.Error()})
 	}
-	
+
 	if req.Amount <= 0 {
 		fmt.Printf("[ERROR] Amount inválido: %f\n", req.Amount)
 		return c.Status(400).JSON(fiber.Map{"error": "Monto inválido"})
 	}
-	
+
 	if len(req.Items) == 0 {
 		fmt.Printf("[ERROR] Carrito vacío\n")
 		return c.Status(400).JSON(fiber.Map{"error": "Carrito vacío"})
 	}
-	
+
 	fmt.Printf("[DEBUG] Request válido. Items: %d, Amount: %f\n", len(req.Items), req.Amount)
 
 	// Iniciar transacción para crear el pedido
@@ -132,7 +133,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	for i, item := range req.Items {
 		fmt.Printf("[DEBUG] Validando producto %d: ID=%s, Cantidad=%d\n", i+1, item.ID, item.Quantity)
 		var price float64
-		err := tx.QueryRow(context.Background(), 
+		err := tx.QueryRow(context.Background(),
 			"SELECT price FROM products WHERE id=$1 AND is_active=TRUE", item.ID).Scan(&price)
 		if err != nil {
 			fmt.Printf("[ERROR] Producto no encontrado: %s - Error: %v\n", item.ID, err)
@@ -141,7 +142,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		total += price * float64(item.Quantity)
 		fmt.Printf("[DEBUG] Producto %s: Precio=%.2f, Subtotal=%.2f\n", item.ID, price, price*float64(item.Quantity))
 	}
-	
+
 	fmt.Printf("[DEBUG] Total calculado: %.2f\n", total)
 
 	// Construir la ubicación para la orden
@@ -169,7 +170,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		fmt.Printf("[ERROR] No se pudo crear el pedido: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear el pedido", "details": err.Error()})
 	}
-	
+
 	fmt.Printf("[DEBUG] Pedido creado con ID: %s\n", orderID)
 
 	// Insertar items del pedido
@@ -197,7 +198,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		fmt.Printf("[ERROR] Error al confirmar transacción: %v\n", err)
 		return c.Status(500).JSON(fiber.Map{"error": "Error al guardar pedido", "details": err.Error()})
 	}
-	
+
 	fmt.Printf("[DEBUG] Transacción confirmada exitosamente\n")
 
 	// Ahora crear el PaymentIntent de Stripe con el order_id
@@ -208,17 +209,17 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		db.DB.Exec(context.Background(), "UPDATE orders SET status='cancelado' WHERE id=$1", orderID)
 		return c.Status(500).JSON(fiber.Map{"error": "Stripe no configurado"})
 	}
-	
+
 	params := &stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(int64(req.Amount)),
 		Currency: stripe.String(req.Currency),
 		Metadata: map[string]string{
-			"type":     "order",
-			"id":       orderID,
-			"user_id":  fmt.Sprintf("%d", userID),
+			"type":    "order",
+			"id":      orderID,
+			"user_id": fmt.Sprintf("%d", userID),
 		},
 	}
-	
+
 	fmt.Printf("[DEBUG] Stripe params: Amount=%d, Currency=%s\n", int64(req.Amount), req.Currency)
 
 	pi, err := paymentintent.New(params)
@@ -228,7 +229,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		db.DB.Exec(context.Background(), "UPDATE orders SET status='cancelado' WHERE id=$1", orderID)
 		return c.Status(500).JSON(fiber.Map{"error": "Error creando PaymentIntent", "details": err.Error()})
 	}
-	
+
 	fmt.Printf("[DEBUG] PaymentIntent creado exitosamente. OrderID: %s\n", orderID)
 
 	return c.JSON(fiber.Map{
@@ -391,25 +392,34 @@ func CreateRefund(c *fiber.Ctx) error {
 // Webhook de Stripe
 func StripeWebhook(c *fiber.Ctx) error {
 	fmt.Printf("[WEBHOOK] Recibiendo webhook de Stripe\n")
-	
+
 	endpointSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	if endpointSecret == "" {
 		fmt.Printf("[WEBHOOK ERROR] STRIPE_WEBHOOK_SECRET no configurado\n")
 		return c.Status(500).SendString("Webhook no configurado")
 	}
-	
+
 	fmt.Printf("[WEBHOOK] Secret configurado: %s\n", endpointSecret[:10]+"...")
 
 	sigHeader := c.Get("Stripe-Signature")
 	fmt.Printf("[WEBHOOK] Signature header: %s\n", sigHeader[:20]+"...")
-	
-	// Usar ConstructEventIgnoringTolerance para aceptar cualquier versión de API
-	event, err := webhook.ConstructEventIgnoringTolerance(c.Body(), sigHeader, endpointSecret)
+
+	// Intentar construir el evento, pero si falla por versión de API, parsearlo directamente
+	event, err := webhook.ConstructEvent(c.Body(), sigHeader, endpointSecret)
 	if err != nil {
-		fmt.Printf("[WEBHOOK ERROR] Error verificando firma: %v\n", err)
-		return c.Status(400).SendString(fmt.Sprintf("Firma inválida: %v", err))
+		// Si el error es por versión de API, parsear el JSON directamente
+		if strings.Contains(err.Error(), "API version") {
+			fmt.Printf("[WEBHOOK] Ignorando error de versión de API, parseando evento directamente\n")
+			if err := json.Unmarshal(c.Body(), &event); err != nil {
+				fmt.Printf("[WEBHOOK ERROR] Error parseando evento: %v\n", err)
+				return c.Status(400).SendString(fmt.Sprintf("Error parseando evento: %v", err))
+			}
+		} else {
+			fmt.Printf("[WEBHOOK ERROR] Error verificando firma: %v\n", err)
+			return c.Status(400).SendString(fmt.Sprintf("Firma inválida: %v", err))
+		}
 	}
-	
+
 	fmt.Printf("[WEBHOOK] Evento recibido: %s\n", event.Type)
 
 	switch event.Type {
@@ -464,14 +474,14 @@ func handleCheckoutCompleted(event stripe.Event) {
 	// Crear notificación de pago exitoso con IA
 	if userID > 0 {
 		userIDStr := fmt.Sprintf("%d", userID)
-		
+
 		// Obtener nombre del usuario
 		var userName string
 		db.DB.QueryRow(context.Background(), "SELECT name FROM users WHERE id=$1", userID).Scan(&userName)
 		if userName == "" {
 			userName = "Usuario"
 		}
-		
+
 		// Crear notificación de pago con IA
 		ctx := services.NotificationContext{
 			Type:       "payment",
@@ -482,18 +492,18 @@ func handleCheckoutCompleted(event stripe.Event) {
 			Status:     "paid",
 			IsForAdmin: false,
 		}
-		
+
 		title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
 		if err != nil {
 			fmt.Printf("Error generando notificación de pago con IA: %v\n", err)
 			// Fallback a notificación simple
-		CreateAutomaticNotification("success", "Pago Exitoso",
-			fmt.Sprintf("Tu pago de S/%.2f ha sido procesado exitosamente", amount),
-			&userIDStr, orderID)
+			CreateAutomaticNotification("success", "Pago Exitoso",
+				fmt.Sprintf("Tu pago de S/%.2f ha sido procesado exitosamente", amount),
+				&userIDStr, orderID)
 		} else {
 			CreateAutomaticNotificationWithPriority(notifType, title, message, &userIDStr, orderID, priority)
 		}
-		
+
 		// Si es un pedido, también crear notificación de pedido
 		if typeStr == "order" && orderID != nil {
 			CreateOrderNotification(*orderID, userIDStr, "pagado")
@@ -510,14 +520,14 @@ func handlePaymentSucceeded(event stripe.Event) {
 	// Obtener metadata del payment intent
 	typeStr := paymentIntent.Metadata["type"]
 	orderID := paymentIntent.Metadata["id"]
-	
+
 	if typeStr == "order" && orderID != "" {
 		// Obtener información del pedido
 		var userID int64
 		var total float64
-		err := db.DB.QueryRow(context.Background(), 
+		err := db.DB.QueryRow(context.Background(),
 			"SELECT user_id, total FROM orders WHERE id=$1", orderID).Scan(&userID, &total)
-		
+
 		if err == nil {
 			// Registrar pago
 			_, _ = db.DB.Exec(context.Background(),
@@ -533,14 +543,14 @@ func handlePaymentSucceeded(event stripe.Event) {
 			// Crear notificación de pago exitoso con IA
 			if userID > 0 {
 				userIDStrLocal := fmt.Sprintf("%d", userID)
-				
+
 				// Obtener nombre del usuario
 				var userName string
 				db.DB.QueryRow(context.Background(), "SELECT name FROM users WHERE id=$1", userID).Scan(&userName)
 				if userName == "" {
 					userName = "Usuario"
 				}
-				
+
 				// Crear notificación de pago con IA
 				ctx := services.NotificationContext{
 					Type:       "payment",
@@ -551,7 +561,7 @@ func handlePaymentSucceeded(event stripe.Event) {
 					Status:     "paid",
 					IsForAdmin: false,
 				}
-				
+
 				title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
 				if err != nil {
 					fmt.Printf("Error generando notificación de pago con IA: %v\n", err)
@@ -562,16 +572,16 @@ func handlePaymentSucceeded(event stripe.Event) {
 				} else {
 					CreateAutomaticNotificationWithPriority(notifType, title, message, &userIDStrLocal, &orderID, priority)
 				}
-				
+
 				// Crear notificación de pedido recibido
 				CreateOrderNotification(orderID, userIDStrLocal, "recibido")
 			}
 		}
 	} else {
 		// Si no hay metadata, intentar actualizar por payment_id
-	_, _ = db.DB.Exec(context.Background(),
-		"UPDATE payments SET status = 'paid' WHERE stripe_payment_id = $1",
-		paymentIntent.ID)
+		_, _ = db.DB.Exec(context.Background(),
+			"UPDATE payments SET status = 'paid' WHERE stripe_payment_id = $1",
+			paymentIntent.ID)
 	}
 }
 
