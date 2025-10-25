@@ -403,7 +403,8 @@ func StripeWebhook(c *fiber.Ctx) error {
 	sigHeader := c.Get("Stripe-Signature")
 	fmt.Printf("[WEBHOOK] Signature header: %s\n", sigHeader[:20]+"...")
 	
-	event, err := webhook.ConstructEvent(c.Body(), sigHeader, endpointSecret)
+	// Usar ConstructEventIgnoringTolerance para aceptar cualquier versión de API
+	event, err := webhook.ConstructEventIgnoringTolerance(c.Body(), sigHeader, endpointSecret)
 	if err != nil {
 		fmt.Printf("[WEBHOOK ERROR] Error verificando firma: %v\n", err)
 		return c.Status(400).SendString(fmt.Sprintf("Firma inválida: %v", err))
