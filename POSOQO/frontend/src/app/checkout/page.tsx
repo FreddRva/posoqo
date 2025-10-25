@@ -21,6 +21,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, summary, loading: cartLoading, clearCart } = useCart();
   const total = summary.total;
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   const {
     profile,
@@ -104,11 +106,11 @@ export default function CheckoutPage() {
 
     // Proceed with Stripe payment intent
     try {
-      const response = await apiFetch("/create-payment-intent", {
+      const response = await apiFetch<{ clientSecret: string; orderId: string }>("/create-payment-intent", {
         method: "POST",
         body: JSON.stringify({
           amount: total * 100, // Stripe expects amount in cents
-          currency: "PEN",
+          currency: "pen",
           items: cart.map((item) => ({
             id: item.id,
             quantity: item.quantity,
@@ -125,7 +127,10 @@ export default function CheckoutPage() {
         authToken: session.accessToken,
       });
 
-      if (response && typeof response === 'object' && 'clientSecret' in response) {
+      if (response && response.clientSecret && response.orderId) {
+        // Guardar clientSecret y orderId
+        setClientSecret(response.clientSecret);
+        setOrderId(response.orderId);
         // Ir al paso 2 del checkout
         setStep(2);
       } else {
@@ -134,6 +139,7 @@ export default function CheckoutPage() {
       }
     } catch (err) {
       // Handle error
+      console.error('Error:', err);
     }
   };
 
@@ -351,6 +357,8 @@ export default function CheckoutPage() {
                 </motion.button>
                 <StripeElementsForm
                   amount={total}
+                  clientSecret={clientSecret}
+                  orderId={orderId}
                 />
               </div>
               <div>

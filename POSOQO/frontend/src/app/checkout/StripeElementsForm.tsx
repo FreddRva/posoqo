@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useSession } from "next-auth/react";
 import { apiFetch } from "@/lib/api";
 import { CreditCard, Package, CheckCircle, AlertCircle } from "lucide-react";
 
@@ -9,11 +10,15 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 interface StripeElementsFormProps {
   amount: number;
+  clientSecret: string | null;
+  orderId: string | null;
 }
 
-function CheckoutForm({ amount }: StripeElementsFormProps) {
+function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: StripeElementsFormProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const { data: session } = useSession();
+  const [clientSecret, setClientSecret] = useState<string | null>(propClientSecret);
   const [cardholderName, setCardholderName] = useState("");
   const [documentType, setDocumentType] = useState("DNI");
   const [documentNumber, setDocumentNumber] = useState("");
@@ -147,24 +152,11 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
         throw new Error("Stripe no está inicializado");
       }
 
-      const data = await apiFetch<{clientSecret: string}>("/create-payment-intent", {
-        method: "POST",
-        body: JSON.stringify({ 
-          amount,
-          currency: "pen",
-          metadata: {
-            document_type: documentType,
-            document_number: documentNumber.replace(/[\s.-]/g, ''),
-            cardholder_name: cardholderName.trim()
-          }
-        }),
-      });
-
-      if (!data.clientSecret) {
-        throw new Error("No se pudo crear el PaymentIntent. El sistema de pagos no está disponible.");
+      if (!clientSecret) {
+        throw new Error("No se pudo obtener el clientSecret. Por favor, intenta de nuevo.");
       }
 
-      const result = await stripe?.confirmCardPayment((data as any).clientSecret, {
+      const result = await stripe?.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements?.getElement(CardNumberElement)!,
           billing_details: { 
@@ -568,10 +560,10 @@ function CheckoutForm({ amount }: StripeElementsFormProps) {
   );
 }
 
-export default function StripeElementsForm({ amount }: { amount: number }) {
+export default function StripeElementsForm({ amount, clientSecret, orderId }: StripeElementsFormProps) {
   return (
     <Elements stripe={stripePromise}>
-      <CheckoutForm amount={amount} />
+      <CheckoutForm amount={amount} clientSecret={clientSecret} orderId={orderId} />
     </Elements>
   );
 }
