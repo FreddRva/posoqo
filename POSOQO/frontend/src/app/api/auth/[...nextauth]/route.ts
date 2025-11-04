@@ -143,7 +143,7 @@ const handler = NextAuth({
         
         console.log('[NextAuth] Token después de asignar:', {
           hasAccessToken: !!token.accessToken,
-          accessTokenLength: token.accessToken?.length || 0,
+          accessTokenLength: typeof token.accessToken === 'string' ? token.accessToken.length : 0,
           hasRefreshToken: !!token.refreshToken
         });
       }
