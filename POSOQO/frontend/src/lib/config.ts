@@ -24,6 +24,10 @@ export const config = {
           throw new Error('NEXTAUTH_SECRET debe estar configurado en producción');
         })()
       : 'posoqo-nextauth-secret-key-development-only'),
+    // Tiempo de expiración del token (en segundos)
+    tokenExpiry: 3600, // 1 hora
+    // Tiempo de expiración del refresh token (en segundos)
+    refreshTokenExpiry: 604800, // 7 días
   },
   
   // Configuración de servicios externos

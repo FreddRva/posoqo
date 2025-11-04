@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -160,10 +161,23 @@ func AuthMiddleware() fiber.Handler {
 // Middleware para roles específicos
 func RequireRole(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		user := c.Locals("user").(jwt.MapClaims)
-		userRole, ok := user["role"].(string)
+		// Verificar que el usuario esté autenticado
+		userInterface := c.Locals("user")
+		if userInterface == nil {
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Usuario no autenticado",
+			})
+		}
 
+		user, ok := userInterface.(jwt.MapClaims)
 		if !ok {
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Datos de usuario inválidos",
+			})
+		}
+
+		userRole, ok := user["role"].(string)
+		if !ok || userRole == "" {
 			return c.Status(http.StatusForbidden).JSON(fiber.Map{
 				"error": "Rol de usuario no encontrado",
 			})
@@ -175,6 +189,11 @@ func RequireRole(roles ...string) fiber.Handler {
 				return c.Next()
 			}
 		}
+
+		// Log de intento de acceso no autorizado
+		userID := user["id"]
+		log.Printf("[SECURITY] Intento de acceso no autorizado - UserID: %v, Role: %s, Required: %v, Path: %s", 
+			userID, userRole, roles, c.Path())
 
 		return c.Status(http.StatusForbidden).JSON(fiber.Map{
 			"error": "Acceso denegado. Rol insuficiente.",
@@ -217,16 +236,31 @@ func SecurityLogger() fiber.Handler {
 // Middleware para headers de seguridad
 func SecurityHeaders() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Headers de seguridad
+		// Headers de seguridad básicos
 		c.Set("X-Content-Type-Options", "nosniff")
 		c.Set("X-Frame-Options", "DENY")
 		c.Set("X-XSS-Protection", "1; mode=block")
 		c.Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		c.Set("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
 
+		// Content Security Policy
+		csp := "default-src 'self'; " +
+			"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; " +
+			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+			"font-src 'self' https://fonts.gstatic.com; " +
+			"img-src 'self' data: https: blob:; " +
+			"connect-src 'self' https://api.stripe.com https://*.cloudinary.com https://*.googleapis.com; " +
+			"frame-src https://js.stripe.com https://hooks.stripe.com; " +
+			"object-src 'none'; " +
+			"base-uri 'self'; " +
+			"form-action 'self'; " +
+			"frame-ancestors 'none'; " +
+			"upgrade-insecure-requests;"
+		c.Set("Content-Security-Policy", csp)
+
 		// HSTS para HTTPS
 		if c.Protocol() == "https" {
-			c.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+			c.Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 		}
 
 		return c.Next()

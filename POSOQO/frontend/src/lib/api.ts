@@ -1,7 +1,13 @@
 import { config, getApiUrl } from './config';
 import { handleError, handleNetworkError, isRetryableError } from './errorHandler';
 
-// Función para obtener el token de autenticación
+// Función para validar si un token está expirado
+function isTokenExpired(expiryTimestamp?: number): boolean {
+  if (!expiryTimestamp) return true;
+  return Date.now() >= expiryTimestamp;
+}
+
+// Función para obtener el token de autenticación de forma segura
 async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   
@@ -14,10 +20,27 @@ async function getAuthToken(): Promise<string | null> {
       
       // Buscar el token en la estructura correcta de NextAuth
       const token = data.data?.accessToken || data.accessToken || null;
-      return token;
+      const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
+      
+      // Validar que el token no esté expirado
+      if (token && !isTokenExpired(expiry)) {
+        return token;
+      }
+      
+      // Si está expirado, retornar null para forzar refresh
+      return null;
     }
   } catch (err) {
     // Error silencioso para evitar logs innecesarios en producción
+    // Limpiar datos corruptos
+    if (err instanceof SyntaxError) {
+      try {
+        const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
+        if (nextAuthKey) {
+          localStorage.removeItem(nextAuthKey);
+        }
+      } catch {}
+    }
   }
   return null;
 }
@@ -128,14 +151,38 @@ export async function apiFetch<T>(
       token = sessionToken || authTokenResult || undefined;
     }
 
-    const res = await fetch(getApiUrl(endpoint), {
-      ...fetchOptions,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...fetchOptions.headers,
-      },
-    });
+    // Validar que el endpoint no esté vacío
+    if (!endpoint || endpoint.trim() === '') {
+      throw new Error('Endpoint no puede estar vacío');
+    }
+
+    // Validar que la URL sea segura
+    const apiUrl = getApiUrl(endpoint);
+    if (!apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
+      throw new Error('URL de API inválida');
+    }
+
+    // Crear timeout para evitar requests colgados (30 segundos)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    
+    // Usar el signal del usuario si existe, sino usar el nuestro
+    const signal = fetchOptions.signal || controller.signal;
+    
+    let res: Response;
+    try {
+      res = await fetch(apiUrl, {
+        ...fetchOptions,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...fetchOptions.headers,
+        },
+        signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     
     // Si el token expiró, intentar renovarlo y repetir la petición
     if (res.status === 401 && token) {

@@ -51,9 +51,34 @@ func main() {
 	// Inicializar servicio de IA (Gemini)
 	handlers.InitAIService()
 
-	// Crear aplicación Fiber
+	// Crear aplicación Fiber con configuración de seguridad
 	app := fiber.New(fiber.Config{
-		AppName: "POSOQO API",
+		AppName:      "POSOQO API",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+		// No exponer información del servidor
+		DisableStartupMessage: false,
+		// Error handler personalizado
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			
+			isProduction := os.Getenv("NODE_ENV") == "production"
+			response := fiber.Map{
+				"error": "Error interno del servidor",
+				"code":  "INTERNAL_ERROR",
+			}
+			
+			// Solo mostrar detalles en desarrollo
+			if !isProduction {
+				response["details"] = err.Error()
+			}
+			
+			return c.Status(code).JSON(response)
+		},
 	})
 
 	// Middleware global
@@ -63,8 +88,11 @@ func main() {
 	app.Use(middleware.SecurityLogger())
 	app.Use(cors.New(middleware.CorsConfig))
 
-	// Rate limiting global (deshabilitado temporalmente)
-	// app.Use(middleware.GeneralRateLimiter)
+	// Rate limiting global - habilitado en producción
+	if os.Getenv("NODE_ENV") == "production" || os.Getenv("ENABLE_RATE_LIMIT") == "true" {
+		app.Use(middleware.GeneralRateLimiter)
+		log.Println(" Rate limiting global habilitado")
+	}
 
 	// Ruta raíz para manejar HEAD y GET requests
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -371,21 +399,35 @@ func main() {
 
 // setupEnvironment configura las variables de entorno necesarias
 func setupEnvironment() {
+	isProduction := os.Getenv("NODE_ENV") == "production"
+
 	// Variables de entorno para JWT
 	if os.Getenv("JWT_ACCESS_SECRET") == "" {
-		if os.Getenv("NODE_ENV") == "production" {
-			log.Fatal("JWT_ACCESS_SECRET debe estar configurado en producción")
+		if isProduction {
+			log.Fatal("❌ JWT_ACCESS_SECRET debe estar configurado en producción")
 		}
 		os.Setenv("JWT_ACCESS_SECRET", "your-super-secret-access-key-change-in-production")
-		log.Println("JWT_ACCESS_SECRET no configurado, usando valor por defecto (SOLO DESARROLLO)")
+		log.Println("⚠️ JWT_ACCESS_SECRET no configurado, usando valor por defecto (SOLO DESARROLLO)")
+	} else if isProduction {
+		// Validar que el secret no sea el valor por defecto en producción
+		if os.Getenv("JWT_ACCESS_SECRET") == "your-super-secret-access-key-change-in-production" {
+			log.Fatal("❌ JWT_ACCESS_SECRET no puede usar el valor por defecto en producción")
+		}
+		log.Println("✅ JWT_ACCESS_SECRET configurado correctamente")
 	}
 
 	if os.Getenv("JWT_REFRESH_SECRET") == "" {
-		if os.Getenv("NODE_ENV") == "production" {
-			log.Fatal("JWT_REFRESH_SECRET debe estar configurado en producción")
+		if isProduction {
+			log.Fatal("❌ JWT_REFRESH_SECRET debe estar configurado en producción")
 		}
 		os.Setenv("JWT_REFRESH_SECRET", "your-super-secret-refresh-key-change-in-production")
-		log.Println("JWT_REFRESH_SECRET no configurado, usando valor por defecto (SOLO DESARROLLO)")
+		log.Println("⚠️ JWT_REFRESH_SECRET no configurado, usando valor por defecto (SOLO DESARROLLO)")
+	} else if isProduction {
+		// Validar que el secret no sea el valor por defecto en producción
+		if os.Getenv("JWT_REFRESH_SECRET") == "your-super-secret-refresh-key-change-in-production" {
+			log.Fatal("❌ JWT_REFRESH_SECRET no puede usar el valor por defecto en producción")
+		}
+		log.Println("✅ JWT_REFRESH_SECRET configurado correctamente")
 	}
 
 	// Variables de entorno para base de datos
@@ -399,11 +441,13 @@ func setupEnvironment() {
 		os.Setenv("DB_USER", "posoqo_user")
 	}
 	if os.Getenv("DB_PASSWORD") == "" {
-		if os.Getenv("NODE_ENV") == "production" {
-			log.Fatal("DB_PASSWORD debe estar configurado en producción")
+		if isProduction {
+			log.Fatal("❌ DB_PASSWORD debe estar configurado en producción")
 		}
 		os.Setenv("DB_PASSWORD", "posoqoEvelinSuarez")
-		log.Println("DB_PASSWORD no configurado, usando valor por defecto (SOLO DESARROLLO)")
+		log.Println("⚠️ DB_PASSWORD no configurado, usando valor por defecto (SOLO DESARROLLO)")
+	} else if isProduction {
+		log.Println("✅ DB_PASSWORD configurado correctamente")
 	}
 	if os.Getenv("DB_NAME") == "" {
 		os.Setenv("DB_NAME", "posoqo")
@@ -414,5 +458,29 @@ func setupEnvironment() {
 		os.Setenv("PORT", "3000")
 	}
 
-	log.Println("Variables de entorno configuradas")
+	// Validar variables críticas en producción
+	if isProduction {
+		requiredVars := []string{
+			"JWT_ACCESS_SECRET",
+			"JWT_REFRESH_SECRET",
+			"DB_PASSWORD",
+			"DB_HOST",
+			"DB_NAME",
+		}
+
+		missingVars := []string{}
+		for _, v := range requiredVars {
+			if os.Getenv(v) == "" {
+				missingVars = append(missingVars, v)
+			}
+		}
+
+		if len(missingVars) > 0 {
+			log.Fatalf("❌ Variables de entorno faltantes en producción: %v", missingVars)
+		}
+
+		log.Println("✅ Todas las variables de entorno críticas están configuradas")
+	}
+
+	log.Println("✅ Variables de entorno configuradas correctamente")
 }
