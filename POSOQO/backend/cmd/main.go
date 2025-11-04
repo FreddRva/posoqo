@@ -283,7 +283,7 @@ func main() {
 	api.Get("/payments", handlers.GetPaymentHistory)
 	api.Post("/payments/refund", handlers.CreateRefund)
 
-	// Obtener puerto de variable de entorno
+	// Obtener puerto de variable de entorno (Render usa PORT automáticamente)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "4000" // Valor por defecto consistente con documentación
