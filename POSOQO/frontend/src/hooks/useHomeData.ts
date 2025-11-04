@@ -74,9 +74,18 @@ export const useHomeData = (): UseHomeDataReturn => {
       const productsData = await productsResponse.json();
       
       // Log detallado de la respuesta
-      const products = productsData.data || productsData || [];
+      let products: Product[] = [];
+      if (Array.isArray(productsData.data)) {
+        products = productsData.data;
+      } else if (Array.isArray(productsData)) {
+        products = productsData;
+      } else if (productsData.data && Array.isArray(productsData.data)) {
+        products = productsData.data;
+      }
+      
       console.log('[useHomeData] Respuesta de productos:', {
         hasData: !!productsData.data,
+        isArray: Array.isArray(products),
         dataLength: products.length,
         productsKeys: Object.keys(productsData),
         totalProducts: products.length,
@@ -101,16 +110,28 @@ export const useHomeData = (): UseHomeDataReturn => {
       // Procesar categorías
       if (categoriesResponse.status === 'fulfilled') {
         const catData = await categoriesResponse.value.json();
-        const categories = catData.data || catData || [];
+        
+        // Asegurar que categories es un array
+        let categories: any[] = [];
+        if (Array.isArray(catData.data)) {
+          categories = catData.data;
+        } else if (Array.isArray(catData)) {
+          categories = catData;
+        } else if (catData && typeof catData === 'object') {
+          // Si es un objeto, intentar extraer arrays
+          categories = [];
+          console.warn('[useHomeData] catData no es un array, estructura:', Object.keys(catData));
+        }
         
         console.log('[useHomeData] Categorías cargadas:', {
+          isArray: Array.isArray(categories),
           categoriesCount: categories.length,
-          categoryNames: categories.map((c: any) => `${c.name} (id: ${c.id}, parent_id: ${c.parent_id || 'null'})`),
-          allCategories: categories.map((c: any) => ({
+          categoryNames: Array.isArray(categories) ? categories.map((c: any) => `${c.name} (id: ${c.id}, parent_id: ${c.parent_id || 'null'})`) : [],
+          allCategories: Array.isArray(categories) ? categories.map((c: any) => ({
             id: c.id,
             name: c.name,
             parent_id: c.parent_id
-          }))
+          })) : []
         });
         
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
@@ -213,14 +234,32 @@ export const useHomeData = (): UseHomeDataReturn => {
 
       // Procesar servicios - solo servicios activos
       if (servicesResponse.status === 'fulfilled') {
-        const servicesData = await servicesResponse.value.json();
-        if (servicesData.success && servicesData.data) {
-          services = servicesData.data.filter((s: Service) => s.is_active === true);
-        } else {
+        try {
+          const servicesData = await servicesResponse.value.json();
+          
+          // Asegurar que services es un array
+          let servicesArray: Service[] = [];
+          if (servicesData.success && servicesData.data && Array.isArray(servicesData.data)) {
+            servicesArray = servicesData.data;
+          } else if (Array.isArray(servicesData.data)) {
+            servicesArray = servicesData.data;
+          } else if (Array.isArray(servicesData)) {
+            servicesArray = servicesData;
+          }
+          
+          services = servicesArray.filter((s: Service) => s.is_active === true);
+          
+          console.log('[useHomeData] Servicios procesados:', {
+            isArray: Array.isArray(servicesArray),
+            totalServices: servicesArray.length,
+            activeServices: services.length
+          });
+        } catch (err) {
+          console.error('[useHomeData] Error parseando servicios:', err);
           services = [];
         }
       } else {
-        console.log('Error cargando servicios:', servicesResponse.reason);
+        console.log('[useHomeData] Error cargando servicios:', servicesResponse.reason);
         services = [];
       }
 
