@@ -12,47 +12,52 @@ async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   
   try {
-    // Buscar el token en localStorage
-    const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
+    // Buscar el token en localStorage - buscar TODAS las keys de nextauth
+    const allNextAuthKeys = Object.keys(localStorage).filter(key => key.includes('nextauth'));
     
     console.log('[API] getAuthToken:', {
-      hasNextAuthKey: !!nextAuthKey,
-      keyName: nextAuthKey || 'not found'
+      allNextAuthKeys: allNextAuthKeys,
+      keysCount: allNextAuthKeys.length
     });
     
-    if (nextAuthKey) {
-      const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
-      
-      // Buscar el token en la estructura correcta de NextAuth
-      const token = data.data?.accessToken || data.accessToken || null;
-      const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
-      
-      // Log detallado de la estructura
-      console.log('[API] getAuthToken localStorage data:', {
-        hasToken: !!token,
-        tokenLength: token?.length || 0,
-        hasExpiry: !!expiry,
-        isExpired: expiry ? isTokenExpired(expiry) : 'unknown',
-        dataStructure: {
-          hasDataAccessToken: !!data.data?.accessToken,
-          hasAccessToken: !!data.accessToken,
-          keys: Object.keys(data),
-          dataKeys: data.data ? Object.keys(data.data) : []
-        },
-        fullData: data, // Log completo para debug
-        dataAccessToken: data.data?.accessToken,
-        directAccessToken: data.accessToken
-      });
-      
-      // Validar que el token no esté expirado
-      if (token && !isTokenExpired(expiry)) {
-        return token;
+    // Intentar con todas las keys de nextauth
+    for (const nextAuthKey of allNextAuthKeys) {
+      try {
+        const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
+        
+        // Buscar el token en la estructura correcta de NextAuth
+        const token = data.data?.accessToken || data.accessToken || null;
+        const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
+        
+        console.log(`[API] getAuthToken checking key "${nextAuthKey}":`, {
+          hasToken: !!token,
+          tokenLength: token?.length || 0,
+          hasExpiry: !!expiry,
+          isExpired: expiry ? isTokenExpired(expiry) : 'unknown',
+          dataStructure: {
+            hasDataAccessToken: !!data.data?.accessToken,
+            hasAccessToken: !!data.accessToken,
+            keys: Object.keys(data),
+            dataKeys: data.data ? Object.keys(data.data) : []
+          },
+          dataAccessToken: data.data?.accessToken,
+          directAccessToken: data.accessToken,
+          fullData: data
+        });
+        
+        // Si encontramos un token válido, retornarlo
+        if (token && !isTokenExpired(expiry)) {
+          console.log(`[API] Token encontrado en key "${nextAuthKey}"`);
+          return token;
+        }
+      } catch (err) {
+        console.error(`[API] Error parseando key "${nextAuthKey}":`, err);
       }
-      
-      // Si está expirado, retornar null para forzar refresh
-      console.log('[API] Token expirado o no encontrado');
-      return null;
     }
+    
+    // Si llegamos aquí, no encontramos ningún token válido
+    console.log('[API] Token expirado o no encontrado en ninguna key');
+    return null;
   } catch (err) {
     console.error('[API] Error en getAuthToken:', err);
     // Limpiar datos corruptos
