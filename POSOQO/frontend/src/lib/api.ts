@@ -12,50 +12,46 @@ async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   
   try {
-    // Buscar el token en localStorage - buscar TODAS las keys de nextauth
+    // Primero intentar con nuestra key separada
+    const tokenKey = 'posoqo.auth.tokens';
+    const tokenDataStr = localStorage.getItem(tokenKey);
+    
+    if (tokenDataStr) {
+      try {
+        const tokenData = JSON.parse(tokenDataStr);
+        const token = tokenData.accessToken || null;
+        const expiry = tokenData.accessTokenExpires;
+        
+        console.log('[API] getAuthToken checking posoqo key:', {
+          hasToken: !!token,
+          tokenLength: token?.length || 0,
+          hasExpiry: !!expiry,
+          isExpired: expiry ? isTokenExpired(expiry) : 'unknown'
+        });
+        
+        if (token && !isTokenExpired(expiry)) {
+          console.log('[API] Token encontrado en key separada');
+          return token;
+        }
+      } catch (err) {
+        console.error('[API] Error parseando token data:', err);
+      }
+    }
+    
+    // Si no encontramos en nuestra key, buscar en keys de nextauth (fallback)
     const allNextAuthKeys = Object.keys(localStorage).filter(key => key.includes('nextauth'));
     
-    console.log('[API] getAuthToken:', {
+    console.log('[API] getAuthToken buscando en nextauth keys:', {
       allNextAuthKeys: allNextAuthKeys,
       keysCount: allNextAuthKeys.length
     });
     
-    // Intentar con todas las keys de nextauth
     for (const nextAuthKey of allNextAuthKeys) {
       try {
         const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
-        
-        // Buscar el token en la estructura correcta de NextAuth
-        // NextAuth guarda en formato {event: 'session', data: {data: {...}}, timestamp: ...}
-        // También puede estar en data.data (estructura anidada) o directamente en data
         const token = data.data?.data?.accessToken || data.data?.accessToken || data.accessToken || null;
         const expiry = data.data?.data?.accessTokenExpires || data.data?.accessTokenExpires || data.accessTokenExpires;
         
-        // Log detallado con stringify para ver contenido completo
-        const dataStr = JSON.stringify(data, null, 2);
-        console.log(`[API] getAuthToken checking key "${nextAuthKey}":`, {
-          hasToken: !!token,
-          tokenLength: token?.length || 0,
-          hasExpiry: !!expiry,
-          isExpired: expiry ? isTokenExpired(expiry) : 'unknown',
-          dataStructure: {
-            hasDataDataAccessToken: !!data.data?.data?.accessToken,
-            hasDataAccessToken: !!data.data?.accessToken,
-            hasAccessToken: !!data.accessToken,
-            keys: Object.keys(data),
-            dataKeys: data.data ? Object.keys(data.data) : [],
-            dataDataKeys: data.data?.data ? Object.keys(data.data.data) : []
-          },
-          dataDataAccessToken: data.data?.data?.accessToken,
-          dataAccessToken: data.data?.accessToken,
-          directAccessToken: data.accessToken,
-          fullDataString: dataStr.substring(0, 500) // Primeros 500 caracteres para no saturar
-        });
-        console.log(`[API] getAuthToken fullData for "${nextAuthKey}":`, data);
-        console.log(`[API] getAuthToken data.data for "${nextAuthKey}":`, data.data);
-        console.log(`[API] getAuthToken data.data.data for "${nextAuthKey}":`, data.data?.data);
-        
-        // Si encontramos un token válido, retornarlo
         if (token && !isTokenExpired(expiry)) {
           console.log(`[API] Token encontrado en key "${nextAuthKey}"`);
           return token;
@@ -66,7 +62,7 @@ async function getAuthToken(): Promise<string | null> {
     }
     
     // Si llegamos aquí, no encontramos ningún token válido
-    console.log('[API] Token expirado o no encontrado en ninguna key');
+    console.log('[API] Token expirado o no encontrado');
     return null;
   } catch (err) {
     console.error('[API] Error en getAuthToken:', err);

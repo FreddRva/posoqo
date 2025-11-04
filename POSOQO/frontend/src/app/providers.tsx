@@ -13,61 +13,38 @@ function TokenSync() {
     // Pequeño delay para asegurar que NextAuth ya guardó su estructura inicial
     const timeoutId = setTimeout(() => {
       try {
-        // Buscar TODAS las keys de nextauth
-        const allNextAuthKeys = Object.keys(localStorage).filter(key => key.includes('nextauth'));
-        console.log('[TokenSync] Todas las keys de nextauth encontradas:', allNextAuthKeys);
-        
-        // Intentar con todas las keys, pero preferir la que tenga 'session' en el nombre
-        const sessionKey = allNextAuthKeys.find(key => key.includes('session')) || allNextAuthKeys[0];
-        const nextAuthKey = sessionKey || allNextAuthKeys.find(key => key.includes('nextauth'));
-        
-        if (nextAuthKey) {
-        const currentData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
+        // Usar una key separada para nuestros tokens para evitar conflictos con NextAuth
+        const tokenKey = 'posoqo.auth.tokens';
         const accessToken = (session as any)?.accessToken;
         const refreshToken = (session as any)?.refreshToken;
         const accessTokenExpires = (session as any)?.accessTokenExpires;
 
-        console.log('[TokenSync] Estructura actual:', {
-          hasEvent: !!currentData.event,
-          hasData: !!currentData.data,
-          dataKeys: currentData.data ? Object.keys(currentData.data) : [],
-          dataDataKeys: currentData.data?.data ? Object.keys(currentData.data.data) : []
+        console.log('[TokenSync] Guardando tokens en key separada:', {
+          key: tokenKey,
+          hasAccessToken: !!accessToken,
+          accessTokenLength: accessToken?.length || 0,
+          hasRefreshToken: !!refreshToken,
+          hasExpiry: !!accessTokenExpires
         });
 
-        // NextAuth guarda en formato {event: 'session', data: {...}, timestamp: ...}
-        // Necesitamos guardar en data.data para que sea compatible
-        if (!currentData.data) {
-          currentData.data = {};
-        }
-        if (!currentData.data.data) {
-          currentData.data.data = {};
-        }
-
-        // Guardar tokens en data.data.accessToken (estructura anidada correcta)
-        currentData.data.data = {
-          ...currentData.data.data,
+        // Guardar tokens en una key separada
+        const tokenData = {
           accessToken,
           refreshToken,
           accessTokenExpires,
+          timestamp: Date.now()
         };
         
-        const savedData = JSON.stringify(currentData);
-        localStorage.setItem(nextAuthKey, savedData);
+        localStorage.setItem(tokenKey, JSON.stringify(tokenData));
         
         // Verificar que se guardó correctamente
-        const verifyData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
+        const verifyData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
         console.log('[TokenSync] Tokens sincronizados correctamente. Verificación:', {
-          hasData: !!verifyData.data,
-          hasDataData: !!verifyData.data?.data,
-          hasAccessToken: !!verifyData.data?.data?.accessToken,
-          accessTokenLength: verifyData.data?.data?.accessToken?.length || 0,
-          verifyDataKeys: Object.keys(verifyData),
-          verifyDataDataKeys: verifyData.data ? Object.keys(verifyData.data) : [],
-          verifyDataDataDataKeys: verifyData.data?.data ? Object.keys(verifyData.data.data) : []
+          hasAccessToken: !!verifyData.accessToken,
+          accessTokenLength: verifyData.accessToken?.length || 0,
+          hasRefreshToken: !!verifyData.refreshToken,
+          hasExpiry: !!verifyData.accessTokenExpires
         });
-        } else {
-          console.warn('[TokenSync] No se encontró key de nextauth en localStorage');
-        }
       } catch (err) {
         console.error('[TokenSync] Error sincronizando tokens:', err);
       }
