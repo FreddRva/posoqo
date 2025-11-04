@@ -190,36 +190,51 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // Validar que el producto existe y está activo antes de agregarlo
       try {
-        console.log('🔍 Validando producto:', product.id);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Validando producto:', product.id);
+        }
         const response = await apiFetch<any>(`/products/${product.id}`);
-        console.log('🔍 Respuesta completa:', response);
         
         // El backend devuelve { success: true, data: {...} }
         const productData = response.data || response;
-        console.log('🔍 Datos del producto:', productData);
-        console.log('🔍 is_active:', productData.is_active, 'tipo:', typeof productData.is_active);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Datos del producto:', productData);
+        }
         
         if (!productData.is_active) {
-          console.log('❌ Producto no activo - NO AGREGANDO AL CARRITO');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('❌ Producto no activo - NO AGREGANDO AL CARRITO');
+          }
           showNotification('El producto no está disponible', 'error');
           return; // IMPORTANTE: return aquí para salir de la función
         }
         // Solo validar stock si es 0 o negativo
         if (productData.stock <= 0) {
-          console.log('❌ Producto sin stock:', productData.stock, '- NO AGREGANDO AL CARRITO');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('❌ Producto sin stock:', productData.stock, '- NO AGREGANDO AL CARRITO');
+          }
           showNotification('El producto no tiene stock disponible', 'error');
           return; // IMPORTANTE: return aquí para salir de la función
         }
-        console.log('✅ Producto válido, stock:', productData.stock);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ Producto válido, stock:', productData.stock);
+        }
       } catch (validationError: any) {
-        console.log('❌ Error validando producto:', validationError);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('❌ Error validando producto:', validationError);
+        }
         if (validationError?.status === 404) {
-          console.warn(`Producto ${product.id} no encontrado - NO AGREGANDO AL CARRITO`);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Producto ${product.id} no encontrado - NO AGREGANDO AL CARRITO`);
+          }
           showNotification('El producto no está disponible', 'error');
           return; // IMPORTANTE: return aquí para salir de la función
         }
         // Para otros errores, continuar (puede ser problema de red)
-        console.log('⚠️ Error de red, continuando...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('⚠️ Error de red, continuando...');
+        }
       }
 
       // Normalizar producto
@@ -262,7 +277,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           }),
         });
         } catch (backendError) {
-          console.warn('Error sincronizando con backend:', backendError);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Error sincronizando con backend:', backendError);
+          }
         }
       }
 

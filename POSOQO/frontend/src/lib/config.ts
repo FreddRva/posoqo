@@ -19,7 +19,11 @@ export const config = {
   
   // Configuración de autenticación
   auth: {
-    secret: process.env.NEXTAUTH_SECRET || 'posoqo-nextauth-secret-key-development-only',
+    secret: process.env.NEXTAUTH_SECRET || (process.env.NODE_ENV === 'production' 
+      ? (() => { 
+          throw new Error('NEXTAUTH_SECRET debe estar configurado en producción');
+        })()
+      : 'posoqo-nextauth-secret-key-development-only'),
   },
   
   // Configuración de servicios externos

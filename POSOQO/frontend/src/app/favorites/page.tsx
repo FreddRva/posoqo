@@ -25,31 +25,36 @@ export default function FavoritesPage() {
 
   const loadFavorites = async () => {
     if (!session) {
-      console.log('🔍 [FAVORITES] No hay sesión, no se cargan favoritos');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔍 [FAVORITES] No hay sesión, no se cargan favoritos');
+      }
       return;
     }
     
-    console.log('🔍 [FAVORITES] Cargando favoritos...', {
-      hasAccessToken: !!session.accessToken,
-      session: session
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 [FAVORITES] Cargando favoritos...', {
+        hasAccessToken: !!session.accessToken,
+      });
+    }
     
     try {
       setLoading(true);
       const response = await apiFetch<{ data: any[] }>('/protected/favorites', {
         authToken: session.accessToken
       });
-      console.log('🔍 [FAVORITES] Respuesta del backend:', response);
       if (response.data) {
         // Los productos ya vienen directamente en response.data
-        console.log('🔍 [FAVORITES] Productos encontrados:', response.data.length);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 [FAVORITES] Productos encontrados:', response.data.length);
+        }
         setFavorites(response.data);
       } else {
-        console.log('🔍 [FAVORITES] No hay data en la respuesta');
         setFavorites([]);
       }
     } catch (error) {
-      console.error('Error cargando favoritos:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error cargando favoritos:', error);
+      }
       setFavorites([]);
     } finally {
       setLoading(false);
@@ -70,7 +75,9 @@ export default function FavoritesPage() {
       // Actualizar lista local
       setFavorites(prev => prev.filter(product => product.id !== productId));
     } catch (error) {
-      console.error('Error removiendo de favoritos:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error removiendo de favoritos:', error);
+      }
     }
   };
 
@@ -88,13 +95,17 @@ export default function FavoritesPage() {
       setAddedToCart(product.id);
       setTimeout(() => setAddedToCart(null), 2000);
     } catch (error) {
-      console.error('Error agregando al carrito:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error agregando al carrito:', error);
+      }
     }
   };
 
   const openProductModal = (product: Product) => {
     // Implementar modal de producto
-    console.log('Abrir modal para:', product.name);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Abrir modal para:', product.name);
+    }
   };
 
   if (!session) {

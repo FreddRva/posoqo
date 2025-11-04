@@ -74,8 +74,8 @@ class ErrorHandler {
       };
     }
 
-    // Log del error
-    if (logToConsole) {
+    // Log del error (solo en desarrollo o si está explícitamente habilitado)
+    if (logToConsole && process.env.NODE_ENV === 'development') {
       console.error(`[ErrorHandler] ${context || 'Unknown'}:`, errorInfo);
     }
 
