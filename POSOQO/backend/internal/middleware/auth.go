@@ -55,15 +55,15 @@ var CorsConfig = cors.Config{
 // Middleware de autenticación mejorado
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Reducir logging excesivo - solo loggear en modo debug
-		if os.Getenv("DEBUG") == "true" {
-			log.Printf("🔐 [AUTH] Verificando autenticación para: %s %s", c.Method(), c.Path())
-		}
+		log.Printf("🔐 [AUTH] AuthMiddleware - Verificando autenticación para: %s %s", c.Method(), c.Path())
+		log.Printf("🔐 [AUTH] AuthMiddleware - Headers: %v", c.GetReqHeaders())
 
 		// Obtener el token del header Authorization
 		authHeader := c.Get("Authorization")
+		log.Printf("🔐 [AUTH] AuthMiddleware - Authorization header: %s", authHeader)
 
 		if authHeader == "" {
+			log.Printf("🔐 [AUTH] AuthMiddleware - Error: Token de autorización requerido")
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token de autorización requerido",
 			})

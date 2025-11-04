@@ -81,7 +81,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	if !ok {
 		return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
 	}
-	
+
 	userID := int64(claims["id"].(float64))
 
 	var req struct {
@@ -100,17 +100,22 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 			Lng          *float64 `json:"lng"`
 		} `json:"shipping"`
 	}
-	
+
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
 	}
-	
+
 	if req.Amount <= 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "Monto inválido"})
 	}
-	
+
 	if len(req.Items) == 0 {
 		return c.Status(400).JSON(fiber.Map{"error": "Carrito vacío"})
+	}
+
+	// Validar y establecer currency por defecto
+	if req.Currency == "" {
+		req.Currency = "pen"
 	}
 
 	// Iniciar transacción para crear el pedido
@@ -124,7 +129,7 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	total := 0.0
 	for _, item := range req.Items {
 		var price float64
-		err := tx.QueryRow(context.Background(), 
+		err := tx.QueryRow(context.Background(),
 			"SELECT price FROM products WHERE id=$1 AND is_active=TRUE", item.ID).Scan(&price)
 		if err != nil {
 			return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("Producto %s no encontrado o inactivo", item.ID)})
@@ -183,8 +188,13 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Stripe no configurado"})
 	}
 
+	// Stripe requiere el amount en centavos (o unidades más pequeñas de la moneda)
+	// Para PEN (sol peruano), no hay centavos, pero Stripe espera el monto en centavos
+	// Por lo tanto, multiplicamos por 100 para convertir soles a centavos
+	amountInCents := int64(req.Amount * 100)
+
 	params := &stripe.PaymentIntentParams{
-		Amount:   stripe.Int64(int64(req.Amount)),
+		Amount:   stripe.Int64(amountInCents),
 		Currency: stripe.String(req.Currency),
 		Metadata: map[string]string{
 			"type":    "order",
@@ -404,11 +414,11 @@ func handleCheckoutCompleted(event stripe.Event) {
 	id := session.Metadata["id"]
 
 	var orderID, reservationID *string
-	if typeStr == "order" {
+	switch typeStr {
+	case "order":
 		db.DB.QueryRow(context.Background(), "SELECT user_id FROM orders WHERE id=$1", id).Scan(&userID)
 		orderID = &id
-	}
-	if typeStr == "reservation" {
+	case "reservation":
 		db.DB.QueryRow(context.Background(), "SELECT user_id FROM reservations WHERE id=$1", id).Scan(&userID)
 		reservationID = &id
 	}
@@ -421,9 +431,10 @@ func handleCheckoutCompleted(event stripe.Event) {
 	)
 
 	// Actualizar estado
-	if typeStr == "order" {
+	switch typeStr {
+	case "order":
 		_, _ = db.DB.Exec(context.Background(), "UPDATE orders SET status='pagado' WHERE id=$1", id)
-	} else if typeStr == "reservation" {
+	case "reservation":
 		_, _ = db.DB.Exec(context.Background(), "UPDATE reservations SET status='confirmada' WHERE id=$1", id)
 	}
 
@@ -587,10 +598,6 @@ func handleRefundCompleted(event stripe.Event) {
 	}
 }
 
-// Utilidad para nil en Go
-func ifThenElse(cond bool, a, b interface{}) interface{} {
-	if cond {
-		return a
-	}
-	return b
-}
+// Nota: se eliminó la función auxiliar `ifThenElse` porque no se utiliza en el código.
+// Si en el futuro se necesita una utilidad ternaria reutilizable, podemos añadir
+// una versión genérica en `internal/utils`.

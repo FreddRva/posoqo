@@ -123,18 +123,15 @@ func parseAITextResponse(text string) AIResponse {
 
 // calculatePriority calcula la prioridad de la notificación
 func calculatePriority(ctx NotificationContext) int {
-	// Alta prioridad (3): Pagos, cancelaciones, errores
-	if ctx.Action == "cancelled" || ctx.Type == "payment" || strings.Contains(ctx.Status, "error") {
+	// Priorizar usando un switch con condiciones etiquetadas para claridad
+	switch {
+	case ctx.Action == "cancelled" || ctx.Type == "payment" || strings.Contains(ctx.Status, "error"):
 		return 3
-	}
-
-	// Media prioridad (2): Nuevos pedidos, actualizaciones importantes
-	if ctx.Action == "created" || ctx.Action == "completed" {
+	case ctx.Action == "created" || ctx.Action == "completed":
 		return 2
+	default:
+		return 1
 	}
-
-	// Baja prioridad (1): Actualizaciones rutinarias
-	return 1
 }
 
 // generateFallbackNotification genera notificaciones sin IA
@@ -326,7 +323,8 @@ func generateReservationNotification(ctx NotificationContext) (title, message, n
 
 	default:
 		title = "📅 Actualización de Reserva"
-		message = fmt.Sprintf("Tu reserva ha sido actualizada", ctx.UserName)
+		// No se usa el nombre de usuario en este mensaje; asignar literal
+		message = "Tu reserva ha sido actualizada"
 		notificationType = "info"
 	}
 

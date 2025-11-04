@@ -11,16 +11,26 @@ export const NavLogo: React.FC = () => (
     href="/"
     className="flex items-center gap-2 group"
     aria-label="Inicio"
+    data-logo="posoqo"
+    style={{ cursor: 'none' }}
   >
-    <Image
-      src="/Logo.png"
-      alt="POSOQO"
-      width={40}
-      height={40}
-      className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-105"
-      priority
-    />
-    <span className={`text-2xl font-bold text-yellow-400 tracking-tight ${playfair.className} group-hover:text-yellow-300 transition-colors duration-300`}>
+    <div className="relative logo-icon-hover">
+      <Image
+        src="/Logo.png"
+        alt="POSOQO"
+        width={40}
+        height={40}
+        className="h-10 w-10 object-contain transition-all duration-500 group-hover:scale-110 group-hover:rotate-12 drop-shadow-lg"
+        priority
+        style={{ cursor: 'none' }}
+      />
+      {/* Efecto de brillo dorado */}
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-amber-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+    </div>
+    <span 
+      className={`text-2xl font-bold text-white tracking-tight ${playfair.className}`}
+      style={{ cursor: 'none' }}
+    >
       POSOQO
     </span>
   </a>
