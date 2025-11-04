@@ -65,13 +65,21 @@ export const useHomeData = (): UseHomeDataReturn => {
   const loadData = useCallback(async () => {
     const result = await loadingState.executeApiCall(async () => {
       // Cargar productos
+      console.log('[useHomeData] Cargando productos desde:', getApiUrl('/products'));
       const productsResponse = await fetch(getApiUrl('/products'));
       if (!productsResponse.ok) {
         throw new Error('Error cargando productos');
       }
       
       const productsData = await productsResponse.json();
-      const products = productsData.data || [];
+      console.log('[useHomeData] Respuesta de productos:', {
+        hasData: !!productsData.data,
+        dataLength: productsData.data?.length || 0,
+        productsKeys: Object.keys(productsData),
+        firstProduct: productsData.data?.[0] || null
+      });
+      
+      const products = productsData.data || productsData || [];
 
       // Cargar categorías y servicios en paralelo
       const [categoriesResponse, servicesResponse] = await Promise.allSettled([
@@ -86,12 +94,23 @@ export const useHomeData = (): UseHomeDataReturn => {
       // Procesar categorías
       if (categoriesResponse.status === 'fulfilled') {
         const catData = await categoriesResponse.value.json();
-        const categories = catData.data || [];
+        const categories = catData.data || catData || [];
+        
+        console.log('[useHomeData] Categorías cargadas:', {
+          categoriesCount: categories.length,
+          categoryNames: categories.map((c: any) => c.name)
+        });
         
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
-        const cervezaCategory = categories.find((c: any) => c.name === "Cervezas");
-        const cervezaSubcategory = categories.find((c: any) => c.name === "Cerveza" && c.parent_id);
-        const comidasCategory = categories.find((c: any) => c.name === "Comidas");
+        const cervezaCategory = categories.find((c: any) => c.name === "Cervezas" || c.name?.toLowerCase() === "cervezas");
+        const cervezaSubcategory = categories.find((c: any) => (c.name === "Cerveza" || c.name?.toLowerCase() === "cerveza") && c.parent_id);
+        const comidasCategory = categories.find((c: any) => c.name === "Comidas" || c.name?.toLowerCase() === "comidas");
+        
+        console.log('[useHomeData] Categorías encontradas:', {
+          cervezaCategory: cervezaCategory?.name,
+          cervezaSubcategory: cervezaSubcategory?.name,
+          comidasCategory: comidasCategory?.name
+        });
         
         // Filtrar cervezas: productos de subcategoría "Cerveza" (destacados o todos)
         if (cervezaSubcategory) {
@@ -104,8 +123,24 @@ export const useHomeData = (): UseHomeDataReturn => {
             return isCerveza && p.is_featured === true;
           });
           
+          console.log('[useHomeData] Cervezas destacadas encontradas:', {
+            count: featuredCervezas.length,
+            nombres: featuredCervezas.map(p => p.name)
+          });
+          
+          // Si no hay destacados, mostrar todos los de la categoría
+          if (featuredCervezas.length === 0) {
+            featuredCervezas = products.filter((p: Product) => {
+              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
+              return isCerveza;
+            });
+            console.log('[useHomeData] Usando todas las cervezas (sin filtrar por destacados):', featuredCervezas.length);
+          }
+          
           featuredCervezas = featuredCervezas.slice(0, 4);
         } else {
+          console.log('[useHomeData] No se encontró subcategoría de cerveza');
           featuredCervezas = [];
         }
 
@@ -116,11 +151,30 @@ export const useHomeData = (): UseHomeDataReturn => {
             const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
             return !isCerveza && p.is_featured === true;
-          }).slice(0, 4);
+          });
+          
+          console.log('[useHomeData] Comidas destacadas encontradas:', {
+            count: featuredComidas.length,
+            nombres: featuredComidas.map(p => p.name)
+          });
+          
+          // Si no hay destacados, mostrar todos los que NO sean cervezas
+          if (featuredComidas.length === 0) {
+            featuredComidas = products.filter((p: Product) => {
+              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
+              return !isCerveza;
+            });
+            console.log('[useHomeData] Usando todas las comidas (sin filtrar por destacados):', featuredComidas.length);
+          }
+          
+          featuredComidas = featuredComidas.slice(0, 4);
         } else {
+          console.log('[useHomeData] No se encontró subcategoría de cerveza para filtrar comidas');
           featuredComidas = [];
         }
       } else {
+        console.error('[useHomeData] Error cargando categorías:', categoriesResponse.reason);
         featuredCervezas = [];
         featuredComidas = [];
       }
