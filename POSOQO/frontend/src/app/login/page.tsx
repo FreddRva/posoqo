@@ -51,8 +51,10 @@ export default function LoginPage() {
 
   // Redirigir si ya está autenticado
   useEffect(() => {
+    if (!mounted) return;
+    
     if (status === "authenticated" && session) {
-      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      const redirectPath = typeof window !== 'undefined' ? localStorage.getItem('redirectAfterLogin') : null;
       if (redirectPath && redirectPath !== '/login') {
         localStorage.removeItem('redirectAfterLogin');
         router.push(redirectPath);
@@ -60,7 +62,7 @@ export default function LoginPage() {
         router.push("/");
       }
     }
-  }, [session, status, router]);
+  }, [session, status, router, mounted]);
 
   // Validaciones
   const validateEmail = (email: string): boolean => {
@@ -122,7 +124,7 @@ export default function LoginPage() {
           setGeneralError("Credenciales inválidas. Verifica tu email y contraseña.");
         }
       } else if (result?.ok) {
-        const redirectPath = localStorage.getItem('redirectAfterLogin');
+        const redirectPath = typeof window !== 'undefined' ? localStorage.getItem('redirectAfterLogin') : null;
         if (redirectPath && redirectPath !== '/login') {
           localStorage.removeItem('redirectAfterLogin');
           router.push(redirectPath);
@@ -162,7 +164,7 @@ export default function LoginPage() {
     setGeneralError(null);
     
     try {
-      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      const redirectPath = typeof window !== 'undefined' ? localStorage.getItem('redirectAfterLogin') : null;
       const callbackUrl = redirectPath && redirectPath !== '/login' ? redirectPath : "/";
       
       await signIn("google", { 
@@ -188,6 +190,11 @@ export default function LoginPage() {
         </div>
       </div>
     );
+  }
+
+  // No renderizar nada hasta que esté montado
+  if (!mounted) {
+    return null;
   }
 
   return (
@@ -234,8 +241,8 @@ export default function LoginPage() {
           }}
         />
         
-        {/* Partículas de fondo - solo renderizar en cliente */}
-        {mounted && particles.map((particle, i) => (
+        {/* Partículas de fondo */}
+        {particles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-yellow-400/30 rounded-full"
