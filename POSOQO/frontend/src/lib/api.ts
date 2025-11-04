@@ -22,29 +22,16 @@ async function getAuthToken(): Promise<string | null> {
         const token = tokenData.accessToken || null;
         const expiry = tokenData.accessTokenExpires;
         
-        console.log('[API] getAuthToken checking posoqo key:', {
-          hasToken: !!token,
-          tokenLength: token?.length || 0,
-          hasExpiry: !!expiry,
-          isExpired: expiry ? isTokenExpired(expiry) : 'unknown'
-        });
-        
         if (token && !isTokenExpired(expiry)) {
-          console.log('[API] Token encontrado en key separada');
           return token;
         }
       } catch (err) {
-        console.error('[API] Error parseando token data:', err);
+        // Error silencioso
       }
     }
     
     // Si no encontramos en nuestra key, buscar en keys de nextauth (fallback)
     const allNextAuthKeys = Object.keys(localStorage).filter(key => key.includes('nextauth'));
-    
-    console.log('[API] getAuthToken buscando en nextauth keys:', {
-      allNextAuthKeys: allNextAuthKeys,
-      keysCount: allNextAuthKeys.length
-    });
     
     for (const nextAuthKey of allNextAuthKeys) {
       try {
@@ -53,19 +40,15 @@ async function getAuthToken(): Promise<string | null> {
         const expiry = data.data?.data?.accessTokenExpires || data.data?.accessTokenExpires || data.accessTokenExpires;
         
         if (token && !isTokenExpired(expiry)) {
-          console.log(`[API] Token encontrado en key "${nextAuthKey}"`);
           return token;
         }
       } catch (err) {
-        console.error(`[API] Error parseando key "${nextAuthKey}":`, err);
+        // Error silencioso
       }
     }
     
-    // Si llegamos aquí, no encontramos ningún token válido
-    console.log('[API] Token expirado o no encontrado');
     return null;
   } catch (err) {
-    console.error('[API] Error en getAuthToken:', err);
     // Limpiar datos corruptos
     if (err instanceof SyntaxError) {
       try {
@@ -87,16 +70,8 @@ async function getSessionToken(): Promise<string | null> {
     // Importar dinámicamente para evitar problemas de SSR
     const { getSession } = await import('next-auth/react');
     const session = await getSession();
-    const token = (session as any)?.accessToken || null;
-    console.log('[API] getSessionToken:', {
-      hasSession: !!session,
-      hasAccessToken: !!(session as any)?.accessToken,
-      tokenLength: token?.length || 0,
-      tokenPreview: token ? `${token.substring(0, 20)}...` : null
-    });
-    return token;
+    return (session as any)?.accessToken || null;
   } catch (err) {
-    console.error('[API] Error en getSessionToken:', err);
     return null;
   }
 }
@@ -182,32 +157,14 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { authToken, ...fetchOptions } = options || {};
   
-  console.log('[API] apiFetch llamado:', {
-    endpoint,
-    hasAuthTokenParam: !!authToken,
-    method: fetchOptions.method || 'GET'
-  });
-  
   try {
     // Obtener token automáticamente si no se proporciona uno
     let token = authToken;
     if (!token) {
-      console.log('[API] No se proporcionó token, buscando automáticamente...');
       // Intentar obtener el token de la sesión primero, luego del localStorage
       const sessionToken = await getSessionToken();
       const authTokenResult = await getAuthToken();
       token = sessionToken || authTokenResult || undefined;
-      console.log('[API] Token obtenido automáticamente:', {
-        hasToken: !!token,
-        fromSession: !!sessionToken,
-        fromLocalStorage: !!authTokenResult,
-        tokenLength: token?.length || 0
-      });
-    } else {
-      console.log('[API] Usando token proporcionado:', {
-        tokenLength: token.length,
-        tokenPreview: `${token.substring(0, 20)}...`
-      });
     }
 
     // Validar que el endpoint no esté vacío
@@ -217,7 +174,6 @@ export async function apiFetch<T>(
 
     // Validar que la URL sea segura
     const apiUrl = getApiUrl(endpoint);
-    console.log('[API] URL construida:', apiUrl);
     if (!apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
       throw new Error('URL de API inválida');
     }
@@ -237,23 +193,10 @@ export async function apiFetch<T>(
         ...fetchOptions.headers,
       };
       
-      console.log('[API] Haciendo request:', {
-        url: apiUrl,
-        method: fetchOptions.method || 'GET',
-        hasAuthHeader: !!headers.Authorization,
-        headers: Object.keys(headers)
-      });
-      
       res = await fetch(apiUrl, {
         ...fetchOptions,
         headers,
         signal,
-      });
-      
-      console.log('[API] Respuesta recibida:', {
-        status: res.status,
-        statusText: res.statusText,
-        ok: res.ok
       });
     } finally {
       clearTimeout(timeoutId);
@@ -261,7 +204,6 @@ export async function apiFetch<T>(
     
     // Si el token expiró, intentar renovarlo y repetir la petición
     if (res.status === 401 && token) {
-      console.log('[API] Token expirado (401), intentando refresh...');
       const newToken = await refreshAccessToken();
       
       if (newToken) {

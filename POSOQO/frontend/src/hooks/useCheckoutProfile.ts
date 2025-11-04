@@ -27,12 +27,6 @@ export const useCheckoutProfile = () => {
   }, [profile]);
 
   const loadProfile = async () => {
-    console.log('[useCheckoutProfile] loadProfile llamado:', {
-      status,
-      hasSession: !!session,
-      sessionKeys: session ? Object.keys(session) : []
-    });
-    
     if (status === "unauthenticated") {
       setLoading(false);
       signIn(undefined, { callbackUrl: "/checkout" });
@@ -43,27 +37,14 @@ export const useCheckoutProfile = () => {
       // Obtener accessToken de la sesión
       const accessToken = (session as any)?.accessToken;
       
-      console.log('[useCheckoutProfile] Verificando accessToken:', {
-        hasAccessToken: !!accessToken,
-        accessTokenLength: accessToken?.length || 0,
-        accessTokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : null
-      });
-      
       if (!accessToken) {
-        // Si no hay accessToken, intentar obtenerlo del localStorage o esperar un poco
-        console.error('[useCheckoutProfile] No se pudo obtener el token de autenticación');
         setLoading(false);
         setError("No se pudo obtener el token de autenticación");
         return;
       }
       
       try {
-        console.log('[useCheckoutProfile] Llamando a apiFetch con token');
         const profileData = await apiFetch("/profile", { authToken: accessToken });
-        console.log('[useCheckoutProfile] Perfil cargado:', {
-          hasProfileData: !!profileData,
-          profileKeys: profileData ? Object.keys(profileData) : []
-        });
         const profile = profileData as Profile;
         
         setProfile(profile);

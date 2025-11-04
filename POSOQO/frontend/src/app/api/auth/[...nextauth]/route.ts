@@ -118,34 +118,13 @@ const handler = NextAuth({
       return true;
     },
     async jwt({ token, user, account }) {
-      console.log('[NextAuth] jwt callback:', {
-        hasUser: !!user,
-        hasAccount: !!account,
-        accountProvider: account?.provider,
-        hasToken: !!token,
-        hasTokenAccessToken: !!token.accessToken
-      });
-      
       // Si es el primer login, guarda los tokens del usuario
       if (user) {
-        console.log('[NextAuth] Usuario en jwt callback:', {
-          hasAccessToken: !!(user as any).accessToken,
-          hasBackendAccessToken: !!(user as any).backendAccessToken,
-          hasRefreshToken: !!(user as any).refreshToken,
-          hasBackendRefreshToken: !!(user as any).backendRefreshToken
-        });
-        
         token.role = (user as any).role;
         token.id = (user as any).id;
         token.accessToken = (user as any).accessToken || (user as any).backendAccessToken;
         token.refreshToken = (user as any).refreshToken || (user as any).backendRefreshToken;
         token.accessTokenExpires = (user as any).accessTokenExpires;
-        
-        console.log('[NextAuth] Token después de asignar:', {
-          hasAccessToken: !!token.accessToken,
-          accessTokenLength: typeof token.accessToken === 'string' ? token.accessToken.length : 0,
-          hasRefreshToken: !!token.refreshToken
-        });
       }
 
       // Si el token ya tiene accessToken y no ha expirado, retorna
@@ -189,24 +168,9 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      console.log('[NextAuth] session callback:', {
-        hasToken: !!token,
-        hasTokenAccessToken: !!token.accessToken,
-        tokenAccessTokenType: typeof token.accessToken,
-        hasSession: !!session,
-        userEmail: session.user?.email
-      });
-      
       (session as any).accessToken = typeof token.accessToken === "string" ? token.accessToken : undefined;
       (session as any).refreshToken = typeof token.refreshToken === "string" ? token.refreshToken : undefined;
       (session as any).accessTokenExpires = token.accessTokenExpires;
-      
-      console.log('[NextAuth] Session después de asignar tokens:', {
-        hasAccessToken: !!(session as any).accessToken,
-        accessTokenLength: (session as any).accessToken?.length || 0,
-        hasRefreshToken: !!(session as any).refreshToken,
-        hasAccessTokenExpires: !!(session as any).accessTokenExpires
-      });
       
       // Usa el rol del token si existe
       if (token.role) {

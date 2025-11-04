@@ -65,7 +65,6 @@ export const useHomeData = (): UseHomeDataReturn => {
   const loadData = useCallback(async () => {
     const result = await loadingState.executeApiCall(async () => {
       // Cargar productos
-      console.log('[useHomeData] Cargando productos desde:', getApiUrl('/products'));
       const productsResponse = await fetch(getApiUrl('/products'));
       if (!productsResponse.ok) {
         throw new Error('Error cargando productos');
@@ -73,29 +72,13 @@ export const useHomeData = (): UseHomeDataReturn => {
       
       const productsData = await productsResponse.json();
       
-      // Log detallado de la respuesta
+      // Procesar productos asegurando que sea un array
       let products: Product[] = [];
       if (Array.isArray(productsData.data)) {
         products = productsData.data;
       } else if (Array.isArray(productsData)) {
         products = productsData;
-      } else if (productsData.data && Array.isArray(productsData.data)) {
-        products = productsData.data;
       }
-      
-      console.log('[useHomeData] Respuesta de productos:', {
-        hasData: !!productsData.data,
-        isArray: Array.isArray(products),
-        dataLength: products.length,
-        productsKeys: Object.keys(productsData),
-        totalProducts: products.length,
-        firstProductName: products[0]?.name || 'N/A',
-        productsWithFeatured: products.filter((p: Product) => p.is_featured === true).length,
-        allProductNames: products.slice(0, 5).map((p: Product) => p.name)
-      });
-      
-      // Log completo de la estructura de la respuesta
-      console.log('[useHomeData] Estructura completa de respuesta:', JSON.stringify(productsData, null, 2).substring(0, 1000));
 
       // Cargar categorías y servicios en paralelo
       const [categoriesResponse, servicesResponse] = await Promise.allSettled([
@@ -117,58 +100,18 @@ export const useHomeData = (): UseHomeDataReturn => {
           categories = catData.data;
         } else if (Array.isArray(catData)) {
           categories = catData;
-        } else if (catData && typeof catData === 'object') {
-          // Si es un objeto, intentar extraer arrays
-          categories = [];
-          console.warn('[useHomeData] catData no es un array, estructura:', Object.keys(catData));
         }
-        
-        console.log('[useHomeData] Categorías cargadas:', {
-          isArray: Array.isArray(categories),
-          categoriesCount: categories.length,
-          categoryNames: Array.isArray(categories) ? categories.map((c: any) => `${c.name} (id: ${c.id}, parent_id: ${c.parent_id || 'null'})`) : [],
-          allCategories: Array.isArray(categories) ? categories.map((c: any) => ({
-            id: c.id,
-            name: c.name,
-            parent_id: c.parent_id
-          })) : []
-        });
         
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
         const cervezaCategory = categories.find((c: any) => c.name === "Cervezas" || c.name?.toLowerCase() === "cervezas");
         const cervezaSubcategory = categories.find((c: any) => (c.name === "Cerveza" || c.name?.toLowerCase() === "cerveza") && c.parent_id);
-        const comidasCategory = categories.find((c: any) => c.name === "Comidas" || c.name?.toLowerCase() === "comidas");
-        
-        console.log('[useHomeData] Categorías encontradas:', {
-          cervezaCategory: cervezaCategory?.name,
-          cervezaSubcategory: cervezaSubcategory?.name,
-          comidasCategory: comidasCategory?.name
-        });
         
         // Filtrar cervezas: productos de subcategoría "Cerveza" (destacados o todos)
         if (cervezaSubcategory) {
-          // Buscar productos que tengan subcategory_id = cervezaSubcategory.id O category_id = cervezaCategory.id
           featuredCervezas = products.filter((p: Product) => {
-            // Solo mostrar productos destacados
             const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
-            
             return isCerveza && p.is_featured === true;
-          });
-          
-          console.log('[useHomeData] Cervezas destacadas encontradas:', {
-            count: featuredCervezas.length,
-            nombres: featuredCervezas.map(p => p.name),
-            productosAnalizados: products.filter((p: Product) => {
-              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
-                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
-              return isCerveza;
-            }).map((p: Product) => ({
-              name: p.name,
-              is_featured: p.is_featured,
-              subcategory_id: p.subcategory_id,
-              category_id: p.category_id
-            }))
           });
           
           // Si no hay destacados, mostrar todos los de la categoría
@@ -178,37 +121,17 @@ export const useHomeData = (): UseHomeDataReturn => {
                                (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
               return isCerveza;
             });
-            console.log('[useHomeData] Usando todas las cervezas (sin filtrar por destacados):', featuredCervezas.length);
           }
           
           featuredCervezas = featuredCervezas.slice(0, 4);
-        } else {
-          console.log('[useHomeData] No se encontró subcategoría de cerveza');
-          featuredCervezas = [];
         }
 
         // Filtrar comidas: productos que NO sean cervezas y que sean destacados
         if (cervezaSubcategory) {
-          // Mostrar productos que NO sean de la subcategoría "Cerveza" NI de la categoría "Bebidas" y que sean destacados
           featuredComidas = products.filter((p: Product) => {
             const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
                              (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
             return !isCerveza && p.is_featured === true;
-          });
-          
-          console.log('[useHomeData] Comidas destacadas encontradas:', {
-            count: featuredComidas.length,
-            nombres: featuredComidas.map(p => p.name),
-            productosAnalizados: products.filter((p: Product) => {
-              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
-                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
-              return !isCerveza;
-            }).slice(0, 10).map((p: Product) => ({
-              name: p.name,
-              is_featured: p.is_featured,
-              subcategory_id: p.subcategory_id,
-              category_id: p.category_id
-            }))
           });
           
           // Si no hay destacados, mostrar todos los que NO sean cervezas
@@ -218,18 +141,10 @@ export const useHomeData = (): UseHomeDataReturn => {
                                (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
               return !isCerveza;
             });
-            console.log('[useHomeData] Usando todas las comidas (sin filtrar por destacados):', featuredComidas.length);
           }
           
           featuredComidas = featuredComidas.slice(0, 4);
-        } else {
-          console.log('[useHomeData] No se encontró subcategoría de cerveza para filtrar comidas');
-          featuredComidas = [];
         }
-      } else {
-        console.error('[useHomeData] Error cargando categorías:', categoriesResponse.reason);
-        featuredCervezas = [];
-        featuredComidas = [];
       }
 
       // Procesar servicios - solo servicios activos
@@ -248,44 +163,19 @@ export const useHomeData = (): UseHomeDataReturn => {
           }
           
           services = servicesArray.filter((s: Service) => s.is_active === true);
-          
-          console.log('[useHomeData] Servicios procesados:', {
-            isArray: Array.isArray(servicesArray),
-            totalServices: servicesArray.length,
-            activeServices: services.length
-          });
         } catch (err) {
-          console.error('[useHomeData] Error parseando servicios:', err);
           services = [];
         }
-      } else {
-        console.log('[useHomeData] Error cargando servicios:', servicesResponse.reason);
-        services = [];
       }
 
-      const finalData = {
+      return {
         featuredCervezas,
         featuredComidas,
         services,
       };
-      
-      console.log('[useHomeData] Datos finales a retornar:', {
-        cervezasCount: featuredCervezas.length,
-        cervezasNames: featuredCervezas.map(p => p.name),
-        comidasCount: featuredComidas.length,
-        comidasNames: featuredComidas.map(p => p.name),
-        servicesCount: services.length
-      });
-      
-      return finalData;
     }, 'Cargando datos de inicio...');
 
     if (result) {
-      console.log('[useHomeData] Datos guardados en estado:', {
-        cervezasCount: result.featuredCervezas?.length || 0,
-        comidasCount: result.featuredComidas?.length || 0,
-        servicesCount: result.services?.length || 0
-      });
       setData(result);
     }
   }, []);

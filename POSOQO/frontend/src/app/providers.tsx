@@ -19,14 +19,6 @@ function TokenSync() {
         const refreshToken = (session as any)?.refreshToken;
         const accessTokenExpires = (session as any)?.accessTokenExpires;
 
-        console.log('[TokenSync] Guardando tokens en key separada:', {
-          key: tokenKey,
-          hasAccessToken: !!accessToken,
-          accessTokenLength: accessToken?.length || 0,
-          hasRefreshToken: !!refreshToken,
-          hasExpiry: !!accessTokenExpires
-        });
-
         // Guardar tokens en una key separada
         const tokenData = {
           accessToken,
@@ -36,17 +28,8 @@ function TokenSync() {
         };
         
         localStorage.setItem(tokenKey, JSON.stringify(tokenData));
-        
-        // Verificar que se guardó correctamente
-        const verifyData = JSON.parse(localStorage.getItem(tokenKey) || '{}');
-        console.log('[TokenSync] Tokens sincronizados correctamente. Verificación:', {
-          hasAccessToken: !!verifyData.accessToken,
-          accessTokenLength: verifyData.accessToken?.length || 0,
-          hasRefreshToken: !!verifyData.refreshToken,
-          hasExpiry: !!verifyData.accessTokenExpires
-        });
       } catch (err) {
-        console.error('[TokenSync] Error sincronizando tokens:', err);
+        // Error silencioso
       }
     }, 100); // Delay de 100ms para dar tiempo a NextAuth
     
