@@ -243,24 +243,8 @@ const handler = NextAuth({
         }
       }
       
-      // Sincronizar tokens con localStorage si estamos en el cliente
-      if (typeof window !== "undefined") {
-        try {
-          const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
-          if (nextAuthKey) {
-            const currentData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
-            currentData.data = {
-              ...currentData.data,
-              accessToken: (session as any).accessToken,
-              refreshToken: (session as any).refreshToken,
-              accessTokenExpires: (session as any).accessTokenExpires,
-            };
-            localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
-          }
-        } catch (err) {
-          // Error silencioso al sincronizar tokens
-        }
-      }
+      // Nota: No podemos sincronizar con localStorage aquí porque este callback
+      // se ejecuta en el servidor. La sincronización se hace en el cliente.
       
       return session;
     },
