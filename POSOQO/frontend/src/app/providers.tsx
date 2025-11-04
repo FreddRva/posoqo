@@ -27,24 +27,25 @@ function TokenSync() {
         const refreshToken = (session as any)?.refreshToken;
         const accessTokenExpires = (session as any)?.accessTokenExpires;
 
-        console.log('[TokenSync] Sincronizando tokens con localStorage:', {
-          hasAccessToken: !!accessToken,
-          accessTokenLength: accessToken?.length || 0,
-          accessTokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : null,
-          hasRefreshToken: !!refreshToken,
-          hasExpiry: !!accessTokenExpires,
-          nextAuthKey: nextAuthKey,
-          currentDataKeys: Object.keys(currentData),
-          currentDataDataKeys: currentData.data ? Object.keys(currentData.data) : []
+        console.log('[TokenSync] Estructura actual:', {
+          hasEvent: !!currentData.event,
+          hasData: !!currentData.data,
+          dataKeys: currentData.data ? Object.keys(currentData.data) : [],
+          dataDataKeys: currentData.data?.data ? Object.keys(currentData.data.data) : []
         });
 
-        // Asegurar que data existe
+        // NextAuth guarda en formato {event: 'session', data: {...}, timestamp: ...}
+        // Necesitamos guardar en data.data para que sea compatible
         if (!currentData.data) {
           currentData.data = {};
         }
+        if (!currentData.data.data) {
+          currentData.data.data = {};
+        }
 
-        currentData.data = {
-          ...currentData.data,
+        // Guardar tokens en data.data.accessToken (estructura anidada correcta)
+        currentData.data.data = {
+          ...currentData.data.data,
           accessToken,
           refreshToken,
           accessTokenExpires,
@@ -57,10 +58,12 @@ function TokenSync() {
         const verifyData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
         console.log('[TokenSync] Tokens sincronizados correctamente. Verificación:', {
           hasData: !!verifyData.data,
-          hasAccessToken: !!verifyData.data?.accessToken,
-          accessTokenLength: verifyData.data?.accessToken?.length || 0,
+          hasDataData: !!verifyData.data?.data,
+          hasAccessToken: !!verifyData.data?.data?.accessToken,
+          accessTokenLength: verifyData.data?.data?.accessToken?.length || 0,
           verifyDataKeys: Object.keys(verifyData),
-          verifyDataDataKeys: verifyData.data ? Object.keys(verifyData.data) : []
+          verifyDataDataKeys: verifyData.data ? Object.keys(verifyData.data) : [],
+          verifyDataDataDataKeys: verifyData.data?.data ? Object.keys(verifyData.data.data) : []
         });
         } else {
           console.warn('[TokenSync] No se encontró key de nextauth en localStorage');

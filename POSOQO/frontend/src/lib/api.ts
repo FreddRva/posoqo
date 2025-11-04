@@ -26,8 +26,10 @@ async function getAuthToken(): Promise<string | null> {
         const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
         
         // Buscar el token en la estructura correcta de NextAuth
-        const token = data.data?.accessToken || data.accessToken || null;
-        const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
+        // NextAuth guarda en formato {event: 'session', data: {data: {...}}, timestamp: ...}
+        // También puede estar en data.data (estructura anidada) o directamente en data
+        const token = data.data?.data?.accessToken || data.data?.accessToken || data.accessToken || null;
+        const expiry = data.data?.data?.accessTokenExpires || data.data?.accessTokenExpires || data.accessTokenExpires;
         
         // Log detallado con stringify para ver contenido completo
         const dataStr = JSON.stringify(data, null, 2);
