@@ -30,10 +30,24 @@ export default function LoginPage() {
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [particles, setParticles] = useState<Array<{ left: number; top: number; delay: number; duration: number }>>([]);
+  const [mounted, setMounted] = useState(false);
   
   // Hooks
   const router = useRouter();
   const { data: session, status } = useSession();
+
+  // Generar partículas solo en el cliente
+  useEffect(() => {
+    setMounted(true);
+    const particlesData = Array.from({ length: 20 }, () => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 2,
+      duration: 3 + Math.random() * 2,
+    }));
+    setParticles(particlesData);
+  }, []);
 
   // Redirigir si ya está autenticado
   useEffect(() => {
@@ -162,20 +176,16 @@ export default function LoginPage() {
   };
 
   // Loading state
-  if (status === "loading") {
+  if (status === "loading" || !mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center relative z-10"
-        >
+        <div className="text-center relative z-10">
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400/30 border-t-yellow-400 mx-auto mb-6"></div>
             <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-2 border-yellow-400/20 mx-auto"></div>
           </div>
           <p className="text-white font-medium text-lg">Cargando...</p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -224,23 +234,23 @@ export default function LoginPage() {
           }}
         />
         
-        {/* Partículas de fondo */}
-        {[...Array(20)].map((_, i) => (
+        {/* Partículas de fondo - solo renderizar en cliente */}
+        {mounted && particles.map((particle, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-yellow-400/30 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
               y: [0, -30, 0],
               opacity: [0.3, 0.8, 0.3],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: particle.delay,
             }}
           />
         ))}
