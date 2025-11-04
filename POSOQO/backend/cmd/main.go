@@ -252,6 +252,7 @@ func main() {
 	admin.Delete("/services/test/:id", handlers.DeleteService)
 
 	// Gestión de categorías (protegidas)
+	admin.Get("/categories", handlers.ListCategories)
 	admin.Post("/categories", handlers.CreateCategory)
 	admin.Put("/categories/:id", handlers.UpdateCategory)
 	admin.Delete("/categories/:id", handlers.DeleteCategory)
@@ -322,6 +323,12 @@ func main() {
 	adminPublic.Put("/products/:id", handlers.UpdateProduct)
 	adminPublic.Post("/products", handlers.CreateProduct)
 	adminPublic.Delete("/products/:id", handlers.DeleteProduct)
+
+	// Rutas de administración de categorías
+	adminPublic.Get("/categories", handlers.ListCategories)
+	adminPublic.Post("/categories", handlers.CreateCategory)
+	adminPublic.Put("/categories/:id", handlers.UpdateCategory)
+	adminPublic.Delete("/categories/:id", handlers.DeleteCategory)
 
 	// Rutas de notificaciones para admin
 	adminPublic.Get("/notifications", handlers.GetNotifications)
