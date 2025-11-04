@@ -29,6 +29,8 @@ async function getAuthToken(): Promise<string | null> {
         const token = data.data?.accessToken || data.accessToken || null;
         const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
         
+        // Log detallado con stringify para ver contenido completo
+        const dataStr = JSON.stringify(data, null, 2);
         console.log(`[API] getAuthToken checking key "${nextAuthKey}":`, {
           hasToken: !!token,
           tokenLength: token?.length || 0,
@@ -42,8 +44,9 @@ async function getAuthToken(): Promise<string | null> {
           },
           dataAccessToken: data.data?.accessToken,
           directAccessToken: data.accessToken,
-          fullData: data
+          fullDataString: dataStr.substring(0, 500) // Primeros 500 caracteres para no saturar
         });
+        console.log(`[API] getAuthToken fullData for "${nextAuthKey}":`, data);
         
         // Si encontramos un token válido, retornarlo
         if (token && !isTokenExpired(expiry)) {

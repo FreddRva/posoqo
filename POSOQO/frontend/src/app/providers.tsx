@@ -8,11 +8,20 @@ function TokenSync() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (typeof window === "undefined" || !session) return;
+    if (typeof window === "undefined" || !session) return () => {};
 
-    try {
-      const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
-      if (nextAuthKey) {
+    // Pequeño delay para asegurar que NextAuth ya guardó su estructura inicial
+    const timeoutId = setTimeout(() => {
+      try {
+        // Buscar TODAS las keys de nextauth
+        const allNextAuthKeys = Object.keys(localStorage).filter(key => key.includes('nextauth'));
+        console.log('[TokenSync] Todas las keys de nextauth encontradas:', allNextAuthKeys);
+        
+        // Intentar con todas las keys, pero preferir la que tenga 'session' en el nombre
+        const sessionKey = allNextAuthKeys.find(key => key.includes('session')) || allNextAuthKeys[0];
+        const nextAuthKey = sessionKey || allNextAuthKeys.find(key => key.includes('nextauth'));
+        
+        if (nextAuthKey) {
         const currentData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
         const accessToken = (session as any)?.accessToken;
         const refreshToken = (session as any)?.refreshToken;
@@ -53,12 +62,15 @@ function TokenSync() {
           verifyDataKeys: Object.keys(verifyData),
           verifyDataDataKeys: verifyData.data ? Object.keys(verifyData.data) : []
         });
-      } else {
-        console.warn('[TokenSync] No se encontró key de nextauth en localStorage');
+        } else {
+          console.warn('[TokenSync] No se encontró key de nextauth en localStorage');
+        }
+      } catch (err) {
+        console.error('[TokenSync] Error sincronizando tokens:', err);
       }
-    } catch (err) {
-      console.error('[TokenSync] Error sincronizando tokens:', err);
-    }
+    }, 100); // Delay de 100ms para dar tiempo a NextAuth
+    
+    return () => clearTimeout(timeoutId);
   }, [session]);
 
   return null;
