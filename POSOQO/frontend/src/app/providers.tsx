@@ -21,9 +21,18 @@ function TokenSync() {
         console.log('[TokenSync] Sincronizando tokens con localStorage:', {
           hasAccessToken: !!accessToken,
           accessTokenLength: accessToken?.length || 0,
+          accessTokenPreview: accessToken ? `${accessToken.substring(0, 20)}...` : null,
           hasRefreshToken: !!refreshToken,
-          hasExpiry: !!accessTokenExpires
+          hasExpiry: !!accessTokenExpires,
+          nextAuthKey: nextAuthKey,
+          currentDataKeys: Object.keys(currentData),
+          currentDataDataKeys: currentData.data ? Object.keys(currentData.data) : []
         });
+
+        // Asegurar que data existe
+        if (!currentData.data) {
+          currentData.data = {};
+        }
 
         currentData.data = {
           ...currentData.data,
@@ -31,8 +40,19 @@ function TokenSync() {
           refreshToken,
           accessTokenExpires,
         };
-        localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
-        console.log('[TokenSync] Tokens sincronizados correctamente');
+        
+        const savedData = JSON.stringify(currentData);
+        localStorage.setItem(nextAuthKey, savedData);
+        
+        // Verificar que se guardó correctamente
+        const verifyData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
+        console.log('[TokenSync] Tokens sincronizados correctamente. Verificación:', {
+          hasData: !!verifyData.data,
+          hasAccessToken: !!verifyData.data?.accessToken,
+          accessTokenLength: verifyData.data?.accessToken?.length || 0,
+          verifyDataKeys: Object.keys(verifyData),
+          verifyDataDataKeys: verifyData.data ? Object.keys(verifyData.data) : []
+        });
       } else {
         console.warn('[TokenSync] No se encontró key de nextauth en localStorage');
       }

@@ -27,6 +27,7 @@ async function getAuthToken(): Promise<string | null> {
       const token = data.data?.accessToken || data.accessToken || null;
       const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
       
+      // Log detallado de la estructura
       console.log('[API] getAuthToken localStorage data:', {
         hasToken: !!token,
         tokenLength: token?.length || 0,
@@ -37,7 +38,10 @@ async function getAuthToken(): Promise<string | null> {
           hasAccessToken: !!data.accessToken,
           keys: Object.keys(data),
           dataKeys: data.data ? Object.keys(data.data) : []
-        }
+        },
+        fullData: data, // Log completo para debug
+        dataAccessToken: data.data?.accessToken,
+        directAccessToken: data.accessToken
       });
       
       // Validar que el token no esté expirado
