@@ -33,9 +33,19 @@ export const useCheckoutProfile = () => {
       return;
     }
     
-    if (status === "authenticated" && session?.accessToken) {
+    if (status === "authenticated" && session) {
+      // Obtener accessToken de la sesión
+      const accessToken = (session as any)?.accessToken;
+      
+      if (!accessToken) {
+        // Si no hay accessToken, intentar obtenerlo del localStorage o esperar un poco
+        setLoading(false);
+        setError("No se pudo obtener el token de autenticación");
+        return;
+      }
+      
       try {
-        const profileData = await apiFetch("/profile", { authToken: session.accessToken });
+        const profileData = await apiFetch("/profile", { authToken: accessToken });
         const profile = profileData as Profile;
         
         setProfile(profile);
@@ -51,11 +61,16 @@ export const useCheckoutProfile = () => {
         setError("Error cargando perfil");
         setLoading(false);
       }
+    } else if (status === "loading") {
+      // Aún cargando la sesión
+      setLoading(true);
     }
   };
 
   const updateProfile = async () => {
-    if (!session?.accessToken) return;
+    if (!session) return;
+    const accessToken = (session as any)?.accessToken;
+    if (!accessToken) return;
     
     setSaving(true);
     setError(null);
@@ -71,7 +86,7 @@ export const useCheckoutProfile = () => {
 
       await apiFetch("/profile", {
         method: "PUT",
-        authToken: session.accessToken,
+        authToken: accessToken,
         body: JSON.stringify(profileData)
       });
 

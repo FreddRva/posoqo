@@ -50,10 +50,15 @@ export default function ProfilePage() {
   // Cargar datos del perfil desde la API
   useEffect(() => {
     async function fetchProfile() {
-      if (status === "authenticated") {
+      if (status === "authenticated" && session) {
         setLoading(true);
         try {
-          const profileData = await apiFetch<any>("/profile", { method: "GET" });
+          // Obtener accessToken de la sesión
+          const accessToken = (session as any)?.accessToken;
+          const profileData = await apiFetch<any>("/profile", { 
+            method: "GET",
+            authToken: accessToken 
+          });
           setProfile(profileData);
           setForm({
             name: (profileData as any).name || "",
@@ -72,23 +77,30 @@ export default function ProfilePage() {
       }
     }
     fetchProfile();
-  }, [status]);
+  }, [status, session]);
 
   useEffect(() => {
     // Cargar historial de pedidos
     async function fetchOrders() {
-      setLoadingOrders(true);
-      try {
-        const res = await apiFetch<any[]>("/orders", { method: "GET" });
-        setOrders(res);
-      } catch {
-        setOrders([]);
-      } finally {
-        setLoadingOrders(false);
+      if (status === "authenticated" && session) {
+        setLoadingOrders(true);
+        try {
+          // Obtener accessToken de la sesión
+          const accessToken = (session as any)?.accessToken;
+          const res = await apiFetch<any[]>("/orders", { 
+            method: "GET",
+            authToken: accessToken 
+          });
+          setOrders(res);
+        } catch {
+          setOrders([]);
+        } finally {
+          setLoadingOrders(false);
+        }
       }
     }
-    if (status === "authenticated") fetchOrders();
-  }, [status]);
+    fetchOrders();
+  }, [status, session]);
 
   if (status === "loading" || loading) {
     return <div className="text-center mt-20">Cargando perfil...</div>;
@@ -107,10 +119,14 @@ export default function ProfilePage() {
 
   async function handleEditSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!session) return;
+    
     try {
+      const accessToken = (session as any)?.accessToken;
       const updatedProfile = await apiFetch("/profile", {
         method: "PUT",
         body: JSON.stringify(form),
+        authToken: accessToken,
       });
       setProfile(updatedProfile);
       setEditing(false);

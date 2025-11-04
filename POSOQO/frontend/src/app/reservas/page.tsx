@@ -85,7 +85,10 @@ export default function ReservationsPage() {
     
     try {
       setLoading(true);
-      const response = await apiFetch<{ reservations: any[]; pagination: any }>('/protected/reservations');
+      const accessToken = (session as any)?.accessToken;
+      const response = await apiFetch<{ reservations: any[]; pagination: any }>('/protected/reservations', {
+        authToken: accessToken
+      });
       console.log('🔍 [RESERVATIONS] Respuesta del backend:', response);
       
       if (response.reservations) {
@@ -111,10 +114,11 @@ export default function ReservationsPage() {
 
     try {
       setSubmitting(true);
+      const accessToken = (session as any)?.accessToken;
       await apiFetch('/protected/reservations', {
         method: 'POST',
         body: JSON.stringify(formData),
-        authToken: session?.accessToken
+        authToken: accessToken
       });
       
       setFormData({ 
