@@ -39,16 +39,21 @@ async function getAuthToken(): Promise<string | null> {
           hasExpiry: !!expiry,
           isExpired: expiry ? isTokenExpired(expiry) : 'unknown',
           dataStructure: {
+            hasDataDataAccessToken: !!data.data?.data?.accessToken,
             hasDataAccessToken: !!data.data?.accessToken,
             hasAccessToken: !!data.accessToken,
             keys: Object.keys(data),
-            dataKeys: data.data ? Object.keys(data.data) : []
+            dataKeys: data.data ? Object.keys(data.data) : [],
+            dataDataKeys: data.data?.data ? Object.keys(data.data.data) : []
           },
+          dataDataAccessToken: data.data?.data?.accessToken,
           dataAccessToken: data.data?.accessToken,
           directAccessToken: data.accessToken,
           fullDataString: dataStr.substring(0, 500) // Primeros 500 caracteres para no saturar
         });
         console.log(`[API] getAuthToken fullData for "${nextAuthKey}":`, data);
+        console.log(`[API] getAuthToken data.data for "${nextAuthKey}":`, data.data);
+        console.log(`[API] getAuthToken data.data.data for "${nextAuthKey}":`, data.data?.data);
         
         // Si encontramos un token válido, retornarlo
         if (token && !isTokenExpired(expiry)) {
