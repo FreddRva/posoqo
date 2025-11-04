@@ -111,10 +111,7 @@ func main() {
 	api.Get("/categories", handlers.ListCategories)
 	api.Get("/categories/hierarchy", handlers.GetCategoriesWithSubcategories)
 
-	// Rutas temporales para categorías (sin autenticación para testing)
-	api.Post("/admin/categories", handlers.CreateCategory)
-	api.Put("/admin/categories/:id", handlers.UpdateCategory)
-	api.Delete("/admin/categories/:id", handlers.DeleteCategory)
+	// Rutas de categorías admin (protegidas - se manejan en el grupo admin más abajo)
 
 	// Endpoint de geocoding (público) - funciones que no existen, comentadas
 	// api.Get("/geocoding/search", handlers.SearchAddress)
@@ -193,10 +190,7 @@ func main() {
 	protected.Put("/notifications/read-all", handlers.MarkAllNotificationsAsRead)
 	protected.Get("/notifications/stats", handlers.GetNotificationStats)
 
-	// Rutas de notificaciones para admin
-	api.Get("/admin/notifications", handlers.GetNotifications)
-	api.Put("/admin/notifications/read-all", handlers.MarkAllNotificationsAsRead)
-	api.Get("/admin/notifications/stats", handlers.GetNotificationStats)
+	// Rutas de notificaciones para admin (protegidas - se manejan más abajo)
 
 	// Rutas públicas para favoritos (devuelven datos vacíos si no hay usuario autenticado)
 	api.Get("/favorites", handlers.ListFavoritesPublic)
@@ -259,20 +253,8 @@ func main() {
 	// Ruta protegida para obtener usuario por email
 	protected.Get("/users/by-email/:email", handlers.GetUserByEmail)
 
-	// Ruta de prueba temporal para DELETE de servicios (sin middleware admin)
-	protected.Delete("/services-debug/:id", handlers.DeleteService)
-
 	// Documentación Swagger
 	app.Get("/swagger/*", swagger.HandlerDefault)
-
-	// Ruta de salud
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":  "ok",
-			"message": "POSOQO API funcionando correctamente",
-			"version": "1.0.0",
-		})
-	})
 
 	// Endpoints de salud y monitoreo
 	app.Get("/test", func(c *fiber.Ctx) error {
@@ -282,39 +264,42 @@ func main() {
 		})
 	})
 
-	// Endpoints públicos para dashboard (con validación de roles)
-	api.Get("/admin/products", handlers.GetAdminProductsPublic)
-	api.Get("/admin/orders", handlers.GetAdminOrdersPublic)
-	api.Get("/admin/users", handlers.GetAdminUsersPublic)
-	api.Get("/admin/reservations", handlers.ListAllReservations)
-	api.Put("/admin/reservations/:id/status", handlers.UpdateReservationStatus)
+	// Endpoints públicos para dashboard (protegidos con autenticación y validación de roles)
+	adminPublic := api.Group("/admin")
+	adminPublic.Use(middleware.AuthMiddleware())
+	adminPublic.Use(middleware.RequireRole("admin"))
+
+	adminPublic.Get("/products", handlers.GetAdminProductsPublic)
+	adminPublic.Get("/orders", handlers.GetAdminOrdersPublic)
+	adminPublic.Get("/users", handlers.GetAdminUsersPublic)
+	adminPublic.Get("/reservations", handlers.ListAllReservations)
+	adminPublic.Put("/reservations/:id/status", handlers.UpdateReservationStatus)
 
 	// Rutas de reclamos para admin
-	api.Get("/admin/complaints", handlers.ListComplaints)
-	api.Put("/admin/complaints/:id/status", handlers.UpdateComplaintStatus)
+	adminPublic.Get("/complaints", handlers.ListComplaints)
+	adminPublic.Put("/complaints/:id/status", handlers.UpdateComplaintStatus)
 
 	// Endpoints para listas de administración
-	api.Get("/admin/products/list", handlers.GetAdminProductsListPublic)
-	api.Get("/admin/services/list", handlers.GetAdminServicesListPublic)
-	api.Get("/admin/orders/list", handlers.GetAdminOrdersListPublic)
-	api.Put("/admin/orders/:id/status", handlers.UpdateOrderStatus)
-	api.Get("/admin/users/list", handlers.GetAdminUsersPublic)
-	api.Put("/admin/users/:id", handlers.UpdateUserAdmin)
-	api.Put("/admin/users/:id/suspend", handlers.SuspendUserAdmin)
-	api.Put("/admin/users/:id/reactivate", handlers.ReactivateUserAdmin)
-	api.Put("/admin/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
+	adminPublic.Get("/products/list", handlers.GetAdminProductsListPublic)
+	adminPublic.Get("/services/list", handlers.GetAdminServicesListPublic)
+	adminPublic.Get("/orders/list", handlers.GetAdminOrdersListPublic)
+	adminPublic.Put("/orders/:id/status", handlers.UpdateOrderStatus)
+	adminPublic.Get("/users/list", handlers.GetAdminUsersPublic)
+	adminPublic.Put("/users/:id", handlers.UpdateUserAdmin)
+	adminPublic.Put("/users/:id/suspend", handlers.SuspendUserAdmin)
+	adminPublic.Put("/users/:id/reactivate", handlers.ReactivateUserAdmin)
+	adminPublic.Put("/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
 
 	// Rutas de administración de productos
-	api.Put("/admin/products/:id", handlers.UpdateProduct)
-	api.Post("/admin/products", handlers.CreateProduct)
-	api.Delete("/admin/products/:id", handlers.DeleteProduct)
+	adminPublic.Put("/products/:id", handlers.UpdateProduct)
+	adminPublic.Post("/products", handlers.CreateProduct)
+	adminPublic.Delete("/products/:id", handlers.DeleteProduct)
 
 	// Rutas de notificaciones para admin
-	api.Get("/admin/notifications", handlers.GetNotifications)
-	api.Post("/admin/notifications", handlers.CreateNotification)
-	api.Put("/admin/notifications/:id/read", handlers.MarkNotificationAsRead)
-	api.Get("/admin/notifications/stats", handlers.GetNotificationStats)
-	api.Put("/admin/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
+	adminPublic.Get("/notifications", handlers.GetNotifications)
+	adminPublic.Post("/notifications", handlers.CreateNotification)
+	adminPublic.Put("/notifications/:id/read", handlers.MarkNotificationAsRead)
+	adminPublic.Get("/notifications/stats", handlers.GetNotificationStats)
 
 	// Rutas de notificaciones para usuarios normales
 	api.Get("/notifications", handlers.GetNotifications)
@@ -325,8 +310,8 @@ func main() {
 	// Rutas de reclamos públicas
 	api.Post("/complaints", handlers.CreateComplaint)
 
-	// Endpoint de monitoreo para admin
-	api.Get("/admin/health", func(c *fiber.Ctx) error {
+	// Endpoint de monitoreo para admin (protegido)
+	adminPublic.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message":   "Panel de administración funcionando",
 			"status":    "ok",

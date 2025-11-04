@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -55,15 +54,10 @@ var CorsConfig = cors.Config{
 // Middleware de autenticación mejorado
 func AuthMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		log.Printf("🔐 [AUTH] AuthMiddleware - Verificando autenticación para: %s %s", c.Method(), c.Path())
-		log.Printf("🔐 [AUTH] AuthMiddleware - Headers: %v", c.GetReqHeaders())
-
 		// Obtener el token del header Authorization
 		authHeader := c.Get("Authorization")
-		log.Printf("🔐 [AUTH] AuthMiddleware - Authorization header: %s", authHeader)
 
 		if authHeader == "" {
-			log.Printf("🔐 [AUTH] AuthMiddleware - Error: Token de autorización requerido")
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token de autorización requerido",
 			})
@@ -117,7 +111,6 @@ func AuthMiddleware() fiber.Handler {
 		}
 
 		if !token.Valid {
-			fmt.Println("[AuthMiddleware] Token inválido")
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token inválido",
 				"code":  "INVALID_TOKEN",
@@ -144,7 +137,6 @@ func AuthMiddleware() fiber.Handler {
 		// Verificar expiración
 		exp, ok := claims["exp"].(float64)
 		if !ok {
-			fmt.Println("[AuthMiddleware] Token sin expiración")
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token sin expiración",
 				"code":  "NO_EXPIRATION",
@@ -152,7 +144,6 @@ func AuthMiddleware() fiber.Handler {
 		}
 
 		if time.Now().Unix() > int64(exp) {
-			fmt.Println("[AuthMiddleware] Token expirado")
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token expirado",
 				"code":  "TOKEN_EXPIRED",
