@@ -4,7 +4,6 @@ import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { motion, AnimatePresence } from "framer-motion";
 
 // Tipos
 interface LoginForm {
@@ -222,85 +221,35 @@ export default function LoginPage() {
       </div>
 
       {/* Contenedor principal */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-md relative z-10"
-      >
+      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
         {/* Card del formulario con glassmorphism mejorado */}
         <div className="relative">
           {/* Borde brillante animado */}
-          <motion.div
-            className="absolute inset-0 rounded-3xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 opacity-20 blur-xl"
-            animate={{
-              opacity: [0.2, 0.3, 0.2],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 opacity-20 blur-xl animate-pulse-glow" />
           
           <div className="relative bg-gray-900/80 backdrop-blur-2xl border border-gray-800/50 rounded-3xl p-8 shadow-2xl">
             {/* Efecto de luz interior */}
             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-yellow-400/5 via-transparent to-transparent pointer-events-none" />
             
             {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-center mb-8"
-            >
+            <div className="text-center mb-8 animate-fade-in">
               {/* Logo/Título POSOQO con efecto especial */}
-              <motion.h1
-                className="text-6xl md:text-7xl font-black mb-2 relative"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-              >
+              <h1 className="text-6xl md:text-7xl font-black mb-2 relative animate-scale-in">
                 <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
                   POSOQO
                 </span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-yellow-400/50 via-yellow-300/50 to-yellow-400/50 blur-xl"
-                  animate={{
-                    opacity: [0.5, 0.8, 0.5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-gray-400 font-medium text-sm tracking-wider uppercase"
-              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/50 via-yellow-300/50 to-yellow-400/50 blur-xl animate-pulse-slow" />
+              </h1>
+              <p className="text-gray-400 font-medium text-sm tracking-wider uppercase animate-fade-in-delayed">
                 Cervezas Artesanales Ayacuchanas
-              </motion.p>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent mt-4"
-              />
-            </motion.div>
+              </p>
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent mt-4 animate-width-expand" />
+            </div>
 
             {/* Formulario */}
             <form onSubmit={handleEmailLogin} className="space-y-6">
               {/* Campo Email */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-2"
-              >
+              <div className="space-y-2 animate-slide-in-left">
                 <label htmlFor="email" className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
                   Correo Electrónico
                 </label>
@@ -320,30 +269,18 @@ export default function LoginPage() {
                   />
                   <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-400/10 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${errors.email ? 'hidden' : ''}`} />
                 </div>
-                <AnimatePresence>
-                  {errors.email && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10, height: 0 }}
-                      animate={{ opacity: 1, y: 0, height: "auto" }}
-                      exit={{ opacity: 0, y: -10, height: 0 }}
-                      className="text-red-400 text-xs flex items-center font-medium mt-1"
-                    >
-                      <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      {errors.email}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                {errors.email && (
+                  <p className="text-red-400 text-xs flex items-center font-medium mt-1 animate-fade-in">
+                    <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
+                  </p>
+                )}
+              </div>
 
               {/* Campo Contraseña */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="space-y-2"
-              >
+              <div className="space-y-2 animate-slide-in-left-delayed">
                 <label htmlFor="password" className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
                   Contraseña
                 </label>
@@ -375,120 +312,73 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
-                <AnimatePresence>
-                  {errors.password && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10, height: 0 }}
-                      animate={{ opacity: 1, y: 0, height: "auto" }}
-                      exit={{ opacity: 0, y: -10, height: 0 }}
-                      className="text-red-400 text-xs flex items-center font-medium mt-1"
-                    >
-                      <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      {errors.password}
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+                {errors.password && (
+                  <p className="text-red-400 text-xs flex items-center font-medium mt-1 animate-fade-in">
+                    <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password}
+                  </p>
+                )}
+              </div>
 
               {/* Errores */}
-              <AnimatePresence>
-                {generalError && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: "auto" }}
-                    exit={{ opacity: 0, y: -10, height: 0 }}
-                    className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm"
-                  >
-                    <p className="text-red-400 text-sm font-medium flex items-center">
-                      <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                      {generalError}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {generalError && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm animate-fade-in">
+                  <p className="text-red-400 text-sm font-medium flex items-center">
+                    <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    {generalError}
+                  </p>
+                </div>
+              )}
 
               {/* Email no verificado */}
-              <AnimatePresence>
-                {unverifiedEmail && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: "auto" }}
-                    exit={{ opacity: 0, y: -10, height: 0 }}
-                    className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm"
+              {unverifiedEmail && (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm animate-fade-in">
+                  <p className="text-yellow-300 text-sm font-semibold mb-3">
+                    Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
+                  </p>
+                  <button
+                    onClick={handleResendVerification}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold px-4 py-3 rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-200 shadow-lg hover:shadow-yellow-400/30 active:scale-95 disabled:opacity-50"
+                    disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
                   >
-                    <p className="text-yellow-300 text-sm font-semibold mb-3">
-                      Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
+                    Reenviar email de verificación
+                  </button>
+                  {resendStatus && (
+                    <p className={`mt-3 text-xs font-medium animate-fade-in ${
+                      resendStatus.startsWith('¡Email') ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {resendStatus}
                     </p>
-                    <button
-                      onClick={handleResendVerification}
-                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold px-4 py-3 rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-200 shadow-lg hover:shadow-yellow-400/30 active:scale-95 disabled:opacity-50"
-                      disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
-                    >
-                      Reenviar email de verificación
-                    </button>
-                    {resendStatus && (
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`mt-3 text-xs font-medium ${
-                          resendStatus.startsWith('¡Email') ? 'text-green-400' : 'text-red-400'
-                        }`}
-                      >
-                        {resendStatus}
-                      </motion.p>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  )}
+                </div>
+              )}
 
               {/* Botón de login */}
-              <motion.button
+              <button
                 type="submit"
                 disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 text-black font-black py-4 px-6 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl hover:shadow-yellow-400/50"
+                className="w-full relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 text-black font-black py-4 px-6 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl hover:shadow-yellow-400/50 hover:scale-[1.02] active:scale-[0.98]"
               >
                 {/* Efecto de brillo animado */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{
-                    x: ["-100%", "100%"],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "linear",
-                    repeatDelay: 0.5,
-                  }}
-                />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" />
                 
                 {loading ? (
                   <div className="flex items-center justify-center relative z-10">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="rounded-full h-5 w-5 border-2 border-black border-t-transparent mr-3"
-                    />
+                    <div className="rounded-full h-5 w-5 border-2 border-black border-t-transparent mr-3 animate-spin" />
                     <span className="font-bold text-base">Iniciando sesión...</span>
                   </div>
                 ) : (
                   <span className="relative z-10 font-black text-base tracking-wide">INICIAR SESIÓN</span>
                 )}
-              </motion.button>
+              </button>
             </form>
 
             {/* Separador elegante */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="relative my-8"
-            >
+            <div className="relative my-8 animate-fade-in-delayed-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-700/50"></div>
               </div>
@@ -497,15 +387,13 @@ export default function LoginPage() {
                   <span className="text-gray-500 font-medium text-xs">o continúa con</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Botón de Google mejorado */}
-            <motion.button
+            <button
               onClick={handleGoogleLogin}
               disabled={loading}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-700/50 rounded-xl text-base font-bold text-white bg-gray-800/30 hover:bg-gray-800/50 hover:border-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm group"
+              className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-700/50 rounded-xl text-base font-bold text-white bg-gray-800/30 hover:bg-gray-800/50 hover:border-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm group hover:scale-[1.02] active:scale-[0.98]"
             >
               <svg className="h-6 w-6 mr-3 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -514,15 +402,10 @@ export default function LoginPage() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               <span>CONTINUAR CON GOOGLE</span>
-            </motion.button>
+            </button>
 
             {/* Enlaces */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="mt-8 text-center space-y-4"
-            >
+            <div className="mt-8 text-center space-y-4 animate-fade-in-delayed-3">
               <div>
                 <p className="text-gray-400 text-sm mb-3">
                   ¿No tienes una cuenta?
@@ -549,10 +432,10 @@ export default function LoginPage() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
