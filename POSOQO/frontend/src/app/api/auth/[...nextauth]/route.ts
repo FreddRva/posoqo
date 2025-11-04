@@ -2,7 +2,23 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+// Obtener el secret de manera segura
+const getNextAuthSecret = () => {
+  if (process.env.NEXTAUTH_SECRET) {
+    return process.env.NEXTAUTH_SECRET;
+  }
+  
+  if (process.env.NODE_ENV === 'development') {
+    return 'posoqo-nextauth-secret-key-development-only';
+  }
+  
+  // En producción, NextAuth generará un warning si no hay secret
+  // pero no lanzará un error inmediato que rompa el bundle del cliente
+  return undefined;
+};
+
 const handler = NextAuth({
+  secret: getNextAuthSecret(),
   providers: [
     // Provider para login con Google
     GoogleProvider({

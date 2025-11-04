@@ -19,11 +19,6 @@ export const config = {
   
   // Configuración de autenticación
   auth: {
-    secret: process.env.NEXTAUTH_SECRET || (process.env.NODE_ENV === 'production' 
-      ? (() => { 
-          throw new Error('NEXTAUTH_SECRET debe estar configurado en producción');
-        })()
-      : 'posoqo-nextauth-secret-key-development-only'),
     // Tiempo de expiración del token (en segundos)
     tokenExpiry: 3600, // 1 hora
     // Tiempo de expiración del refresh token (en segundos)
