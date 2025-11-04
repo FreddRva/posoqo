@@ -59,6 +59,7 @@ func main() {
 	// Middleware global
 	app.Use(recover.New())
 	app.Use(logger.New())
+	app.Use(middleware.ErrorHandler()) // Agregar manejo de errores
 	app.Use(middleware.SecurityHeaders())
 	app.Use(middleware.SecurityLogger())
 	app.Use(cors.New(middleware.CorsConfig))
@@ -97,15 +98,10 @@ func main() {
 	api.Get("/categories", handlers.ListCategories)
 	api.Get("/categories/hierarchy", handlers.GetCategoriesWithSubcategories)
 
-	// Rutas temporales para categorías (sin autenticación para testing)
-	api.Post("/admin/categories", handlers.CreateCategory)
-	api.Put("/admin/categories/:id", handlers.UpdateCategory)
-	api.Delete("/admin/categories/:id", handlers.DeleteCategory)
-
 	// Endpoint de geocoding (público) - funciones que no existen, comentadas
 	// api.Get("/geocoding/search", handlers.SearchAddress)
 	// api.Get("/geocoding/reverse", handlers.ReverseAddress)
-	
+
 	// Nuevos endpoints de geocoding para el mapa
 	api.Post("/geocoding/search-location", handlers.SearchLocation)
 	api.Post("/geocoding/reverse-geocoding", handlers.ReverseGeocoding)
@@ -119,21 +115,14 @@ func main() {
 	ai.Post("/search", handlers.SmartSearchHandler)
 	ai.Post("/pairing", handlers.PairingAssistantHandler)
 	ai.Post("/sentiment", handlers.AnalyzeSentimentHandler)
-	
+
 	// Rutas de IA protegidas (requiere autenticación)
 	aiAdmin := api.Group("/ai/admin")
 	aiAdmin.Use(middleware.AuthMiddleware())
 	aiAdmin.Post("/generate-description", handlers.GenerateProductDescriptionHandler)
 	aiAdmin.Get("/analytics", handlers.PredictiveAnalyticsHandler)
 
-	// Endpoint de pago con Stripe
-	api.Post("/pay", handlers.CreateStripeCheckout)
-	api.Post("/create-payment-intent", middleware.AuthMiddleware(), handlers.CreateStripePaymentIntent)
-	api.Post("/stripe/webhook", handlers.StripeWebhook)
-
-	// Historial de pagos y reembolsos
-	api.Get("/payments", handlers.GetPaymentHistory)
-	api.Post("/payments/refund", handlers.CreateRefund)
+	// Endpoints de pago (ya definidos más abajo, no duplicar)
 
 	// Ruta de prueba para verificar conexión a base de datos (mover fuera del grupo /api)
 
@@ -179,11 +168,6 @@ func main() {
 	protected.Put("/notifications/read-all", handlers.MarkAllNotificationsAsRead)
 	protected.Get("/notifications/stats", handlers.GetNotificationStats)
 
-	// Rutas de notificaciones para admin
-	api.Get("/admin/notifications", handlers.GetNotifications)
-	api.Put("/admin/notifications/read-all", handlers.MarkAllNotificationsAsRead)
-	api.Get("/admin/notifications/stats", handlers.GetNotificationStats)
-
 	// Rutas públicas para favoritos (devuelven datos vacíos si no hay usuario autenticado)
 	api.Get("/favorites", handlers.ListFavoritesPublic)
 
@@ -212,9 +196,6 @@ func main() {
 	admin.Put("/services/:id", handlers.UpdateService)
 	admin.Delete("/services/:id", handlers.DeleteService)
 
-	// Ruta de prueba temporal para DELETE
-	admin.Delete("/services/test/:id", handlers.DeleteService)
-
 	// Gestión de categorías (protegidas)
 	admin.Post("/categories", handlers.CreateCategory)
 	admin.Put("/categories/:id", handlers.UpdateCategory)
@@ -242,77 +223,8 @@ func main() {
 	admin.Get("/orders", handlers.GetAdminOrders)
 	admin.Get("/users", handlers.GetAdminUsers)
 
-	// Ruta protegida para obtener usuario por email
-	protected.Get("/users/by-email/:email", handlers.GetUserByEmail)
-
-	// Ruta de prueba temporal para DELETE de servicios (sin middleware admin)
-	protected.Delete("/services-debug/:id", handlers.DeleteService)
-
-	// Documentación Swagger
-	app.Get("/swagger/*", swagger.HandlerDefault)
-
-	// Ruta de salud
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"status":  "ok",
-			"message": "POSOQO API funcionando correctamente",
-			"version": "1.0.0",
-		})
-	})
-
-	// Endpoints de salud y monitoreo
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "API funcionando correctamente",
-			"status":  "ok",
-		})
-	})
-
-	// Endpoints públicos para dashboard (con validación de roles)
-	api.Get("/admin/products", handlers.GetAdminProductsPublic)
-	api.Get("/admin/orders", handlers.GetAdminOrdersPublic)
-	api.Get("/admin/users", handlers.GetAdminUsersPublic)
-	api.Get("/admin/reservations", handlers.ListAllReservations)
-	api.Put("/admin/reservations/:id/status", handlers.UpdateReservationStatus)
-
-	// Rutas de reclamos para admin
-	api.Get("/admin/complaints", handlers.ListComplaints)
-	api.Put("/admin/complaints/:id/status", handlers.UpdateComplaintStatus)
-
-	// Endpoints para listas de administración
-	api.Get("/admin/products/list", handlers.GetAdminProductsListPublic)
-	api.Get("/admin/services/list", handlers.GetAdminServicesListPublic)
-	api.Get("/admin/orders/list", handlers.GetAdminOrdersListPublic)
-	api.Put("/admin/orders/:id/status", handlers.UpdateOrderStatus)
-	api.Get("/admin/users/list", handlers.GetAdminUsersPublic)
-	api.Put("/admin/users/:id", handlers.UpdateUserAdmin)
-	api.Put("/admin/users/:id/suspend", handlers.SuspendUserAdmin)
-	api.Put("/admin/users/:id/reactivate", handlers.ReactivateUserAdmin)
-	api.Put("/admin/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
-
-	// Rutas de administración de productos
-	api.Put("/admin/products/:id", handlers.UpdateProduct)
-	api.Post("/admin/products", handlers.CreateProduct)
-	api.Delete("/admin/products/:id", handlers.DeleteProduct)
-
-	// Rutas de notificaciones para admin
-	api.Get("/admin/notifications", handlers.GetNotifications)
-	api.Post("/admin/notifications", handlers.CreateNotification)
-	api.Put("/admin/notifications/:id/read", handlers.MarkNotificationAsRead)
-	api.Get("/admin/notifications/stats", handlers.GetNotificationStats)
-	api.Put("/admin/notifications/:type/read-all", handlers.MarkNotificationsAsReadByType)
-
-	// Rutas de notificaciones para usuarios normales
-	api.Get("/notifications", handlers.GetNotifications)
-	api.Post("/notifications", handlers.CreateNotification)
-	api.Put("/notifications/:id/read", handlers.MarkNotificationAsRead)
-	api.Get("/notifications/stats", handlers.GetNotificationStats)
-
-	// Rutas de reclamos públicas
-	api.Post("/complaints", handlers.CreateComplaint)
-
 	// Endpoint de monitoreo para admin
-	api.Get("/admin/health", func(c *fiber.Ctx) error {
+	admin.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message":   "Panel de administración funcionando",
 			"status":    "ok",
@@ -320,7 +232,13 @@ func main() {
 		})
 	})
 
-	// Health check endpoint para verificar que el servidor esté funcionando
+	// Ruta protegida para obtener usuario por email
+	protected.Get("/users/by-email/:email", handlers.GetUserByEmail)
+
+	// Documentación Swagger
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	// Health check endpoint único - verifica conexión a base de datos
 	app.Get("/health", func(c *fiber.Ctx) error {
 		// Verificar conexión a base de datos
 		if err := db.DB.Ping(context.Background()); err != nil {
@@ -341,34 +259,34 @@ func main() {
 		})
 	})
 
-	// Ruta de prueba para verificar conexión a base de datos (sin /api)
-	app.Get("/test-db", handlers.TestDatabaseConnection)
-	app.Get("/test-users", handlers.TestUsersConnection)
-	app.Get("/test-table-structure", handlers.TestTableStructure)
-	app.Get("/test-user-exists", handlers.TestUserExists)
-	app.Get("/test-orders-location", handlers.TestOrdersLocation)
-	app.Get("/run-migrations", handlers.RunMigrations)
+	// Rutas de prueba (solo en desarrollo)
+	if os.Getenv("NODE_ENV") != "production" {
+		app.Get("/test-db", handlers.TestDatabaseConnection)
+		app.Get("/test-users", handlers.TestUsersConnection)
+		app.Get("/test-table-structure", handlers.TestTableStructure)
+		app.Get("/test-user-exists", handlers.TestUserExists)
+		app.Get("/test-orders-location", handlers.TestOrdersLocation)
+		app.Get("/run-migrations", handlers.RunMigrations)
+	}
 
 	// Servir archivos estáticos de la carpeta uploads
 	app.Static("/uploads", "./uploads")
 
 	// Upload de imágenes se maneja directamente desde el frontend con Cloudinary
 
-	// Endpoints de geocoding - funciones que no existen, comentadas
-	// api.Get("/geocoding/search", handlers.SearchAddress)
-	// api.Get("/geocoding/reverse", handlers.ReverseAddress)
-
-	// Endpoints de pago
+	// Endpoints de pago con Stripe
 	api.Post("/pay", handlers.CreateStripeCheckout)
-	api.Post("/create-payment-intent", handlers.CreateStripePaymentIntent)
-	api.Get("/payments", handlers.GetPaymentHistory)
-	api.Post("/refund", handlers.CreateRefund)
+	api.Post("/create-payment-intent", middleware.AuthMiddleware(), handlers.CreateStripePaymentIntent)
 	api.Post("/stripe/webhook", handlers.StripeWebhook)
+
+	// Historial de pagos y reembolsos
+	api.Get("/payments", handlers.GetPaymentHistory)
+	api.Post("/payments/refund", handlers.CreateRefund)
 
 	// Obtener puerto de variable de entorno
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "4000" // Valor por defecto consistente con documentación
 	}
 
 	// Iniciar servidor
@@ -410,20 +328,18 @@ func setupEnvironment() {
 	if os.Getenv("DB_USER") == "" {
 		os.Setenv("DB_USER", "posoqo_user")
 	}
-	if os.Getenv("DB_PASSWORD") == "" {
-		if os.Getenv("NODE_ENV") == "production" {
-			log.Fatal("DB_PASSWORD debe estar configurado en producción")
-		}
-		os.Setenv("DB_PASSWORD", "posoqoEvelinSuarez")
-		log.Println("DB_PASSWORD no configurado, usando valor por defecto (SOLO DESARROLLO)")
+	// DB_PASSWORD debe estar configurado en el archivo .env
+	// No establecer valores por defecto aquí por seguridad
+	if os.Getenv("DB_PASSWORD") == "" && os.Getenv("NODE_ENV") == "production" {
+		log.Fatal("DB_PASSWORD debe estar configurado en producción")
 	}
 	if os.Getenv("DB_NAME") == "" {
 		os.Setenv("DB_NAME", "posoqo")
 	}
 
-	// Variable de entorno para puerto
+	// Variable de entorno para puerto (por defecto 4000 según documentación)
 	if os.Getenv("PORT") == "" {
-		os.Setenv("PORT", "3000")
+		os.Setenv("PORT", "4000")
 	}
 
 	log.Println("Variables de entorno configuradas")

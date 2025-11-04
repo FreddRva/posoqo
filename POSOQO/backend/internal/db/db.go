@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -22,14 +21,32 @@ func InitDB() error {
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
+	sslMode := os.Getenv("DB_SSL_MODE")
 
-	// Si no hay contraseña configurada, usar la contraseña por defecto
+	// Validar que la contraseña esté configurada en producción
 	if password == "" {
-		password = "posoqoEvelinSuarez"
+		if os.Getenv("NODE_ENV") == "production" {
+			return fmt.Errorf("DB_PASSWORD debe estar configurado en producción")
+		}
+		log.Println("⚠️ DB_PASSWORD no configurado. La conexión fallará si no se proporciona contraseña.")
 	}
 
-	// URL con SSL habilitado para producción
-	url := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=require", user, password, host, port, dbname)
+	// Configurar SSL mode (por defecto 'disable' para desarrollo, 'require' para producción)
+	if sslMode == "" {
+		if os.Getenv("NODE_ENV") == "production" {
+			sslMode = "require"
+		} else {
+			sslMode = "disable"
+		}
+	}
+
+	// Construir URL de conexión
+	var url string
+	if password != "" {
+		url = fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, dbname, sslMode)
+	} else {
+		url = fmt.Sprintf("postgresql://%s@%s:%s/%s?sslmode=%s", user, host, port, dbname, sslMode)
+	}
 
 	pool, err := pgxpool.New(context.Background(), url)
 	if err != nil {
@@ -40,64 +57,8 @@ func InitDB() error {
 	}
 	DB = pool
 
-	// Ejecutar migraciones
-	if err := runMigrations(); err != nil {
-		log.Printf("Error ejecutando migraciones: %v", err)
-		return err
-	}
+	// Las migraciones se ejecutan desde migrations.RunMigrations() en main.go
+	// No ejecutar aquí para evitar duplicación
 
-	return nil
-}
-
-func runMigrations() error {
-	log.Println("🔄 Ejecutando migraciones de base de datos...")
-
-	// Lista de archivos de migración en orden
-	migrations := []string{
-		"001_initial_schema.sql",
-		"002_add_products_table.sql",
-		"003_add_orders_table.sql",
-		"004_email_verifications.sql",
-		"005_add_user_address_fields.sql",
-		"006_notifications.sql",
-		"007_add_featured_products.sql",
-		"009_favorites.sql",
-		"010_complaints.sql",
-		"011_reservations.sql",
-		"012_add_user_active_field.sql",
-		"016_add_order_id_to_notifications.sql",
-		"017_create_cart_tables.sql",
-		"018_create_payments_table.sql",
-		"019_add_is_read_to_notifications.sql",
-		"020_create_services_table.sql",
-	}
-
-	for _, migration := range migrations {
-		if err := executeMigration(migration); err != nil {
-			return fmt.Errorf("error en migración %s: %w", migration, err)
-		}
-	}
-
-	log.Println("✅ Migraciones completadas exitosamente")
-	return nil
-}
-
-func executeMigration(filename string) error {
-	// Leer archivo de migración
-	migrationPath := filepath.Join("migrations", filename)
-	content, err := os.ReadFile(migrationPath)
-	if err != nil {
-		// Si no existe el archivo, continuar (migración opcional)
-		log.Printf("⚠️  Archivo de migración %s no encontrado, saltando...", filename)
-		return nil
-	}
-
-	// Ejecutar migración
-	_, err = DB.Exec(context.Background(), string(content))
-	if err != nil {
-		return fmt.Errorf("error ejecutando %s: %w", filename, err)
-	}
-
-	log.Printf("✅ Migración %s ejecutada", filename)
 	return nil
 }
