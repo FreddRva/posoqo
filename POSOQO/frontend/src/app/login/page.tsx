@@ -199,65 +199,23 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden p-4">
-      {/* Fondo animado con gradientes */}
+      {/* Fondo animado con gradientes - usando CSS puro para evitar problemas SSR */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Gradientes animados */}
-        <motion.div
-          className="absolute top-0 left-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, 100, 0],
-            y: [0, 100, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, -100, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.5, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        {/* Gradientes animados con CSS */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float-slow" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float-reverse" />
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl animate-pulse-slow" />
         
-        {/* Partículas de fondo */}
-        {particles.map((particle, i) => (
-          <motion.div
+        {/* Partículas de fondo - solo renderizar cuando esté montado */}
+        {mounted && particles.map((particle, i) => (
+          <div
             key={i}
-            className="absolute w-1 h-1 bg-yellow-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-yellow-400/30 rounded-full animate-particle"
             style={{
               left: `${particle.left}%`,
               top: `${particle.top}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.3, 0.8, 0.3],
-            }}
-            transition={{
-              duration: particle.duration,
-              repeat: Infinity,
-              delay: particle.delay,
+              animationDelay: `${particle.delay}s`,
+              animationDuration: `${particle.duration}s`,
             }}
           />
         ))}

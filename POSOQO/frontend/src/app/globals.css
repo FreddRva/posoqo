@@ -635,6 +635,69 @@ html {
   50% { transform: translateY(-16px); }
 }
 
+/* Animaciones para login page */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(100px, 100px) scale(1.2);
+  }
+  66% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-100px, -100px) scale(1.2);
+  }
+  66% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes particle {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-30px);
+    opacity: 0.8;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 20s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 25s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 30s linear infinite;
+}
+
+.animate-particle {
+  animation: particle 3s ease-in-out infinite;
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
