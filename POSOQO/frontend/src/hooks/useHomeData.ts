@@ -72,14 +72,21 @@ export const useHomeData = (): UseHomeDataReturn => {
       }
       
       const productsData = await productsResponse.json();
+      
+      // Log detallado de la respuesta
+      const products = productsData.data || productsData || [];
       console.log('[useHomeData] Respuesta de productos:', {
         hasData: !!productsData.data,
-        dataLength: productsData.data?.length || 0,
+        dataLength: products.length,
         productsKeys: Object.keys(productsData),
-        firstProduct: productsData.data?.[0] || null
+        totalProducts: products.length,
+        firstProductName: products[0]?.name || 'N/A',
+        productsWithFeatured: products.filter((p: Product) => p.is_featured === true).length,
+        allProductNames: products.slice(0, 5).map((p: Product) => p.name)
       });
       
-      const products = productsData.data || productsData || [];
+      // Log completo de la estructura de la respuesta
+      console.log('[useHomeData] Estructura completa de respuesta:', JSON.stringify(productsData, null, 2).substring(0, 1000));
 
       // Cargar categorías y servicios en paralelo
       const [categoriesResponse, servicesResponse] = await Promise.allSettled([
@@ -98,7 +105,12 @@ export const useHomeData = (): UseHomeDataReturn => {
         
         console.log('[useHomeData] Categorías cargadas:', {
           categoriesCount: categories.length,
-          categoryNames: categories.map((c: any) => c.name)
+          categoryNames: categories.map((c: any) => `${c.name} (id: ${c.id}, parent_id: ${c.parent_id || 'null'})`),
+          allCategories: categories.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            parent_id: c.parent_id
+          }))
         });
         
         // Buscar categoría "Cervezas" y subcategoría "Cerveza"
@@ -125,7 +137,17 @@ export const useHomeData = (): UseHomeDataReturn => {
           
           console.log('[useHomeData] Cervezas destacadas encontradas:', {
             count: featuredCervezas.length,
-            nombres: featuredCervezas.map(p => p.name)
+            nombres: featuredCervezas.map(p => p.name),
+            productosAnalizados: products.filter((p: Product) => {
+              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
+              return isCerveza;
+            }).map((p: Product) => ({
+              name: p.name,
+              is_featured: p.is_featured,
+              subcategory_id: p.subcategory_id,
+              category_id: p.category_id
+            }))
           });
           
           // Si no hay destacados, mostrar todos los de la categoría
@@ -155,7 +177,17 @@ export const useHomeData = (): UseHomeDataReturn => {
           
           console.log('[useHomeData] Comidas destacadas encontradas:', {
             count: featuredComidas.length,
-            nombres: featuredComidas.map(p => p.name)
+            nombres: featuredComidas.map(p => p.name),
+            productosAnalizados: products.filter((p: Product) => {
+              const isCerveza = p.subcategory_id === cervezaSubcategory.id || 
+                               (!p.subcategory_id && p.category_id === cervezaSubcategory.parent_id);
+              return !isCerveza;
+            }).slice(0, 10).map((p: Product) => ({
+              name: p.name,
+              is_featured: p.is_featured,
+              subcategory_id: p.subcategory_id,
+              category_id: p.category_id
+            }))
           });
           
           // Si no hay destacados, mostrar todos los que NO sean cervezas
@@ -192,14 +224,29 @@ export const useHomeData = (): UseHomeDataReturn => {
         services = [];
       }
 
-      return {
+      const finalData = {
         featuredCervezas,
         featuredComidas,
         services,
       };
+      
+      console.log('[useHomeData] Datos finales a retornar:', {
+        cervezasCount: featuredCervezas.length,
+        cervezasNames: featuredCervezas.map(p => p.name),
+        comidasCount: featuredComidas.length,
+        comidasNames: featuredComidas.map(p => p.name),
+        servicesCount: services.length
+      });
+      
+      return finalData;
     }, 'Cargando datos de inicio...');
 
     if (result) {
+      console.log('[useHomeData] Datos guardados en estado:', {
+        cervezasCount: result.featuredCervezas?.length || 0,
+        comidasCount: result.featuredComidas?.length || 0,
+        servicesCount: result.services?.length || 0
+      });
       setData(result);
     }
   }, []);
