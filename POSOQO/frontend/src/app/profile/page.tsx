@@ -50,14 +50,31 @@ export default function ProfilePage() {
   // Cargar datos del perfil desde la API
   useEffect(() => {
     async function fetchProfile() {
+      console.log('[Profile] fetchProfile llamado:', {
+        status,
+        hasSession: !!session,
+        sessionKeys: session ? Object.keys(session) : [],
+        hasAccessToken: !!(session as any)?.accessToken
+      });
+      
       if (status === "authenticated" && session) {
         setLoading(true);
         try {
           // Obtener accessToken de la sesión
           const accessToken = (session as any)?.accessToken;
+          console.log('[Profile] Intentando cargar perfil con token:', {
+            hasAccessToken: !!accessToken,
+            accessTokenLength: accessToken?.length || 0
+          });
+          
           const profileData = await apiFetch<any>("/profile", { 
             method: "GET",
             authToken: accessToken 
+          });
+          
+          console.log('[Profile] Perfil cargado exitosamente:', {
+            hasProfileData: !!profileData,
+            profileKeys: profileData ? Object.keys(profileData) : []
           });
           setProfile(profileData);
           setForm({

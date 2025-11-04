@@ -15,6 +15,11 @@ async function getAuthToken(): Promise<string | null> {
     // Buscar el token en localStorage
     const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
     
+    console.log('[API] getAuthToken:', {
+      hasNextAuthKey: !!nextAuthKey,
+      keyName: nextAuthKey || 'not found'
+    });
+    
     if (nextAuthKey) {
       const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
       
@@ -22,16 +27,30 @@ async function getAuthToken(): Promise<string | null> {
       const token = data.data?.accessToken || data.accessToken || null;
       const expiry = data.data?.accessTokenExpires || data.accessTokenExpires;
       
+      console.log('[API] getAuthToken localStorage data:', {
+        hasToken: !!token,
+        tokenLength: token?.length || 0,
+        hasExpiry: !!expiry,
+        isExpired: expiry ? isTokenExpired(expiry) : 'unknown',
+        dataStructure: {
+          hasDataAccessToken: !!data.data?.accessToken,
+          hasAccessToken: !!data.accessToken,
+          keys: Object.keys(data),
+          dataKeys: data.data ? Object.keys(data.data) : []
+        }
+      });
+      
       // Validar que el token no esté expirado
       if (token && !isTokenExpired(expiry)) {
         return token;
       }
       
       // Si está expirado, retornar null para forzar refresh
+      console.log('[API] Token expirado o no encontrado');
       return null;
     }
   } catch (err) {
-    // Error silencioso para evitar logs innecesarios en producción
+    console.error('[API] Error en getAuthToken:', err);
     // Limpiar datos corruptos
     if (err instanceof SyntaxError) {
       try {
@@ -53,9 +72,16 @@ async function getSessionToken(): Promise<string | null> {
     // Importar dinámicamente para evitar problemas de SSR
     const { getSession } = await import('next-auth/react');
     const session = await getSession();
-    return (session as any)?.accessToken || null;
+    const token = (session as any)?.accessToken || null;
+    console.log('[API] getSessionToken:', {
+      hasSession: !!session,
+      hasAccessToken: !!(session as any)?.accessToken,
+      tokenLength: token?.length || 0,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : null
+    });
+    return token;
   } catch (err) {
-    // Error silencioso para evitar logs innecesarios en producción
+    console.error('[API] Error en getSessionToken:', err);
     return null;
   }
 }
@@ -141,14 +167,32 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const { authToken, ...fetchOptions } = options || {};
   
+  console.log('[API] apiFetch llamado:', {
+    endpoint,
+    hasAuthTokenParam: !!authToken,
+    method: fetchOptions.method || 'GET'
+  });
+  
   try {
     // Obtener token automáticamente si no se proporciona uno
     let token = authToken;
     if (!token) {
+      console.log('[API] No se proporcionó token, buscando automáticamente...');
       // Intentar obtener el token de la sesión primero, luego del localStorage
       const sessionToken = await getSessionToken();
       const authTokenResult = await getAuthToken();
       token = sessionToken || authTokenResult || undefined;
+      console.log('[API] Token obtenido automáticamente:', {
+        hasToken: !!token,
+        fromSession: !!sessionToken,
+        fromLocalStorage: !!authTokenResult,
+        tokenLength: token?.length || 0
+      });
+    } else {
+      console.log('[API] Usando token proporcionado:', {
+        tokenLength: token.length,
+        tokenPreview: `${token.substring(0, 20)}...`
+      });
     }
 
     // Validar que el endpoint no esté vacío
@@ -158,6 +202,7 @@ export async function apiFetch<T>(
 
     // Validar que la URL sea segura
     const apiUrl = getApiUrl(endpoint);
+    console.log('[API] URL construida:', apiUrl);
     if (!apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
       throw new Error('URL de API inválida');
     }
@@ -171,14 +216,29 @@ export async function apiFetch<T>(
     
     let res: Response;
     try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...fetchOptions.headers,
+      };
+      
+      console.log('[API] Haciendo request:', {
+        url: apiUrl,
+        method: fetchOptions.method || 'GET',
+        hasAuthHeader: !!headers.Authorization,
+        headers: Object.keys(headers)
+      });
+      
       res = await fetch(apiUrl, {
         ...fetchOptions,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...fetchOptions.headers,
-        },
+        headers,
         signal,
+      });
+      
+      console.log('[API] Respuesta recibida:', {
+        status: res.status,
+        statusText: res.statusText,
+        ok: res.ok
       });
     } finally {
       clearTimeout(timeoutId);
@@ -186,6 +246,7 @@ export async function apiFetch<T>(
     
     // Si el token expiró, intentar renovarlo y repetir la petición
     if (res.status === 401 && token) {
+      console.log('[API] Token expirado (401), intentando refresh...');
       const newToken = await refreshAccessToken();
       
       if (newToken) {
