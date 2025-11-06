@@ -14,6 +14,7 @@ import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useRecentlyViewed } from "@/lib/recentlyViewedContext";
 import { useCart } from "@/contexts/CartContext";
+import { apiFetch } from "@/lib/api";
 import RecentlyViewed from "@/components/cart/RecentlyViewed";
 
 // Componentes dinámicos
@@ -45,15 +46,40 @@ function ProductsContent() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Cargar favoritos del localStorage
+  // Cargar favoritos desde el backend si el usuario está autenticado
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-  }, []);
+    const loadFavorites = async () => {
+      if (session && (session as any).accessToken) {
+        try {
+          const response = await apiFetch<{ data: any[] }>('/protected/favorites', {
+            authToken: (session as any).accessToken
+          });
+          if (response.data && Array.isArray(response.data)) {
+            const favoriteIds = response.data.map((product: any) => product.id);
+            setFavorites(favoriteIds);
+            // También guardar en localStorage como backup
+            localStorage.setItem('favorites', JSON.stringify(favoriteIds));
+          }
+        } catch (error) {
+          console.error('Error cargando favoritos:', error);
+          // Si falla, intentar cargar desde localStorage
+          const savedFavorites = localStorage.getItem('favorites');
+          if (savedFavorites) {
+            setFavorites(JSON.parse(savedFavorites));
+          }
+        }
+      } else {
+        // Si no hay sesión, cargar desde localStorage
+        const savedFavorites = localStorage.getItem('favorites');
+        if (savedFavorites) {
+          setFavorites(JSON.parse(savedFavorites));
+        }
+      }
+    };
+    loadFavorites();
+  }, [session]);
 
-  // Guardar favoritos en localStorage
+  // Guardar favoritos en localStorage como backup
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -81,17 +107,46 @@ function ProductsContent() {
     }
   };
 
-  const handleToggleFavorite = (product: any) => {
-    setFavorites(prev => {
-      const isFavorite = prev.includes(product.id);
-      if (isFavorite) {
-        alert(`${product.name} eliminado de favoritos`);
-        return prev.filter(id => id !== product.id);
-          } else {
-        alert(`${product.name} agregado a favoritos`);
-        return [...prev, product.id];
+  const handleToggleFavorite = async (product: any) => {
+    const isFavorite = favorites.includes(product.id);
+    const accessToken = (session as any)?.accessToken;
+
+    // Si el usuario está autenticado, guardar en el backend
+    if (session && accessToken) {
+      try {
+        if (isFavorite) {
+          // Remover de favoritos
+          await apiFetch(`/protected/favorites/${product.id}`, {
+            method: 'DELETE',
+            authToken: accessToken
+          });
+          setFavorites(prev => prev.filter(id => id !== product.id));
+        } else {
+          // Agregar a favoritos
+          await apiFetch('/protected/favorites', {
+            method: 'POST',
+            authToken: accessToken,
+            body: JSON.stringify({ product_id: product.id })
+          });
+          setFavorites(prev => [...prev, product.id]);
+        }
+      } catch (error) {
+        console.error('Error actualizando favoritos:', error);
+        alert('Error al actualizar favoritos. Por favor intenta nuevamente.');
       }
-    });
+    } else {
+      // Si no está autenticado, solo usar localStorage
+      setFavorites(prev => {
+        if (isFavorite) {
+          return prev.filter(id => id !== product.id);
+        } else {
+          return [...prev, product.id];
+        }
+      });
+      if (!isFavorite) {
+        alert('Inicia sesión para guardar tus favoritos permanentemente');
+      }
+    }
   };
 
   const handleViewDetails = (product: any) => {

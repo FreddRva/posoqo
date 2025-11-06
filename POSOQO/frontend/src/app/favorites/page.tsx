@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiFetch } from '@/lib/api';
 import { HeartIcon, ShoppingCartIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
@@ -23,7 +23,7 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
 
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     if (!session) {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔍 [FAVORITES] No hay sesión, no se cargan favoritos');
@@ -33,22 +33,27 @@ export default function FavoritesPage() {
     
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 [FAVORITES] Cargando favoritos...', {
-        hasAccessToken: !!session.accessToken,
+        hasAccessToken: !!(session as any).accessToken,
       });
     }
     
     try {
       setLoading(true);
       const response = await apiFetch<{ data: any[] }>('/protected/favorites', {
-        authToken: session.accessToken
+        authToken: (session as any).accessToken
       });
-      if (response.data) {
-        // Los productos ya vienen directamente en response.data
+      // El backend devuelve { data: products }
+      const products = (response as any).data || response || [];
+      if (Array.isArray(products)) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 [FAVORITES] Productos encontrados:', response.data.length);
+          console.log('🔍 [FAVORITES] Productos encontrados:', products.length);
+          console.log('🔍 [FAVORITES] Respuesta completa:', response);
         }
-        setFavorites(response.data);
+        setFavorites(products);
       } else {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 [FAVORITES] Respuesta no es un array:', products);
+        }
         setFavorites([]);
       }
     } catch (error) {
@@ -59,17 +64,37 @@ export default function FavoritesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     loadFavorites();
-  }, [session]);
+  }, [loadFavorites]);
+
+  // Recargar favoritos cuando la página se vuelve visible (por si se agregaron desde otra pestaña)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && session) {
+        loadFavorites();
+      }
+    };
+    const handleFocus = () => {
+      if (session) {
+        loadFavorites();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [session, loadFavorites]);
 
   const removeFromFavorites = async (productId: string) => {
     try {
       await apiFetch(`/protected/favorites/${productId}`, {
         method: 'DELETE',
-        authToken: session?.accessToken
+        authToken: (session as any)?.accessToken
       });
       
       // Actualizar lista local
@@ -85,7 +110,7 @@ export default function FavoritesPage() {
     try {
       await apiFetch('/protected/cart/add', {
         method: 'POST',
-        authToken: session?.accessToken,
+        authToken: (session as any)?.accessToken,
         body: JSON.stringify({
           product_id: product.id,
           quantity: 1
