@@ -30,17 +30,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
     >
       {/* Imagen del producto */}
-      <div className="relative bg-gray-100 flex items-center justify-center rounded-t-xl" style={{ minHeight: '250px', padding: '20px' }}>
+      <div className="relative bg-gray-100 rounded-t-xl" style={{ padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '350px' }}>
         {product.image_url ? (
           <img
             src={getImageUrl(product.image_url)}
             alt={product.name}
-            className="max-w-full max-h-[250px] w-auto h-auto"
             style={{ 
+              maxWidth: '100%',
+              width: 'auto',
+              height: 'auto',
+              maxHeight: 'none',
               objectFit: 'contain',
               display: 'block',
-              width: 'auto',
-              height: 'auto'
+              margin: '0 auto'
             }}
             onError={(e) => {
               const target = e.currentTarget;
@@ -48,7 +50,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             }}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full flex items-center justify-center text-gray-400" style={{ minHeight: '350px' }}>
             <Package className="w-12 h-12" />
           </div>
         )}
