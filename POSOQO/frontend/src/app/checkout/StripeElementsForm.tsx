@@ -91,7 +91,12 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
     setDniData(null);
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      // Construir URL correctamente (evitar duplicación de /api)
+      let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      // Remover /api si está al final
+      apiUrl = apiUrl.replace(/\/api\/?$/, '');
+      // Remover barra final si existe
+      apiUrl = apiUrl.replace(/\/$/, '');
       const response = await fetch(`${apiUrl}/api/dni/${dni}`);
       
       if (response.ok) {

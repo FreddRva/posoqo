@@ -141,7 +141,12 @@ export default function ProfilePage() {
     setConsultandoDNI(true);
     setDniVerificado(false);
     try {
-      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com').replace(/\/$/, '');
+      // Construir URL correctamente (evitar duplicación de /api)
+      let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      // Remover /api si está al final
+      apiUrl = apiUrl.replace(/\/api\/?$/, '');
+      // Remover barra final si existe
+      apiUrl = apiUrl.replace(/\/$/, '');
       const url = `${apiUrl}/api/dni/${dniValue}`;
       
       const response = await fetch(url);
