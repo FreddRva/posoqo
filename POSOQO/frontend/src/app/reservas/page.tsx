@@ -96,7 +96,7 @@ export default function ReservationsPage() {
     date: '',
     time: '',
     people: 1,
-    payment_method: 'efectivo',
+    payment_method: 'tarjeta',
     advance: 0
   })
   const [submitting, setSubmitting] = useState(false)
@@ -202,7 +202,7 @@ export default function ReservationsPage() {
         date: '', 
         time: '', 
         people: 1, 
-        payment_method: 'efectivo', 
+        payment_method: 'tarjeta', 
         advance: 0 
       })
       setShowForm(false)
@@ -224,7 +224,7 @@ export default function ReservationsPage() {
       date: '', 
       time: '', 
       people: 1, 
-      payment_method: 'efectivo', 
+      payment_method: 'tarjeta', 
       advance: 0 
     })
     setShowForm(false)
@@ -441,8 +441,8 @@ export default function ReservationsPage() {
                     className="bg-black/80 backdrop-blur-xl rounded-2xl p-8 border border-purple-400/20"
                   >
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-2xl font-bold text-purple-400 flex items-center gap-3">
-                        <Calendar className="w-6 h-6" />
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent flex items-center gap-3">
+                        <Calendar className="w-6 h-6 text-purple-400" />
                         Nueva Reserva
                       </h2>
                       <button
@@ -511,9 +511,7 @@ export default function ReservationsPage() {
                             className="w-full px-5 py-3 bg-black/50 border border-white/10 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
                             required
                           >
-                            <option value="efectivo">Efectivo</option>
                             <option value="tarjeta">Tarjeta</option>
-                            <option value="transferencia">Transferencia</option>
                             <option value="yape">Yape</option>
                             <option value="plin">Plin</option>
                           </select>
@@ -551,6 +549,52 @@ export default function ReservationsPage() {
                             Se procesará un adelanto de <span className="font-bold text-yellow-400">S/ {formData.advance.toFixed(2)}</span> mediante Stripe. 
                             El resto se pagará al momento de la reserva.
                           </p>
+                        </div>
+                      )}
+
+                      {(formData.payment_method === 'yape' || formData.payment_method === 'plin') && formData.advance > 0 && (
+                        <div className="p-6 bg-gradient-to-r from-green-400/10 to-emerald-400/10 border border-green-400/30 rounded-xl">
+                          <div className="flex items-center gap-2 text-green-400 mb-4">
+                            <CreditCard className="w-5 h-5" />
+                            <span className="font-semibold text-lg">Pago con {formData.payment_method === 'yape' ? 'Yape' : 'Plin'}</span>
+                          </div>
+                          
+                          <div className="grid md:grid-cols-2 gap-6">
+                            {/* QR Code */}
+                            <div className="flex flex-col items-center">
+                              <p className="text-sm text-gray-300 mb-3 font-medium">Escanea el código QR</p>
+                              <div className="bg-white p-4 rounded-xl shadow-lg">
+                                <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                                  <span className="text-gray-400 text-xs text-center px-4">
+                                    {formData.payment_method === 'yape' ? 'QR Yape' : 'QR Plin'}
+                                    <br />
+                                    (Imagen QR aquí)
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Número de teléfono */}
+                            <div className="flex flex-col justify-center">
+                              <p className="text-sm text-gray-300 mb-3 font-medium">O transfiere al número:</p>
+                              <div className="bg-black/50 border border-white/10 rounded-xl p-4">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <Phone className="w-5 h-5 text-green-400" />
+                                  <span className="text-gray-400 text-sm">Número de {formData.payment_method === 'yape' ? 'Yape' : 'Plin'}:</span>
+                                </div>
+                                <p className="text-2xl font-bold text-green-400 font-mono">
+                                  {formData.payment_method === 'yape' ? '966 123 456' : '966 123 457'}
+                                </p>
+                                <div className="mt-4 p-3 bg-green-400/10 border border-green-400/30 rounded-lg">
+                                  <p className="text-xs text-gray-300 mb-1">Monto a pagar:</p>
+                                  <p className="text-xl font-bold text-green-400">S/ {formData.advance.toFixed(2)}</p>
+                                </div>
+                                <p className="text-xs text-yellow-400 mt-3">
+                                  ⚠️ Envía el comprobante después de realizar el pago
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                       
