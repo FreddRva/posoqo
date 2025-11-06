@@ -53,6 +53,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.div>
+            
+            {/* Corazón de favoritos en esquina superior derecha */}
+            <motion.button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite(product);
+              }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              className={`absolute top-2 right-2 z-30 p-2 rounded-full backdrop-blur-md shadow-lg border transition-all duration-300 ${
+                isFavorite
+                  ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400/50 shadow-red-500/50'
+                  : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+              }`}
+              title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+            </motion.button>
           </div>
 
           {/* Contenido */}
@@ -94,19 +112,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   title="Ver detalles"
                 >
                   <Eye className="w-5 h-5" />
-                </motion.button>
-                <motion.button
-                  onClick={() => onToggleFavorite(product)}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    isFavorite
-                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border border-red-400/50 shadow-lg'
-                      : 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
-                  }`}
-                  title="Agregar a favoritos"
-                >
-                  <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
                 </motion.button>
                 <motion.button
                   onClick={() => onAddToCart(product)}
@@ -204,6 +209,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
+        {/* Corazón de favoritos en esquina superior derecha */}
+        <motion.button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite(product);
+          }}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
+          className={`absolute top-4 right-4 z-30 p-2.5 rounded-full backdrop-blur-md shadow-lg border transition-all duration-300 ${
+            isFavorite
+              ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400/50 shadow-red-500/50'
+              : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+          }`}
+          title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+        >
+          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+        </motion.button>
+
         {/* Botones de acción flotantes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -221,23 +244,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             title="Ver detalles"
           >
             <Eye className="w-5 h-5" />
-          </motion.button>
-          
-          <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(product);
-            }}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className={`p-3 rounded-xl backdrop-blur-sm shadow-lg border transition-all duration-300 ${
-              isFavorite
-                ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400/50'
-                : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
-            }`}
-            title="Agregar a favoritos"
-          >
-            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
           </motion.button>
           
           <motion.button

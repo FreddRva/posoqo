@@ -331,8 +331,6 @@ function ProductsContent() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onAddToCart={handleAddToCart}
-        onToggleFavorite={handleToggleFavorite}
-        isFavorite={selectedProduct ? favorites.includes(selectedProduct.id) : false}
       />
     </div>
   );
