@@ -141,6 +141,9 @@ func main() {
 	api.Get("/products/featured", handlers.GetFeaturedProducts)
 	api.Get("/products/:id", handlers.GetProduct)
 
+	// Rutas de reseñas (públicas para leer, protegidas para escribir)
+	api.Get("/products/:product_id/reviews", handlers.ListProductReviews)
+
 	// Rutas de servicios (públicas)
 	api.Get("/services", handlers.GetServices)
 	api.Get("/services/:id", handlers.GetService)
@@ -221,6 +224,11 @@ func main() {
 	protected.Post("/favorites", handlers.AddFavorite)
 	protected.Post("/favorites/:product_id", handlers.AddFavorite)
 	protected.Delete("/favorites/:product_id", handlers.RemoveFavorite)
+
+	// Rutas de reseñas (protegidas)
+	protected.Post("/products/:product_id/reviews", handlers.UpsertReview)
+	protected.Get("/reviews", handlers.ListMyReviews)
+	protected.Get("/products/:product_id/can-review", handlers.CanReviewProduct)
 
 	// Rutas de notificaciones (protegidas)
 	protected.Get("/notifications", handlers.GetNotifications)

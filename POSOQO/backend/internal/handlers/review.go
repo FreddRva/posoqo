@@ -30,18 +30,23 @@ func UpsertReview(c *fiber.Ctx) error {
 	if !utils.IsValidNumber(req.Rating, 1, 5) {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Rating inválido (1-5)"})
 	}
-	if !utils.IsValidString(req.Comment, 0, 500) {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Comentario demasiado largo (máx 500)"})
+	// Validar comentario solo si no está vacío (el comentario es opcional)
+	if req.Comment != "" && !utils.IsValidString(req.Comment, 1, 500) {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Comentario demasiado largo (máx 500 caracteres)"})
 	}
 
-	// Verificar que el usuario haya comprado el producto
+	// Verificar que el usuario haya comprado Y recibido el producto
+	// Solo permite reseñar productos cuando la orden esté en estado "entregado"
+	// Esto asegura que el cliente realmente recibió el producto antes de reseñarlo
 	var count int
 	err := db.DB.QueryRow(context.Background(),
 		`SELECT COUNT(*) FROM order_items oi
 		 JOIN orders o ON oi.order_id = o.id
-		 WHERE o.user_id = $1 AND oi.product_id = $2`, userID, productID).Scan(&count)
+		 WHERE o.user_id = $1 AND oi.product_id = $2 
+		 AND o.status = 'entregado'`, userID, productID).Scan(&count)
 	if err != nil || count == 0 {
-		return c.Status(http.StatusForbidden).JSON(fiber.Map{"error": "Solo puedes reseñar productos que hayas comprado"})
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{
+			"error": "Solo puedes reseñar productos que hayas comprado y recibido. Tu pedido debe estar en estado 'entregado' para poder reseñar."})
 	}
 
 	p := bluemonday.UGCPolicy()
@@ -106,6 +111,32 @@ func ListProductReviews(c *fiber.Ctx) error {
 			"total": total,
 			"pages": (total + limit - 1) / limit,
 		},
+	})
+}
+
+// Verificar si el usuario puede reseñar un producto
+func CanReviewProduct(c *fiber.Ctx) error {
+	claims := c.Locals("user").(jwt.MapClaims)
+	userID := int64(claims["id"].(float64))
+	productID := c.Params("product_id")
+
+	var count int
+	err := db.DB.QueryRow(context.Background(),
+		`SELECT COUNT(*) FROM order_items oi
+		 JOIN orders o ON oi.order_id = o.id
+		 WHERE o.user_id = $1 AND oi.product_id = $2 
+		 AND o.status = 'entregado'`, userID, productID).Scan(&count)
+
+	canReview := err == nil && count > 0
+
+	return c.JSON(fiber.Map{
+		"can_review": canReview,
+		"reason": func() string {
+			if !canReview {
+				return "Debes haber comprado y recibido este producto para poder reseñarlo"
+			}
+			return ""
+		}(),
 	})
 }
 

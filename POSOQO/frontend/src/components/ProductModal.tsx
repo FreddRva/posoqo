@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, MessageSquare, Send, Package } from "lucide-react";
+import { useState, useEffect } from "react";
 import { getImageUrl, getApiUrl } from "@/lib/config";
 import { useSession } from "next-auth/react";
+import { apiFetch } from "@/lib/api";
 
 interface Product {
   id: string;
@@ -39,81 +40,123 @@ interface ProductModalProps {
 export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
-  
-  // Asegurar que si es comida, no esté en la pestaña de detalles
-  useEffect(() => {
-    if (productType === 'comida' && activeTab === 'detalles') {
-      setActiveTab('descripcion');
-    }
-  }, [productType, activeTab]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [selectedRating, setSelectedRating] = useState(0);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [checkingCanReview, setCheckingCanReview] = useState(false);
   
   // Cargar reseñas cuando se abre el modal
   useEffect(() => {
     if (isOpen && product?.id) {
       loadReviews();
+      if (session) {
+        checkCanReview();
+      } else {
+        setCanReview(false);
+      }
     }
-  }, [isOpen, product?.id]);
+  }, [isOpen, product?.id, session]);
+
+  const checkCanReview = async () => {
+    if (!product?.id || !session) {
+      setCanReview(false);
+      return;
+    }
+    
+    setCheckingCanReview(true);
+    try {
+      const data = await apiFetch<{ can_review: boolean; reason?: string }>(
+        `protected/products/${product.id}/can-review`
+      );
+      setCanReview(data.can_review || false);
+    } catch (error) {
+      console.error('Error verificando si puede reseñar:', error);
+      setCanReview(false);
+    } finally {
+      setCheckingCanReview(false);
+    }
+  };
 
   const loadReviews = async () => {
     if (!product?.id) return;
     
     setLoadingReviews(true);
     try {
-      const response = await fetch(getApiUrl(`products/${product.id}/reviews`));
-      if (response.ok) {
-        const data = await response.json();
-        setReviews(data.reviews || []);
-        
-        // Calcular promedio de rating
-        if (data.reviews && data.reviews.length > 0) {
+      const data = await apiFetch<{ reviews: Review[]; pagination?: any }>(
+        `products/${product.id}/reviews`
+      );
+      setReviews(data.reviews || []);
+      
+      // Calcular promedio de rating usando todas las reseñas
+      // Si hay paginación, necesitamos cargar todas las reseñas para el promedio exacto
+      if (data.reviews && data.reviews.length > 0) {
+        // Si hay más páginas, cargar todas para calcular promedio correcto
+        if (data.pagination && data.pagination.total > data.reviews.length) {
+          const allReviewsData = await apiFetch<{ reviews: Review[]; pagination?: any }>(
+            `products/${product.id}/reviews?limit=${data.pagination.total}`
+          );
+          const allReviews = allReviewsData.reviews || [];
+          if (allReviews.length > 0) {
+            const avg = allReviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / allReviews.length;
+            setAverageRating(avg);
+          } else {
+            setAverageRating(0);
+          }
+        } else {
           const avg = data.reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / data.reviews.length;
           setAverageRating(avg);
         }
+      } else {
+        setAverageRating(0);
       }
     } catch (error) {
       console.error('Error cargando reseñas:', error);
+      setReviews([]);
+      setAverageRating(0);
     } finally {
       setLoadingReviews(false);
     }
   };
 
   const handleSubmitReview = async () => {
-    if (!product?.id || !session || selectedRating === 0) {
-      alert('Debes estar autenticado y seleccionar una calificación');
+    if (!product?.id || !session) {
+      alert('Debes estar autenticado para enviar una reseña');
+      return;
+    }
+
+    if (selectedRating === 0) {
+      alert('Por favor, selecciona una calificación');
       return;
     }
 
     setSubmittingReview(true);
     try {
-      const response = await fetch(getApiUrl(`products/${product.id}/reviews`), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          rating: selectedRating,
-          comment: reviewComment.trim()
-        })
-      });
+      await apiFetch<{ message: string }>(
+        `protected/products/${product.id}/reviews`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            rating: selectedRating,
+            comment: reviewComment.trim() || ""
+          })
+        }
+      );
 
-      if (response.ok) {
-        setReviewComment('');
-        setSelectedRating(0);
-        loadReviews(); // Recargar reseñas
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Error al enviar la reseña');
-      }
-    } catch (error) {
+      // Limpiar formulario y recargar reseñas
+      setReviewComment('');
+      setSelectedRating(0);
+      await Promise.all([loadReviews(), checkCanReview()]);
+      
+      // Mostrar mensaje de éxito
+      alert('¡Reseña enviada exitosamente!');
+    } catch (error: any) {
       console.error('Error enviando reseña:', error);
-      alert('Error al enviar la reseña');
+      const errorMessage = error.message || 'Error al enviar la reseña. Asegúrate de haber comprado este producto.';
+      alert(errorMessage);
     } finally {
       setSubmittingReview(false);
     }
@@ -202,7 +245,6 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {/* Solo mostrar pestaña de detalles para cervezas - NO para comidas/gastronomía */}
                       {productType === 'cerveza' && (
                         <button 
                           onClick={() => setActiveTab('detalles')}
@@ -294,8 +336,18 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                             </span>
                           </div>
 
-                          {/* Formulario de reseña */}
-                          {session && (
+                          {/* Mensaje si no puede reseñar */}
+                          {session && !checkingCanReview && !canReview && (
+                            <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                              <p className="text-gray-400 text-sm text-center">
+                                Para reseñar este producto, debes haberlo comprado y recibido. 
+                                Una vez que tu pedido esté en estado "entregado", podrás dejar tu reseña.
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Formulario de reseña - Solo si el usuario puede reseñar */}
+                          {session && !checkingCanReview && canReview && (
                             <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
                               <h3 className="text-white font-semibold mb-3">Escribe tu reseña</h3>
                               

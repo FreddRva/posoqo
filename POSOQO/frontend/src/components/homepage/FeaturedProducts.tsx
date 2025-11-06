@@ -6,44 +6,78 @@ import { FeaturedProductsProps, Product } from '@/types/homepage'
 import { ProductSkeleton, ErrorWithRetry } from '@/components/LoadingStates'
 import { Eye, Heart, ShoppingCart, Star, Beer, Sparkles, ArrowRight } from 'lucide-react'
 
-// Componente para estrellas calificables
+// Componente para mostrar estrellas de solo lectura (promedio de reseñas)
 const RatingStars: React.FC<{ product: Product }> = ({ product }) => {
-  const [hoverRating, setHoverRating] = useState(0);
-  const [isRating, setIsRating] = useState(false);
+  const [averageRating, setAverageRating] = useState<number>(0);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
   
-  const handleStarClick = async (value: number) => {
-    if (!product.id || isRating) return;
-    
-    setIsRating(true);
-    try {
-      const response = await fetch(getApiUrl(`products/${product.id}/reviews`), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          rating: value,
-          comment: ''
-        })
-      });
-      
-      if (response.ok) {
-        // Recargar página para actualizar rating
-        window.location.reload();
-      } else {
-        const error = await response.json();
-        alert(error.error || 'Error al calificar. Debes haber comprado el producto para calificarlo.');
-      }
-    } catch (error) {
-      console.error('Error al calificar:', error);
-      alert('Error al calificar el producto');
-    } finally {
-      setIsRating(false);
+  React.useEffect(() => {
+    if (!product.id) {
+      setLoading(false);
+      return;
     }
-  };
+    
+    // Cargar reseñas para calcular promedio
+    const loadRating = async () => {
+      try {
+        // Primero obtener el total de reseñas
+        const response = await fetch(getApiUrl(`products/${product.id}/reviews?limit=1`));
+        if (response.ok) {
+          const data = await response.json();
+          const totalReviews = data.pagination?.total || 0;
+          setReviewCount(totalReviews);
+          
+          if (totalReviews > 0) {
+            // Cargar todas las reseñas para calcular el promedio correcto
+            const allReviewsResponse = await fetch(getApiUrl(`products/${product.id}/reviews?limit=${totalReviews}`));
+            if (allReviewsResponse.ok) {
+              const allReviewsData = await allReviewsResponse.json();
+              const allReviews = allReviewsData.reviews || [];
+              
+              if (allReviews.length > 0) {
+                const avg = allReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / allReviews.length;
+                setAverageRating(avg);
+              } else {
+                setAverageRating(0);
+              }
+            }
+          } else {
+            setAverageRating(0);
+            setReviewCount(0);
+          }
+        }
+      } catch (error) {
+        console.error('Error cargando rating:', error);
+        setAverageRating(0);
+        setReviewCount(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadRating();
+  }, [product.id]);
   
-  const rating = product.rating || 0;
+  const rating = averageRating || product.rating || 0;
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center gap-1 mb-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} className="w-5 h-5 fill-gray-700 text-gray-700" />
+        ))}
+      </div>
+    );
+  }
+  
+  if (rating === 0 && reviewCount === 0) {
+    return (
+      <div className="flex justify-center items-center gap-2 mb-5">
+        <span className="text-sm text-gray-500">Sin reseñas aún</span>
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col items-center gap-2 mb-5">
@@ -54,34 +88,26 @@ const RatingStars: React.FC<{ product: Product }> = ({ product }) => {
           const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
           
           return (
-            <button
+            <Star
               key={i}
-              onClick={() => handleStarClick(starValue)}
-              onMouseEnter={() => setHoverRating(starValue)}
-              onMouseLeave={() => setHoverRating(0)}
-              disabled={isRating}
-              className="focus:outline-none transition-transform hover:scale-125 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={`Calificar ${starValue} estrellas`}
-            >
-              <Star
-                className={`w-5 h-5 transition-colors ${
-                  hoverRating >= starValue
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : isFilled
-                    ? 'fill-cyan-400 text-cyan-400'
-                    : isHalfFilled
-                    ? 'fill-cyan-400/50 text-cyan-400/50'
-                    : 'fill-gray-600 text-gray-600 hover:fill-gray-500'
-                }`}
-              />
-            </button>
+              className={`w-5 h-5 transition-colors ${
+                isFilled
+                  ? 'fill-cyan-400 text-cyan-400'
+                  : isHalfFilled
+                  ? 'fill-cyan-400/50 text-cyan-400/50'
+                  : 'fill-gray-600 text-gray-600'
+              }`}
+            />
           );
         })}
-        {rating > 0 && (
-          <span className="ml-2 text-sm text-gray-400">({rating.toFixed(1)})</span>
-        )}
+        <span className="ml-2 text-sm text-gray-400">
+          {rating > 0 ? `${rating.toFixed(1)}` : '0.0'}
+          {reviewCount > 0 && (
+            <span className="text-gray-500"> ({reviewCount})</span>
+          )}
+        </span>
       </div>
-      <p className="text-xs text-gray-500">Haz clic en las estrellas para calificar</p>
+      <p className="text-xs text-gray-500">Promedio de reseñas</p>
     </div>
   );
 };
