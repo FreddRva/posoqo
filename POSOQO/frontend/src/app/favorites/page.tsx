@@ -1,40 +1,29 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiFetch } from '@/lib/api';
 import { HeartIcon, ShoppingCartIcon, EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url?: string;
-  imageURL?: string; // Campo que devuelve el backend
-  category?: string;
-  category_id?: string;
-}
+import { ProductDetailModal } from '@/components/products/ProductDetailModal';
+import { Product } from '@/types/products';
 
 export default function FavoritesPage() {
   const { data: session } = useSession();
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   const loadFavorites = useCallback(async () => {
-    if (!session) {
+    if (!session || !(session as any).accessToken) {
       if (process.env.NODE_ENV === 'development') {
         console.log('🔍 [FAVORITES] No hay sesión, no se cargan favoritos');
       }
+      setLoading(false);
       return;
-    }
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 [FAVORITES] Cargando favoritos...', {
-        hasAccessToken: !!(session as any).accessToken,
-      });
     }
     
     try {
@@ -45,15 +34,13 @@ export default function FavoritesPage() {
       // El backend devuelve { data: products }
       const products = (response as any).data || response || [];
       if (Array.isArray(products)) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 [FAVORITES] Productos encontrados:', products.length);
-          console.log('🔍 [FAVORITES] Respuesta completa:', response);
-        }
-        setFavorites(products);
+        // Normalizar imageURL a image_url para compatibilidad
+        const normalizedProducts = products.map((p: any) => ({
+          ...p,
+          image_url: p.image_url || p.imageURL || p.image,
+        }));
+        setFavorites(normalizedProducts);
       } else {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 [FAVORITES] Respuesta no es un array:', products);
-        }
         setFavorites([]);
       }
     } catch (error) {
@@ -66,28 +53,16 @@ export default function FavoritesPage() {
     }
   }, [session]);
 
+  // Cargar favoritos solo una vez cuando hay sesión
   useEffect(() => {
-    loadFavorites();
-  }, [loadFavorites]);
-
-  // Recargar favoritos cuando la página se vuelve visible (por si se agregaron desde otra pestaña)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && session) {
-        loadFavorites();
-      }
-    };
-    const handleFocus = () => {
-      if (session) {
-        loadFavorites();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
+    if (session && (session as any).accessToken && !hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      loadFavorites();
+    } else if (!session) {
+      hasLoadedRef.current = false;
+      setFavorites([]);
+      setLoading(false);
+    }
   }, [session, loadFavorites]);
 
   const removeFromFavorites = async (productId: string) => {
@@ -127,10 +102,13 @@ export default function FavoritesPage() {
   };
 
   const openProductModal = (product: Product) => {
-    // Implementar modal de producto
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Abrir modal para:', product.name);
-    }
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeProductModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
   };
 
   if (!session) {
@@ -264,10 +242,10 @@ export default function FavoritesPage() {
                   >
                     <img
                       src={
-                        (product.imageURL || product.image_url)
-                          ? ((product.imageURL || product.image_url || '').startsWith('http')
-                              ? (product.imageURL || product.image_url || '')
-                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${product.imageURL || product.image_url || ''}`)
+                        product.image_url
+                          ? (product.image_url.startsWith('http')
+                              ? product.image_url
+                              : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:4000'}${product.image_url}`)
                           : "/file.svg"
                       }
                       alt={product.name}
@@ -329,6 +307,17 @@ export default function FavoritesPage() {
             ))}
           </motion.div>
         )}
+
+        {/* Modal de detalles del producto */}
+        <ProductDetailModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={closeProductModal}
+          onAddToCart={(product) => {
+            addToCart(product);
+            closeProductModal();
+          }}
+        />
       </div>
     </div>
   );
