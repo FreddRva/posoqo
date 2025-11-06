@@ -221,7 +221,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                   {/* Precio y rating */}
                   <div className="flex items-center justify-between mb-5">
                     <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                      S/ {product.price.toFixed(2)}
+                      S/ {product.price?.toFixed(2) || '0.00'}
                     </span>
                     {product.rating && (
                       <div className="flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 rounded-lg">
