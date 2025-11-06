@@ -8,7 +8,6 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 interface RegisterForm {
   name: string;
   lastName: string;
-  dni: string;
   phone: string;
   email: string;
   password: string;
@@ -18,7 +17,6 @@ interface RegisterForm {
 interface ValidationErrors {
   name?: string;
   lastName?: string;
-  dni?: string;
   phone?: string;
   email?: string;
   password?: string;
@@ -30,7 +28,6 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterForm>({
     name: "",
     lastName: "",
-    dni: "",
     phone: "",
     email: "",
     password: "",
@@ -87,13 +84,6 @@ export default function RegisterPage() {
       newErrors.lastName = "El apellido es requerido";
     } else if (!validateName(formData.lastName)) {
       newErrors.lastName = "El apellido debe contener solo letras (2-50 caracteres)";
-    }
-
-    // Validar DNI
-    if (!formData.dni.trim()) {
-      newErrors.dni = "El DNI es requerido";
-    } else if (!/^\d{8}$/.test(formData.dni.trim())) {
-      newErrors.dni = "El DNI debe tener exactamente 8 dígitos numéricos";
     }
 
     // Validar teléfono
@@ -163,7 +153,6 @@ export default function RegisterPage() {
         body: JSON.stringify({
           name: formData.name.trim(),
           last_name: formData.lastName.trim(),
-          dni: formData.dni.trim(),
           phone: formData.phone.trim(),
           email: formData.email.trim().toLowerCase(),
           password: formData.password,
@@ -180,7 +169,6 @@ export default function RegisterPage() {
         setFormData({
           name: "",
           lastName: "",
-          dni: "",
           phone: "",
           email: "",
           password: "",
@@ -286,51 +274,27 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* DNI y Teléfono */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="dni" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
-                  DNI
-                </label>
-                <input
-                  id="dni"
-                  type="text"
-                  value={formData.dni}
-                  onChange={(e) => handleInputChange("dni", e.target.value)}
-                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
-                    errors.dni 
-                      ? "border-red-400 text-white" 
-                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
-                  } focus:outline-none text-sm font-medium`}
-                  placeholder="12345678"
-                  disabled={loading}
-                />
-                {errors.dni && (
-                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.dni}</p>
-                )}
-              </div>
-              
-              <div>
-                <label htmlFor="phone" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
-                  Teléfono
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
-                    errors.phone 
-                      ? "border-red-400 text-white" 
-                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
-                  } focus:outline-none text-sm font-medium`}
-                  placeholder="999888777"
-                  disabled={loading}
-                />
-                {errors.phone && (
-                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.phone}</p>
-                )}
-              </div>
+            {/* Teléfono */}
+            <div>
+              <label htmlFor="phone" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
+                Teléfono
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
+                  errors.phone 
+                    ? "border-red-400 text-white" 
+                    : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                } focus:outline-none text-sm font-medium`}
+                placeholder="999888777"
+                disabled={loading}
+              />
+              {errors.phone && (
+                <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.phone}</p>
+              )}
             </div>
 
             {/* Email */}

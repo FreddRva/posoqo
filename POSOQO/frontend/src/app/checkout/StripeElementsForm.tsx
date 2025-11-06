@@ -85,31 +85,41 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
     }
   };
 
-  // Consultar datos del DNI (simulado - en producción usar API real)
+  // Consultar datos del DNI desde APIperu.dev
   const consultarDNI = async (dni: string) => {
     setConsultingDNI(true);
     setDniData(null);
     
     try {
-      // Simular consulta a API (reemplazar con API real)
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simular delay
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
+      const response = await fetch(`${apiUrl}/api/dni/${dni}`);
       
-      // Datos simulados - en producción esto vendría de la API
-      const datosSimulados = {
-        nombres: "Juan Carlos",
-        apellidoPaterno: "García",
-        apellidoMaterno: "López"
-      };
-      
-      setDniData(datosSimulados);
-      
-      // Auto-completar nombre del titular
-      const nombreCompleto = `${datosSimulados.nombres} ${datosSimulados.apellidoPaterno} ${datosSimulados.apellidoMaterno}`;
-      setCardholderName(nombreCompleto);
-      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Guardar los datos del DNI
+          const datosReales = {
+            nombres: result.data.nombres || '',
+            apellidoPaterno: result.data.apellido_paterno || '',
+            apellidoMaterno: result.data.apellido_materno || ''
+          };
+          
+          setDniData(datosReales);
+          
+          // Auto-completar nombre del titular
+          const nombreCompleto = result.data.nombre_completo || 
+            `${datosReales.nombres} ${datosReales.apellidoPaterno} ${datosReales.apellidoMaterno}`.trim();
+          setCardholderName(nombreCompleto);
+        } else {
+          setError('DNI no encontrado en los registros. Por favor, ingresa el nombre manualmente.');
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Error al consultar el DNI' }));
+        setError(errorData.error || 'No se pudieron obtener los datos del DNI. Por favor, ingresa el nombre manualmente.');
+      }
     } catch (error) {
       console.error('Error consultando DNI:', error);
-      setError('No se pudieron obtener los datos del DNI. Por favor, ingresa el nombre manualmente.');
+      setError('No se pudo consultar el DNI. Por favor, ingresa el nombre manualmente.');
     } finally {
       setConsultingDNI(false);
     }

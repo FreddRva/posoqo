@@ -127,7 +127,7 @@ func RegisterUser(c *fiber.Ctx) error {
 	// Sanitización de datos
 	req.Name = strings.TrimSpace(req.Name)
 	req.LastName = strings.TrimSpace(req.LastName)
-	req.DNI = strings.TrimSpace(req.DNI)
+	req.DNI = strings.TrimSpace(req.DNI) // DNI es opcional, puede estar vacío
 	req.Phone = strings.TrimSpace(req.Phone)
 	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
 	req.Password = strings.TrimSpace(req.Password)
@@ -141,10 +141,7 @@ func RegisterUser(c *fiber.Ctx) error {
 		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_LASTNAME")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Apellido inválido (solo letras, 2-50 caracteres)"})
 	}
-	if !utils.IsValidString(req.DNI, 8, 12) {
-		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_DNI")
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "DNI inválido (8-12 caracteres)"})
-	}
+	// DNI es opcional - no se valida en el registro, se puede completar después
 	if !utils.IsValidString(req.Phone, 6, 20) {
 		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_PHONE")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número inválido (6-20 caracteres)"})
@@ -177,7 +174,8 @@ func RegisterUser(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error al procesar contraseña"})
 	}
 
-	// Insertar usuario en la base de datos
+	// Insertar usuario en la base de datos (DNI es opcional, puede ser string vacío)
+	// El DNI se puede completar después en el perfil del usuario
 	_, err = db.DB.Exec(context.Background(),
 		"INSERT INTO users (name, last_name, dni, phone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		req.Name, req.LastName, req.DNI, req.Phone, req.Email, string(hash), "user")
