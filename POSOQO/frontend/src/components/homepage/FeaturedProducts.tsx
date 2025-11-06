@@ -171,19 +171,39 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                 {/* Efecto de brillo superior */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
-                {/* Imagen del producto */}
-                <div className="relative aspect-square overflow-hidden bg-black">
-                  <img
-                    src={getImageUrl(product.image_url)}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
+                {/* Imagen del producto - completa y atractiva */}
+                <div className="relative h-80 overflow-hidden bg-black">
+                  <motion.div
+                    whileHover={{ scale: 1.15 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="relative w-full h-full"
+                  >
+                    <img
+                      src={getImageUrl(product.image_url)}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Overlay gradiente */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    
+                    {/* Efecto de brillo dorado */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    />
+                  </motion.div>
                   
-                  {/* Overlay sutil sin botón */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  {/* Efecto de brillo sutil */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Badge destacado */}
+                  {product.is_featured && (
+                    <motion.div
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.2, type: "spring" }}
+                      className="absolute top-4 left-4 px-3 py-1.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-yellow-300/50 z-20"
+                    >
+                      ⭐ Destacado
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Información del producto */}
@@ -198,16 +218,34 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     </p>
                   )}
 
-                  {/* Botón de ver detalle en la parte inferior */}
+                  {/* Precio y rating */}
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                      S/ {product.price.toFixed(2)}
+                    </span>
+                    {product.rating && (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 rounded-lg">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        <span className="text-sm text-yellow-400 font-semibold">{product.rating.toFixed(1)}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Botón de ver detalle mejorado */}
                   <motion.button
                     onClick={() => onProductClick?.(product)}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full px-4 py-3 bg-gradient-to-r from-yellow-400/10 to-amber-500/10 hover:from-yellow-400/20 hover:to-amber-500/20 border border-yellow-400/30 hover:border-yellow-400/50 text-yellow-400 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-yellow-400/20"
+                    className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-5 h-5" />
                     <span>Ver Detalle</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.span>
                   </motion.button>
                 </div>
 

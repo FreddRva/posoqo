@@ -192,24 +192,41 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               {/* Card content */}
               <div className="relative h-full bg-black/80 backdrop-blur-xl rounded-3xl overflow-hidden border border-yellow-400/20 group-hover:border-yellow-400/50 transition-all duration-500">
                 
-                {/* Imagen del servicio */}
+                {/* Imagen del servicio - completa y atractiva */}
                 {service.image_url && (
-                  <div className="relative h-56 overflow-hidden">
-                    <Image
-                      src={getImageUrl(service.image_url)}
-                      alt={service.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                  <div className="relative h-72 overflow-hidden bg-black">
+                    <motion.div
+                      whileHover={{ scale: 1.15 }}
+                      transition={{ duration: 0.7, ease: "easeOut" }}
+                      className="relative w-full h-full"
+                    >
+                      <Image
+                        src={getImageUrl(service.image_url)}
+                        alt={service.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      {/* Overlay gradiente */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      {/* Efecto de brillo dorado */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                    </motion.div>
                     
-                    {/* Badge flotante */}
-                    <div className="absolute top-4 right-4 bg-yellow-400/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-black text-black" />
-                        <span className="text-black font-bold text-sm">Premium</span>
+                    {/* Badge flotante premium */}
+                    <motion.div
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.2, type: "spring" }}
+                      className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-yellow-300/50"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <Star className="w-4 h-4 fill-black" />
+                        <span className="font-bold text-sm">Premium</span>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
                 )}
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, ShoppingCart, Eye, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, Star, ArrowRight } from 'lucide-react';
 import { Product, ViewMode } from '@/types/products';
 import { getImageUrl } from '@/lib/config';
 
@@ -28,48 +28,55 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ x: 5 }}
-        className="bg-gradient-to-r from-gray-900/90 via-gray-800/80 to-black/90 backdrop-blur-xl rounded-2xl shadow-xl border border-blue-400/20 overflow-hidden hover:shadow-blue-500/25 hover:border-blue-400/40 transition-all duration-500 group relative"
+        whileHover={{ x: 5, scale: 1.01 }}
+        className="bg-black/80 backdrop-blur-xl rounded-2xl shadow-xl border border-yellow-400/20 overflow-hidden hover:shadow-yellow-400/25 hover:border-yellow-400/40 transition-all duration-500 group relative"
       >
-        {/* Efectos de brillo */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Efectos de brillo dorado */}
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-amber-400/5 to-yellow-400/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="flex">
-          {/* Imagen */}
-          <div className="w-32 h-32 flex-shrink-0">
-            <Image
-              src={getImageUrl(product.image_url || product.image || '')}
-              alt={product.name}
-              width={128}
-              height={128}
-              className="w-full h-full object-cover"
-            />
+          {/* Imagen más grande */}
+          <div className="w-48 h-48 flex-shrink-0 relative overflow-hidden">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.5 }}
+              className="relative w-full h-full"
+            >
+              <Image
+                src={getImageUrl(product.image_url || product.image || '')}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="192px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.div>
           </div>
 
           {/* Contenido */}
           <div className="flex-1 p-6 relative z-10">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors duration-300">
                   {product.name}
                 </h3>
-                <p className="text-gray-300 text-sm mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-gray-300 text-sm mb-3 line-clamp-2 leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
                   {product.description}
                 </p>
                 <div className="flex items-center gap-6 text-sm">
-                  <span className="text-lg font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
                     S/ {product.price.toFixed(2)}
                   </span>
                   {product.stock !== undefined && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2 px-2.5 py-1 bg-green-500/10 border border-green-400/20 rounded-lg">
                       <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                      <span className="text-gray-400">Stock: {product.stock}</span>
+                      <span className="text-green-400 text-xs font-medium">Stock: {product.stock}</span>
                     </div>
                   )}
                   {product.rating && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 rounded-lg">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-yellow-400 font-semibold">{product.rating.toFixed(1)}</span>
+                      <span className="text-yellow-400 font-semibold text-sm">{product.rating.toFixed(1)}</span>
                     </div>
                   )}
                 </div>
@@ -79,21 +86,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <div className="flex items-center gap-3 ml-6">
                 <motion.button
                   onClick={() => onViewDetails(product)}
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.9 }}
-                  className="p-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-400 rounded-xl hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-300"
+                  className="p-3 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black rounded-xl shadow-lg hover:shadow-yellow-400/50 transition-all duration-300"
                   title="Ver detalles"
                 >
                   <Eye className="w-5 h-5" />
                 </motion.button>
                 <motion.button
                   onClick={() => onToggleFavorite(product)}
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.9 }}
                   className={`p-3 rounded-xl transition-all duration-300 ${
                     isFavorite
-                      ? 'bg-gradient-to-r from-red-500/30 to-pink-500/30 border border-red-400/50 text-red-400'
-                      : 'bg-gradient-to-r from-gray-500/20 to-gray-600/20 border border-gray-400/30 text-gray-400 hover:from-red-500/20 hover:to-pink-500/20 hover:border-red-400/30 hover:text-red-400'
+                      ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border border-red-400/50 shadow-lg'
+                      : 'bg-white/20 text-white border border-white/30 hover:bg-white/30'
                   }`}
                   title="Agregar a favoritos"
                 >
@@ -101,9 +108,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 </motion.button>
                 <motion.button
                   onClick={() => onAddToCart(product)}
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.9 }}
-                  className="p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-400/30 text-green-400 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 transition-all duration-300"
+                  className="p-3 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-xl hover:bg-white/30 shadow-lg transition-all duration-300"
                   title="Agregar al carrito"
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -119,93 +126,176 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   // Vista de cuadrícula
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ y: -10, scale: 1.02 }}
-      className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-400/20 overflow-hidden hover:shadow-blue-500/25 hover:border-blue-400/40 transition-all duration-500 group relative"
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+      whileHover={{ y: -12, scale: 1.02 }}
+      className="group relative h-full bg-black/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-yellow-400/20 overflow-hidden hover:border-yellow-400/50 transition-all duration-500 hover:shadow-yellow-400/20"
     >
-      {/* Efectos de brillo */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      {/* Imagen */}
-      <div className="relative aspect-square overflow-hidden">
-        <Image
-          src={getImageUrl(product.image_url || product.image || '')}
-          alt={product.name}
-          fill
-          className="object-cover group-hover:scale-110 transition-transform duration-300"
-        />
+      {/* Efecto de brillo dorado */}
+      <motion.div
+        className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 rounded-3xl opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-700"
+        animate={{
+          opacity: [0, 0.2, 0],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      
+      {/* Línea superior dorada */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      {/* Imagen completa y atractiva */}
+      <div className="relative h-80 overflow-hidden bg-black">
+        <motion.div
+          whileHover={{ scale: 1.15 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="relative w-full h-full"
+        >
+          <Image
+            src={getImageUrl(product.image_url || product.image || '')}
+            alt={product.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={false}
+          />
+          
+          {/* Overlay gradiente sutil */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Efecto de brillo dorado en la imagen */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          />
+        </motion.div>
         
-        {/* Overlay de acciones */}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-          <button
-            onClick={() => onViewDetails(product)}
-            className="p-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors"
+        {/* Badges flotantes */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+          {product.is_featured && (
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="px-3 py-1.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-yellow-300/50"
+            >
+              ⭐ Destacado
+            </motion.div>
+          )}
+          {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+              className="px-3 py-1.5 bg-red-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-full shadow-lg border border-red-400/50"
+            >
+              ¡Últimas unidades!
+            </motion.div>
+          )}
+        </div>
+
+        {/* Botones de acción flotantes */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20"
+        >
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails(product);
+            }}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black rounded-xl shadow-lg hover:shadow-yellow-400/50 backdrop-blur-sm border border-yellow-300/50 transition-all duration-300"
             title="Ver detalles"
           >
             <Eye className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => onToggleFavorite(product)}
-            className={`p-2 backdrop-blur-sm rounded-lg transition-colors ${
-              isFavorite 
-                ? 'bg-red-500/80 text-white' 
-                : 'bg-white/20 text-white hover:bg-white/30'
+          </motion.button>
+          
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(product);
+            }}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className={`p-3 rounded-xl backdrop-blur-sm shadow-lg border transition-all duration-300 ${
+              isFavorite
+                ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-400/50'
+                : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
             }`}
             title="Agregar a favoritos"
           >
             <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-          </button>
-          <button
-            onClick={() => onAddToCart(product)}
-            className="p-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors"
+          </motion.button>
+          
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product);
+            }}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 border border-white/30 shadow-lg transition-all duration-300"
             title="Agregar al carrito"
           >
             <ShoppingCart className="w-5 h-5" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
 
       {/* Contenido */}
-      <div className="p-6 relative z-10">
-        <h3 className="font-bold text-white mb-3 line-clamp-2 text-lg group-hover:text-blue-400 transition-colors duration-300">
-          {product.name}
-        </h3>
-        <p className="text-gray-300 text-sm mb-4 line-clamp-2 leading-relaxed">
-          {product.description}
-        </p>
+      <div className="p-6 relative z-10 bg-gradient-to-b from-black/80 to-black">
+        <div className="mb-4">
+          <h3 className="font-bold text-white mb-2 line-clamp-2 text-xl group-hover:text-yellow-400 transition-colors duration-300">
+            {product.name}
+          </h3>
+          <p className="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
+            {product.description}
+          </p>
+        </div>
         
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <span className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
               S/ {product.price.toFixed(2)}
             </span>
             {product.rating && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 rounded-lg">
                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 <span className="text-sm text-yellow-400 font-semibold">{product.rating.toFixed(1)}</span>
               </div>
             )}
           </div>
           {product.stock !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-400/20 rounded-lg">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-xs text-gray-400">
-                Stock: {product.stock}
+              <span className="text-xs text-green-400 font-medium">
+                {product.stock} disponibles
               </span>
             </div>
           )}
         </div>
 
-        {/* Botón de acción galáctico */}
+        {/* Botón de acción principal */}
         <motion.button
           onClick={() => onViewDetails(product)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full px-4 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-400 font-semibold rounded-xl hover:from-blue-500/30 hover:to-purple-500/30 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-blue-500/25"
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
         >
-          <Eye className="w-4 h-4" />
-          <span>Explorar Producto</span>
+          <Eye className="w-5 h-5" />
+          <span>Ver Detalle</span>
+          <motion.span
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ArrowRight className="w-4 h-4" />
+          </motion.span>
         </motion.button>
       </div>
     </motion.div>
