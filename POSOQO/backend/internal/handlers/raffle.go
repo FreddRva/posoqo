@@ -407,10 +407,35 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 	}
 	log.Printf("[RAFFLE] Meses disponibles en BD: %v", availableMonths)
 
+	// Primero verificar directamente qué hay en la BD para este mes
+	var debugCount int
+	db.DB.QueryRow(
+		context.Background(),
+		`SELECT COUNT(*) FROM raffle_subscriptions WHERE TRIM(mes_sorteo) = TRIM($1)`,
+		mesSorteo,
+	).Scan(&debugCount)
+	log.Printf("[RAFFLE] Count con TRIM para %s: %d", mesSorteo, debugCount)
+
+	// Obtener todos los registros para debug
+	debugRows, _ := db.DB.Query(
+		context.Background(),
+		`SELECT id, mes_sorteo, nombre, email FROM raffle_subscriptions LIMIT 10`,
+	)
+	if debugRows != nil {
+		log.Printf("[RAFFLE] Primeros 10 registros en BD:")
+		for debugRows.Next() {
+			var id, mesDB, nombre, email string
+			if err := debugRows.Scan(&id, &mesDB, &nombre, &email); err == nil {
+				log.Printf("[RAFFLE]   ID: %s, Mes: '%s' (len=%d), Nombre: %s", id, mesDB, len(mesDB), nombre)
+			}
+		}
+		debugRows.Close()
+	}
+
 	rows, err := db.DB.Query(
 		context.Background(),
 		`SELECT id, nombre, email, telefono, edad, numero_participacion, is_winner, prize_level, created_at, mes_sorteo
-		 FROM raffle_subscriptions WHERE mes_sorteo = $1 ORDER BY created_at DESC`,
+		 FROM raffle_subscriptions WHERE TRIM(mes_sorteo) = TRIM($1) ORDER BY created_at DESC`,
 		mesSorteo,
 	)
 	if err != nil {
@@ -422,16 +447,20 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	participants := []fiber.Map{}
+	rowCount := 0
 	for rows.Next() {
+		rowCount++
 		var id, nombre, email, telefono, prizeLevel, mesSorteoDB string
 		var edad, numeroParticipacion int
 		var isWinner bool
 		var createdAt time.Time
 
 		if err := rows.Scan(&id, &nombre, &email, &telefono, &edad, &numeroParticipacion, &isWinner, &prizeLevel, &createdAt, &mesSorteoDB); err != nil {
-			log.Printf("[RAFFLE] Error escaneando fila: %v", err)
+			log.Printf("[RAFFLE] Error escaneando fila %d: %v", rowCount, err)
 			continue
 		}
+
+		log.Printf("[RAFFLE] Participante encontrado: %s - %s (mes: '%s')", nombre, email, mesSorteoDB)
 
 		participants = append(participants, fiber.Map{
 			"id":                   id,
@@ -445,6 +474,7 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 			"created_at":           createdAt,
 		})
 	}
+	log.Printf("[RAFFLE] Total filas procesadas: %d, participantes agregados: %d", rowCount, len(participants))
 
 	log.Printf("[RAFFLE] Participantes encontrados: %d para mes %s", len(participants), mesSorteo)
 
@@ -505,18 +535,41 @@ func GetRaffleStats(c *fiber.Ctx) error {
 		mesSorteo = time.Now().Format("2006-01")
 	}
 
+	log.Printf("[RAFFLE STATS] Consultando estadísticas para mes: %s", mesSorteo)
+
+	// Primero verificar todos los meses disponibles
+	var allMonths []string
+	monthRows, err := db.DB.Query(
+		context.Background(),
+		`SELECT DISTINCT mes_sorteo, COUNT(*) as count FROM raffle_subscriptions GROUP BY mes_sorteo ORDER BY mes_sorteo DESC`,
+	)
+	if err == nil {
+		defer monthRows.Close()
+		for monthRows.Next() {
+			var month string
+			var count int
+			if err := monthRows.Scan(&month, &count); err == nil {
+				allMonths = append(allMonths, month)
+				log.Printf("[RAFFLE STATS] Mes %s tiene %d participantes", month, count)
+			}
+		}
+	}
+
 	var totalParticipants, totalWinners int
-	err := db.DB.QueryRow(
+	err = db.DB.QueryRow(
 		context.Background(),
 		`SELECT COUNT(*) FROM raffle_subscriptions WHERE mes_sorteo = $1`,
 		mesSorteo,
 	).Scan(&totalParticipants)
 
 	if err != nil {
+		log.Printf("[RAFFLE STATS] Error contando participantes: %v", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al obtener estadísticas",
 		})
 	}
+
+	log.Printf("[RAFFLE STATS] Total participantes para %s: %d", mesSorteo, totalParticipants)
 
 	err = db.DB.QueryRow(
 		context.Background(),
@@ -532,5 +585,6 @@ func GetRaffleStats(c *fiber.Ctx) error {
 		"mes_sorteo":         mesSorteo,
 		"total_participants": totalParticipants,
 		"total_winners":      totalWinners,
+		"available_months":   allMonths,
 	})
 }
