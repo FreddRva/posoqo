@@ -186,6 +186,8 @@ export default function Navbar() {
 
 
 
+  const isDashboard = pathname.startsWith('/dashboard');
+
   return (
 
     <>
@@ -193,17 +195,19 @@ export default function Navbar() {
       <nav 
         
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-          
-          scrolled 
-            
-            ? "bg-white/5 backdrop-blur-2xl border-b border-white/10" 
-            : "bg-transparent"
+          isDashboard
+            ? scrolled
+              ? "bg-gray-900 shadow-lg border-b border-gray-800"
+              : "bg-gray-900 shadow-md border-b border-gray-800"
+            : scrolled 
+              ? "bg-white/5 backdrop-blur-2xl border-b border-white/10" 
+              : "bg-transparent"
         }`}
-        style={{
+        style={!isDashboard ? {
           background: scrolled 
             ? 'linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.7) 100%)' 
             : 'transparent'
-        }}
+        } : {}}
       >
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -252,7 +256,11 @@ export default function Navbar() {
 
                     onClick={() => setShowNotifications(!showNotifications)}
 
-                    className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                    className={`relative p-2 rounded-lg transition-all duration-200 ${
+                      isDashboard
+                        ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                        : "text-gray-400 hover:text-white hover:bg-white/5"
+                    }`}
                   >
 
                     <Bell className="w-5 h-5" />
@@ -392,7 +400,11 @@ export default function Navbar() {
 
                 onClick={() => setShowSmartSearch(true)}
 
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                className={`p-2 rounded-lg transition-all duration-200 ${
+                  isDashboard
+                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
                 title="Búsqueda Inteligente con IA"
 
               >
@@ -412,7 +424,11 @@ export default function Navbar() {
 
                 href="/cart"
 
-                className="relative p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                className={`relative p-2 rounded-lg transition-all duration-200 ${
+                  isDashboard
+                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
               >
 
                 <ShoppingCart className="w-5 h-5" />
@@ -444,10 +460,16 @@ export default function Navbar() {
 
                     onClick={() => setShowUserMenu(!showUserMenu)}
 
-                    className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 flex items-center justify-center transition-all duration-200"
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 ${
+                      isDashboard
+                        ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
+                        : "bg-white/10 hover:bg-white/15 border border-white/10"
+                    }`}
                   >
 
-                    <span className="text-sm font-medium text-white">
+                    <span className={`text-sm font-medium ${
+                      isDashboard ? "text-white" : "text-white"
+                    }`}>
                       {user.name?.charAt(0).toUpperCase()}
 
                     </span>
@@ -625,7 +647,11 @@ export default function Navbar() {
 
                 href="/cart" 
 
-                className="relative p-2.5 text-gray-400 hover:text-[#FFD700] hover:bg-[#D4AF37]/10 rounded-lg transition-all duration-300 group"
+                className={`relative p-2.5 rounded-lg transition-all duration-300 group ${
+                  isDashboard
+                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-400 hover:text-[#FFD700] hover:bg-[#D4AF37]/10"
+                }`}
 
               >
 
@@ -651,7 +677,11 @@ export default function Navbar() {
 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
+                className={`p-2 rounded-lg transition-all duration-200 ${
+                  isDashboard
+                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                }`}
 
               >
 

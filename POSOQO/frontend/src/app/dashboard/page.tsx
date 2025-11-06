@@ -198,20 +198,17 @@ export default function DashboardPage() {
 
   if (statsLoading || notificationsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-            <p className="text-stone-600">Cargando Dashboard...</p>
-          </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="animate-spin w-12 h-12 text-blue-600" />
+          <p className="text-stone-700">Cargando Dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
@@ -220,7 +217,7 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={handleRefreshAll}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
+            className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 font-semibold"
           >
             <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>Actualizar</span>
@@ -243,7 +240,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-blue-600">{alert.icon}</div>
-                    <p className="text-stone-800 text-sm">{alert.message}</p>
+                    <p className="text-stone-700 text-sm">{alert.message}</p>
                   </div>
                 </Link>
               ))}
@@ -317,7 +314,6 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

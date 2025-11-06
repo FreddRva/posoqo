@@ -41,8 +41,8 @@ export const ChatbotWidget: React.FC = () => {
     }
   }, [isOpen]);
 
-  // Ocultar en la página de login y registro
-  if (pathname === '/login' || pathname === '/register' || pathname === '/forgot-password') {
+  // Ocultar en la página de login, registro y dashboard
+  if (pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname.startsWith('/dashboard')) {
     return null;
   }
 

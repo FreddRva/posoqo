@@ -43,41 +43,32 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Cargando productos...</p>
+      <div className="flex justify-center items-center h-64">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-stone-700">Cargando productos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="space-y-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Package className="w-8 h-8 text-blue-600" />
-                Gestión de Productos
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Administra tu catálogo de productos y cervezas
-              </p>
-            </div>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={openCreateModal}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Nuevo Producto
-            </motion.button>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-stone-800 mb-2">Gestión de Productos</h1>
+            <p className="text-stone-600">Administra tu catálogo de productos y cervezas</p>
           </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openCreateModal}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg font-semibold"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Agregar Producto</span>
+          </motion.button>
         </div>
 
         {/* Estadísticas */}
@@ -98,13 +89,13 @@ export default function ProductsPage() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3"
+            className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3"
           >
             <AlertCircle className="w-5 h-5 text-red-600" />
-            <span className="text-red-800">{error}</span>
+            <span className="text-red-800 flex-1">{error}</span>
             <button
               onClick={() => setError(null)}
-              className="ml-auto text-red-600 hover:text-red-800"
+              className="text-red-600 hover:text-red-800 transition-colors"
             >
               ✕
             </button>
@@ -116,13 +107,13 @@ export default function ProductsPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-12"
+            className="text-center py-12 bg-white rounded-xl shadow-sm border border-stone-200"
           >
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <Package className="w-16 h-16 text-stone-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-stone-800 mb-2">
               {allProducts.length === 0 ? 'No hay productos' : 'No se encontraron productos'}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-stone-600 mb-6">
               {allProducts.length === 0 
                 ? 'Comienza creando tu primer producto'
                 : 'Intenta ajustar los filtros de búsqueda'
@@ -133,7 +124,7 @@ export default function ProductsPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={openCreateModal}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg"
               >
                 Crear Primer Producto
               </motion.button>

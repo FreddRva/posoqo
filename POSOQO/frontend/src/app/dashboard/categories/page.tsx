@@ -298,20 +298,17 @@ export default function AdminCategories() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="animate-spin w-12 h-12 text-blue-500" />
-            <p className="text-stone-600">Cargando categorías...</p>
-          </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="animate-spin w-12 h-12 text-blue-600" />
+          <p className="text-stone-700">Cargando categorías...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
@@ -808,7 +805,6 @@ export default function AdminCategories() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 } 
