@@ -26,190 +26,139 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20"
     >
-      {/* Imagen del producto */}
-      <div 
-        className="relative bg-gray-100 rounded-t-xl" 
-        style={{ 
-          padding: '32px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          minHeight: '400px',
-          height: 'auto',
-          overflow: 'visible'
-        }}
-      >
-        {product.image_url ? (
-          <img
-            src={getImageUrl(product.image_url)}
-            alt={product.name}
-            style={{ 
-              maxWidth: '100%',
-              width: 'auto',
-              height: 'auto',
-              objectFit: 'contain',
-              display: 'block',
-              margin: '0 auto',
-              flexShrink: 0
-            }}
-            onError={(e) => {
-              const target = e.currentTarget;
-              target.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="w-full flex items-center justify-center text-gray-400" style={{ minHeight: '400px' }}>
-            <Package className="w-12 h-12" />
-          </div>
-        )}
-        
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.is_featured && (
-            <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-              Destacado
-            </span>
-          )}
-          {!product.is_active && (
-            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-              Inactivo
-            </span>
-          )}
-          {(product.stock || 0) <= 0 && (
-            <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-              Sin Stock
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Contenido */}
-      <div className="p-4">
-        {/* Nombre del producto */}
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-          {product.name}
-        </h3>
-        
-        {/* Descripción */}
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {product.description}
-        </p>
-        
-        {/* Precio */}
-        {product.price && (
-          <div className="flex items-center gap-1 mb-3">
-            <DollarSign className="w-4 h-4 text-green-600" />
-            <span className="text-lg font-bold text-green-600">
-              S/ {product.price.toFixed(2)}
-            </span>
-          </div>
-        )}
-        
-        {/* Stock */}
-        <div className="flex items-center gap-1 mb-4">
-          <Package className="w-4 h-4 text-gray-500" />
-          <span className="text-sm text-gray-600">
-            Stock: {product.stock || 0}
-          </span>
-        </div>
-        
-        {/* Especificaciones */}
-        <div className="flex flex-wrap gap-1 mb-4">
-          {product.abv && (
-            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              ABV {product.abv}
-            </span>
-          )}
-          {product.ibu && (
-            <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
-              IBU {product.ibu}
-            </span>
-          )}
-          {product.color && (
-            <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded">
-              {product.color}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Acciones */}
-      <div className="px-4 pb-4">
-        <div className="flex gap-2">
-          {/* Botón editar */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onEdit(product)}
-            className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-1"
+      {/* Contenedor principal con espacio para la imagen flotante */}
+      <div className="relative pt-48">
+        {/* Imagen del producto - FLOTANTE estilo Fortnite */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
+          <motion.div
+            whileHover={{ scale: 1.08, y: -5 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="relative w-full flex items-center justify-center"
           >
-            <Edit className="w-4 h-4" />
-            Editar
-          </motion.button>
-          
-          {/* Botón eliminar */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => product.id && onDelete(product.id)}
-            className="flex-1 bg-red-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-1"
-          >
-            <Trash2 className="w-4 h-4" />
-            Eliminar
-          </motion.button>
-        </div>
-        
-        <div className="flex gap-2 mt-2">
-          {/* Toggle activo */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => product.id && onToggleActive(product.id)}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-1 ${
-              product.is_active
-                ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-            }`}
-          >
-            {product.is_active ? (
-              <>
-                <Eye className="w-4 h-4" />
-                Activo
-              </>
-            ) : (
-              <>
-                <EyeOff className="w-4 h-4" />
-                Inactivo
-              </>
+            <div className="w-full max-w-[300px] h-auto flex items-center justify-center">
+              {product.image_url ? (
+                <img
+                  src={getImageUrl(product.image_url)}
+                  alt={product.name}
+                  className="w-auto h-auto max-w-full max-h-[420px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                  style={{ objectFit: 'contain', display: 'block' }}
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <Package className="w-12 h-12" />
+                </div>
+              )}
+            </div>
+            
+            {/* Badge destacado */}
+            {product.is_featured && (
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="absolute top-2 right-2 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-cyan-300/50 z-20"
+              >
+                ⭐ Destacado
+              </motion.div>
             )}
-          </motion.button>
+          </motion.div>
+        </div>
+
+        {/* Card estilo Fortnite - Diseño moderno y limpio */}
+        <div className="relative bg-gray-800/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 mt-48 p-6">
+          {/* Nombre del producto */}
+          <h3 className="text-2xl font-bold text-white text-center mb-4">
+            {product.name}
+          </h3>
           
-          {/* Toggle destacado */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => product.id && onToggleFeatured(product.id)}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center justify-center gap-1 ${
-              product.is_featured
-                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-            }`}
-          >
-            {product.is_featured ? (
-              <>
-                <Star className="w-4 h-4" />
-                Destacado
-              </>
-            ) : (
-              <>
-                <StarOff className="w-4 h-4" />
-                Normal
-              </>
+          {/* Rating con estrellas brillantes */}
+          <div className="flex justify-center items-center gap-1 mb-6">
+            {Array.from({ length: 5 }).map((_, i) => {
+              const rating = product.rating || 0;
+              const starValue = i + 1;
+              const isFilled = starValue <= Math.floor(rating);
+              const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
+              
+              return (
+                <Star
+                  key={i}
+                  className={`w-5 h-5 ${
+                    isFilled
+                      ? 'fill-cyan-400 text-cyan-400'
+                      : isHalfFilled
+                      ? 'fill-cyan-400/50 text-cyan-400/50'
+                      : 'fill-gray-600 text-gray-600'
+                  }`}
+                />
+              );
+            })}
+            {product.rating && (
+              <span className="ml-2 text-sm text-gray-400">({product.rating.toFixed(1)})</span>
             )}
-          </motion.button>
+          </div>
+
+          {/* Botones de acción - Estilo Fortnite */}
+          <div className="space-y-2">
+            {/* Botón Editar */}
+            <motion.button
+              onClick={() => onEdit(product)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-6 py-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-cyan-500/50 uppercase tracking-wider text-sm"
+            >
+              <Edit className="w-5 h-5" />
+              <span>Editar</span>
+            </motion.button>
+            
+            {/* Botón Eliminar */}
+            <motion.button
+              onClick={() => product.id && onDelete(product.id)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-red-500/50 uppercase tracking-wider text-xs"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Eliminar</span>
+            </motion.button>
+            
+            {/* Toggles compactos */}
+            <div className="flex gap-2 mt-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => product.id && onToggleActive(product.id)}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors duration-200 flex items-center justify-center gap-1 ${
+                  product.is_active
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30'
+                    : 'bg-gray-700 text-gray-400 border border-gray-600 hover:bg-gray-600'
+                }`}
+              >
+                {product.is_active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                <span className="text-xs">{product.is_active ? 'Activo' : 'Inactivo'}</span>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => product.id && onToggleFeatured(product.id)}
+                className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors duration-200 flex items-center justify-center gap-1 ${
+                  product.is_featured
+                    ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30'
+                    : 'bg-gray-700 text-gray-400 border border-gray-600 hover:bg-gray-600'
+                }`}
+              >
+                {product.is_featured ? <Star className="w-3 h-3" /> : <StarOff className="w-3 h-3" />}
+                <span className="text-xs">{product.is_featured ? 'Destacado' : 'Normal'}</span>
+              </motion.button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
