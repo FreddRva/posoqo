@@ -35,18 +35,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-amber-400/5 to-yellow-400/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="flex">
-          {/* Imagen más grande */}
-          <div className="w-48 h-48 flex-shrink-0 relative overflow-hidden">
+          {/* Imagen más grande - Adaptativa */}
+          <div className="w-48 h-48 flex-shrink-0 relative overflow-hidden bg-black flex items-center justify-center">
             <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.5 }}
-              className="relative w-full h-full"
+              className="relative w-full h-full flex items-center justify-center p-4"
             >
               <Image
                 src={getImageUrl(product.image_url || product.image || '')}
                 alt={product.name}
-                fill
-                className="object-cover"
+                width={192}
+                height={192}
+                className="w-auto h-auto max-w-full max-h-full object-contain"
+                style={{ objectFit: 'contain' }}
                 sizes="192px"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -148,21 +150,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Línea superior dorada */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      {/* Imagen completa y atractiva */}
-      <div className="relative h-80 overflow-hidden bg-black">
+      {/* Imagen completa y atractiva - Adaptativa para imágenes pequeñas */}
+      <div className="relative overflow-hidden bg-black" style={{ minHeight: '280px', height: 'auto' }}>
         <motion.div
           whileHover={{ scale: 1.15 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="relative w-full h-full"
+          className="relative w-full flex items-center justify-center p-8"
+          style={{ minHeight: '280px' }}
         >
-          <Image
-            src={getImageUrl(product.image_url || product.image || '')}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={false}
-          />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Image
+              src={getImageUrl(product.image_url || product.image || '')}
+              alt={product.name}
+              width={400}
+              height={400}
+              className="w-auto h-auto max-w-full max-h-[400px] object-contain"
+              style={{ objectFit: 'contain' }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={false}
+            />
+          </div>
           
           {/* Overlay gradiente sutil */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

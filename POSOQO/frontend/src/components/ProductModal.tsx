@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, MessageSquare, Send, Package } from "lucide-react";
-import { useState, useEffect } from "react";
 import { getImageUrl, getApiUrl } from "@/lib/config";
 import { useSession } from "next-auth/react";
 
@@ -39,6 +39,13 @@ interface ProductModalProps {
 export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
+  
+  // Asegurar que si es comida, no esté en la pestaña de detalles
+  useEffect(() => {
+    if (productType === 'comida' && activeTab === 'detalles') {
+      setActiveTab('descripcion');
+    }
+  }, [productType, activeTab]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
@@ -195,7 +202,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {/* Solo mostrar pestaña de detalles para cervezas */}
+                      {/* Solo mostrar pestaña de detalles para cervezas - NO para comidas/gastronomía */}
                       {productType === 'cerveza' && (
                         <button 
                           onClick={() => setActiveTab('detalles')}

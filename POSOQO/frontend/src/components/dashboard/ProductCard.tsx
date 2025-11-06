@@ -38,13 +38,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="relative w-full flex items-center justify-center"
           >
-            <div className="w-full flex items-center justify-center" style={{ minHeight: '200px', maxHeight: '500px' }}>
+            <div className="w-full flex items-center justify-center p-4" style={{ minHeight: '200px', maxHeight: '500px' }}>
               {product.image_url ? (
                 <img
                   src={getImageUrl(product.image_url)}
                   alt={product.name}
-                  className="w-auto h-auto max-w-full max-h-[500px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
-                  style={{ objectFit: 'contain', display: 'block', maxWidth: '100%' }}
+                  className="w-auto h-auto max-w-full max-h-[500px] min-h-[150px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                  style={{ objectFit: 'contain', display: 'block', maxWidth: '100%', minWidth: '120px' }}
                   onError={(e) => {
                     const target = e.currentTarget;
                     target.style.display = 'none';

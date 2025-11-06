@@ -255,12 +255,12 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     transition={{ duration: 0.4, ease: "easeOut" }}
                     className="relative w-full flex items-center justify-center"
                   >
-                    <div className="w-full max-w-[300px] h-auto flex items-center justify-center">
+                    <div className="w-full max-w-[300px] h-auto flex items-center justify-center" style={{ minHeight: '200px', maxHeight: '500px' }}>
                       <img
                         src={getImageUrl(product.image_url)}
                         alt={product.name}
-                        className="w-auto h-auto max-w-full max-h-[420px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
-                        style={{ objectFit: 'contain', display: 'block' }}
+                        className="w-auto h-auto max-w-full max-h-[500px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                        style={{ objectFit: 'contain', display: 'block', minHeight: '150px', maxHeight: '500px' }}
                       />
                     </div>
                     
