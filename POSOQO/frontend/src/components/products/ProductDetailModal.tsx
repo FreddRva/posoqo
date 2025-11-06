@@ -261,7 +261,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   Agregar al Carrito
                 </motion.button>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </>
       )}
