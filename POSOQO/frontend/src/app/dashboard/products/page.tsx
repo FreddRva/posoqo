@@ -165,7 +165,6 @@ export default function ProductsPage() {
           onSave={saveProduct}
           loading={saving}
         />
-      </div>
     </div>
   );
 }
