@@ -11,6 +11,11 @@ import { ChatbotWidget } from "@/components/ai";
 export const metadata: Metadata = {
   title: "POSOQO",
   description: "POSOQO Restaurante",
+  icons: {
+    icon: "/Logo.png",
+    shortcut: "/Logo.png",
+    apple: "/Logo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
