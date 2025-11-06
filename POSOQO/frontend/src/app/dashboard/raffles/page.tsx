@@ -109,6 +109,14 @@ export default function RafflesPage() {
         } else if (response.participants && Array.isArray(response.participants)) {
           console.log('Tiene propiedad participants, total:', response.participants.length);
           participantsList = response.participants;
+          
+          // Mostrar meses disponibles si vienen en la respuesta
+          if (response.available_months && Array.isArray(response.available_months)) {
+            console.log('Meses disponibles con participantes:', response.available_months);
+            if (response.available_months.length > 0 && participantsList.length === 0) {
+              console.warn(`⚠️ No hay participantes para ${mes}, pero existen meses: ${response.available_months.join(', ')}`);
+            }
+          }
         } else if (response.data && Array.isArray(response.data)) {
           console.log('Tiene propiedad data, total:', response.data.length);
           participantsList = response.data;
@@ -506,6 +514,9 @@ export default function RafflesPage() {
                 <p className="text-stone-600">No hay participantes para este mes</p>
                 <p className="text-xs text-stone-500 mt-2">
                   Mes consultado: {selectedMes} | Total en stats: {stats.total_participants}
+                </p>
+                <p className="text-xs text-amber-600 mt-2">
+                  💡 Sugerencia: Verifica en la consola los meses disponibles con participantes
                 </p>
               </div>
             ) : (
