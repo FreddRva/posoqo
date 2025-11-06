@@ -135,86 +135,107 @@ func ConsultarDNI(c *fiber.Ctx) error {
 		})
 	}
 
-	// Parsear la respuesta JSON - intentar diferentes formatos posibles
+	// Parsear la respuesta JSON - usar parseo genérico para manejar diferentes tipos
 	var apiResponse DNIResponse
 	var rawResponse map[string]interface{}
 	
-	// Primero intentar parsear como estructura esperada
-	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		log.Printf("[DNI] Error al parsear JSON con estructura esperada: %v", err)
+	// Parsear como mapa genérico para manejar tipos flexibles (números/strings)
+	if jsonErr := json.Unmarshal(body, &rawResponse); jsonErr != nil {
+		log.Printf("[DNI] Error al parsear JSON: %v", jsonErr)
 		log.Printf("[DNI] Respuesta recibida: %s", string(body))
-		
-		// Intentar parsear como mapa genérico para inspeccionar la estructura
-		if jsonErr := json.Unmarshal(body, &rawResponse); jsonErr != nil {
-			log.Printf("[DNI] Error al parsear JSON genérico: %v", jsonErr)
+		return c.Status(500).JSON(fiber.Map{
+			"error": fmt.Sprintf("Error al procesar la respuesta JSON: %v", jsonErr),
+		})
+	}
+	
+	// Función auxiliar para convertir codigo_verificacion (puede ser número o string)
+	convertCodigoVerificacion := func(val interface{}) string {
+		if val == nil {
+			return ""
+		}
+		switch v := val.(type) {
+		case string:
+			return v
+		case float64:
+			// JSON numbers se parsean como float64
+			return fmt.Sprintf("%.0f", v)
+		case int:
+			return fmt.Sprintf("%d", v)
+		case int64:
+			return fmt.Sprintf("%d", v)
+		default:
+			return fmt.Sprintf("%v", v)
+		}
+	}
+	
+	// Extraer datos de diferentes estructuras posibles
+	log.Printf("[DNI] Estructura recibida: %+v", rawResponse)
+	
+	// Intentar extraer datos del campo "data"
+	if data, ok := rawResponse["data"].(map[string]interface{}); ok {
+		apiResponse.Success = true
+		if numero, ok := data["numero"].(string); ok {
+			apiResponse.Data.Numero = numero
+		} else if numero, ok := data["numero"].(float64); ok {
+			apiResponse.Data.Numero = fmt.Sprintf("%.0f", numero)
+		}
+		if nombres, ok := data["nombres"].(string); ok {
+			apiResponse.Data.Nombres = nombres
+		}
+		if apellidoPaterno, ok := data["apellido_paterno"].(string); ok {
+			apiResponse.Data.ApellidoPaterno = apellidoPaterno
+		}
+		if apellidoMaterno, ok := data["apellido_materno"].(string); ok {
+			apiResponse.Data.ApellidoMaterno = apellidoMaterno
+		}
+		if nombresCompletos, ok := data["nombres_completos"].(string); ok {
+			apiResponse.Data.NombresCompletos = nombresCompletos
+		}
+		// Manejar codigo_verificacion como número o string
+		if codigoVerificacion, exists := data["codigo_verificacion"]; exists {
+			apiResponse.Data.CodigoVerificacion = convertCodigoVerificacion(codigoVerificacion)
+		}
+		// Verificar si success está en el root
+		if success, ok := rawResponse["success"].(bool); ok {
+			apiResponse.Success = success
+		}
+	} else if success, ok := rawResponse["success"].(bool); ok && success {
+		// Si no hay data pero hay success, intentar buscar datos en otros campos
+		apiResponse.Success = true
+		// Los datos podrían estar directamente en el root
+		if numero, ok := rawResponse["numero"].(string); ok {
+			apiResponse.Data.Numero = numero
+		}
+		if nombres, ok := rawResponse["nombres"].(string); ok {
+			apiResponse.Data.Nombres = nombres
+		}
+		if apellidoPaterno, ok := rawResponse["apellido_paterno"].(string); ok {
+			apiResponse.Data.ApellidoPaterno = apellidoPaterno
+		}
+		if apellidoMaterno, ok := rawResponse["apellido_materno"].(string); ok {
+			apiResponse.Data.ApellidoMaterno = apellidoMaterno
+		}
+		if nombresCompletos, ok := rawResponse["nombres_completos"].(string); ok {
+			apiResponse.Data.NombresCompletos = nombresCompletos
+		}
+		if codigoVerificacion, exists := rawResponse["codigo_verificacion"]; exists {
+			apiResponse.Data.CodigoVerificacion = convertCodigoVerificacion(codigoVerificacion)
+		}
+	} else {
+		// Intentar parsear como respuesta de error
+		if errorMsg, ok := rawResponse["message"].(string); ok {
 			return c.Status(500).JSON(fiber.Map{
-				"error": fmt.Sprintf("Error al procesar la respuesta JSON: %v. Respuesta: %s", jsonErr, string(body)),
+				"error": fmt.Sprintf("Error de API: %s", errorMsg),
 			})
 		}
-		
-		// Intentar extraer datos de diferentes estructuras posibles
-		log.Printf("[DNI] Estructura recibida: %+v", rawResponse)
-		
-		// Formato alternativo 1: datos directamente en el root
-		if data, ok := rawResponse["data"].(map[string]interface{}); ok {
-			apiResponse.Success = true
-			if numero, ok := data["numero"].(string); ok {
-				apiResponse.Data.Numero = numero
-			}
-			if nombres, ok := data["nombres"].(string); ok {
-				apiResponse.Data.Nombres = nombres
-			}
-			if apellidoPaterno, ok := data["apellido_paterno"].(string); ok {
-				apiResponse.Data.ApellidoPaterno = apellidoPaterno
-			}
-			if apellidoMaterno, ok := data["apellido_materno"].(string); ok {
-				apiResponse.Data.ApellidoMaterno = apellidoMaterno
-			}
-			if nombresCompletos, ok := data["nombres_completos"].(string); ok {
-				apiResponse.Data.NombresCompletos = nombresCompletos
-			}
-			if codigoVerificacion, ok := data["codigo_verificacion"].(string); ok {
-				apiResponse.Data.CodigoVerificacion = codigoVerificacion
-			}
-		} else if success, ok := rawResponse["success"].(bool); ok && success {
-			// Formato alternativo 2: success en root, datos en otro campo
-			apiResponse.Success = true
-			if data, ok := rawResponse["data"].(map[string]interface{}); ok {
-				if numero, ok := data["numero"].(string); ok {
-					apiResponse.Data.Numero = numero
-				}
-				if nombres, ok := data["nombres"].(string); ok {
-					apiResponse.Data.Nombres = nombres
-				}
-				if apellidoPaterno, ok := data["apellido_paterno"].(string); ok {
-					apiResponse.Data.ApellidoPaterno = apellidoPaterno
-				}
-				if apellidoMaterno, ok := data["apellido_materno"].(string); ok {
-					apiResponse.Data.ApellidoMaterno = apellidoMaterno
-				}
-				if nombresCompletos, ok := data["nombres_completos"].(string); ok {
-					apiResponse.Data.NombresCompletos = nombresCompletos
-				}
-				if codigoVerificacion, ok := data["codigo_verificacion"].(string); ok {
-					apiResponse.Data.CodigoVerificacion = codigoVerificacion
-				}
-			}
-		} else {
-			// Intentar parsear como respuesta de error
-			if errorMsg, ok := rawResponse["message"].(string); ok {
-				return c.Status(500).JSON(fiber.Map{
-					"error": fmt.Sprintf("Error de API: %s", errorMsg),
-				})
-			}
-			if errorMsg, ok := rawResponse["error"].(string); ok {
-				return c.Status(500).JSON(fiber.Map{
-					"error": fmt.Sprintf("Error de API: %s", errorMsg),
-				})
-			}
+		if errorMsg, ok := rawResponse["error"].(string); ok {
 			return c.Status(500).JSON(fiber.Map{
-				"error": fmt.Sprintf("Error al procesar la respuesta: formato desconocido. Respuesta: %s", string(body)),
+				"error": fmt.Sprintf("Error de API: %s", errorMsg),
 			})
 		}
+		return c.Status(500).JSON(fiber.Map{
+			"error": fmt.Sprintf("Error al procesar la respuesta: formato desconocido. Respuesta: %s", string(body)),
+		})
 	}
 
 	// Verificar si la consulta fue exitosa
