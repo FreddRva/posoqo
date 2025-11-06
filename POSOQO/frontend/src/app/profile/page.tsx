@@ -21,6 +21,8 @@ export default function ProfilePage() {
     addressRef: "",
     streetNumber: "",
   });
+  const [consultandoDNI, setConsultandoDNI] = useState(false);
+  const [dniVerificado, setDniVerificado] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const { notifications, stats } = useNotifications();
@@ -115,7 +117,60 @@ export default function ProfilePage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Si cambia el DNI, resetear verificación
+    if (e.target.name === 'dni') {
+      setDniVerificado(false);
+    }
   }
+
+  // Función para consultar DNI cuando se complete
+  const handleDNIBlur = async () => {
+    const dniValue = form.dni.trim();
+    
+    // Solo consultar si tiene exactamente 8 dígitos
+    if (!/^\d{8}$/.test(dniValue)) {
+      setDniVerificado(false);
+      return;
+    }
+
+    // Si ya tiene nombre completo, no consultar de nuevo
+    if (form.name.trim() !== '' && form.last_name.trim() !== '') {
+      return;
+    }
+
+    setConsultandoDNI(true);
+    setDniVerificado(false);
+    try {
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com').replace(/\/$/, '');
+      const url = `${apiUrl}/api/dni/${dniValue}`;
+      
+      const response = await fetch(url);
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Autocompletar los datos con los datos del DNI
+          if (!form.name.trim()) {
+            setForm(prev => ({ ...prev, name: result.data.nombres || '' }));
+          }
+          if (!form.last_name.trim()) {
+            const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
+            setForm(prev => ({ ...prev, last_name: apellidos }));
+          }
+          setDniVerificado(true);
+        } else {
+          setDniVerificado(false);
+        }
+      } else {
+        setDniVerificado(false);
+      }
+    } catch (error) {
+      console.error('Error consultando DNI:', error);
+      setDniVerificado(false);
+    } finally {
+      setConsultandoDNI(false);
+    }
+  };
 
   async function handleEditSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -242,14 +297,35 @@ export default function ProfilePage() {
                 />
               </label>
               <label className="flex flex-col gap-1">
-                DNI
-                <input
-                  type="text"
-                  name="dni"
-                  value={form.dni}
-                  onChange={handleChange}
-                  className="border rounded px-3 py-2"
-                />
+                DNI <span className="text-xs text-gray-500">(Opcional - 8 dígitos)</span>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="dni"
+                    value={form.dni}
+                    onChange={handleChange}
+                    onBlur={handleDNIBlur}
+                    maxLength={8}
+                    className={`border rounded px-3 py-2 w-full ${
+                      dniVerificado ? 'border-green-400' : 'border-gray-300'
+                    }`}
+                    placeholder="12345678"
+                    disabled={consultandoDNI}
+                  />
+                  {consultandoDNI && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                  {dniVerificado && !consultandoDNI && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <span className="text-green-500 text-sm">✓</span>
+                    </div>
+                  )}
+                </div>
+                {dniVerificado && (
+                  <p className="text-xs text-green-600 mt-1">DNI verificado - Datos autocompletados</p>
+                )}
               </label>
               <label className="flex flex-col gap-1">
                 Teléfono

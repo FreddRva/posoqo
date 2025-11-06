@@ -1,5 +1,5 @@
 // components/checkout/ProfileForm.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Phone, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { ProfileForm } from '@/types/checkout';
@@ -25,11 +25,73 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
   onSave,
   onCancel
 }) => {
+  const [consultandoDNI, setConsultandoDNI] = useState(false);
+  const [dniVerificado, setDniVerificado] = useState(false);
+
   const handleInputChange = (field: keyof ProfileForm, value: string) => {
     setProfileForm({
       ...profileForm,
       [field]: value
     });
+    // Si cambia el DNI, resetear verificación
+    if (field === 'dni') {
+      setDniVerificado(false);
+    }
+  };
+
+  // Función para consultar DNI cuando se complete
+  const handleDNIBlur = async () => {
+    const dniValue = profileForm.dni.trim();
+    
+    // Solo consultar si tiene exactamente 8 dígitos
+    if (!/^\d{8}$/.test(dniValue)) {
+      setDniVerificado(false);
+      return;
+    }
+
+    // Si ya tiene nombre completo, no consultar de nuevo
+    if (profileForm.name.trim() !== '' && profileForm.last_name.trim() !== '') {
+      return;
+    }
+
+    setConsultandoDNI(true);
+    setDniVerificado(false);
+    try {
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com').replace(/\/$/, '');
+      const url = `${apiUrl}/api/dni/${dniValue}`;
+      
+      const response = await fetch(url);
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          // Autocompletar los datos con los datos del DNI
+          if (!profileForm.name.trim()) {
+            setProfileForm({
+              ...profileForm,
+              name: result.data.nombres || ''
+            });
+          }
+          if (!profileForm.last_name.trim()) {
+            const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
+            setProfileForm({
+              ...profileForm,
+              last_name: apellidos
+            });
+          }
+          setDniVerificado(true);
+        } else {
+          setDniVerificado(false);
+        }
+      } else {
+        setDniVerificado(false);
+      }
+    } catch (error) {
+      console.error('Error consultando DNI:', error);
+      setDniVerificado(false);
+    } finally {
+      setConsultandoDNI(false);
+    }
   };
 
   return (
@@ -110,10 +172,33 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
               type="text"
               value={profileForm.dni}
               onChange={(e) => handleInputChange('dni', e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
+              onBlur={handleDNIBlur}
+              maxLength={8}
+              className={`w-full pl-12 pr-12 py-3 bg-white/5 border rounded-xl focus:ring-2 focus:ring-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500 ${
+                dniVerificado 
+                  ? 'border-green-400/50 focus:border-green-400/50' 
+                  : 'border-white/10 focus:border-yellow-400/50'
+              }`}
               placeholder="12345678"
+              disabled={consultandoDNI}
             />
+            {consultandoDNI && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
+              </div>
+            )}
+            {dniVerificado && !consultandoDNI && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+              </div>
+            )}
           </div>
+          {dniVerificado && (
+            <p className="text-xs text-green-400 flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" />
+              DNI verificado - Datos autocompletados
+            </p>
+          )}
         </div>
 
         {/* Teléfono */}
