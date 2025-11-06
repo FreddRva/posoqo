@@ -387,13 +387,34 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 		mesSorteo = time.Now().Format("2006-01")
 	}
 
+	// Log para debug
+	log.Printf("[RAFFLE] Consultando participantes para mes: %s", mesSorteo)
+
+	// Primero verificar qué meses existen en la base de datos
+	var availableMonths []string
+	monthRows, err := db.DB.Query(
+		context.Background(),
+		`SELECT DISTINCT mes_sorteo FROM raffle_subscriptions ORDER BY mes_sorteo DESC`,
+	)
+	if err == nil {
+		defer monthRows.Close()
+		for monthRows.Next() {
+			var month string
+			if err := monthRows.Scan(&month); err == nil {
+				availableMonths = append(availableMonths, month)
+			}
+		}
+	}
+	log.Printf("[RAFFLE] Meses disponibles en BD: %v", availableMonths)
+
 	rows, err := db.DB.Query(
 		context.Background(),
-		`SELECT id, nombre, email, telefono, edad, numero_participacion, is_winner, prize_level, created_at
+		`SELECT id, nombre, email, telefono, edad, numero_participacion, is_winner, prize_level, created_at, mes_sorteo
 		 FROM raffle_subscriptions WHERE mes_sorteo = $1 ORDER BY created_at DESC`,
 		mesSorteo,
 	)
 	if err != nil {
+		log.Printf("[RAFFLE] Error en query: %v", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al obtener participantes",
 		})
@@ -402,12 +423,13 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 
 	participants := []fiber.Map{}
 	for rows.Next() {
-		var id, nombre, email, telefono, prizeLevel string
+		var id, nombre, email, telefono, prizeLevel, mesSorteoDB string
 		var edad, numeroParticipacion int
 		var isWinner bool
 		var createdAt time.Time
 
-		if err := rows.Scan(&id, &nombre, &email, &telefono, &edad, &numeroParticipacion, &isWinner, &prizeLevel, &createdAt); err != nil {
+		if err := rows.Scan(&id, &nombre, &email, &telefono, &edad, &numeroParticipacion, &isWinner, &prizeLevel, &createdAt, &mesSorteoDB); err != nil {
+			log.Printf("[RAFFLE] Error escaneando fila: %v", err)
 			continue
 		}
 
@@ -424,10 +446,13 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 		})
 	}
 
+	log.Printf("[RAFFLE] Participantes encontrados: %d para mes %s", len(participants), mesSorteo)
+
 	return c.JSON(fiber.Map{
-		"mes_sorteo":   mesSorteo,
-		"participants": participants,
-		"total":        len(participants),
+		"mes_sorteo":        mesSorteo,
+		"participants":      participants,
+		"total":             len(participants),
+		"available_months":  availableMonths,
 	})
 }
 
