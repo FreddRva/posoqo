@@ -34,14 +34,23 @@ function HomePageContent() {
   // Hook personalizado para datos de la página
   const { data, loading, error, refetch } = useHomeData();
 
+  // Estado para el modal de producto
+  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   // Handlers
   const handleScrollToProducts = () => {
     productosRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleProductClick = (product: Product) => {
-    // Lógica para abrir modal del producto
-    console.log('Product clicked:', product);
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
   };
 
   const handleJoinClub = () => {
@@ -110,9 +119,9 @@ function HomePageContent() {
 
       {/* Modal de producto */}
       <ProductModal 
-        product={null}
-        isOpen={false}
-        onClose={() => {}}
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
       />
     </div>
   );

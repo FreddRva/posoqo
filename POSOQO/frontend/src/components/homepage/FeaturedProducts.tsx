@@ -1,10 +1,90 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { getImageUrl } from '@/lib/config'
-import { FeaturedProductsProps } from '@/types/homepage'
+import { getImageUrl, getApiUrl } from '@/lib/config'
+import { FeaturedProductsProps, Product } from '@/types/homepage'
 import { ProductSkeleton, ErrorWithRetry } from '@/components/LoadingStates'
 import { Eye, Heart, ShoppingCart, Star, Beer, Sparkles, ArrowRight } from 'lucide-react'
+
+// Componente para estrellas calificables
+const RatingStars: React.FC<{ product: Product }> = ({ product }) => {
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isRating, setIsRating] = useState(false);
+  
+  const handleStarClick = async (value: number) => {
+    if (!product.id || isRating) return;
+    
+    setIsRating(true);
+    try {
+      const response = await fetch(getApiUrl(`products/${product.id}/reviews`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          rating: value,
+          comment: ''
+        })
+      });
+      
+      if (response.ok) {
+        // Recargar página para actualizar rating
+        window.location.reload();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Error al calificar. Debes haber comprado el producto para calificarlo.');
+      }
+    } catch (error) {
+      console.error('Error al calificar:', error);
+      alert('Error al calificar el producto');
+    } finally {
+      setIsRating(false);
+    }
+  };
+  
+  const rating = product.rating || 0;
+  
+  return (
+    <div className="flex flex-col items-center gap-2 mb-5">
+      <div className="flex justify-center items-center gap-1">
+        {Array.from({ length: 5 }).map((_, i) => {
+          const starValue = i + 1;
+          const isFilled = starValue <= Math.floor(rating);
+          const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
+          
+          return (
+            <button
+              key={i}
+              onClick={() => handleStarClick(starValue)}
+              onMouseEnter={() => setHoverRating(starValue)}
+              onMouseLeave={() => setHoverRating(0)}
+              disabled={isRating}
+              className="focus:outline-none transition-transform hover:scale-125 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={`Calificar ${starValue} estrellas`}
+            >
+              <Star
+                className={`w-5 h-5 transition-colors ${
+                  hoverRating >= starValue
+                    ? 'fill-yellow-400 text-yellow-400'
+                    : isFilled
+                    ? 'fill-cyan-400 text-cyan-400'
+                    : isHalfFilled
+                    ? 'fill-cyan-400/50 text-cyan-400/50'
+                    : 'fill-gray-600 text-gray-600 hover:fill-gray-500'
+                }`}
+              />
+            </button>
+          );
+        })}
+        {rating > 0 && (
+          <span className="ml-2 text-sm text-gray-400">({rating.toFixed(1)})</span>
+        )}
+      </div>
+      <p className="text-xs text-gray-500">Haz clic en las estrellas para calificar</p>
+    </div>
+  );
+};
 
 export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
@@ -207,31 +287,8 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     {product.name}
                   </h3>
                   
-                  {/* Rating con estrellas brillantes */}
-                  <div className="flex justify-center items-center gap-1 mb-5">
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const rating = product.rating || 0;
-                      const starValue = i + 1;
-                      const isFilled = starValue <= Math.floor(rating);
-                      const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
-                      
-                      return (
-                        <Star
-                          key={i}
-                          className={`w-5 h-5 ${
-                            isFilled
-                              ? 'fill-cyan-400 text-cyan-400'
-                              : isHalfFilled
-                              ? 'fill-cyan-400/50 text-cyan-400/50'
-                              : 'fill-gray-600 text-gray-600'
-                          }`}
-                        />
-                      );
-                    })}
-                    {product.rating && (
-                      <span className="ml-2 text-sm text-gray-400">({product.rating.toFixed(1)})</span>
-                    )}
-                  </div>
+                  {/* Rating con estrellas brillantes - Interactivas para calificar */}
+                  <RatingStars product={product} />
 
                   {/* Botón destacado - Estilo Fortnite */}
                   <motion.button
