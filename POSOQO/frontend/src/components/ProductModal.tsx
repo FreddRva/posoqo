@@ -66,6 +66,13 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
     }
   }, [isOpen, product?.id, session, productType]);
   
+  // Si cambia el productType a 'comida' y estamos en 'detalles', cambiar a 'descripcion'
+  useEffect(() => {
+    if (productType === 'comida' && activeTab === 'detalles') {
+      setActiveTab('descripcion');
+    }
+  }, [productType, activeTab]);
+  
   // Prevenir que se cambie a 'detalles' si es comida
   const handleTabChange = (tab: string) => {
     // Si intenta cambiar a 'detalles' y es comida, no permitirlo
@@ -259,7 +266,8 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {productType === 'cerveza' && (
+                      {/* Solo mostrar pestaña DETALLES si NO es comida */}
+                      {productType !== 'comida' && (
                         <button 
                           onClick={() => handleTabChange('detalles')}
                           className={`pb-3 px-2 font-semibold transition-colors ${
@@ -293,7 +301,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                         </div>
                       )}
 
-                      {activeTab === 'detalles' && productType === 'cerveza' && (
+                      {activeTab === 'detalles' && productType !== 'comida' && (
                         <div className="grid grid-cols-2 gap-4">
                           {product.abv && (
                             <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
