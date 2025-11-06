@@ -28,7 +28,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
   if (loading) {
     return (
-      <section className="py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <motion.div
@@ -57,7 +57,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
   if (error) {
     return (
-      <section className="py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
@@ -77,7 +77,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
   if (!products || products.length === 0) {
     return (
-      <section className="py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <motion.div
@@ -102,7 +102,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-16"
             >
-              <div className="bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-yellow-400/20 rounded-3xl p-12 max-w-2xl mx-auto">
+              <div className="bg-black/80 backdrop-blur-xl border border-yellow-400/20 rounded-3xl p-12 max-w-2xl mx-auto">
                 <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Star className="w-10 h-10 text-black" />
                 </div>
@@ -167,12 +167,12 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               className="group relative z-10"
             >
               {/* Card con glassmorphism premium */}
-              <div className="relative h-full bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-black/95 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500 shadow-2xl hover:shadow-yellow-400/20 group-hover:shadow-3xl">
+              <div className="relative h-full bg-black/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500 shadow-2xl hover:shadow-yellow-400/20 group-hover:shadow-3xl">
                 {/* Efecto de brillo superior */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 {/* Imagen del producto */}
-                <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
+                <div className="relative aspect-square overflow-hidden bg-black">
                   <img
                     src={getImageUrl(product.image_url)}
                     alt={product.name}

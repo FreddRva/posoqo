@@ -55,7 +55,7 @@ function HomePageContent() {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 ${montserrat.className}`}>
+    <div className={`min-h-screen bg-black ${montserrat.className}`}>
       {/* Hero Section */}
       <HeroSection onScrollToProducts={handleScrollToProducts} />
 

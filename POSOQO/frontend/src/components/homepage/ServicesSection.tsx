@@ -18,7 +18,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   if (loading) {
     return (
-      <section className="py-32 bg-gradient-to-b from-gray-950 via-black to-gray-950 relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <motion.div
@@ -47,7 +47,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   if (error) {
     return (
-      <section className="py-32 bg-gradient-to-b from-gray-950 via-black to-gray-950 relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
@@ -67,7 +67,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   if (!services || services.length === 0) {
     return (
-      <section className="py-32 bg-gradient-to-b from-gray-950 via-black to-gray-950 relative overflow-hidden">
+      <section className="py-32 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-20">
             <motion.div
@@ -92,7 +92,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-16"
             >
-              <div className="bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-xl border border-yellow-400/20 rounded-3xl p-12 max-w-2xl mx-auto">
+              <div className="bg-black/80 backdrop-blur-xl border border-yellow-400/20 rounded-3xl p-12 max-w-2xl mx-auto">
                 <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Sparkles className="w-10 h-10 text-black" />
                 </div>
@@ -109,7 +109,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   }
 
   return (
-    <section ref={sectionRef} className="py-32 bg-gradient-to-b from-gray-950 via-black to-gray-950 relative overflow-hidden">
+      <section ref={sectionRef} className="py-32 bg-black relative overflow-hidden">
       {/* Efectos de fondo futuristas */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
@@ -190,7 +190,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 rounded-3xl opacity-0 group-hover:opacity-30 blur-2xl transition-opacity duration-700" />
               
               {/* Card content */}
-              <div className="relative h-full bg-gradient-to-br from-gray-900/90 via-gray-900/80 to-black/90 backdrop-blur-xl rounded-3xl overflow-hidden border border-yellow-400/20 group-hover:border-yellow-400/50 transition-all duration-500">
+              <div className="relative h-full bg-black/80 backdrop-blur-xl rounded-3xl overflow-hidden border border-yellow-400/20 group-hover:border-yellow-400/50 transition-all duration-500">
                 
                 {/* Imagen del servicio */}
                 {service.image_url && (
@@ -201,7 +201,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                     
                     {/* Badge flotante */}
                     <div className="absolute top-4 right-4 bg-yellow-400/90 backdrop-blur-sm px-4 py-2 rounded-full">

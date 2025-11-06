@@ -21,7 +21,7 @@ type NotificationContext struct {
 // GenerateSmartNotification genera una notificación inteligente usando IA
 func GenerateSmartNotification(ctx NotificationContext) (title, message, notificationType string, priority int, err error) {
 	geminiService := NewGeminiService()
-	
+
 	// Si no hay API key, usar fallback
 	if geminiService.APIKey == "" {
 		return generateFallbackNotification(ctx)
@@ -35,7 +35,7 @@ func GenerateSmartNotification(ctx NotificationContext) (title, message, notific
 		Temperature:     0.7,
 		MaxOutputTokens: 500,
 	})
-	
+
 	if err != nil || response == "" {
 		// Fallback si hay error
 		return generateFallbackNotification(ctx)

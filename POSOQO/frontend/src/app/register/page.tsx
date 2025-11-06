@@ -92,8 +92,8 @@ export default function RegisterPage() {
     // Validar DNI
     if (!formData.dni.trim()) {
       newErrors.dni = "El DNI es requerido";
-    } else if (formData.dni.length < 8 || formData.dni.length > 12) {
-      newErrors.dni = "El DNI debe tener entre 8 y 12 caracteres";
+    } else if (!/^\d{8}$/.test(formData.dni.trim())) {
+      newErrors.dni = "El DNI debe tener exactamente 8 dígitos numéricos";
     }
 
     // Validar teléfono
@@ -200,49 +200,49 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/FondoPoS.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay oscuro para mejor legibilidad */}
+      <div className="absolute inset-0 bg-black/60"></div>
       
       {/* Contenedor principal del formulario */}
       <div className="w-full max-w-lg relative z-10">
-        {/* Card del formulario profesional */}
-        <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-          {/* Efecto de brillo sutil */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-[#FFD700]/5 opacity-30"></div>
-          
-          {/* Header compacto */}
-          <div className="text-center mb-6 relative z-10">
-            {/* Logo POSOQO */}
-            <div className="mb-4 relative">
-              <div className="w-12 h-12 mx-auto bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center shadow-lg relative overflow-hidden">
-                <img 
-                  src="/Logo.png" 
-                  alt="POSOQO" 
-                  className="w-8 h-8"
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl"></div>
-              </div>
-            </div>
-            
-            <h1 className="text-2xl font-bold text-white mb-1">Crear Cuenta</h1>
-            <p className="text-gray-400 text-xs">Únete a POSOQO</p>
+        {/* Card del formulario con glassmorphism */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-black mb-3 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
+              POSOQO
+            </h1>
+            <div className="h-0.5 w-20 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 mx-auto mb-3"></div>
+            <p className="text-white/90 text-sm font-medium tracking-wide">
+              Únete a POSOQO
+            </p>
           </div>
 
           {/* Mensaje de éxito */}
           {success && (
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 mb-6">
-              <p className="text-green-400 text-sm">
+            <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/50 rounded-lg p-4 mb-6">
+              <p className="text-green-200 text-sm font-semibold">
                 ¡Registro exitoso! Redirigiendo al login...
               </p>
             </div>
           )}
 
           {/* Formulario de registro */}
-          <form onSubmit={handleRegister} className="space-y-4 relative z-10">
+          <form onSubmit={handleRegister} className="space-y-5">
             
             {/* Nombre y Apellido */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="name" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   Nombre
                 </label>
                 <input
@@ -250,21 +250,21 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                     errors.name 
-                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
                   placeholder="Nombre"
                   disabled={loading}
                 />
                 {errors.name && (
-                  <p className="text-red-400 text-xs">{errors.name}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.name}</p>
                 )}
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">
+              <div>
+                <label htmlFor="lastName" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   Apellido
                 </label>
                 <input
@@ -272,24 +272,24 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                     errors.lastName 
-                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
                   placeholder="Apellido"
                   disabled={loading}
                 />
                 {errors.lastName && (
-                  <p className="text-red-400 text-xs">{errors.lastName}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.lastName}</p>
                 )}
               </div>
             </div>
 
             {/* DNI y Teléfono */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label htmlFor="dni" className="block text-sm font-medium text-gray-300">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="dni" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   DNI
                 </label>
                 <input
@@ -297,21 +297,21 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.dni}
                   onChange={(e) => handleInputChange("dni", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                     errors.dni 
-                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
                   placeholder="12345678"
                   disabled={loading}
                 />
                 {errors.dni && (
-                  <p className="text-red-400 text-xs">{errors.dni}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.dni}</p>
                 )}
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-300">
+              <div>
+                <label htmlFor="phone" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   Teléfono
                 </label>
                 <input
@@ -319,122 +319,144 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
+                  className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                     errors.phone 
-                      ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                      : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                  } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
                   placeholder="999888777"
                   disabled={loading}
                 />
                 {errors.phone && (
-                  <p className="text-red-400 text-xs">{errors.phone}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.phone}</p>
                 )}
               </div>
             </div>
 
             {/* Email */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                Email
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
+                Correo Electrónico
               </label>
-              <input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className={`w-full px-3 py-2 rounded-lg border transition-all duration-200 ${
-                  errors.email 
-                    ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                    : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
-                placeholder="tu@email.com"
-                disabled={loading}
-              />
+              <div className="relative">
+                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white/70 pl-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className={`w-full pl-12 pr-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
+                    errors.email 
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
+                  placeholder="tu@email.com"
+                  disabled={loading}
+                />
+              </div>
               {errors.email && (
-                <p className="text-red-400 text-xs">{errors.email}</p>
+                <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.email}</p>
               )}
             </div>
 
             {/* Contraseñas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="password" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   Contraseña
                 </label>
                 <div className="relative">
+                  <div className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white/70 pl-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
-                    className={`w-full px-3 py-2 pr-10 rounded-lg border transition-all duration-200 ${
+                    className={`w-full pl-12 pr-12 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                       errors.password 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                    } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                        ? "border-red-400 text-white" 
+                        : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                    } focus:outline-none text-sm font-medium`}
                     placeholder="••••••••"
                     disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2"
                     disabled={loading}
                   >
                     {showPassword ? (
-                      <EyeSlashIcon className="w-4 h-4" />
+                      <EyeSlashIcon className="w-5 h-5" />
                     ) : (
-                      <EyeIcon className="w-4 h-4" />
+                      <EyeIcon className="w-5 h-5" />
                     )}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-400 text-xs">{errors.password}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.password}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
+              <div>
+                <label htmlFor="confirmPassword" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
                   Confirmar
                 </label>
                 <div className="relative">
+                  <div className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white/70 pl-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
                   <input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-                    className={`w-full px-3 py-2 pr-10 rounded-lg border transition-all duration-200 ${
+                    className={`w-full pl-12 pr-12 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                       errors.confirmPassword 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/20" 
-                        : "border-gray-600 bg-gray-700/50 focus:border-[#D4AF37] focus:ring-[#D4AF37]/20"
-                    } text-white placeholder-gray-400 focus:outline-none focus:ring-2`}
+                        ? "border-red-400 text-white" 
+                        : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                    } focus:outline-none text-sm font-medium`}
                     placeholder="••••••••"
                     disabled={loading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] transition-colors"
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2"
                     disabled={loading}
                   >
                     {showConfirmPassword ? (
-                      <EyeSlashIcon className="w-4 h-4" />
+                      <EyeSlashIcon className="w-5 h-5" />
                     ) : (
-                      <EyeIcon className="w-4 h-4" />
+                      <EyeIcon className="w-5 h-5" />
                     )}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-red-400 text-xs">{errors.confirmPassword}</p>
+                  <p className="text-red-300 text-xs mt-1.5 font-medium">{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
 
             {/* Error general */}
             {generalError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <p className="text-red-400 text-sm">{generalError}</p>
+              <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/50 rounded-lg p-3">
+                <p className="text-red-200 text-xs font-semibold flex items-center">
+                  <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  {generalError}
+                </p>
               </div>
             )}
 
@@ -442,30 +464,30 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3 px-4 rounded-lg hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 hover:scale-[1.02] active:scale-[0.98] text-black font-bold py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
-                  Creando cuenta...
+                  <div className="rounded-full h-4 w-4 border-2 border-black border-t-transparent mr-2 animate-spin" />
+                  <span>Creando cuenta...</span>
                 </div>
               ) : (
-                "Crear cuenta"
+                "CREAR CUENTA"
               )}
-      </button>
-    </form>
+            </button>
+          </form>
 
           {/* Enlaces adicionales */}
           <div className="mt-6 text-center">
-            <p className="text-gray-400 text-sm">
-              ¿Ya tienes cuenta?{' '}
-              <Link 
-                href="/login" 
-                className="text-[#FFD700] hover:text-[#D4AF37] transition-colors font-medium"
-              >
-                Inicia sesión aquí
-              </Link>
+            <p className="text-white/80 text-xs mb-2 font-medium">
+              ¿Ya tienes cuenta?
             </p>
+            <Link 
+              href="/login" 
+              className="inline-block text-white hover:bg-gradient-to-r hover:from-yellow-400 hover:via-amber-400 hover:to-yellow-500 hover:bg-clip-text hover:text-transparent font-bold text-xs transition-all duration-200"
+            >
+              Inicia sesión aquí
+            </Link>
           </div>
         </div>
       </div>

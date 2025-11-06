@@ -29,29 +29,12 @@ export default function LoginPage() {
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
-  const [particles, setParticles] = useState<Array<{ left: number; top: number; delay: number; duration: number }>>([]);
-  const [mounted, setMounted] = useState(false);
-  
   // Hooks
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  // Generar partículas solo en el cliente
-  useEffect(() => {
-    setMounted(true);
-    const particlesData = Array.from({ length: 20 }, () => ({
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      delay: Math.random() * 2,
-      duration: 3 + Math.random() * 2,
-    }));
-    setParticles(particlesData);
-  }, []);
-
   // Redirigir si ya está autenticado
   useEffect(() => {
-    if (!mounted) return;
-    
     if (status === "authenticated" && session) {
       const redirectPath = typeof window !== 'undefined' ? localStorage.getItem('redirectAfterLogin') : null;
       if (redirectPath && redirectPath !== '/login') {
@@ -61,7 +44,7 @@ export default function LoginPage() {
         router.push("/");
       }
     }
-  }, [session, status, router, mounted]);
+  }, [session, status, router]);
 
   // Validaciones
   const validateEmail = (email: string): boolean => {
@@ -177,261 +160,224 @@ export default function LoginPage() {
   };
 
   // Loading state
-  if (status === "loading" || !mounted) {
+  if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
-        <div className="text-center relative z-10">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400/30 border-t-yellow-400 mx-auto mb-6"></div>
-            <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-2 border-yellow-400/20 mx-auto"></div>
-          </div>
-          <p className="text-white font-medium text-lg">Cargando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent mx-auto mb-4"></div>
+          <p className="text-white font-medium">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  // No renderizar nada hasta que esté montado
-  if (!mounted) {
-    return null;
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden p-4">
-      {/* Fondo animado con gradientes - usando CSS puro para evitar problemas SSR */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Gradientes animados con CSS */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float-slow" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-float-reverse" />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl animate-pulse-slow" />
-        
-        {/* Partículas de fondo - solo renderizar cuando esté montado */}
-        {mounted && particles.map((particle, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-yellow-400/30 rounded-full animate-particle"
-            style={{
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-              animationDelay: `${particle.delay}s`,
-              animationDuration: `${particle.duration}s`,
-            }}
-          />
-        ))}
-      </div>
-
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/FondoPoS.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay oscuro para mejor legibilidad */}
+      <div className="absolute inset-0 bg-black/60"></div>
+      
       {/* Contenedor principal */}
-      <div className="w-full max-w-md relative z-10 animate-fade-in-up">
-        {/* Card del formulario con glassmorphism mejorado */}
-        <div className="relative">
-          {/* Borde brillante animado */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 opacity-20 blur-xl animate-pulse-glow" />
-          
-          <div className="relative bg-gray-900/80 backdrop-blur-2xl border border-gray-800/50 rounded-3xl p-8 shadow-2xl">
-            {/* Efecto de luz interior */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-yellow-400/5 via-transparent to-transparent pointer-events-none" />
-            
-            {/* Header */}
-            <div className="text-center mb-8 animate-fade-in">
-              {/* Logo/Título POSOQO con efecto especial */}
-              <h1 className="text-6xl md:text-7xl font-black mb-2 relative animate-scale-in">
-                <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
-                  POSOQO
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/50 via-yellow-300/50 to-yellow-400/50 blur-xl animate-pulse-slow" />
-              </h1>
-              <p className="text-gray-400 font-medium text-sm tracking-wider uppercase animate-fade-in-delayed">
-                Cervezas Artesanales Ayacuchanas
-              </p>
-              <div className="h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent mt-4 animate-width-expand" />
-            </div>
+      <div className="w-full max-w-[420px] relative z-10">
+        {/* Card del formulario con glassmorphism */}
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-black mb-3 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent tracking-tight drop-shadow-lg">
+              POSOQO
+            </h1>
+            <div className="h-0.5 w-20 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 mx-auto mb-3"></div>
+            <p className="text-white/90 text-xs font-medium tracking-wide">
+              Cervezas Artesanales Ayacuchanas
+            </p>
+          </div>
 
-            {/* Formulario */}
-            <form onSubmit={handleEmailLogin} className="space-y-6">
-              {/* Campo Email */}
-              <div className="space-y-2 animate-slide-in-left">
-                <label htmlFor="email" className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
-                  Correo Electrónico
-                </label>
-                <div className="relative group">
-                  <input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                    className={`w-full px-5 py-4 rounded-xl border-2 transition-all duration-300 ${
-                      errors.email 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/50" 
-                        : "border-gray-700/50 bg-gray-800/30 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 hover:border-gray-600"
-                    } text-white placeholder-gray-500 focus:outline-none backdrop-blur-sm text-base`}
-                    placeholder="tu@email.com"
-                    disabled={loading}
-                  />
-                  <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-400/10 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${errors.email ? 'hidden' : ''}`} />
+          {/* Formulario */}
+          <form onSubmit={handleEmailLogin} className="space-y-5">
+            {/* Campo Email */}
+            <div>
+              <label htmlFor="email" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
+                Correo Electrónico
+              </label>
+              <div className="relative">
+                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white/70 pl-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 </div>
-                {errors.email && (
-                  <p className="text-red-400 text-xs flex items-center font-medium mt-1 animate-fade-in">
-                    <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {errors.email}
-                  </p>
-                )}
+                <input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className={`w-full pl-12 pr-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
+                    errors.email 
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
+                  placeholder="tu@email.com"
+                  disabled={loading}
+                />
               </div>
-
-              {/* Campo Contraseña */}
-              <div className="space-y-2 animate-slide-in-left-delayed">
-                <label htmlFor="password" className="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">
-                  Contraseña
-                </label>
-                <div className="relative group">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => handleInputChange("password", e.target.value)}
-                    className={`w-full px-5 py-4 pr-14 rounded-xl border-2 transition-all duration-300 ${
-                      errors.password 
-                        ? "border-red-500 bg-red-500/10 focus:ring-red-500/50" 
-                        : "border-gray-700/50 bg-gray-800/30 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 hover:border-gray-600"
-                    } text-white placeholder-gray-500 focus:outline-none backdrop-blur-sm text-base`}
-                    placeholder="••••••••"
-                    disabled={loading}
-                  />
-                  <div className={`absolute inset-0 rounded-xl bg-gradient-to-r from-yellow-400/0 via-yellow-400/10 to-yellow-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${errors.password ? 'hidden' : ''}`} />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-all duration-200 p-2 rounded-lg hover:bg-gray-700/50 active:scale-95"
-                    disabled={loading}
-                  >
-                    {showPassword ? (
-                      <EyeSlashIcon className="w-5 h-5" />
-                    ) : (
-                      <EyeIcon className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-400 text-xs flex items-center font-medium mt-1 animate-fade-in">
-                    <svg className="w-4 h-4 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {errors.password}
-                  </p>
-                )}
-              </div>
-
-              {/* Errores */}
-              {generalError && (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm animate-fade-in">
-                  <p className="text-red-400 text-sm font-medium flex items-center">
-                    <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    {generalError}
-                  </p>
-                </div>
-              )}
-
-              {/* Email no verificado */}
-              {unverifiedEmail && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 backdrop-blur-sm animate-fade-in">
-                  <p className="text-yellow-300 text-sm font-semibold mb-3">
-                    Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
-                  </p>
-                  <button
-                    onClick={handleResendVerification}
-                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold px-4 py-3 rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-200 shadow-lg hover:shadow-yellow-400/30 active:scale-95 disabled:opacity-50"
-                    disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
-                  >
-                    Reenviar email de verificación
-                  </button>
-                  {resendStatus && (
-                    <p className={`mt-3 text-xs font-medium animate-fade-in ${
-                      resendStatus.startsWith('¡Email') ? 'text-green-400' : 'text-red-400'
-                    }`}>
-                      {resendStatus}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Botón de login */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 text-black font-black py-4 px-6 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl hover:shadow-yellow-400/50 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {/* Efecto de brillo animado */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" />
-                
-                {loading ? (
-                  <div className="flex items-center justify-center relative z-10">
-                    <div className="rounded-full h-5 w-5 border-2 border-black border-t-transparent mr-3 animate-spin" />
-                    <span className="font-bold text-base">Iniciando sesión...</span>
-                  </div>
-                ) : (
-                  <span className="relative z-10 font-black text-base tracking-wide">INICIAR SESIÓN</span>
-                )}
-              </button>
-            </form>
-
-            {/* Separador elegante */}
-            <div className="relative my-8 animate-fade-in-delayed-2">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700/50"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <div className="bg-gray-900/80 px-4 py-1.5 rounded-full border border-gray-700/50 backdrop-blur-sm">
-                  <span className="text-gray-500 font-medium text-xs">o continúa con</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Botón de Google mejorado */}
-            <button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-700/50 rounded-xl text-base font-bold text-white bg-gray-800/30 hover:bg-gray-800/50 hover:border-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm group hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <svg className="h-6 w-6 mr-3 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              <span>CONTINUAR CON GOOGLE</span>
-            </button>
-
-            {/* Enlaces */}
-            <div className="mt-8 text-center space-y-4 animate-fade-in-delayed-3">
-              <div>
-                <p className="text-gray-400 text-sm mb-3">
-                  ¿No tienes una cuenta?
+              {errors.email && (
+                <p className="text-red-300 text-xs mt-1.5 flex items-center font-medium">
+                  <svg className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.email}
                 </p>
-                <Link 
-                  href="/register" 
-                  className="inline-flex items-center text-yellow-400 hover:text-yellow-300 transition-all duration-200 font-bold text-sm group"
-                >
-                  <span className="group-hover:translate-x-1 transition-transform">Regístrate aquí</span>
-                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              )}
+            </div>
+
+            {/* Campo Contraseña */}
+            <div>
+              <label htmlFor="password" className="block text-xs font-semibold text-white/90 mb-2 uppercase tracking-wide">
+                Contraseña
+              </label>
+              <div className="relative">
+                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 text-white/70 pl-3">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                </Link>
-              </div>
-              
-              <div className="pt-4 border-t border-gray-800/50">
-                <Link 
-                  href="/forgot-password" 
-                  className="inline-flex items-center text-gray-400 hover:text-yellow-400 transition-all duration-200 text-sm font-medium group"
+                </div>
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  className={`w-full pl-12 pr-12 py-3 bg-transparent border-b-2 transition-all duration-200 ${
+                    errors.password 
+                      ? "border-red-400 text-white" 
+                      : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
+                  } focus:outline-none text-sm font-medium`}
+                  placeholder="••••••••"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors p-2"
+                  disabled={loading}
                 >
-                  <svg className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
-                  ¿Olvidaste tu contraseña?
-                </Link>
+                  {showPassword ? (
+                    <EyeSlashIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeIcon className="w-5 h-5" />
+                  )}
+                </button>
               </div>
+              {errors.password && (
+                <p className="text-red-300 text-xs mt-1.5 flex items-center font-medium">
+                  <svg className="w-3.5 h-3.5 mr-1.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.password}
+                </p>
+              )}
+            </div>
+
+            {/* Errores */}
+            {generalError && (
+              <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/50 rounded-lg p-3">
+                <p className="text-red-200 text-xs font-semibold flex items-center">
+                  <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  {generalError}
+                </p>
+              </div>
+            )}
+
+            {/* Email no verificado */}
+            {unverifiedEmail && (
+              <div className="bg-yellow-500/20 backdrop-blur-sm border border-[#FFD700]/50 rounded-lg p-4">
+                <p className="text-yellow-200 text-xs font-semibold mb-3">
+                  Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
+                </p>
+                <button
+                  onClick={handleResendVerification}
+                  className="w-full bg-white hover:bg-gray-100 text-black font-bold px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
+                >
+                  Reenviar email de verificación
+                </button>
+                {resendStatus && (
+                  <p className={`mt-2.5 text-xs font-semibold ${
+                    resendStatus.startsWith('¡Email') ? 'text-green-200' : 'text-red-200'
+                  }`}>
+                    {resendStatus}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Botón de login */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 hover:scale-[1.02] active:scale-[0.98] text-black font-bold py-3.5 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="rounded-full h-4 w-4 border-2 border-black border-t-transparent mr-2 animate-spin" />
+                  <span>Iniciando sesión...</span>
+                </div>
+              ) : (
+                "INICIAR SESIÓN"
+              )}
+            </button>
+          </form>
+
+          {/* Separador */}
+          <div className="relative my-6">
+            <div className="relative flex justify-center">
+              <span className="bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full border border-white/20 text-xs text-white/90 font-medium uppercase tracking-wide">o continúa con</span>
+            </div>
+          </div>
+
+          {/* Botón de Google */}
+          <button
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center px-6 py-3 border-2 border-white/30 rounded-lg text-sm font-semibold text-white bg-white/10 backdrop-blur-sm hover:bg-white/25 hover:border-white/60 hover:scale-[1.02] active:scale-[0.98] active:bg-white/15 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="h-4 w-4 mr-2.5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continuar con Google
+          </button>
+
+          {/* Enlaces */}
+          <div className="mt-6 text-center space-y-3">
+            <div>
+              <p className="text-white/80 text-xs mb-2 font-medium">
+                ¿No tienes una cuenta?
+              </p>
+              <Link 
+                href="/register" 
+                className="inline-block text-white hover:bg-gradient-to-r hover:from-yellow-400 hover:via-amber-400 hover:to-yellow-500 hover:bg-clip-text hover:text-transparent font-bold text-xs transition-all duration-200"
+              >
+                Regístrate aquí
+              </Link>
+            </div>
+            
+            <div className="pt-3 border-t border-white/20">
+              <Link 
+                href="/forgot-password" 
+                className="text-white/80 hover:text-white text-xs font-medium transition-colors duration-200"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
           </div>
         </div>

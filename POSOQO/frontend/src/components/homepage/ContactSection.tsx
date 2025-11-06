@@ -52,7 +52,7 @@ export const ContactSection: React.FC = () => {
   ]
 
   return (
-    <section ref={ref} className="py-32 bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+    <section ref={ref} className="py-32 bg-black relative overflow-hidden">
       {/* Efectos de fondo */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
@@ -134,7 +134,7 @@ export const ContactSection: React.FC = () => {
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                   transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
                   whileHover={{ x: 5 }}
-                  className="group flex items-start gap-4 p-5 bg-gradient-to-br from-gray-900/80 to-black/80 backdrop-blur-sm rounded-2xl border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500"
+                  className="group flex items-start gap-4 p-5 bg-black/60 backdrop-blur-sm rounded-2xl border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500"
                 >
                   <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     <contact.icon className="w-7 h-7 text-black" />
@@ -161,7 +161,7 @@ export const ContactSection: React.FC = () => {
             {/* Glow effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 rounded-3xl opacity-20 blur-2xl" />
             
-            <div className="relative bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl p-8 rounded-3xl border border-yellow-400/20">
+            <div className="relative bg-black/80 backdrop-blur-xl p-8 rounded-3xl border border-yellow-400/20">
               <div className="mb-8">
                 <h3 className="text-3xl font-bold text-white mb-3">Envíanos un Mensaje</h3>
                 <p className="text-gray-400 leading-relaxed">

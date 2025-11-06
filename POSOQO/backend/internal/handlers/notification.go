@@ -403,13 +403,13 @@ func CreateOrderNotification(orderID string, userID string, status string) error
 	// Obtener información del pedido y usuario
 	var userName string
 	var orderTotal float64
-	
-	err := db.DB.QueryRow(context.Background(), 
+
+	err := db.DB.QueryRow(context.Background(),
 		`SELECT u.name, o.total 
 		 FROM orders o 
 		 JOIN users u ON o.user_id = u.id 
 		 WHERE o.id = $1`, orderID).Scan(&userName, &orderTotal)
-	
+
 	if err != nil {
 		userName = "Usuario"
 		orderTotal = 0.0
@@ -423,7 +423,7 @@ func CreateOrderNotification(orderID string, userID string, status string) error
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			
+
 			ctx := services.NotificationContext{
 				Type:       "order",
 				Action:     status,
@@ -433,13 +433,13 @@ func CreateOrderNotification(orderID string, userID string, status string) error
 				Status:     status,
 				IsForAdmin: false,
 			}
-			
+
 			title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
 			if err != nil {
 				fmt.Printf("Error generando notificación con IA: %v\n", err)
 				return
 			}
-			
+
 			err = CreateAutomaticNotificationWithPriority(notifType, title, message, &userID, &orderID, priority)
 			if err != nil {
 				fmt.Printf("Error creando notificación de pedido para usuario: %v\n", err)
@@ -451,7 +451,7 @@ func CreateOrderNotification(orderID string, userID string, status string) error
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		
+
 		ctx := services.NotificationContext{
 			Type:       "order",
 			Action:     status,
@@ -461,13 +461,13 @@ func CreateOrderNotification(orderID string, userID string, status string) error
 			Status:     status,
 			IsForAdmin: true,
 		}
-		
+
 		title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
 		if err != nil {
 			fmt.Printf("Error generando notificación con IA: %v\n", err)
 			return
 		}
-		
+
 		err = CreateAutomaticNotificationWithPriority(notifType, title, message, nil, &orderID, priority)
 		if err != nil {
 			fmt.Printf("Error creando notificación de pedido para admin: %v\n", err)
