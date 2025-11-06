@@ -11,6 +11,16 @@ export interface Product {
   ibu?: string;
   color?: string;
   image_url?: string;
+  rating?: number;
+  is_featured?: boolean;
+  stock?: number;
+  category_id?: string;
+  subcategory_id?: string;
+  subcategory?: string;
+  is_active?: boolean;
+  estilo?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Service {
