@@ -34,8 +34,11 @@ export default function CompletarPerfilPage() {
     setConsultandoDNI(true);
     setDniVerificado(false);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com';
-      const response = await fetch(`${apiUrl}/api/dni/${dniValue}`);
+      // Construir URL correctamente (sin barras duplicadas)
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com').replace(/\/$/, '');
+      const url = `${apiUrl}/api/dni/${dniValue}`;
+      
+      const response = await fetch(url);
       
       if (response.ok) {
         const result = await response.json();
@@ -52,13 +55,18 @@ export default function CompletarPerfilPage() {
           setError(null);
         } else {
           setDniVerificado(false);
+          setError('DNI no encontrado en los registros');
         }
       } else {
+        const errorData = await response.json().catch(() => ({ error: 'Error al consultar el DNI' }));
         setDniVerificado(false);
+        setError(errorData.error || `Error ${response.status}: No se pudo consultar el DNI`);
+        console.error('Error en respuesta:', response.status, errorData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error consultando DNI:', error);
       setDniVerificado(false);
+      setError(`Error de conexión: ${error.message || 'No se pudo conectar con el servidor'}`);
     } finally {
       setConsultandoDNI(false);
     }
