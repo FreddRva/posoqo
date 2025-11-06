@@ -130,24 +130,25 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
     }
   };
 
-  // Consultar DNI cuando sea válido
+  // Consultar DNI cuando tenga 8 dígitos (sin validar formato primero)
   const handleDocumentChange = (value: string) => {
     setDocumentNumber(value);
     setDniData(null);
     setDniValid(null); // Limpiar validación cuando cambia el DNI
     
-    // Solo consultar si es DNI y tiene 8 dígitos
-    if (documentType === 'DNI' && value.replace(/[\s.-]/g, '').length === 8) {
+    // Solo consultar si es DNI y tiene exactamente 8 dígitos
+    if (documentType === 'DNI') {
       const cleanDNI = value.replace(/[\s.-]/g, '');
-      if (validateDNI(cleanDNI)) {
+      if (cleanDNI.length === 8 && /^\d{8}$/.test(cleanDNI)) {
+        // Consultar directamente sin validar formato primero
         consultarDNI(cleanDNI);
-      } else {
-        // Si el formato no es válido, marcar como inválido
+      } else if (cleanDNI.length > 0 && cleanDNI.length < 8) {
+        // Si está ingresando pero aún no tiene 8 dígitos, limpiar validación
+        setDniValid(null);
+      } else if (cleanDNI.length > 8 || (cleanDNI.length === 8 && !/^\d{8}$/.test(cleanDNI))) {
+        // Si tiene más de 8 dígitos o no es numérico, marcar como inválido
         setDniValid(false);
       }
-    } else if (documentType === 'DNI' && value.replace(/[\s.-]/g, '').length > 0) {
-      // Si está ingresando pero aún no tiene 8 dígitos, limpiar validación
-      setDniValid(null);
     }
   };
 
