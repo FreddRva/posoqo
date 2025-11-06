@@ -46,11 +46,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       formData.append('file', file);
       formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo_products');
       formData.append('folder', 'posoqo/products');
-      // Configuración para evitar transformaciones automáticas que recorten
-      formData.append('transformation', JSON.stringify({
-        quality: 'auto:good',
-        fetch_format: 'auto'
-      }));
+      // No aplicar transformaciones en el upload para preservar imagen completa
+      // Las transformaciones se aplicarán al mostrar la imagen si es necesario
 
       const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
