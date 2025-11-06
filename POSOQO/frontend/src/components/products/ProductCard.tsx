@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, ShoppingCart, Eye, Star, ArrowRight } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, Star, ArrowRight, Store } from 'lucide-react';
 import { Product, ViewMode } from '@/types/products';
 import { getImageUrl } from '@/lib/config';
 
@@ -113,15 +113,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 >
                   <Eye className="w-5 h-5" />
                 </motion.button>
-                <motion.button
-                  onClick={() => onAddToCart(product)}
-                  whileHover={{ scale: 1.1, y: -2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-3 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-xl hover:bg-white/30 shadow-lg transition-all duration-300"
-                  title="Agregar al carrito"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                </motion.button>
+                <Link href="/products">
+                  <motion.button
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="p-3 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-xl hover:bg-white/30 shadow-lg transition-all duration-300"
+                    title="Ver tienda"
+                  >
+                    <Store className="w-5 h-5" />
+                  </motion.button>
+                </Link>
               </div>
             </div>
           </div>
@@ -246,18 +247,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Eye className="w-5 h-5" />
           </motion.button>
           
-          <motion.button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddToCart(product);
-            }}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 border border-white/30 shadow-lg transition-all duration-300"
-            title="Agregar al carrito"
-          >
-            <ShoppingCart className="w-5 h-5" />
-          </motion.button>
+          <Link href="/products">
+            <motion.button
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              whileHover={{ scale: 1.1, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 border border-white/30 shadow-lg transition-all duration-300"
+              title="Ver tienda"
+            >
+              <Store className="w-5 h-5" />
+            </motion.button>
+          </Link>
         </motion.div>
       </div>
 

@@ -58,8 +58,12 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
       } else {
         setCanReview(false);
       }
+      // Si es comida, asegurar que la pestaña activa no sea 'detalles'
+      if (productType === 'comida' && activeTab === 'detalles') {
+        setActiveTab('descripcion');
+      }
     }
-  }, [isOpen, product?.id, session]);
+  }, [isOpen, product?.id, session, productType]);
 
   const checkCanReview = async () => {
     if (!product?.id || !session) {
