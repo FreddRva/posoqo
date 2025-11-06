@@ -163,19 +163,16 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -10 }}
+              whileHover={{ y: -8, scale: 1.02 }}
               className="group relative z-10"
             >
-              {/* Card con glassmorphism premium */}
-              <div className="relative h-full bg-black/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-yellow-400/20 hover:border-yellow-400/40 transition-all duration-500 shadow-2xl hover:shadow-yellow-400/20 group-hover:shadow-3xl">
-                {/* Efecto de brillo superior */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                {/* Imagen del producto - completa y atractiva */}
-                <div className="relative h-80 overflow-hidden bg-black">
+              {/* Card estilo Fortnite - Diseño moderno y limpio */}
+              <div className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 group-hover:shadow-3xl">
+                {/* Imagen del producto - Ocupa más espacio como en Fortnite */}
+                <div className="relative h-96 overflow-hidden bg-gradient-to-b from-gray-800 to-black">
                   <motion.div
-                    whileHover={{ scale: 1.15 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                     className="relative w-full h-full"
                   >
                     <img
@@ -184,13 +181,8 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                       className="w-full h-full object-cover"
                     />
                     
-                    {/* Overlay gradiente */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    
-                    {/* Efecto de brillo dorado */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    />
+                    {/* Overlay sutil */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent" />
                   </motion.div>
                   
                   {/* Badge destacado */}
@@ -199,58 +191,88 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: 0.2, type: "spring" }}
-                      className="absolute top-4 left-4 px-3 py-1.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-yellow-300/50 z-20"
+                      className="absolute top-4 right-4 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-cyan-300/50 z-20"
                     >
                       ⭐ Destacado
                     </motion.div>
                   )}
                 </div>
 
-                {/* Información del producto */}
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-yellow-400 transition-colors duration-300">
+                {/* Tarjeta de información - Estilo Fortnite */}
+                <div className="bg-gray-800/95 backdrop-blur-sm p-6 border-t border-gray-700/50">
+                  {/* Nombre del producto */}
+                  <h3 className="text-2xl font-bold text-white text-center mb-4">
                     {product.name}
                   </h3>
                   
-                  {product.description && (
-                    <p className="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
-                      {product.description}
-                    </p>
-                  )}
-
-                  {/* Precio y rating */}
-                  <div className="flex items-center justify-between mb-5">
-                    <span className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-                      S/ {product.price?.toFixed(2) || '0.00'}
-                    </span>
+                  {/* Rating con estrellas brillantes */}
+                  <div className="flex justify-center items-center gap-1 mb-5">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const rating = product.rating || 0;
+                      const starValue = i + 1;
+                      const isFilled = starValue <= Math.floor(rating);
+                      const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
+                      
+                      return (
+                        <Star
+                          key={i}
+                          className={`w-5 h-5 ${
+                            isFilled
+                              ? 'fill-cyan-400 text-cyan-400'
+                              : isHalfFilled
+                              ? 'fill-cyan-400/50 text-cyan-400/50'
+                              : 'fill-gray-600 text-gray-600'
+                          }`}
+                        />
+                      );
+                    })}
                     {product.rating && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 bg-yellow-400/10 border border-yellow-400/20 rounded-lg">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm text-yellow-400 font-semibold">{product.rating.toFixed(1)}</span>
-                      </div>
+                      <span className="ml-2 text-sm text-gray-400">({product.rating.toFixed(1)})</span>
                     )}
                   </div>
+
+                  {/* Información en dos columnas */}
+                  <div className="grid grid-cols-2 gap-4 mb-5 text-sm">
+                    {/* Columna izquierda */}
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-gray-400 mb-1">Tipo:</p>
+                        <p className="text-white font-semibold">{product.category || 'Producto'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 mb-1">Disponibilidad:</p>
+                        <p className="text-cyan-400 font-semibold">
+                          {product.stock && product.stock > 0 ? 'Disponible' : 'Agotado'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Columna derecha */}
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-gray-400 mb-1">Estilo:</p>
+                        <p className="text-white font-semibold">{product.estilo || product.style || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 mb-1">Precio:</p>
+                        <p className="text-white font-bold text-lg">
+                          S/ {product.price?.toFixed(2) || '0.00'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                   
-                  {/* Botón de ver detalle mejorado */}
+                  {/* Botón destacado - Estilo Fortnite */}
                   <motion.button
                     onClick={() => onProductClick?.(product)}
-                    whileHover={{ scale: 1.02, y: -2 }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
+                    className="w-full px-6 py-4 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 hover:from-cyan-400 hover:via-blue-400 hover:to-cyan-400 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-cyan-500/50 uppercase tracking-wider text-sm"
                   >
                     <Eye className="w-5 h-5" />
                     <span>Ver Detalle</span>
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.span>
                   </motion.button>
                 </div>
-
-                {/* Efecto de brillo en hover */}
-                <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-yellow-400/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </motion.div>
           ))}
