@@ -19,7 +19,8 @@ import {
   Settings, 
   Home,
   LogOut,
-  User
+  User,
+  Trophy
 } from 'lucide-react';
 import Navbar from "@/components/Navbar";
 
@@ -70,6 +71,7 @@ export default function DashboardLayout({
     { name: 'Usuarios', href: '/dashboard/users', icon: Users },
     { name: 'Reclamos', href: '/dashboard/complaints', icon: AlertTriangle },
     { name: 'Reservas', href: '/dashboard/reservations', icon: Calendar },
+    { name: 'Sorteos', href: '/dashboard/raffles', icon: Trophy },
     { name: 'Reportes', href: '/dashboard/reports', icon: PieChart },
     { name: 'Configuración', href: '/dashboard/settings', icon: Settings },
   ];
