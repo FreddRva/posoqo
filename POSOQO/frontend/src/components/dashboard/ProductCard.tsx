@@ -30,19 +30,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
     >
       {/* Imagen del producto */}
-      <div className="relative h-48 bg-gray-100">
+      <div className="relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
         {product.image_url ? (
           <img
             src={getImageUrl(product.image_url)}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain p-2"
             onError={(e) => {
               const target = e.currentTarget;
               target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent) {
-                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-400"><Package className="w-12 h-12" /></div>';
-              }
             }}
           />
         ) : (

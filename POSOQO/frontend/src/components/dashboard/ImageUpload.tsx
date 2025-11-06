@@ -102,18 +102,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         
         {currentImage ? (
           <div className="space-y-4">
-            <div className="relative inline-block">
-              <img
-                src={currentImage}
-                alt="Preview"
-                className="w-32 h-32 object-cover rounded-lg"
-              />
-              <button
-                onClick={() => onImageUpload('')}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+            <div className="relative w-full flex items-center justify-center">
+              <div className="relative w-full max-w-xs h-64 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                <img
+                  src={currentImage}
+                  alt="Preview"
+                  className="w-full h-full object-contain"
+                />
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onImageUpload('');
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <p className="text-sm text-green-600 font-medium">
               Imagen cargada correctamente
