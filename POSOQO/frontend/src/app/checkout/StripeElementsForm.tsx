@@ -415,7 +415,8 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
           </button>
         </form>
       </div>
-    );
+    </div>
+  );
 }
 
 export default function StripeElementsForm({ amount, clientSecret, orderId }: StripeElementsFormProps) {
