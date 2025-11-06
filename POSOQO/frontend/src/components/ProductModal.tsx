@@ -41,6 +41,9 @@ interface ProductModalProps {
 export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
+  
+  // Asegurar que productType sea válido
+  const currentProductType = productType === 'comida' ? 'comida' : 'cerveza';
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
@@ -64,19 +67,19 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
         setCanReview(false);
       }
     }
-  }, [isOpen, product?.id, session, productType]);
+  }, [isOpen, product?.id, session, currentProductType]);
   
   // Si cambia el productType a 'comida' y estamos en 'detalles', cambiar a 'descripcion'
   useEffect(() => {
-    if (productType === 'comida' && activeTab === 'detalles') {
+    if (currentProductType === 'comida' && activeTab === 'detalles') {
       setActiveTab('descripcion');
     }
-  }, [productType, activeTab]);
+  }, [currentProductType, activeTab]);
   
   // Prevenir que se cambie a 'detalles' si es comida
   const handleTabChange = (tab: string) => {
     // Si intenta cambiar a 'detalles' y es comida, no permitirlo
-    if (tab === 'detalles' && productType === 'comida') {
+    if (tab === 'detalles' && currentProductType === 'comida') {
       return;
     }
     setActiveTab(tab);
@@ -266,8 +269,8 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {/* Solo mostrar pestaña DETALLES si NO es comida */}
-                      {productType !== 'comida' && (
+                      {/* SOLO mostrar DETALLES si NO es comida - Renderizado condicional estricto */}
+                      {currentProductType === 'cerveza' ? (
                         <button 
                           onClick={() => handleTabChange('detalles')}
                           className={`pb-3 px-2 font-semibold transition-colors ${
@@ -278,7 +281,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                         >
                           DETALLES
                         </button>
-                      )}
+                      ) : null}
                       <button 
                         onClick={() => handleTabChange('resenas')}
                         className={`pb-3 px-2 font-semibold transition-colors ${
@@ -301,7 +304,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                         </div>
                       )}
 
-                      {activeTab === 'detalles' && productType !== 'comida' && (
+                      {activeTab === 'detalles' && currentProductType !== 'comida' && (
                         <div className="grid grid-cols-2 gap-4">
                           {product.abv && (
                             <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
