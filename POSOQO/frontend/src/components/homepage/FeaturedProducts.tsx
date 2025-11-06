@@ -233,37 +233,6 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     )}
                   </div>
 
-                  {/* Información en dos columnas */}
-                  <div className="grid grid-cols-2 gap-4 mb-5 text-sm">
-                    {/* Columna izquierda */}
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-gray-400 mb-1">Tipo:</p>
-                        <p className="text-white font-semibold">{product.category || 'Producto'}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 mb-1">Disponibilidad:</p>
-                        <p className="text-cyan-400 font-semibold">
-                          {product.stock && product.stock > 0 ? 'Disponible' : 'Agotado'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Columna derecha */}
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-gray-400 mb-1">Estilo:</p>
-                        <p className="text-white font-semibold">{product.estilo || product.style || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 mb-1">Precio:</p>
-                        <p className="text-white font-bold text-lg">
-                          S/ {product.price?.toFixed(2) || '0.00'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
                   {/* Botón destacado - Estilo Fortnite */}
                   <motion.button
                     onClick={() => onProductClick?.(product)}

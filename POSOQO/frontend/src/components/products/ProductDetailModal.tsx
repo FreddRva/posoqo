@@ -95,12 +95,53 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Precio */}
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-white">
-                        S/ {product.price}
-                      </div>
-                      <div className="text-gray-400 text-sm">Precio por unidad</div>
+                    {/* Rating y Precio */}
+                    <div className="text-center space-y-4">
+                      {/* Rating con estrellas */}
+                      {product.rating && (
+                        <div className="flex justify-center items-center gap-2 mb-4">
+                          {Array.from({ length: 5 }).map((_, i) => {
+                            const rating = product.rating || 0;
+                            const starValue = i + 1;
+                            const isFilled = starValue <= Math.floor(rating);
+                            const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
+                            
+                            return (
+                              <Star
+                                key={i}
+                                className={`w-6 h-6 ${
+                                  isFilled
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : isHalfFilled
+                                    ? 'fill-yellow-400/50 text-yellow-400/50'
+                                    : 'fill-gray-600 text-gray-600'
+                                }`}
+                              />
+                            );
+                          })}
+                          <span className="text-yellow-400 font-semibold ml-2">({product.rating.toFixed(1)})</span>
+                        </div>
+                      )}
+                      
+                      {/* Precio */}
+                      {product.price && (
+                        <div>
+                          <div className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                            S/ {product.price.toFixed(2)}
+                          </div>
+                          <div className="text-gray-400 text-sm mt-2">Precio por unidad</div>
+                        </div>
+                      )}
+                      
+                      {/* Stock */}
+                      {product.stock !== undefined && (
+                        <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg">
+                          <Package className="w-4 h-4 text-green-400" />
+                          <span className={`font-semibold ${product.stock > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            {product.stock > 0 ? `${product.stock} unidades disponibles` : 'Agotado'}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -119,74 +160,73 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </div>
                     )}
 
-                    {/* Detalles técnicos */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {product.stock !== undefined && (
-                        <div className="bg-gray-800/50 rounded-xl p-4">
-                          <div className="text-sm text-gray-400 mb-1">Stock</div>
-                          <div className="text-lg font-semibold text-white">
-                            {product.stock} unidades
-                          </div>
+                    {/* Detalles técnicos - Solo para cervezas */}
+                    {(product.estilo || product.abv || product.ibu || product.color) && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                          <Tag className="w-5 h-5 text-purple-400" />
+                          Especificaciones Técnicas
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {product.estilo && (
+                            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 rounded-xl p-4 border border-gray-700/50">
+                              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Estilo</div>
+                              <div className="text-lg font-bold text-white">
+                                {product.estilo}
+                              </div>
+                            </div>
+                          )}
+
+                          {product.abv && (
+                            <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 border border-blue-500/30">
+                              <div className="text-xs text-blue-400 mb-1 uppercase tracking-wider">ABV</div>
+                              <div className="text-lg font-bold text-white">
+                                {product.abv}
+                              </div>
+                            </div>
+                          )}
+
+                          {product.ibu && (
+                            <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl p-4 border border-purple-500/30">
+                              <div className="text-xs text-purple-400 mb-1 uppercase tracking-wider">IBU</div>
+                              <div className="text-lg font-bold text-white">
+                                {product.ibu}
+                              </div>
+                            </div>
+                          )}
+
+                          {product.color && (
+                            <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-xl p-4 border border-orange-500/30">
+                              <div className="text-xs text-orange-400 mb-1 uppercase tracking-wider">Color</div>
+                              <div className="text-lg font-bold text-white">
+                                {product.color}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                      
+                      </div>
+                    )}
+
+                    {/* Información adicional */}
+                    <div className="grid grid-cols-2 gap-4">
                       {product.category && (
-                        <div className="bg-gray-800/50 rounded-xl p-4">
-                          <div className="text-sm text-gray-400 mb-1">Categoría</div>
-                          <div className="text-lg font-semibold text-white">
+                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Categoría</div>
+                          <div className="text-sm font-semibold text-white">
                             {product.category}
                           </div>
                         </div>
                       )}
 
                       {product.subcategory && (
-                        <div className="bg-gray-800/50 rounded-xl p-4">
-                          <div className="text-sm text-gray-400 mb-1">Subcategoría</div>
-                          <div className="text-lg font-semibold text-white">
+                        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                          <div className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Subcategoría</div>
+                          <div className="text-sm font-semibold text-white">
                             {product.subcategory}
                           </div>
                         </div>
                       )}
-
-                      {product.estilo && (
-                        <div className="bg-gray-800/50 rounded-xl p-4">
-                          <div className="text-sm text-gray-400 mb-1">Estilo</div>
-                          <div className="text-lg font-semibold text-white">
-                            {product.estilo}
-                          </div>
-                        </div>
-                      )}
                     </div>
-
-                    {/* Características especiales */}
-                    {(product.abv || product.ibu || product.color) && (
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                          <Tag className="w-5 h-5 text-purple-400" />
-                          Características
-                        </h3>
-                        <div className="grid grid-cols-1 gap-3">
-                          {product.abv && (
-                            <div className="flex justify-between items-center py-2 px-4 bg-gray-800/30 rounded-lg">
-                              <span className="text-gray-300">ABV</span>
-                              <span className="text-white font-semibold">{product.abv}</span>
-                            </div>
-                          )}
-                          {product.ibu && (
-                            <div className="flex justify-between items-center py-2 px-4 bg-gray-800/30 rounded-lg">
-                              <span className="text-gray-300">IBU</span>
-                              <span className="text-white font-semibold">{product.ibu}</span>
-                            </div>
-                          )}
-                          {product.color && (
-                            <div className="flex justify-between items-center py-2 px-4 bg-gray-800/30 rounded-lg">
-                              <span className="text-gray-300">Color</span>
-                              <span className="text-white font-semibold">{product.color}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
