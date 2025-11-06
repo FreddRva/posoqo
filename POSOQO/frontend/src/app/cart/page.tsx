@@ -65,21 +65,6 @@ export default function CartPage() {
                 Carrito de Compras
               </span>
             </h1>
-
-            <div className="flex flex-wrap items-center gap-6 text-gray-300 mb-8">
-              <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-yellow-400" />
-                <span>
-                  {summary.uniqueItems} {summary.uniqueItems === 1 ? 'producto' : 'productos'} en tu carrito
-                </span>
-              </div>
-              {summary.hasItems && (
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-yellow-400" />
-                  <span>Total: S/ {summary.total.toFixed(2)}</span>
-                </div>
-              )}
-            </div>
           </motion.div>
         </div>
       </section>
@@ -288,13 +273,22 @@ export default function CartPage() {
                       </p>
                     </div>
                   </motion.div>
-
-                  {/* Vistos Recientemente */}
-                  <RecentlyViewed />
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Vistos Recientemente - Fuera del resumen */}
+          {!summary.isEmpty && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-8"
+            >
+              <RecentlyViewed />
+            </motion.div>
+          )}
         </div>
       </section>
     </div>

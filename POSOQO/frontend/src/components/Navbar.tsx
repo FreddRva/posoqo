@@ -284,14 +284,20 @@ export default function Navbar() {
 
                         transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
 
-                        className="absolute right-0 top-full mt-2 w-80 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                        className="absolute right-0 top-full mt-2 w-80 bg-black/95 backdrop-blur-2xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl z-50"
+                        style={{
+                          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5)'
+                        }}
                       >
 
                         <div className="p-4 border-b border-white/10">
                           <div className="flex items-center justify-between">
-                            <h3 className="text-white font-semibold text-sm">Notificaciones</h3>
+                            <h3 className="text-white font-semibold text-sm flex items-center gap-2">
+                              <Bell className="w-4 h-4 text-yellow-400" />
+                              Notificaciones
+                            </h3>
                             {stats.unread > 0 && (
-                              <span className="text-xs text-gray-400">{stats.unread} nuevas</span>
+                              <span className="text-xs text-yellow-400 font-medium">{stats.unread} nuevas</span>
                             )}
                           </div>
                         </div>
@@ -301,45 +307,56 @@ export default function Navbar() {
                           {notifications.length === 0 ? (
 
                             <div className="p-8 text-center">
-                              <Bell className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                              <p className="text-gray-500 text-sm">No hay notificaciones</p>
+                              <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center mx-auto mb-3">
+                                <Bell className="w-6 h-6 text-gray-400" />
+                              </div>
+                              <p className="text-gray-400 text-sm">No hay notificaciones</p>
                             </div>
 
                           ) : (
 
-                            notifications.slice(0, 5).map((notif) => (
+                            <div className="p-2">
+                              {notifications.slice(0, 5).map((notif) => (
 
-                              <div
+                                <div
 
-                                key={notif.id}
+                                  key={notif.id}
 
-                                onClick={() => markAsRead(notif.id)}
+                                  onClick={() => markAsRead(notif.id)}
 
-                                className={`group p-3 border-b border-white/5 cursor-pointer transition-all duration-150 ${
-                                  !notif.is_read 
-                                    ? "bg-white/5" 
-                                    : "hover:bg-white/5"
-                                }`}
+                                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer ${
+                                    !notif.is_read 
+                                      ? "bg-white/5" 
+                                      : "hover:bg-white/5"
+                                  }`}
 
-                              >
-
-                                <div className="flex items-start gap-3">
-                                  {!notif.is_read && (
-                                    <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full mt-1.5 flex-shrink-0" />
-                                  )}
+                                >
+                                  <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${
+                                    !notif.is_read
+                                      ? "bg-yellow-400/20"
+                                      : "bg-white/5 group-hover:bg-white/10"
+                                  }`}>
+                                    <Bell className={`w-4 h-4 transition-colors duration-150 ${
+                                      !notif.is_read
+                                        ? "text-yellow-400"
+                                        : "text-gray-400 group-hover:text-yellow-400"
+                                    }`} />
+                                  </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-white text-sm font-medium group-hover:text-white transition-colors duration-150">
                                       {notif.title}
                                     </p>
-                                    <p className="text-gray-500 text-xs mt-1 group-hover:text-gray-400 transition-colors duration-150">
+                                    <p className="text-gray-500 text-xs mt-0.5 group-hover:text-gray-400 transition-colors duration-150 line-clamp-2">
                                       {notif.message}
                                     </p>
                                   </div>
+                                  {!notif.is_read && (
+                                    <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0" />
+                                  )}
                                 </div>
 
-                              </div>
-
-                            ))
+                              ))}
+                            </div>
 
                           )}
 
@@ -349,10 +366,10 @@ export default function Navbar() {
                           <div className="p-3 border-t border-white/10">
                             <a 
                               href="/dashboard" 
-                              className="text-xs text-gray-400 hover:text-white font-medium transition-colors duration-150 flex items-center justify-center gap-1"
+                              className="group flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5 transition-all duration-150"
                             >
-                              Ver todas
-                              <span>→</span>
+                              <span className="text-xs text-gray-400 group-hover:text-white font-medium transition-colors duration-150">Ver todas</span>
+                              <ArrowRight className="w-3 h-3 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                             </a>
                           </div>
                         )}
@@ -453,7 +470,10 @@ export default function Navbar() {
 
                         transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
 
-                        className="absolute right-0 top-full mt-2 w-72 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                        className="absolute right-0 top-full mt-2 w-72 bg-black/95 backdrop-blur-2xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl z-50"
+                        style={{
+                          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5)'
+                        }}
                       >
 
                         {/* Header */}
@@ -461,7 +481,7 @@ export default function Navbar() {
                         <div className="p-4 border-b border-white/10">
                           <div className="flex items-center gap-3">
 
-                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400/20 to-amber-400/20 border border-yellow-400/30 flex items-center justify-center">
                               <span className="text-sm font-medium text-white">
                                 {user.name?.charAt(0).toUpperCase()}
 
@@ -491,14 +511,14 @@ export default function Navbar() {
 
                               href="/dashboard" 
 
-                              className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition-all duration-150 group"
+                              className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-150"
                             >
 
-                              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                                <Crown className="w-4 h-4 text-[#D4AF37]" />
+                              <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 group-hover:bg-white/10 transition-all duration-150">
+                                <Crown className="w-4 h-4 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                               </div>
 
-                              <span className="text-white font-medium text-sm">Dashboard</span>
+                              <span className="text-white/90 font-medium text-sm group-hover:text-white transition-colors duration-150">Dashboard</span>
                             </a>
 
                           )}
@@ -507,42 +527,42 @@ export default function Navbar() {
 
                             href="/profile" 
 
-                            className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition-all duration-150"
+                            className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-150"
                           >
 
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                              <User className="w-4 h-4 text-gray-400" />
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 group-hover:bg-white/10 transition-all duration-150">
+                              <User className="w-4 h-4 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                             </div>
 
-                            <span className="text-white font-medium text-sm">Mi Perfil</span>
+                            <span className="text-white/90 font-medium text-sm group-hover:text-white transition-colors duration-150">Mi Perfil</span>
                           </a>
 
                           <a 
 
                             href="/orders" 
 
-                            className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition-all duration-150"
+                            className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-150"
                           >
 
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                              <Package className="w-4 h-4 text-gray-400" />
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 group-hover:bg-white/10 transition-all duration-150">
+                              <Package className="w-4 h-4 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                             </div>
 
-                            <span className="text-white font-medium text-sm">Mis Pedidos</span>
+                            <span className="text-white/90 font-medium text-sm group-hover:text-white transition-colors duration-150">Mis Pedidos</span>
                           </a>
 
                           <a 
 
                             href="/favorites" 
 
-                            className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition-all duration-150"
+                            className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-150"
                           >
 
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                              <Heart className="w-4 h-4 text-gray-400" />
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 group-hover:bg-white/10 transition-all duration-150">
+                              <Heart className="w-4 h-4 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                             </div>
 
-                            <span className="text-white font-medium text-sm">Favoritos</span>
+                            <span className="text-white/90 font-medium text-sm group-hover:text-white transition-colors duration-150">Favoritos</span>
                           </a>
 
                         </div>
@@ -556,14 +576,14 @@ export default function Navbar() {
 
                             onClick={() => signOut()}
 
-                            className="w-full flex items-center gap-3 px-3 py-2 hover:bg-white/5 rounded-xl transition-all duration-150"
+                            className="w-full group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-150"
                           >
 
-                            <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
-                              <LogOut className="w-4 h-4 text-red-400" />
+                            <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 group-hover:bg-red-500/20 transition-all duration-150">
+                              <LogOut className="w-4 h-4 text-red-400 group-hover:text-red-300 transition-colors duration-150" />
                             </div>
 
-                            <span className="text-red-400 font-medium text-sm">Cerrar Sesión</span>
+                            <span className="text-red-400 font-medium text-sm group-hover:text-red-300 transition-colors duration-150">Cerrar Sesión</span>
                           </button>
 
                         </div>
