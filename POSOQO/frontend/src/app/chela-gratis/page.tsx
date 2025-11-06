@@ -79,8 +79,10 @@ export default function ChelaGratisPage() {
     
     try {
       // Construir URL del API
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
-      const url = `${apiUrl.replace(/\/$/, '')}/api/raffle/subscribe`
+      let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
+      // Normalizar URL: eliminar /api si existe y eliminar trailing slash
+      apiUrl = apiUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
+      const url = `${apiUrl}/api/raffle/subscribe`
       
       // Enviar datos al backend
       const response = await fetch(url, {
@@ -144,8 +146,10 @@ export default function ChelaGratisPage() {
   useEffect(() => {
     const loadRaffleConfig = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
-        const url = `${apiUrl.replace(/\/$/, '')}/api/raffle/config`
+        let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
+        // Normalizar URL: eliminar /api si existe y eliminar trailing slash
+        apiUrl = apiUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
+        const url = `${apiUrl}/api/raffle/config`
         const response = await fetch(url)
         if (response.ok) {
           const data = await response.json()
