@@ -65,7 +65,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
           {/* Búsqueda inteligente mejorada - Diseño Premium */}
-          <div className="space-y-3">
+          <div className="space-y-3 relative">
             <label className="block text-sm font-semibold text-yellow-400 mb-2 flex items-center gap-2">
               <div className="w-6 h-6 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-lg flex items-center justify-center">
                 <Search className="w-3.5 h-3.5 text-black" />
@@ -126,9 +126,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 )}
               </div>
               
-              {/* Tooltip informativo */}
+              {/* Tooltip informativo - Posicionado absolutamente para evitar conflictos */}
               {!filters.search && (
-                <div className="absolute top-full left-0 right-0 mt-2 px-4 py-2.5 bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl z-20">
+                <div className="absolute top-full left-0 right-0 mt-2 px-4 py-2.5 bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl z-50">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-1 bg-yellow-400 rounded-full animate-pulse" />
                     <p>Escribe para buscar productos por nombre, categoría o descripción</p>
@@ -183,7 +183,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
 
         {/* Botones de acción */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-gradient-to-r from-transparent via-yellow-400/30 to-transparent relative z-10">
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-yellow-400/30 relative z-10">
           <motion.button
             onClick={onResetFilters}
             whileHover={{ scale: 1.05 }}

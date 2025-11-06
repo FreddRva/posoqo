@@ -3,6 +3,62 @@ import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Product, Category, FilterState, SortOption, ViewMode } from '@/types/products';
 
+// Función para obtener variantes de una palabra (singular y plural)
+const getWordVariants = (word: string): string[] => {
+  const lowerWord = word.toLowerCase().trim();
+  const variants = [lowerWord];
+  
+  // Si termina en 'es' (cervezas, comidas), crear singular
+  if (lowerWord.endsWith('es') && lowerWord.length > 4) {
+    variants.push(lowerWord.slice(0, -2)); // cervezas -> cerveza
+  }
+  // Si termina en 'as' (cervezas alternativo), crear singular
+  else if (lowerWord.endsWith('as') && lowerWord.length > 4) {
+    variants.push(lowerWord.slice(0, -1)); // cervezas -> cerveza
+  }
+  // Si termina en 'os' (vinos), crear singular
+  else if (lowerWord.endsWith('os') && lowerWord.length > 4) {
+    variants.push(lowerWord.slice(0, -1)); // vinos -> vino
+  }
+  // Si termina en 's' pero no en 'es', crear plural agregando 'es'
+  else if (lowerWord.endsWith('s') && !lowerWord.endsWith('es') && lowerWord.length > 3) {
+    // Ya es plural, crear singular removiendo 's'
+    variants.push(lowerWord.slice(0, -1));
+  }
+  // Si no termina en 's', crear plurales comunes
+  else if (!lowerWord.endsWith('s') && lowerWord.length > 2) {
+    variants.push(lowerWord + 's'); // cerveza -> cervezas
+    variants.push(lowerWord + 'es'); // cerveza -> cervezas (alternativa)
+  }
+  
+  return [...new Set(variants)]; // Eliminar duplicados
+};
+
+// Función de búsqueda inteligente que maneja plural/singular
+const smartSearch = (searchTerm: string, text: string): boolean => {
+  if (!text) return false;
+  
+  const normalizedText = text.toLowerCase();
+  const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
+  
+  // Para cada palabra de búsqueda, obtener sus variantes y buscar
+  return searchWords.some(word => {
+    const variants = getWordVariants(word);
+    
+    // Buscar cualquiera de las variantes en el texto
+    return variants.some(variant => {
+      // Búsqueda exacta de palabra completa (mejor coincidencia)
+      const wordRegex = new RegExp(`\\b${variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (wordRegex.test(normalizedText)) return true;
+      
+      // Búsqueda como substring (coincidencia parcial)
+      if (normalizedText.includes(variant)) return true;
+      
+      return false;
+    });
+  });
+};
+
 export const useProducts = () => {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,17 +107,33 @@ export const useProducts = () => {
     }
   };
 
+
   // Productos filtrados y ordenados
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
     
 
-    // Filtro por búsqueda
+    // Filtro por búsqueda inteligente
     if (filters.search) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        product.description?.toLowerCase().includes(filters.search.toLowerCase())
-      );
+      const searchTerm = filters.search.trim();
+      
+      filtered = filtered.filter(product => {
+        // Buscar en nombre del producto
+        if (smartSearch(searchTerm, product.name)) return true;
+        
+        // Buscar en descripción
+        if (product.description && smartSearch(searchTerm, product.description)) return true;
+        
+        // Buscar en nombre de categoría
+        const productCategory = categories.find(cat => cat.id === product.category_id);
+        if (productCategory && smartSearch(searchTerm, productCategory.name)) return true;
+        
+        // Buscar en nombre de subcategoría
+        const productSubcategory = categories.find(cat => cat.id === product.subcategory_id);
+        if (productSubcategory && smartSearch(searchTerm, productSubcategory.name)) return true;
+        
+        return false;
+      });
     }
 
     // Filtro por categoría (buscar tanto en category_id como en subcategory_id)
@@ -111,7 +183,7 @@ export const useProducts = () => {
     });
 
     return filtered;
-  }, [products, filters]);
+  }, [products, filters, categories]);
 
   // Subcategorías de la categoría seleccionada
   const subcategories = useMemo(() => {
