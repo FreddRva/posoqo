@@ -48,8 +48,18 @@ export const config = {
 export const getImageUrl = (imageUrl: string | undefined | null): string => {
   if (!imageUrl) return '/file.svg';
   
-  // Si ya es una URL completa (Cloudinary o externa), devolverla tal como está
+  // Si ya es una URL completa (Cloudinary o externa)
   if (imageUrl.startsWith('http')) {
+    // Si es Cloudinary, verificar y corregir transformaciones que recorten
+    if (imageUrl.includes('cloudinary.com')) {
+      // Si tiene transformaciones de recorte (c_fill, c_crop), reemplazarlas con c_limit
+      if (imageUrl.includes('c_fill') || imageUrl.includes('c_crop')) {
+        // Reemplazar cualquier transformación de recorte con c_limit para preservar proporción completa
+        return imageUrl.replace(/c_(fill|crop)/g, 'c_limit');
+      }
+      // Si no tiene transformaciones de recorte, devolver tal cual
+      return imageUrl;
+    }
     return imageUrl;
   }
   

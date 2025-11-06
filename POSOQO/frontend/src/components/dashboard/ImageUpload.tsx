@@ -46,6 +46,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       formData.append('file', file);
       formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'posoqo_products');
       formData.append('folder', 'posoqo/products');
+      // Configuración para evitar transformaciones automáticas que recorten
+      formData.append('transformation', JSON.stringify({
+        quality: 'auto:good',
+        fetch_format: 'auto'
+      }));
 
       const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
@@ -103,11 +108,18 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         {currentImage ? (
           <div className="space-y-4">
             <div className="relative w-full flex items-center justify-center">
-              <div className="relative w-full max-w-xs h-64 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+              <div className="relative w-full max-w-xs min-h-[300px] bg-white rounded-lg flex items-center justify-center p-4">
                 <img
                   src={currentImage}
                   alt="Preview"
-                  className="w-full h-full object-contain"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: 'none',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    display: 'block'
+                  }}
                 />
                 <button
                   onClick={(e) => {
