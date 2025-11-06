@@ -28,6 +28,7 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
   const [subtotal, setSubtotal] = useState(amount);
   const [tax, setTax] = useState(0);
   const [consultingDNI, setConsultingDNI] = useState(false);
+  const [dniValid, setDniValid] = useState<boolean | null>(null);
   const [dniData, setDniData] = useState<{
     nombres?: string;
     apellidoPaterno?: string;
@@ -85,10 +86,12 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
     }
   };
 
-  // Consultar datos del DNI desde APIperu.dev
+  // Consultar datos del DNI desde APIperu.dev - Solo validar, no autocompletar
   const consultarDNI = async (dni: string) => {
     setConsultingDNI(true);
+    setDniValid(null);
     setDniData(null);
+    setError(null); // Limpiar errores previos
     
     try {
       // Construir URL correctamente (evitar duplicación de /api)
@@ -102,29 +105,26 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.data) {
-          // Guardar los datos del DNI
-          const datosReales = {
-            nombres: result.data.nombres || '',
-            apellidoPaterno: result.data.apellido_paterno || '',
-            apellidoMaterno: result.data.apellido_materno || ''
-          };
+          // DNI válido y encontrado
+          setDniValid(true);
           
-          setDniData(datosReales);
-          
-          // Auto-completar nombre del titular
+          // Siempre autocompletar nombre con los datos del DNI
           const nombreCompleto = result.data.nombre_completo || 
-            `${datosReales.nombres} ${datosReales.apellidoPaterno} ${datosReales.apellidoMaterno}`.trim();
-          setCardholderName(nombreCompleto);
+            `${result.data.nombres || ''} ${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
+          if (nombreCompleto) {
+            setCardholderName(nombreCompleto);
+          }
         } else {
-          setError('DNI no encontrado en los registros. Por favor, ingresa el nombre manualmente.');
+          // DNI no encontrado en los registros
+          setDniValid(false);
         }
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Error al consultar el DNI' }));
-        setError(errorData.error || 'No se pudieron obtener los datos del DNI. Por favor, ingresa el nombre manualmente.');
+        // Error al consultar
+        setDniValid(false);
       }
     } catch (error) {
       console.error('Error consultando DNI:', error);
-      setError('No se pudo consultar el DNI. Por favor, ingresa el nombre manualmente.');
+      setDniValid(false);
     } finally {
       setConsultingDNI(false);
     }
@@ -134,13 +134,20 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
   const handleDocumentChange = (value: string) => {
     setDocumentNumber(value);
     setDniData(null);
+    setDniValid(null); // Limpiar validación cuando cambia el DNI
     
     // Solo consultar si es DNI y tiene 8 dígitos
     if (documentType === 'DNI' && value.replace(/[\s.-]/g, '').length === 8) {
       const cleanDNI = value.replace(/[\s.-]/g, '');
       if (validateDNI(cleanDNI)) {
         consultarDNI(cleanDNI);
+      } else {
+        // Si el formato no es válido, marcar como inválido
+        setDniValid(false);
       }
+    } else if (documentType === 'DNI' && value.replace(/[\s.-]/g, '').length > 0) {
+      // Si está ingresando pero aún no tiene 8 dígitos, limpiar validación
+      setDniValid(null);
     }
   };
 
@@ -362,7 +369,11 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
             <div className="flex gap-2">
               <select 
                 value={documentType}
-                onChange={(e) => setDocumentType(e.target.value)}
+                onChange={(e) => {
+                  setDocumentType(e.target.value);
+                  setDniValid(null); // Limpiar validación cuando cambia el tipo de documento
+                  setDniData(null);
+                }}
                 className="border border-white/10 rounded-xl px-4 py-3 bg-white/5 text-white focus:border-yellow-400/50 focus:ring-2 focus:ring-yellow-400/20 outline-none transition-all duration-200"
               >
                 <option value="DNI">DNI</option>
@@ -381,24 +392,25 @@ function CheckoutForm({ amount, clientSecret: propClientSecret, orderId }: Strip
             {consultingDNI && (
               <div className="flex items-center text-yellow-400 text-sm">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-400 mr-2"></div>
-                Consultando datos del DNI...
+                Validando DNI...
               </div>
             )}
             
-            {dniData && (
-              <div className="bg-green-500/10 border border-green-400/30 rounded-lg p-3 backdrop-blur-sm">
-                <div className="flex items-center text-green-400 text-sm mb-2">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Datos encontrados:
-                </div>
-                <div className="text-green-300 text-sm">
-                  <p><strong>Nombres:</strong> {dniData.nombres}</p>
-                  <p><strong>Apellidos:</strong> {dniData.apellidoPaterno} {dniData.apellidoMaterno}</p>
-                </div>
+            {!consultingDNI && dniValid === true && documentType === 'DNI' && (
+              <div className="flex items-center text-green-400 text-sm">
+                <CheckCircle className="w-4 h-4 mr-2" />
+                DNI válido
               </div>
             )}
             
-            {documentNumber && !validateDocument(documentType, documentNumber) && !consultingDNI && (
+            {!consultingDNI && dniValid === false && documentType === 'DNI' && documentNumber.replace(/[\s.-]/g, '').length === 8 && (
+              <div className="flex items-center text-red-400 text-sm">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                DNI no válido
+              </div>
+            )}
+            
+            {documentType !== 'DNI' && documentNumber && !validateDocument(documentType, documentNumber) && !consultingDNI && (
               <p className="text-red-400 text-sm flex items-center">
                 <AlertCircle className="w-4 h-4 mr-1" />
                 El {documentType} ingresado no es válido
