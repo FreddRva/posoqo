@@ -18,7 +18,6 @@ import {
   Zap,
   User,
   Mail,
-  CreditCard,
   AlertCircle,
   Info,
   X,
@@ -46,14 +45,12 @@ export default function ChelaGratisPage() {
     nombre: "",
     email: "",
     telefono: "",
-    dni: "",
     edad: "",
     aceptaTerminos: false
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string } | null>(null)
-  const [consultandoDNI, setConsultandoDNI] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -63,76 +60,8 @@ export default function ChelaGratisPage() {
     }))
   }
 
-  // Función para consultar DNI cuando se complete
-  const handleDNIBlur = async () => {
-    const dni = formData.dni.trim()
-    
-    // Solo consultar si tiene exactamente 8 dígitos
-    if (!/^\d{8}$/.test(dni)) {
-      return
-    }
-
-    // Si ya tiene nombre completo, no consultar de nuevo
-    if (formData.nombre.trim() !== '') {
-      return
-    }
-
-    setConsultandoDNI(true)
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
-      const response = await fetch(`${apiUrl}/api/dni/${dni}`)
-      
-      if (response.ok) {
-        const result = await response.json()
-        if (result.success && result.data) {
-          // Autocompletar el nombre con los datos del DNI
-          setFormData(prev => ({
-            ...prev,
-            nombre: result.data.nombre_completo || `${result.data.nombres} ${result.data.apellido_paterno} ${result.data.apellido_materno}`.trim()
-          }))
-          
-          setAlert({
-            type: 'success',
-            title: 'DNI Verificado',
-            message: `Datos encontrados: ${result.data.nombre_completo}`
-          })
-          setTimeout(() => setAlert(null), 3000)
-        }
-      } else {
-        const error = await response.json()
-        setAlert({
-          type: 'warning',
-          title: 'DNI no encontrado',
-          message: error.error || 'No se encontraron datos para este DNI. Puedes continuar ingresando manualmente.'
-        })
-        setTimeout(() => setAlert(null), 5000)
-      }
-    } catch (error) {
-      console.error('Error consultando DNI:', error)
-      setAlert({
-        type: 'info',
-        title: 'Consulta de DNI no disponible',
-        message: 'No se pudo consultar el DNI. Por favor completa los datos manualmente.'
-      })
-      setTimeout(() => setAlert(null), 5000)
-    } finally {
-      setConsultandoDNI(false)
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Validar DNI (8 dígitos para Perú)
-    if (formData.dni && !/^\d{8}$/.test(formData.dni)) {
-      setAlert({
-        type: 'error',
-        title: 'DNI Inválido',
-        message: 'El DNI debe contener exactamente 8 dígitos numéricos.'
-      })
-      setTimeout(() => setAlert(null), 5000)
-      return
-    }
     
     setIsSubmitting(true)
     
@@ -155,7 +84,6 @@ export default function ChelaGratisPage() {
         nombre: "",
         email: "",
         telefono: "",
-        dni: "",
         edad: "",
         aceptaTerminos: false
       })
@@ -194,19 +122,18 @@ export default function ChelaGratisPage() {
         
         {/* Patrón repetitivo de free.png - pequeñas y repetidas */}
         <div 
-          className="absolute inset-0 z-[1]"
+          className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: 'url(/free.png)',
             backgroundSize: '80px 80px',
             backgroundPosition: '0 0',
             backgroundRepeat: 'repeat',
             animation: 'slide-diagonal-reverse 35s linear infinite',
-            opacity: 0.5,
           }}
         />
         
         {/* Overlay oscuro para mejor contraste del contenido */}
-        <div className="absolute inset-0 bg-black/40 z-[2]" />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
       
       {/* Estilos para las animaciones */}
@@ -399,44 +326,6 @@ export default function ChelaGratisPage() {
                         placeholder="tu@email.com"
                       />
                     </div>
-
-                    <div>
-                          <label htmlFor="dni" className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                            <CreditCard className="w-4 h-4 text-yellow-400" />
-                            DNI (Documento Nacional de Identidad) *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              id="dni"
-                              name="dni"
-                              required
-                              maxLength={8}
-                              pattern="[0-9]{8}"
-                              value={formData.dni}
-                              onChange={handleInputChange}
-                              onBlur={handleDNIBlur}
-                              className="w-full px-5 py-3 bg-black/60 backdrop-blur-sm border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 text-white placeholder-gray-500 transition-all duration-200"
-                              placeholder="12345678"
-                              disabled={consultandoDNI}
-                            />
-                            {consultandoDNI && (
-                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <div className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-                              </div>
-                            )}
-                            {formData.dni.length === 8 && !consultandoDNI && (
-                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                              </div>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            {consultandoDNI 
-                              ? 'Consultando datos del DNI...' 
-                              : 'Ingresa tu DNI de 8 dígitos. Los datos se completarán automáticamente.'}
-                          </p>
-                        </div>
 
                         <div>
                           <label htmlFor="telefono" className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
