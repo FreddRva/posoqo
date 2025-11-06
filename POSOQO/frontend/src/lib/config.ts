@@ -50,15 +50,27 @@ export const getImageUrl = (imageUrl: string | undefined | null): string => {
   
   // Si ya es una URL completa (Cloudinary o externa)
   if (imageUrl.startsWith('http')) {
-    // Si es Cloudinary, verificar y corregir transformaciones que recorten
+    // Si es Cloudinary, corregir transformaciones que recorten
     if (imageUrl.includes('cloudinary.com')) {
-      // Si tiene transformaciones de recorte (c_fill, c_crop), reemplazarlas con c_limit
-      if (imageUrl.includes('c_fill') || imageUrl.includes('c_crop')) {
-        // Reemplazar cualquier transformación de recorte con c_limit para preservar proporción completa
-        return imageUrl.replace(/c_(fill|crop)/g, 'c_limit');
+      // Reemplazar c_fill o c_crop con c_limit para preservar proporción completa
+      let correctedUrl = imageUrl;
+      
+      // Reemplazar transformaciones de recorte
+      if (correctedUrl.includes('c_fill') || correctedUrl.includes('c_crop')) {
+        correctedUrl = correctedUrl.replace(/c_fill/g, 'c_limit').replace(/c_crop/g, 'c_limit');
       }
-      // Si no tiene transformaciones de recorte, devolver tal cual
-      return imageUrl;
+      
+      // Remover dimensiones fijas que causan recortes (w_XXX,h_XXX)
+      correctedUrl = correctedUrl.replace(/w_\d+,h_\d+/g, '');
+      correctedUrl = correctedUrl.replace(/,w_\d+,h_\d+/g, '');
+      correctedUrl = correctedUrl.replace(/w_\d+,h_\d+,/g, '');
+      
+      // Limpiar comas dobles que puedan quedar
+      correctedUrl = correctedUrl.replace(/,,/g, ',');
+      correctedUrl = correctedUrl.replace(/\/,\//g, '//');
+      correctedUrl = correctedUrl.replace(/upload,/, 'upload/');
+      
+      return correctedUrl;
     }
     return imageUrl;
   }
