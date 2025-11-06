@@ -167,20 +167,22 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               className="group relative z-10"
             >
               {/* Contenedor principal con espacio para la imagen flotante */}
-              <div className="relative pt-40">
-                {/* Imagen del producto - FLOTANTE como en Fortnite */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-80 z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
+              <div className="relative pt-48">
+                {/* Imagen del producto - FLOTANTE como en Fortnite - COMPLETA */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
                   <motion.div
                     whileHover={{ scale: 1.08, y: -5 }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="relative w-full h-full flex items-center justify-center"
+                    className="relative w-full flex items-center justify-center"
                   >
-                    <img
-                      src={getImageUrl(product.image_url)}
-                      alt={product.name}
-                      className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
-                      style={{ maxHeight: '320px', objectFit: 'contain' }}
-                    />
+                    <div className="w-full max-w-[300px] h-auto flex items-center justify-center">
+                      <img
+                        src={getImageUrl(product.image_url)}
+                        alt={product.name}
+                        className="w-auto h-auto max-w-full max-h-[420px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                        style={{ objectFit: 'contain', display: 'block' }}
+                      />
+                    </div>
                     
                     {/* Badge destacado */}
                     {product.is_featured && (
@@ -197,7 +199,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                 </div>
 
                 {/* Card estilo Fortnite - Diseño moderno y limpio */}
-                <div className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 group-hover:shadow-3xl mt-40">
+                <div className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 group-hover:shadow-3xl mt-48">
                   {/* Tarjeta de información - Estilo Fortnite */}
                   <div className="bg-gray-800/95 backdrop-blur-sm p-6 border-t border-gray-700/50 rounded-b-2xl">
                   {/* Nombre del producto */}
