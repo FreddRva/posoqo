@@ -166,40 +166,40 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               whileHover={{ y: -8, scale: 1.02 }}
               className="group relative z-10"
             >
-              {/* Card estilo Fortnite - Diseño moderno y limpio */}
-              <div className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 group-hover:shadow-3xl">
-                {/* Imagen del producto - Ocupa más espacio como en Fortnite */}
-                <div className="relative h-96 overflow-hidden bg-gradient-to-b from-gray-800 to-black">
+              {/* Contenedor principal con espacio para la imagen flotante */}
+              <div className="relative pt-40">
+                {/* Imagen del producto - FLOTANTE como en Fortnite */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-80 z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
                   <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="relative w-full h-full"
+                    whileHover={{ scale: 1.08, y: -5 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="relative w-full h-full flex items-center justify-center"
                   >
                     <img
                       src={getImageUrl(product.image_url)}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                      style={{ maxHeight: '320px', objectFit: 'contain' }}
                     />
                     
-                    {/* Overlay sutil */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent" />
+                    {/* Badge destacado */}
+                    {product.is_featured && (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: 0.2, type: "spring" }}
+                        className="absolute top-2 right-2 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-cyan-300/50 z-20"
+                      >
+                        ⭐ Destacado
+                      </motion.div>
+                    )}
                   </motion.div>
-                  
-                  {/* Badge destacado */}
-                  {product.is_featured && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.2, type: "spring" }}
-                      className="absolute top-4 right-4 px-3 py-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 text-white text-xs font-bold rounded-full shadow-lg backdrop-blur-sm border border-cyan-300/50 z-20"
-                    >
-                      ⭐ Destacado
-                    </motion.div>
-                  )}
                 </div>
 
-                {/* Tarjeta de información - Estilo Fortnite */}
-                <div className="bg-gray-800/95 backdrop-blur-sm p-6 border-t border-gray-700/50">
+                {/* Card estilo Fortnite - Diseño moderno y limpio */}
+                <div className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 group-hover:shadow-3xl mt-40">
+                  {/* Tarjeta de información - Estilo Fortnite */}
+                  <div className="bg-gray-800/95 backdrop-blur-sm p-6 border-t border-gray-700/50 rounded-b-2xl">
                   {/* Nombre del producto */}
                   <h3 className="text-2xl font-bold text-white text-center mb-4">
                     {product.name}
@@ -272,6 +272,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     <Eye className="w-5 h-5" />
                     <span>Ver Detalle</span>
                   </motion.button>
+                  </div>
                 </div>
               </div>
             </motion.div>
