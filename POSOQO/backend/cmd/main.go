@@ -467,11 +467,7 @@ func setupEnvironment() {
 		os.Setenv("DB_USER", "posoqo_user")
 	}
 	if os.Getenv("DB_PASSWORD") == "" {
-		if isProduction {
-			log.Fatal("❌ DB_PASSWORD debe estar configurado en producción")
-		}
-		os.Setenv("DB_PASSWORD", "posoqoEvelinSuarez")
-		log.Println("⚠️ DB_PASSWORD no configurado, usando valor por defecto (SOLO DESARROLLO)")
+		log.Fatal("❌ DB_PASSWORD debe estar configurado en el archivo .env")
 	} else if isProduction {
 		log.Println("✅ DB_PASSWORD configurado correctamente")
 	}
