@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"math/rand"
 	"net/http"
@@ -450,9 +451,10 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 	rowCount := 0
 	for rows.Next() {
 		rowCount++
-		var id, nombre, email, telefono, prizeLevel, mesSorteoDB string
+		var id, nombre, email, telefono, mesSorteoDB string
 		var edad, numeroParticipacion int
 		var isWinner bool
+		var prizeLevel sql.NullString
 		var createdAt time.Time
 
 		if err := rows.Scan(&id, &nombre, &email, &telefono, &edad, &numeroParticipacion, &isWinner, &prizeLevel, &createdAt, &mesSorteoDB); err != nil {
@@ -462,6 +464,12 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 
 		log.Printf("[RAFFLE] Participante encontrado: %s - %s (mes: '%s')", nombre, email, mesSorteoDB)
 
+		// Convertir sql.NullString a string normal
+		prizeLevelStr := ""
+		if prizeLevel.Valid {
+			prizeLevelStr = prizeLevel.String
+		}
+
 		participants = append(participants, fiber.Map{
 			"id":                   id,
 			"nombre":               nombre,
@@ -470,7 +478,7 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 			"edad":                 edad,
 			"numero_participacion": numeroParticipacion,
 			"is_winner":            isWinner,
-			"prize_level":          prizeLevel,
+			"prize_level":          prizeLevelStr,
 			"created_at":           createdAt,
 		})
 	}
