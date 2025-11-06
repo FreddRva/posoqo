@@ -194,18 +194,19 @@ export default function ChelaGratisPage() {
         
         {/* Patrón repetitivo de free.png - pequeñas y repetidas */}
         <div 
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 z-[1]"
           style={{
             backgroundImage: 'url(/free.png)',
             backgroundSize: '80px 80px',
             backgroundPosition: '0 0',
             backgroundRepeat: 'repeat',
             animation: 'slide-diagonal-reverse 35s linear infinite',
+            opacity: 0.5,
           }}
         />
         
         {/* Overlay oscuro para mejor contraste del contenido */}
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/40 z-[2]" />
       </div>
       
       {/* Estilos para las animaciones */}
