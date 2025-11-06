@@ -338,62 +338,8 @@ export default function ReservationsPage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
-      <section 
-        ref={heroRef}
-        className="relative pt-24 pb-12 px-6 overflow-hidden"
-      >
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-black to-pink-900/30" />
-          </div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={heroInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 bg-gradient-to-r from-purple-400/10 to-pink-400/10 border border-purple-400/30 rounded-full">
-              <Calendar className="w-5 h-5 text-purple-400" />
-              <span className="text-purple-400 font-semibold tracking-wider uppercase text-sm">
-                Reservas
-              </span>
-            </div>
-
-            <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent drop-shadow-2xl">
-                Reservar Mesa
-              </span>
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-6 text-gray-300 mb-8">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-purple-400" />
-                <span>Reserva tu mesa con anticipación</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-purple-400" />
-                <span>Disponibilidad garantizada</span>
-              </div>
-            </div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={heroInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-xl md:text-2xl text-gray-300 max-w-4xl leading-relaxed"
-            >
-              Reserva tu mesa en POSOQO y disfruta de una experiencia única con nuestras cervezas 
-              artesanales y gastronomía ayacuchana. Nos aseguramos de tener todo listo para ti.
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Main Content */}
-      <section className="relative py-12 px-6 bg-black">
+      <section className="relative pt-20 pb-12 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - Form */}
