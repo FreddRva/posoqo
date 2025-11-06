@@ -125,19 +125,50 @@ export default function ChelaGratisPage() {
         ref={heroRef}
         className="relative pt-32 pb-20 px-6 overflow-hidden"
       >
-        {/* Fondo con efecto de profundidad */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/30 via-black to-amber-900/30" />
-            <div 
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
-                                 radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%)`
-              }}
-            />
-            </div>
-          </div>
+        {/* Fondo con patrón repetitivo de "chela gratis" */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Imagen principal de fondo */}
+          <div 
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage: 'url(/Imagen1.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          
+          {/* Patrón repetitivo de "free.png" en fila con animación */}
+          <div 
+            className="absolute inset-0 opacity-40 animate-slide-horizontal"
+            style={{
+              backgroundImage: 'url(/free.png)',
+              backgroundSize: 'auto 200px',
+              backgroundPosition: 'top center',
+              backgroundRepeat: 'repeat-x',
+            }}
+          />
+          
+          {/* Overlay oscuro para mejor contraste */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
+        </div>
+        
+        {/* Estilos globales para la animación */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes slide-horizontal {
+              0% {
+                background-position: 0 0;
+              }
+              100% {
+                background-position: 100% 0;
+              }
+            }
+            .animate-slide-horizontal {
+              animation: slide-horizontal 30s linear infinite;
+            }
+          `
+        }} />
           
         <div className="relative z-10 max-w-7xl mx-auto text-center">
           <motion.div
