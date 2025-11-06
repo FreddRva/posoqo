@@ -27,21 +27,21 @@ export const ContactSection: React.FC = () => {
   const contactInfo = [
     { 
       icon: Phone, 
-      title: "Teléfono Premium", 
+      title: "Teléfono", 
       content: "+51 999 999 999", 
-      description: "Línea directa para miembros VIP"
+      description: "Línea directa de atención"
     },
     { 
       icon: Mail, 
-      title: "Email Exclusivo", 
+      title: "Email", 
       content: "info@posoqo.com", 
       description: "Respuesta en menos de 24 horas"
     },
     { 
       icon: MapPin, 
-      title: "Ubicación Premium", 
+      title: "Ubicación", 
       content: "Ayacucho, Perú", 
-      description: "Cervecería artesanal de clase mundial"
+      description: "Cervecería artesanal"
     },
     { 
       icon: Clock, 
@@ -121,7 +121,7 @@ export const ContactSection: React.FC = () => {
             <div className="mb-8">
               <h3 className="text-3xl font-bold text-white mb-4">Información de Contacto</h3>
               <p className="text-lg text-gray-400 leading-relaxed">
-                Estamos aquí para ayudarte con cualquier consulta sobre nuestros productos, servicios o membresía VIP.
+                Estamos aquí para ayudarte con cualquier consulta sobre nuestros productos y servicios.
               </p>
             </div>
 

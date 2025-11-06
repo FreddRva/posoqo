@@ -35,9 +35,7 @@ export default function SobreNosotrosPage() {
 
   const stats = [
     { label: "Años de Tradición", value: "10+", icon: Calendar },
-    { label: "Cervezas Únicas", value: "15+", icon: Beer },
-    { label: "Comunidad", value: "50K+", icon: Users },
-    { label: "Experiencia", value: "Premium", icon: Award }
+    { label: "Cervezas Únicas", value: "15+", icon: Beer }
   ]
 
   const valores = [
@@ -144,7 +142,7 @@ export default function SobreNosotrosPage() {
           </motion.div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
             {stats.map((stat, index) => (
               <motion.div
                 key={index}

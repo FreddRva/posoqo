@@ -224,7 +224,7 @@ export default function RafflesPage() {
               type="month"
               value={selectedMes}
               onChange={(e) => setSelectedMes(e.target.value)}
-              className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-stone-900"
             />
           </div>
           <button
@@ -311,7 +311,7 @@ export default function RafflesPage() {
                     name="titulo"
                     defaultValue={editingConfig.titulo}
                     required
-                    className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                   />
                 </div>
 
@@ -321,7 +321,7 @@ export default function RafflesPage() {
                     name="descripcion"
                     defaultValue={editingConfig.descripcion}
                     rows={3}
-                    className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                   />
                 </div>
 
@@ -333,7 +333,7 @@ export default function RafflesPage() {
                       name="fecha_sorteo"
                       defaultValue={editingConfig.fecha_sorteo}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                   <div>
@@ -343,7 +343,7 @@ export default function RafflesPage() {
                       name="hora_sorteo"
                       defaultValue={editingConfig.hora_sorteo}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                 </div>
@@ -372,7 +372,7 @@ export default function RafflesPage() {
                       name="premio_primero"
                       defaultValue={editingConfig.premio_primero}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                   <div>
@@ -385,7 +385,7 @@ export default function RafflesPage() {
                       name="premio_segundo"
                       defaultValue={editingConfig.premio_segundo}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                   <div>
@@ -398,7 +398,7 @@ export default function RafflesPage() {
                       name="premio_tercero"
                       defaultValue={editingConfig.premio_tercero}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                   <div>
@@ -411,7 +411,7 @@ export default function RafflesPage() {
                       name="premio_consuelo"
                       defaultValue={editingConfig.premio_consuelo}
                       required
-                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-stone-900"
                     />
                   </div>
                 </div>

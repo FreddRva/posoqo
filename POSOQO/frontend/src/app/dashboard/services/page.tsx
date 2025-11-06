@@ -550,7 +550,7 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
               type="text"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-stone-900"
               required
             />
           </div>
@@ -567,7 +567,7 @@ function EditServiceModal({ service, isOpen, onClose, onSave }: {
               onChange={(e) => handleInputChange('description', e.target.value)}
               rows={5}
               placeholder="• Característica 1&#10;• Característica 2&#10;• Característica 3"
-              className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-stone-900"
               required
             />
           </div>

@@ -128,10 +128,10 @@ export default function ProfilePage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-stone-600">Cargando perfil...</p>
+          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-300">Cargando perfil...</p>
         </div>
       </div>
     );
@@ -225,17 +225,17 @@ export default function ProfilePage() {
     const statusLower = status?.toLowerCase() || '';
     switch (statusLower) {
       case 'recibido':
-        return { icon: Clock, color: 'text-yellow-500', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-200' };
+        return { icon: Clock, color: 'text-yellow-400' };
       case 'preparando':
-        return { icon: Package, color: 'text-blue-500', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
+        return { icon: Package, color: 'text-blue-400' };
       case 'camino':
-        return { icon: Truck, color: 'text-purple-500', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' };
+        return { icon: Truck, color: 'text-purple-400' };
       case 'entregado':
-        return { icon: CheckCircle, color: 'text-green-500', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
+        return { icon: CheckCircle, color: 'text-green-400' };
       case 'cancelado':
-        return { icon: XCircle, color: 'text-red-500', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+        return { icon: XCircle, color: 'text-red-400' };
       default:
-        return { icon: Clock, color: 'text-stone-500', bgColor: 'bg-stone-50', borderColor: 'border-stone-200' };
+        return { icon: Clock, color: 'text-gray-400' };
     }
   };
 
@@ -248,13 +248,13 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header del Perfil */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6"
+          className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-700/50 p-6 md:p-8 mb-6"
         >
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Avatar */}
@@ -279,10 +279,10 @@ export default function ProfilePage() {
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
                     {profile?.name || name} {profile?.last_name || ''}
                   </h1>
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-stone-600">
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-gray-300">
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4" />
                       <span>{profile?.email || email}</span>
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                     )}
                   </div>
                   {profile?.role && (
-                    <span className="inline-block mt-3 px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold">
+                    <span className="inline-block mt-3 px-3 py-1 bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 rounded-full text-sm font-semibold">
                       {profile.role}
                     </span>
                   )}
@@ -303,14 +303,14 @@ export default function ProfilePage() {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => setEditing(true)}
-                    className="px-6 py-2.5 bg-amber-400 hover:bg-amber-500 text-stone-900 font-semibold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className="px-6 py-2.5 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-semibold rounded-lg transition-all shadow-lg hover:shadow-yellow-500/25 flex items-center justify-center gap-2"
                   >
                     <Edit className="w-4 h-4" />
                     {isProfileComplete(profile) ? "Editar Perfil" : "Completar Perfil"}
                   </button>
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="px-6 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className="px-6 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     Cerrar Sesión
@@ -322,12 +322,12 @@ export default function ProfilePage() {
               {profile && (
                 <div className="mt-4">
                   {isProfileComplete(profile) ? (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg">
                       <CheckCircle className="w-5 h-5" />
                       <span className="font-semibold">Perfil completo</span>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-lg">
                       <AlertCircle className="w-5 h-5" />
                       <span className="font-semibold">Perfil incompleto - Completa tu información</span>
                     </div>
@@ -338,41 +338,41 @@ export default function ProfilePage() {
           </div>
 
           {/* Estadísticas */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-stone-200">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gray-700">
             <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mx-auto mb-2">
-                <ShoppingBag className="w-6 h-6 text-amber-600" />
+              <div className="flex items-center justify-center w-12 h-12 bg-yellow-400/20 rounded-full mx-auto mb-2 border border-yellow-400/30">
+                <ShoppingBag className="w-6 h-6 text-yellow-400" />
               </div>
-              <div className="text-2xl font-bold text-stone-900">{statsData.totalOrders}</div>
-              <div className="text-sm text-stone-600">Pedidos Totales</div>
+              <div className="text-2xl font-bold text-white">{statsData.totalOrders}</div>
+              <div className="text-sm text-gray-400">Pedidos Totales</div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mx-auto mb-2">
-                <DollarSign className="w-6 h-6 text-green-600" />
+              <div className="flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-full mx-auto mb-2 border border-green-500/30">
+                <DollarSign className="w-6 h-6 text-green-400" />
               </div>
-              <div className="text-2xl font-bold text-stone-900">S/ {statsData.totalSpent.toFixed(2)}</div>
-              <div className="text-sm text-stone-600">Total Gastado</div>
+              <div className="text-2xl font-bold text-white">S/ {statsData.totalSpent.toFixed(2)}</div>
+              <div className="text-sm text-gray-400">Total Gastado</div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mx-auto mb-2">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mx-auto mb-2 border border-blue-500/30">
+                <Clock className="w-6 h-6 text-blue-400" />
               </div>
-              <div className="text-2xl font-bold text-stone-900">{statsData.pendingOrders}</div>
-              <div className="text-sm text-stone-600">En Proceso</div>
+              <div className="text-2xl font-bold text-white">{statsData.pendingOrders}</div>
+              <div className="text-sm text-gray-400">En Proceso</div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mx-auto mb-2">
-                <CheckCircle className="w-6 h-6 text-purple-600" />
+              <div className="flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mx-auto mb-2 border border-purple-500/30">
+                <CheckCircle className="w-6 h-6 text-purple-400" />
               </div>
-              <div className="text-2xl font-bold text-stone-900">{statsData.completedOrders}</div>
-              <div className="text-sm text-stone-600">Completados</div>
+              <div className="text-2xl font-bold text-white">{statsData.completedOrders}</div>
+              <div className="text-sm text-gray-400">Completados</div>
             </div>
           </div>
         </motion.div>
 
         {/* Tabs Navigation */}
-        <div className="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
-          <div className="flex flex-wrap border-b border-stone-200">
+        <div className="bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-700/50 mb-6 overflow-hidden">
+          <div className="flex flex-wrap border-b border-gray-700">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -382,8 +382,8 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 min-w-[120px] px-4 py-4 flex items-center justify-center gap-2 font-semibold transition-all relative ${
                     isActive
-                      ? "text-amber-600 border-b-2 border-amber-400 bg-amber-50"
-                      : "text-stone-600 hover:text-amber-600 hover:bg-stone-50"
+                      ? "text-yellow-400 border-b-2 border-yellow-400 bg-yellow-400/10"
+                      : "text-gray-300 hover:text-yellow-400 hover:bg-gray-700/50"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -408,55 +408,55 @@ export default function ProfilePage() {
                 className="space-y-6"
               >
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-stone-50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
-                      <User className="w-5 h-5 text-amber-600" />
+                  <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <User className="w-5 h-5 text-yellow-400" />
                       Datos Personales
                     </h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-stone-600">Nombre</label>
-                        <p className="text-stone-900 font-semibold mt-1">{profile?.name || name || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">Nombre</label>
+                        <p className="text-white font-semibold mt-1">{profile?.name || name || "—"}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-stone-600">Apellidos</label>
-                        <p className="text-stone-900 font-semibold mt-1">{profile?.last_name || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">Apellidos</label>
+                        <p className="text-white font-semibold mt-1">{profile?.last_name || "—"}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-stone-600">DNI</label>
-                        <p className="text-stone-900 font-semibold mt-1">{profile?.dni || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">DNI</label>
+                        <p className="text-white font-semibold mt-1">{profile?.dni || "—"}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-stone-600">Email</label>
-                        <p className="text-stone-900 font-semibold mt-1">{profile?.email || email || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">Email</label>
+                        <p className="text-white font-semibold mt-1">{profile?.email || email || "—"}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-stone-600">Teléfono</label>
-                        <p className="text-stone-900 font-semibold mt-1">{profile?.phone || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">Teléfono</label>
+                        <p className="text-white font-semibold mt-1">{profile?.phone || "—"}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-stone-50 rounded-xl p-6">
-                    <h3 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-amber-600" />
+                  <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50">
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-yellow-400" />
                       Dirección
                     </h3>
                     <div className="space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-stone-600">Dirección Principal</label>
-                        <p className="text-stone-900 mt-1">{profile?.address || "—"}</p>
+                        <label className="text-sm font-medium text-gray-400">Dirección Principal</label>
+                        <p className="text-white mt-1">{profile?.address || "—"}</p>
                       </div>
                       {profile?.addressRef && (
                         <div>
-                          <label className="text-sm font-medium text-stone-600">Referencia</label>
-                          <p className="text-stone-900 mt-1">{profile.addressRef}</p>
+                          <label className="text-sm font-medium text-gray-400">Referencia</label>
+                          <p className="text-white mt-1">{profile.addressRef}</p>
                         </div>
                       )}
                       {profile?.streetNumber && (
                         <div>
-                          <label className="text-sm font-medium text-stone-600">Número</label>
-                          <p className="text-stone-900 mt-1">{profile.streetNumber}</p>
+                          <label className="text-sm font-medium text-gray-400">Número</label>
+                          <p className="text-white mt-1">{profile.streetNumber}</p>
                         </div>
                       )}
                     </div>
@@ -473,16 +473,16 @@ export default function ProfilePage() {
               >
                 {loadingOrders ? (
                   <div className="text-center py-12">
-                    <div className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-stone-600">Cargando pedidos...</p>
+                    <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-300">Cargando pedidos...</p>
                   </div>
                 ) : orders.length === 0 ? (
                   <div className="text-center py-12">
-                    <ShoppingBag className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-                    <p className="text-stone-600 text-lg">No tienes pedidos aún</p>
+                    <ShoppingBag className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-300 text-lg">No tienes pedidos aún</p>
                     <button
                       onClick={() => router.push('/')}
-                      className="mt-4 px-6 py-2 bg-amber-400 text-stone-900 font-semibold rounded-lg hover:bg-amber-500 transition"
+                      className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold rounded-lg hover:from-yellow-300 hover:to-amber-400 transition shadow-lg"
                     >
                       Explorar Productos
                     </button>
@@ -495,21 +495,21 @@ export default function ProfilePage() {
                       return (
                         <div
                           key={order.id}
-                          className={`border-2 ${statusInfo.borderColor} ${statusInfo.bgColor} rounded-xl p-6 hover:shadow-md transition-all`}
+                          className="bg-gray-700/50 border border-gray-600/50 rounded-xl p-6 hover:bg-gray-700/70 transition-all"
                         >
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div className="flex items-start gap-4">
-                              <div className={`p-3 rounded-lg ${statusInfo.bgColor}`}>
+                              <div className="p-3 rounded-lg bg-gray-600/50">
                                 <StatusIcon className={`w-6 h-6 ${statusInfo.color}`} />
                               </div>
                               <div>
                                 <div className="flex items-center gap-3 mb-2">
-                                  <h4 className="font-bold text-stone-900">Pedido #{order.id?.slice(0, 8) || 'N/A'}</h4>
-                                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color} ${statusInfo.bgColor}`}>
+                                  <h4 className="font-bold text-white">Pedido #{order.id?.slice(0, 8) || 'N/A'}</h4>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color} bg-gray-800/50`}>
                                     {order.status || 'Pendiente'}
                                   </span>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-4 text-sm text-stone-600">
+                                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
                                   <div className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
                                     {new Date(order.created_at || Date.now()).toLocaleDateString('es-PE', {
@@ -527,7 +527,7 @@ export default function ProfilePage() {
                             </div>
                             <button
                               onClick={() => router.push(`/orders?order=${order.id}`)}
-                              className="px-4 py-2 bg-white border border-stone-300 text-stone-700 rounded-lg hover:bg-stone-50 transition flex items-center gap-2"
+                              className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition flex items-center gap-2"
                             >
                               <Eye className="w-4 h-4" />
                               Ver Detalles
@@ -547,35 +547,35 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <div className="bg-stone-50 rounded-xl p-6">
+                <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50">
                   {profile?.address ? (
                     <div className="space-y-4">
-                      <div className="flex items-start gap-4 p-4 bg-white rounded-lg border-2 border-amber-200">
-                        <div className="p-2 bg-amber-100 rounded-lg">
-                          <Home className="w-5 h-5 text-amber-600" />
+                      <div className="flex items-start gap-4 p-4 bg-gray-600/30 rounded-lg border border-yellow-400/30">
+                        <div className="p-2 bg-yellow-400/20 rounded-lg">
+                          <Home className="w-5 h-5 text-yellow-400" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-stone-900">Dirección Principal</h4>
-                            <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded">Principal</span>
+                            <h4 className="font-semibold text-white">Dirección Principal</h4>
+                            <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 text-xs font-semibold rounded border border-yellow-400/30">Principal</span>
                           </div>
-                          <p className="text-stone-700">{profile.address}</p>
+                          <p className="text-gray-200">{profile.address}</p>
                           {profile.addressRef && (
-                            <p className="text-sm text-stone-600 mt-1">Ref: {profile.addressRef}</p>
+                            <p className="text-sm text-gray-400 mt-1">Ref: {profile.addressRef}</p>
                           )}
                           {profile.streetNumber && (
-                            <p className="text-sm text-stone-600">N° {profile.streetNumber}</p>
+                            <p className="text-sm text-gray-400">N° {profile.streetNumber}</p>
                           )}
                         </div>
                       </div>
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <MapPin className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-                      <p className="text-stone-600 mb-4">No tienes direcciones guardadas</p>
+                      <MapPin className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                      <p className="text-gray-300 mb-4">No tienes direcciones guardadas</p>
                       <button
                         onClick={() => setEditing(true)}
-                        className="px-6 py-2 bg-amber-400 text-stone-900 font-semibold rounded-lg hover:bg-amber-500 transition"
+                        className="px-6 py-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-semibold rounded-lg hover:from-yellow-300 hover:to-amber-400 transition shadow-lg"
                       >
                         Agregar Dirección
                       </button>
@@ -593,43 +593,43 @@ export default function ProfilePage() {
               >
                 {unread.length === 0 && all.length === 0 ? (
                   <div className="text-center py-12">
-                    <Bell className="w-16 h-16 text-stone-300 mx-auto mb-4" />
-                    <p className="text-stone-600 text-lg">No tienes notificaciones</p>
+                    <Bell className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-300 text-lg">No tienes notificaciones</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {(unread.length > 0 ? unread : all.slice(0, 10)).map((n) => (
                       <div
                         key={n.id}
-                        className={`p-4 rounded-xl border-2 ${
+                        className={`p-4 rounded-xl border ${
                           !n.is_read
-                            ? 'bg-amber-50 border-amber-200'
-                            : 'bg-white border-stone-200'
+                            ? 'bg-yellow-400/10 border-yellow-400/30'
+                            : 'bg-gray-700/50 border-gray-600/50'
                         }`}
                       >
                         <div className="flex items-start gap-4">
                           <div className={`p-2 rounded-lg ${
-                            n.type === "success" ? "bg-green-100" :
-                            n.type === "error" ? "bg-red-100" :
-                            n.type === "warning" ? "bg-yellow-100" :
-                            "bg-blue-100"
+                            n.type === "success" ? "bg-green-500/20" :
+                            n.type === "error" ? "bg-red-500/20" :
+                            n.type === "warning" ? "bg-yellow-500/20" :
+                            "bg-blue-500/20"
                           }`}>
-                            {n.type === "success" ? <CheckCircle className="w-5 h-5 text-green-600" /> :
-                             n.type === "error" ? <XCircle className="w-5 h-5 text-red-600" /> :
-                             n.type === "warning" ? <AlertCircle className="w-5 h-5 text-yellow-600" /> :
-                             <Bell className="w-5 h-5 text-blue-600" />}
+                            {n.type === "success" ? <CheckCircle className="w-5 h-5 text-green-400" /> :
+                             n.type === "error" ? <XCircle className="w-5 h-5 text-red-400" /> :
+                             n.type === "warning" ? <AlertCircle className="w-5 h-5 text-yellow-400" /> :
+                             <Bell className="w-5 h-5 text-blue-400" />}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className="font-semibold text-stone-900">{n.title}</h4>
+                              <h4 className="font-semibold text-white">{n.title}</h4>
                               {!n.is_read && (
-                                <span className="w-2 h-2 bg-amber-500 rounded-full mt-2"></span>
+                                <span className="w-2 h-2 bg-yellow-400 rounded-full mt-2"></span>
                               )}
                             </div>
                             {n.message && (
-                              <p className="text-stone-600 text-sm mt-1">{n.message}</p>
+                              <p className="text-gray-300 text-sm mt-1">{n.message}</p>
                             )}
-                            <p className="text-xs text-stone-400 mt-2">
+                            <p className="text-xs text-gray-500 mt-2">
                               {new Date(n.created_at).toLocaleString('es-PE')}
                             </p>
                           </div>
@@ -648,38 +648,38 @@ export default function ProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <div className="bg-stone-50 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-amber-600" />
+                <div className="bg-gray-700/50 rounded-xl p-6 border border-gray-600/50">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-yellow-400" />
                     Configuración de Cuenta
                   </h3>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white rounded-lg">
+                    <div className="flex items-center justify-between p-4 bg-gray-600/30 rounded-lg border border-gray-600/50">
                       <div>
-                        <p className="font-semibold text-stone-900">Notificaciones por Email</p>
-                        <p className="text-sm text-stone-600">Recibe actualizaciones sobre tus pedidos</p>
+                        <p className="font-semibold text-white">Notificaciones por Email</p>
+                        <p className="text-sm text-gray-400">Recibe actualizaciones sobre tus pedidos</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-400"></div>
+                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-400/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-400"></div>
                       </label>
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-white rounded-lg">
+                    <div className="flex items-center justify-between p-4 bg-gray-600/30 rounded-lg border border-gray-600/50">
                       <div>
-                        <p className="font-semibold text-stone-900">Notificaciones Push</p>
-                        <p className="text-sm text-stone-600">Recibe notificaciones en tiempo real</p>
+                        <p className="font-semibold text-white">Notificaciones Push</p>
+                        <p className="text-sm text-gray-400">Recibe notificaciones en tiempo real</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" />
-                        <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-400"></div>
+                        <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-400/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-400"></div>
                       </label>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-red-900 mb-2">Zona de Peligro</h3>
-                  <p className="text-sm text-red-700 mb-4">Acciones que no se pueden deshacer</p>
+                <div className="bg-red-500/10 border-2 border-red-500/30 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-red-400 mb-2">Zona de Peligro</h3>
+                  <p className="text-sm text-red-300 mb-4">Acciones que no se pueden deshacer</p>
                   <button
                     onClick={() => {
                       if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
@@ -699,27 +699,27 @@ export default function ProfilePage() {
 
       {/* Modal de Edición */}
       {editing && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+            className="bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-700"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-stone-900">
+              <h3 className="text-2xl font-bold text-white">
                 {isProfileComplete(profile) ? "Editar Perfil" : "Completar Perfil"}
               </h3>
               <button
                 onClick={() => setEditing(false)}
-                className="p-2 hover:bg-stone-100 rounded-lg transition"
+                className="p-2 hover:bg-gray-700 rounded-lg transition"
               >
-                <XCircle className="w-6 h-6 text-stone-600" />
+                <XCircle className="w-6 h-6 text-gray-400" />
               </button>
             </div>
 
             {profile && !isProfileComplete(profile) && (
-              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-sm text-amber-800">
+              <div className="mb-6 p-4 bg-yellow-400/10 border border-yellow-400/30 rounded-lg">
+                <p className="text-sm text-yellow-400">
                   Completa tu información personal para una mejor experiencia de compra.
                 </p>
               </div>
@@ -728,31 +728,31 @@ export default function ProfilePage() {
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-stone-700">Nombre *</span>
+                  <span className="text-sm font-semibold text-gray-300">Nombre *</span>
                   <input
                     type="text"
                     name="name"
                     value={form.name}
                     onChange={handleChange}
-                    className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                    className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                     required
                   />
                 </label>
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-stone-700">Apellidos</span>
+                  <span className="text-sm font-semibold text-gray-300">Apellidos</span>
                   <input
                     type="text"
                     name="last_name"
                     value={form.last_name}
                     onChange={handleChange}
-                    className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                    className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                   />
                 </label>
               </div>
 
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-stone-700">
-                  DNI <span className="text-xs text-stone-500 font-normal">(Opcional - 8 dígitos)</span>
+                <span className="text-sm font-semibold text-gray-300">
+                  DNI <span className="text-xs text-gray-500 font-normal">(Opcional - 8 dígitos)</span>
                 </span>
                 <div className="relative">
                   <input
@@ -762,25 +762,25 @@ export default function ProfilePage() {
                     onChange={handleChange}
                     onBlur={handleDNIBlur}
                     maxLength={8}
-                    className={`border-2 rounded-lg px-4 py-2.5 w-full focus:outline-none transition ${
-                      dniVerificado ? 'border-green-400' : 'border-stone-300 focus:border-amber-400'
+                    className={`border-2 rounded-lg px-4 py-2.5 w-full bg-gray-700/50 text-white focus:outline-none transition ${
+                      dniVerificado ? 'border-green-400' : 'border-gray-600 focus:border-yellow-400'
                     }`}
                     placeholder="12345678"
                     disabled={consultandoDNI}
                   />
                   {consultandoDNI && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                   {dniVerificado && !consultandoDNI && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <CheckCircle className="w-5 h-5 text-green-400" />
                     </div>
                   )}
                 </div>
                 {dniVerificado && (
-                  <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-green-400 mt-1 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" />
                     DNI verificado - Datos autocompletados
                   </p>
@@ -788,46 +788,46 @@ export default function ProfilePage() {
               </label>
 
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-stone-700">Teléfono</span>
+                <span className="text-sm font-semibold text-gray-300">Teléfono</span>
                 <input
                   type="text"
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                  className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                 />
               </label>
 
               <label className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-stone-700">Dirección</span>
+                <span className="text-sm font-semibold text-gray-300">Dirección</span>
                 <input
                   type="text"
                   name="address"
                   value={form.address}
                   onChange={handleChange}
-                  className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                  className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                 />
               </label>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-stone-700">Referencia de Dirección</span>
+                  <span className="text-sm font-semibold text-gray-300">Referencia de Dirección</span>
                   <input
                     type="text"
                     name="addressRef"
                     value={form.addressRef}
                     onChange={handleChange}
-                    className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                    className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                   />
                 </label>
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-stone-700">Número de Calle</span>
+                  <span className="text-sm font-semibold text-gray-300">Número de Calle</span>
                   <input
                     type="text"
                     name="streetNumber"
                     value={form.streetNumber}
                     onChange={handleChange}
-                    className="border-2 border-stone-300 rounded-lg px-4 py-2.5 focus:border-amber-400 focus:outline-none transition"
+                    className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
                   />
                 </label>
               </div>
@@ -835,14 +835,14 @@ export default function ProfilePage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-amber-400 hover:bg-amber-500 text-stone-900 font-semibold rounded-lg transition shadow-md hover:shadow-lg"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-semibold rounded-lg transition shadow-lg hover:shadow-yellow-500/25"
                 >
                   Guardar Cambios
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditing(false)}
-                  className="flex-1 px-6 py-3 bg-stone-200 hover:bg-stone-300 text-stone-900 font-semibold rounded-lg transition"
+                  className="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg transition"
                 >
                   Cancelar
                 </button>
