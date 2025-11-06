@@ -195,6 +195,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
+                      {/* Solo mostrar pestaña de detalles para cervezas */}
                       {productType === 'cerveza' && (
                         <button 
                           onClick={() => setActiveTab('detalles')}

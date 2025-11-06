@@ -121,26 +121,29 @@ export default function FeaturedFoods() {
             <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <div className="relative z-10 text-center">
-              {/* Imagen flotante profesional */}
-              <div className="relative w-full h-80 mb-6 group">
+              {/* Imagen flotante profesional - Adaptada automáticamente */}
+              <div className="relative w-full mb-6 group" style={{ minHeight: '320px', height: 'auto' }}>
                 {/* Efecto de resplandor sutil */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-[#FFD700]/10 rounded-3xl blur-xl scale-110 group-hover:scale-125 transition-all duration-500"></div>
                 
-                {/* Imagen flotante con sombra elegante */}
-                <div className="relative h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-            <img
-              src={food.image_url && !food.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${food.image_url}` : (food.image_url || "/file.svg")}
-              alt={food.name}
-                    className="max-w-full max-h-full object-cover rounded-3xl drop-shadow-2xl filter brightness-105 contrast-105 saturate-110"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><span class="text-8xl">🍽️</span></div>';
-                      }
-                    }}
-                  />
+                {/* Imagen flotante con sombra elegante - Se adapta automáticamente */}
+                <div className="relative flex items-center justify-center p-8 group-hover:scale-105 transition-transform duration-500">
+                  <div className="w-full flex items-center justify-center">
+                    <img
+                      src={food.image_url && !food.image_url.startsWith('http') ? `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${food.image_url}` : (food.image_url || "/file.svg")}
+                      alt={food.name}
+                      className="w-auto h-auto max-w-full max-h-[400px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-105 contrast-105 saturate-110"
+                      style={{ objectFit: 'contain', display: 'block' }}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = '<div class="w-full h-full flex items-center justify-center"><span class="text-8xl">🍽️</span></div>';
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
                 
               </div>

@@ -29,29 +29,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       whileHover={{ y: -8, scale: 1.02 }}
       className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20"
     >
-      {/* Contenedor principal con espacio para la imagen flotante */}
-      <div className="relative pt-48 group">
-        {/* Imagen del producto - FLOTANTE estilo Fortnite */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
+      {/* Contenedor principal con espacio para la imagen flotante - Adaptativo */}
+      <div className="relative group">
+        {/* Imagen del producto - FLOTANTE estilo Fortnite - Tamaño adaptativo */}
+        <div className="relative w-full flex items-center justify-center mb-6 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
           <motion.div
             whileHover={{ scale: 1.08, y: -5 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="relative w-full flex items-center justify-center"
           >
-            <div className="w-full max-w-[300px] h-auto flex items-center justify-center">
+            <div className="w-full flex items-center justify-center" style={{ minHeight: '200px', maxHeight: '500px' }}>
               {product.image_url ? (
                 <img
                   src={getImageUrl(product.image_url)}
                   alt={product.name}
-                  className="w-auto h-auto max-w-full max-h-[420px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
-                  style={{ objectFit: 'contain', display: 'block' }}
+                  className="w-auto h-auto max-w-full max-h-[500px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] filter brightness-110"
+                  style={{ objectFit: 'contain', display: 'block', maxWidth: '100%' }}
                   onError={(e) => {
                     const target = e.currentTarget;
                     target.style.display = 'none';
                   }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-gray-400" style={{ minHeight: '200px' }}>
                   <Package className="w-12 h-12" />
                 </div>
               )}
@@ -72,37 +72,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Card estilo Fortnite - Diseño moderno y limpio */}
-        <div className="relative bg-gray-800/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 mt-48 p-6">
+        <div className="relative bg-gray-800/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20 p-6">
           {/* Nombre del producto */}
-          <h3 className="text-2xl font-bold text-white text-center mb-4">
+          <h3 className="text-2xl font-bold text-white text-center mb-6">
             {product.name}
           </h3>
-          
-          {/* Rating con estrellas brillantes */}
-          <div className="flex justify-center items-center gap-1 mb-6">
-            {Array.from({ length: 5 }).map((_, i) => {
-              const rating = product.rating || 0;
-              const starValue = i + 1;
-              const isFilled = starValue <= Math.floor(rating);
-              const isHalfFilled = starValue === Math.ceil(rating) && rating % 1 >= 0.5;
-              
-              return (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 ${
-                    isFilled
-                      ? 'fill-cyan-400 text-cyan-400'
-                      : isHalfFilled
-                      ? 'fill-cyan-400/50 text-cyan-400/50'
-                      : 'fill-gray-600 text-gray-600'
-                  }`}
-                />
-              );
-            })}
-            {product.rating && (
-              <span className="ml-2 text-sm text-gray-400">({product.rating.toFixed(1)})</span>
-            )}
-          </div>
 
           {/* Botones de acción - Estilo Fortnite */}
           <div className="space-y-2">

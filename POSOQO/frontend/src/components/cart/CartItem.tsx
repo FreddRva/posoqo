@@ -98,22 +98,23 @@ export default function CartItemComponent({
           </div>
 
           {/* Controles de cantidad y precio total */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-gray-400">Cantidad:</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 pt-4 border-t border-white/10">
+            {/* Selector de cantidad - Centrado en mobile */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
+              <span className="text-sm font-medium text-gray-400 text-center sm:text-left">Cantidad:</span>
               
-              <div className="flex items-center gap-2 bg-black/50 rounded-lg p-1 border border-yellow-400/20">
+              <div className="flex items-center justify-center gap-2 bg-black/50 rounded-lg p-1 border border-yellow-400/20 w-full sm:w-auto">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => handleQuantityChange(item.quantity - 1)}
                   disabled={item.quantity <= 1}
-                  className="p-2 rounded-md bg-white/5 text-gray-400 hover:bg-red-400/20 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border border-transparent hover:border-red-400/30"
+                  className="p-2 rounded-md bg-white/5 text-gray-400 hover:bg-red-400/20 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 border border-transparent hover:border-red-400/30 flex-shrink-0"
                 >
                   <Minus className="w-4 h-4" />
                 </motion.button>
                 
-                <span className="px-4 py-1 text-white font-bold min-w-[3rem] text-center bg-yellow-400/10 rounded-md border border-yellow-400/30">
+                <span className="px-4 py-1 text-white font-bold min-w-[3rem] text-center bg-yellow-400/10 rounded-md border border-yellow-400/30 flex-shrink-0">
                   {item.quantity}
                 </span>
                 
@@ -121,15 +122,15 @@ export default function CartItemComponent({
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => handleQuantityChange(item.quantity + 1)}
-                  className="p-2 rounded-md bg-white/5 text-gray-400 hover:bg-green-400/20 hover:text-green-400 transition-all duration-200 border border-transparent hover:border-green-400/30"
+                  className="p-2 rounded-md bg-white/5 text-gray-400 hover:bg-green-400/20 hover:text-green-400 transition-all duration-200 border border-transparent hover:border-green-400/30 flex-shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                 </motion.button>
               </div>
             </div>
 
-            {/* Precio total del item */}
-            <div className="text-right">
+            {/* Precio total del item - Centrado en mobile */}
+            <div className="text-center sm:text-right">
               <div className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">
                 S/ {(item.price * item.quantity).toFixed(2)}
               </div>

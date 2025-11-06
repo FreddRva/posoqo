@@ -110,44 +110,57 @@ function ProductsContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error al cargar productos</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-        <button 
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 -left-64 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        </div>
+        
+        <div className="text-center relative z-10">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent mb-4">
+            Error al cargar productos
+          </h2>
+          <p className="text-gray-300 mb-6">{error}</p>
+          <motion.button 
             onClick={refetch}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Reintentar
-        </button>
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold rounded-xl hover:from-yellow-300 hover:to-amber-400 transition-all duration-300 shadow-lg"
+          >
+            Reintentar
+          </motion.button>
+        </div>
       </div>
-    </div>
-  );
+    );
   }
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
-      {/* Efectos de fondo galácticos */}
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+      {/* Efectos de fondo */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/4 -left-64 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
         </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
-        {/* Header galáctico */}
+        {/* Header profesional */}
         <motion.div 
           className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent mb-4 leading-tight">
+          <div className="inline-flex items-center gap-3 bg-yellow-400/10 backdrop-blur-sm border border-yellow-400/30 rounded-full px-6 py-2 text-yellow-400 text-sm font-semibold mb-6">
+            <span>NUESTROS PRODUCTOS</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-extrabold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent mb-4 leading-tight">
             Productos
           </h1>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Encuentra los mejores productos
+            Descubre nuestra selección de cervezas artesanales y deliciosos platos
           </p>
         </motion.div>
 
@@ -160,7 +173,7 @@ function ProductsContent() {
           onResetFilters={resetFilters}
         />
 
-        {/* Controles galácticos */}
+        {/* Controles profesionales */}
         <motion.div 
           className="flex items-center justify-between mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -168,10 +181,10 @@ function ProductsContent() {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <div className="flex items-center gap-6">
-            <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl border border-blue-400/20 p-4">
+            <div className="bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm rounded-xl border border-yellow-400/20 p-4">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
-                <span className="text-blue-400 font-semibold">Productos Encontrados</span>
+                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
+                <span className="text-yellow-400 font-semibold">Productos Encontrados</span>
                 <div className="text-2xl font-bold text-white">
                   {products.length}
             </div>
@@ -187,8 +200,8 @@ function ProductsContent() {
               whileTap={{ scale: 0.95 }}
               className={`flex items-center gap-3 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
                 showMap
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border border-gray-600/30 hover:from-blue-500/20 hover:to-purple-500/20 hover:border-blue-400/30 hover:text-blue-400'
+                  ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black shadow-lg shadow-yellow-500/25'
+                  : 'bg-gradient-to-r from-gray-800/50 to-gray-700/50 text-gray-300 border border-gray-600/30 hover:from-yellow-500/20 hover:to-amber-500/20 hover:border-yellow-400/30 hover:text-yellow-400'
               }`}
             >
               <MapPin className="w-5 h-5" />
@@ -220,19 +233,19 @@ function ProductsContent() {
               className="lg:col-span-1"
             >
               <div className="sticky top-4">
-                <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-400/20 p-6 relative overflow-hidden">
+                <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-yellow-400/20 p-6 relative overflow-hidden">
                   {/* Efectos de fondo */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-cyan-500/5 rounded-3xl" />
-                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-amber-500/5 to-yellow-400/5 rounded-3xl" />
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent" />
                   
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
-                        <MapPin className="w-4 h-4 text-white" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-lg flex items-center justify-center">
+                        <MapPin className="w-4 h-4 text-black" />
             </div>
                       <h3 className="text-xl font-bold text-white">Ubicación</h3>
           </div>
-                    <div className="h-80 rounded-2xl overflow-hidden border border-blue-400/20">
+                    <div className="h-80 rounded-2xl overflow-hidden border border-yellow-400/20">
                       <Map
                         orderId=""
                         lat={-13.1631}
@@ -273,27 +286,27 @@ function ProductsContent() {
 export default function ProductsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center relative overflow-hidden">
-        {/* Efectos de fondo galácticos */}
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center relative overflow-hidden">
+        {/* Efectos de fondo */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 -left-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+          <div className="absolute top-1/4 -left-64 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 -right-64 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
         </div>
         
         <div className="text-center relative z-10">
           <div className="relative mb-8">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-400/30 border-t-blue-400 mx-auto"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-purple-400/20 border-t-purple-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '3s' }}></div>
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400/30 border-t-yellow-400 mx-auto"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-amber-400/20 border-t-amber-400 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '3s' }}></div>
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent mb-2">
             Cargando Productos
           </h2>
           <p className="text-gray-300">Por favor espera...</p>
           <div className="flex items-center justify-center gap-2 mt-4">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} />
+            <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
         </div>
       </div>
