@@ -176,13 +176,16 @@ export default function ProfilePage() {
       if (response.ok) {
         const result = await response.json();
         if (result.success && result.data) {
-          if (!form.name.trim()) {
-            setForm(prev => ({ ...prev, name: result.data.nombres || '' }));
-          }
-          if (!form.last_name.trim()) {
-            const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
-            setForm(prev => ({ ...prev, last_name: apellidos }));
-          }
+          // Autocompletar los datos con los datos del DNI
+          const nombres = result.data.nombres || '';
+          const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
+          
+          // Actualizar ambos campos en una sola operación
+          setForm(prev => ({
+            ...prev,
+            name: prev.name.trim() || nombres,
+            last_name: prev.last_name.trim() || apellidos
+          }));
           setDniVerificado(true);
         } else {
           setDniVerificado(false);

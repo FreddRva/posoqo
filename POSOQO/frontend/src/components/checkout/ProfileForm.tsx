@@ -71,19 +71,15 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
         const result = await response.json();
         if (result.success && result.data) {
           // Autocompletar los datos con los datos del DNI
-          if (!profileForm.name.trim()) {
-            setProfileForm({
-              ...profileForm,
-              name: result.data.nombres || ''
-            });
-          }
-          if (!profileForm.last_name.trim()) {
-            const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
-            setProfileForm({
-              ...profileForm,
-              last_name: apellidos
-            });
-          }
+          const nombres = result.data.nombres || '';
+          const apellidos = `${result.data.apellido_paterno || ''} ${result.data.apellido_materno || ''}`.trim();
+          
+          // Actualizar ambos campos en una sola operación
+          setProfileForm({
+            ...profileForm,
+            name: profileForm.name.trim() || nombres,
+            last_name: profileForm.last_name.trim() || apellidos
+          });
           setDniVerificado(true);
         } else {
           setDniVerificado(false);

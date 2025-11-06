@@ -44,6 +44,7 @@ export default function CheckoutPage() {
     markerPosition,
     setMarkerPosition,
     fetchAddressFromCoordinates,
+    getCurrentLocation,
     setAddress,
     setAddressRef,
     setStreetNumber,
@@ -315,7 +316,13 @@ export default function CheckoutPage() {
                       location={location}
                       markerPosition={markerPosition}
                       onMapClick={() => setShowMap(true)}
-                      onAddressFromCoords={() => fetchAddressFromCoordinates(markerPosition[0], markerPosition[1])}
+                      onAddressFromCoords={async () => {
+                        const success = await getCurrentLocation();
+                        if (!success) {
+                          // Si falla GPS, intentar con las coordenadas del marcador
+                          await fetchAddressFromCoordinates(markerPosition[0], markerPosition[1]);
+                        }
+                      }}
                     />
                     
                     <div className="flex gap-3">

@@ -119,9 +119,11 @@ export const AddressFormComponent: React.FC<AddressFormProps> = ({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onAddressFromCoords}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+                title="Obtener dirección usando GPS"
               >
-                Obtener Dirección
+                <Navigation className="w-4 h-4" />
+                Obtener Dirección (GPS)
               </motion.button>
             </div>
           </div>
