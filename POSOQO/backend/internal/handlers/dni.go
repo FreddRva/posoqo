@@ -135,12 +135,86 @@ func ConsultarDNI(c *fiber.Ctx) error {
 		})
 	}
 
-	// Parsear la respuesta JSON
+	// Parsear la respuesta JSON - intentar diferentes formatos posibles
 	var apiResponse DNIResponse
+	var rawResponse map[string]interface{}
+	
+	// Primero intentar parsear como estructura esperada
 	if err := json.Unmarshal(body, &apiResponse); err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"error": "Error al procesar la respuesta",
-		})
+		log.Printf("[DNI] Error al parsear JSON con estructura esperada: %v", err)
+		log.Printf("[DNI] Respuesta recibida: %s", string(body))
+		
+		// Intentar parsear como mapa genérico para inspeccionar la estructura
+		if jsonErr := json.Unmarshal(body, &rawResponse); jsonErr != nil {
+			log.Printf("[DNI] Error al parsear JSON genérico: %v", jsonErr)
+			return c.Status(500).JSON(fiber.Map{
+				"error": fmt.Sprintf("Error al procesar la respuesta JSON: %v. Respuesta: %s", jsonErr, string(body)),
+			})
+		}
+		
+		// Intentar extraer datos de diferentes estructuras posibles
+		log.Printf("[DNI] Estructura recibida: %+v", rawResponse)
+		
+		// Formato alternativo 1: datos directamente en el root
+		if data, ok := rawResponse["data"].(map[string]interface{}); ok {
+			apiResponse.Success = true
+			if numero, ok := data["numero"].(string); ok {
+				apiResponse.Data.Numero = numero
+			}
+			if nombres, ok := data["nombres"].(string); ok {
+				apiResponse.Data.Nombres = nombres
+			}
+			if apellidoPaterno, ok := data["apellido_paterno"].(string); ok {
+				apiResponse.Data.ApellidoPaterno = apellidoPaterno
+			}
+			if apellidoMaterno, ok := data["apellido_materno"].(string); ok {
+				apiResponse.Data.ApellidoMaterno = apellidoMaterno
+			}
+			if nombresCompletos, ok := data["nombres_completos"].(string); ok {
+				apiResponse.Data.NombresCompletos = nombresCompletos
+			}
+			if codigoVerificacion, ok := data["codigo_verificacion"].(string); ok {
+				apiResponse.Data.CodigoVerificacion = codigoVerificacion
+			}
+		} else if success, ok := rawResponse["success"].(bool); ok && success {
+			// Formato alternativo 2: success en root, datos en otro campo
+			apiResponse.Success = true
+			if data, ok := rawResponse["data"].(map[string]interface{}); ok {
+				if numero, ok := data["numero"].(string); ok {
+					apiResponse.Data.Numero = numero
+				}
+				if nombres, ok := data["nombres"].(string); ok {
+					apiResponse.Data.Nombres = nombres
+				}
+				if apellidoPaterno, ok := data["apellido_paterno"].(string); ok {
+					apiResponse.Data.ApellidoPaterno = apellidoPaterno
+				}
+				if apellidoMaterno, ok := data["apellido_materno"].(string); ok {
+					apiResponse.Data.ApellidoMaterno = apellidoMaterno
+				}
+				if nombresCompletos, ok := data["nombres_completos"].(string); ok {
+					apiResponse.Data.NombresCompletos = nombresCompletos
+				}
+				if codigoVerificacion, ok := data["codigo_verificacion"].(string); ok {
+					apiResponse.Data.CodigoVerificacion = codigoVerificacion
+				}
+			}
+		} else {
+			// Intentar parsear como respuesta de error
+			if errorMsg, ok := rawResponse["message"].(string); ok {
+				return c.Status(500).JSON(fiber.Map{
+					"error": fmt.Sprintf("Error de API: %s", errorMsg),
+				})
+			}
+			if errorMsg, ok := rawResponse["error"].(string); ok {
+				return c.Status(500).JSON(fiber.Map{
+					"error": fmt.Sprintf("Error de API: %s", errorMsg),
+				})
+			}
+			return c.Status(500).JSON(fiber.Map{
+				"error": fmt.Sprintf("Error al procesar la respuesta: formato desconocido. Respuesta: %s", string(body)),
+			})
+		}
 	}
 
 	// Verificar si la consulta fue exitosa
@@ -148,6 +222,11 @@ func ConsultarDNI(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "DNI no encontrado en los registros",
 		})
+	}
+
+	// Validar que tengamos al menos el número de DNI
+	if apiResponse.Data.Numero == "" {
+		apiResponse.Data.Numero = dni // Usar el DNI consultado si no viene en la respuesta
 	}
 
 	// Normalizar y retornar los datos
