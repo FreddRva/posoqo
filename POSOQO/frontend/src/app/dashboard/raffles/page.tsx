@@ -91,14 +91,39 @@ export default function RafflesPage() {
   const loadParticipants = async (mes: string) => {
     try {
       setLoadingParticipants(true);
-      const response = await apiFetch<{ participants: Participant[]; total: number }>(
+      console.log('Cargando participantes para mes:', mes);
+      const response = await apiFetch<any>(
         `/admin/raffles/participants?mes_sorteo=${mes}`
       );
-      if ((response as any).participants) {
-        setParticipants((response as any).participants);
+      console.log('Respuesta completa de participantes:', JSON.stringify(response, null, 2));
+      
+      let participantsList: Participant[] = [];
+      
+      // Manejar diferentes estructuras de respuesta
+      if (response) {
+        if (Array.isArray(response)) {
+          console.log('Es un array directo, participantes:', response.length);
+          participantsList = response;
+        } else if (response.participants && Array.isArray(response.participants)) {
+          console.log('Tiene propiedad participants, total:', response.participants.length);
+          participantsList = response.participants;
+        } else if (response.data && Array.isArray(response.data)) {
+          console.log('Tiene propiedad data, total:', response.data.length);
+          participantsList = response.data;
+        } else {
+          console.log('Estructura desconocida:', Object.keys(response));
+          participantsList = [];
+        }
+      } else {
+        console.log('Respuesta vacía o null');
+        participantsList = [];
       }
+      
+      console.log('Estableciendo participantes:', participantsList.length);
+      setParticipants(participantsList);
     } catch (error) {
       console.error('Error cargando participantes:', error);
+      setParticipants([]);
     } finally {
       setLoadingParticipants(false);
     }
@@ -447,10 +472,24 @@ export default function RafflesPage() {
             exit={{ opacity: 0, y: 20 }}
             className="bg-white rounded-xl p-6 shadow-lg border border-stone-200"
           >
-            <h2 className="text-xl font-bold text-stone-900 mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Participantes - {selectedMes ? formatMes(selectedMes) : ''}
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Participantes - {selectedMes ? formatMes(selectedMes) : ''}
+              </h2>
+              <button
+                onClick={() => {
+                  if (selectedMes) {
+                    loadParticipants(selectedMes);
+                    loadStats(selectedMes);
+                  }
+                }}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2 text-sm"
+              >
+                <Loader2 className="w-4 h-4" />
+                Recargar
+              </button>
+            </div>
 
             {loadingParticipants ? (
               <div className="text-center py-12">
@@ -461,6 +500,9 @@ export default function RafflesPage() {
               <div className="text-center py-12">
                 <Users className="w-16 h-16 text-stone-300 mx-auto mb-4" />
                 <p className="text-stone-600">No hay participantes para este mes</p>
+                <p className="text-xs text-stone-500 mt-2">
+                  Mes consultado: {selectedMes} | Total en stats: {stats.total_participants}
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
