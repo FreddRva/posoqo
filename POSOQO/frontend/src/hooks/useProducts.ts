@@ -3,60 +3,113 @@ import { useSearchParams } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { Product, Category, FilterState, SortOption, ViewMode } from '@/types/products';
 
-// Función para obtener variantes de una palabra (singular y plural)
-const getWordVariants = (word: string): string[] => {
-  const lowerWord = word.toLowerCase().trim();
-  const variants = [lowerWord];
-  
-  // Si termina en 'es' (cervezas, comidas), crear singular
-  if (lowerWord.endsWith('es') && lowerWord.length > 4) {
-    variants.push(lowerWord.slice(0, -2)); // cervezas -> cerveza
-  }
-  // Si termina en 'as' (cervezas alternativo), crear singular
-  else if (lowerWord.endsWith('as') && lowerWord.length > 4) {
-    variants.push(lowerWord.slice(0, -1)); // cervezas -> cerveza
-  }
-  // Si termina en 'os' (vinos), crear singular
-  else if (lowerWord.endsWith('os') && lowerWord.length > 4) {
-    variants.push(lowerWord.slice(0, -1)); // vinos -> vino
-  }
-  // Si termina en 's' pero no en 'es', crear plural agregando 'es'
-  else if (lowerWord.endsWith('s') && !lowerWord.endsWith('es') && lowerWord.length > 3) {
-    // Ya es plural, crear singular removiendo 's'
-    variants.push(lowerWord.slice(0, -1));
-  }
-  // Si no termina en 's', crear plurales comunes
-  else if (!lowerWord.endsWith('s') && lowerWord.length > 2) {
-    variants.push(lowerWord + 's'); // cerveza -> cervezas
-    variants.push(lowerWord + 'es'); // cerveza -> cervezas (alternativa)
-  }
-  
-  return [...new Set(variants)]; // Eliminar duplicados
+// Función para normalizar texto (quitar acentos, convertir a minúsculas)
+const normalizeText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+    .trim();
 };
 
-// Función de búsqueda inteligente que maneja plural/singular
+// Función mejorada para obtener variantes de una palabra (singular/plural)
+const getWordVariants = (word: string): string[] => {
+  if (!word || word.length < 2) return [word.toLowerCase()];
+  
+  const normalized = normalizeText(word);
+  const variants = new Set<string>([normalized]);
+  
+  // Si la palabra tiene menos de 3 caracteres, no hacer transformaciones
+  if (normalized.length < 3) {
+    return [normalized];
+  }
+  
+  // Reglas para plurales comunes en español
+  const pluralPatterns = [
+    // Palabras que terminan en 'es' (cervezas, hamburguesas, etc.)
+    { pattern: /^(.*)es$/, singular: (m: string) => m.slice(0, -2) },
+    // Palabras que terminan en 'as' cuando la raíz es larga
+    { pattern: /^(.*[aeiou])as$/, singular: (m: string) => m.slice(0, -1) },
+    // Palabras que terminan en 'os' (vinos, platos, etc.)
+    { pattern: /^(.*[aeiou])os$/, singular: (m: string) => m.slice(0, -1) },
+    // Palabras que terminan en 's' simple (productos, refrescos, etc.)
+    { pattern: /^(.*)s$/, singular: (m: string) => m.slice(0, -1) },
+  ];
+  
+  // Si termina en 's', crear singular
+  if (normalized.endsWith('s') && normalized.length > 3) {
+    for (const rule of pluralPatterns) {
+      const match = normalized.match(rule.pattern);
+      if (match && normalized.length > 4) {
+        const singular = rule.singular(normalized);
+        if (singular.length >= 3) {
+          variants.add(singular);
+        }
+      }
+    }
+  }
+  
+  // Si no termina en 's', crear plurales
+  if (!normalized.endsWith('s') && normalized.length >= 3) {
+    // Plural simple con 's'
+    variants.add(normalized + 's');
+    // Plural con 'es' (para palabras que terminan en consonante)
+    if (!/[aeiou]$/.test(normalized)) {
+      variants.add(normalized + 'es');
+    }
+  }
+  
+  return Array.from(variants);
+};
+
+// Función de búsqueda inteligente mejorada
 const smartSearch = (searchTerm: string, text: string): boolean => {
-  if (!text) return false;
+  if (!text || !searchTerm) return false;
   
-  const normalizedText = text.toLowerCase();
-  const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
+  const normalizedText = normalizeText(text);
+  const normalizedSearch = normalizeText(searchTerm);
   
-  // Para cada palabra de búsqueda, obtener sus variantes y buscar
-  return searchWords.some(word => {
+  // Búsqueda exacta directa (mejor coincidencia)
+  if (normalizedText.includes(normalizedSearch)) return true;
+  
+  // Dividir búsqueda en palabras
+  const searchWords = normalizedSearch.split(/\s+/).filter(w => w.length >= 2);
+  
+  // Si es una sola palabra, buscar con variantes
+  if (searchWords.length === 1) {
+    const word = searchWords[0];
     const variants = getWordVariants(word);
     
-    // Buscar cualquiera de las variantes en el texto
-    return variants.some(variant => {
-      // Búsqueda exacta de palabra completa (mejor coincidencia)
-      const wordRegex = new RegExp(`\\b${variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (wordRegex.test(normalizedText)) return true;
+    // Buscar cada variante
+    for (const variant of variants) {
+      // Búsqueda de palabra completa (con límites de palabra)
+      const wordBoundaryRegex = new RegExp(`\\b${variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (wordBoundaryRegex.test(normalizedText)) return true;
       
-      // Búsqueda como substring (coincidencia parcial)
+      // Búsqueda como substring (más flexible)
       if (normalizedText.includes(variant)) return true;
-      
-      return false;
+    }
+  } else {
+    // Búsqueda de múltiples palabras - todas deben aparecer
+    const allWordsMatch = searchWords.every(word => {
+      const variants = getWordVariants(word);
+      return variants.some(variant => normalizedText.includes(variant));
     });
-  });
+    if (allWordsMatch) return true;
+  }
+  
+  // Búsqueda por coincidencias parciales (para palabras dentro de otras)
+  const searchChars = normalizedSearch.replace(/\s+/g, '');
+  let textIndex = 0;
+  for (let i = 0; i < searchChars.length; i++) {
+    const char = searchChars[i];
+    const foundIndex = normalizedText.indexOf(char, textIndex);
+    if (foundIndex === -1) return false;
+    textIndex = foundIndex + 1;
+  }
+  
+  // Si los caracteres aparecen en orden, es una coincidencia parcial
+  return true;
 };
 
 export const useProducts = () => {
@@ -113,24 +166,34 @@ export const useProducts = () => {
     let filtered = [...products];
     
 
-    // Filtro por búsqueda inteligente
-    if (filters.search) {
+    // Filtro por búsqueda inteligente mejorada
+    if (filters.search && filters.search.trim().length > 0) {
       const searchTerm = filters.search.trim();
       
       filtered = filtered.filter(product => {
-        // Buscar en nombre del producto
+        // 1. Buscar en nombre del producto (prioridad alta)
         if (smartSearch(searchTerm, product.name)) return true;
         
-        // Buscar en descripción
+        // 2. Buscar en descripción del producto
         if (product.description && smartSearch(searchTerm, product.description)) return true;
         
-        // Buscar en nombre de categoría
-        const productCategory = categories.find(cat => cat.id === product.category_id);
-        if (productCategory && smartSearch(searchTerm, productCategory.name)) return true;
-        
-        // Buscar en nombre de subcategoría
-        const productSubcategory = categories.find(cat => cat.id === product.subcategory_id);
-        if (productSubcategory && smartSearch(searchTerm, productSubcategory.name)) return true;
+        // 3. Buscar en nombre de categoría
+        if (categories.length > 0) {
+          const productCategory = categories.find(cat => cat.id === product.category_id);
+          if (productCategory && smartSearch(searchTerm, productCategory.name)) return true;
+          
+          // 4. Buscar en nombre de subcategoría
+          const productSubcategory = categories.find(cat => cat.id === product.subcategory_id);
+          if (productSubcategory && smartSearch(searchTerm, productSubcategory.name)) return true;
+          
+          // 5. Buscar en todas las subcategorías de la categoría
+          if (productCategory?.subcategories) {
+            const matchesSubcategory = productCategory.subcategories.some(subcat => 
+              smartSearch(searchTerm, subcat.name)
+            );
+            if (matchesSubcategory) return true;
+          }
+        }
         
         return false;
       });

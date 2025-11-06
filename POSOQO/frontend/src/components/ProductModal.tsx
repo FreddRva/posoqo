@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, MessageSquare, Send, Package } from "lucide-react";
+import { X, Star, MessageSquare, Send, Package, Store } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getImageUrl, getApiUrl } from "@/lib/config";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/lib/api";
+import Link from "next/link";
 
 interface Product {
   id: string;
@@ -49,21 +50,28 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
   const [canReview, setCanReview] = useState(false);
   const [checkingCanReview, setCheckingCanReview] = useState(false);
   
-  // Cargar reseñas cuando se abre el modal
+  // Resetear y configurar pestaña cuando se abre el modal
   useEffect(() => {
     if (isOpen && product?.id) {
+      // Si es comida, siempre usar 'descripcion' (no mostrar detalles)
+      // Si es cerveza, resetear a 'descripcion' también al abrir
+      setActiveTab('descripcion');
+      
       loadReviews();
       if (session) {
         checkCanReview();
       } else {
         setCanReview(false);
       }
-      // Si es comida, asegurar que la pestaña activa no sea 'detalles'
-      if (productType === 'comida' && activeTab === 'detalles') {
-        setActiveTab('descripcion');
-      }
     }
   }, [isOpen, product?.id, session, productType]);
+  
+  // Prevenir que se cambie a 'detalles' si es comida
+  useEffect(() => {
+    if (productType === 'comida' && activeTab === 'detalles') {
+      setActiveTab('descripcion');
+    }
+  }, [activeTab, productType]);
 
   const checkCanReview = async () => {
     if (!product?.id || !session) {
@@ -454,9 +462,12 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
 
               {/* Footer */}
               <div className="p-6 border-t border-gray-700 bg-gray-900">
-                <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider">
-                  Agregar al Carrito
-                </button>
+                <Link href="/products">
+                  <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider flex items-center justify-center gap-2">
+                    <Store className="w-5 h-5" />
+                    Ver Tienda
+                  </button>
+                </Link>
               </div>
             </div>
           </motion.div>

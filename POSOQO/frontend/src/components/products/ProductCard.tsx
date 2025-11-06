@@ -297,21 +297,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Botón de acción principal */}
-        <motion.button
-          onClick={() => onViewDetails(product)}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
-        >
-          <Eye className="w-5 h-5" />
-          <span>Ver Detalle</span>
-          <motion.span
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        <Link href="/products">
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
           >
-            <ArrowRight className="w-4 h-4" />
-          </motion.span>
-        </motion.button>
+            <Store className="w-5 h-5" />
+            <span>Ver Tienda</span>
+            <motion.span
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ArrowRight className="w-4 h-4" />
+            </motion.span>
+          </motion.button>
+        </Link>
       </div>
     </motion.div>
   );
