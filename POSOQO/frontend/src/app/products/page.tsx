@@ -31,6 +31,7 @@ function ProductsContent() {
 
   const {
     products,
+    allProducts,
     categories,
     subcategories,
     loading,
@@ -226,6 +227,7 @@ function ProductsContent() {
           filters={filters}
           onFiltersChange={updateFilters}
           onResetFilters={resetFilters}
+          products={allProducts || []}
         />
 
         {/* Controles profesionales */}

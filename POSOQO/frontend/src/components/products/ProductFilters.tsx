@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, X, ChevronDown, Grid3X3, List } from 'lucide-react';
-import { Category, FilterState, SortOption, ViewMode } from '@/types/products';
+import { Search, Filter, X, ChevronDown, Grid3X3, List, Package } from 'lucide-react';
+import { Category, FilterState, SortOption, ViewMode, Product } from '@/types/products';
 
 interface ProductFiltersProps {
   categories: Category[];
@@ -9,16 +9,31 @@ interface ProductFiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: Partial<FilterState>) => void;
   onResetFilters: () => void;
+  products?: Product[]; // Agregar productos para autocompletado
 }
+
+// Función para normalizar texto (quitar acentos, convertir a minúsculas)
+const normalizeText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+};
 
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
   categories,
   subcategories,
   filters,
   onFiltersChange,
-  onResetFilters
+  onResetFilters,
+  products = []
 }) => {
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'name-asc', label: 'Nombre A-Z' },
@@ -32,6 +47,109 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     { value: 'grid', label: 'Cuadrícula' },
     { value: 'list', label: 'Lista' }
   ];
+
+  const handleSelectSuggestion = useCallback((product: Product) => {
+    onFiltersChange({ search: product.name });
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+    inputRef.current?.blur();
+  }, [onFiltersChange]);
+
+  const handleSearchChange = (value: string) => {
+    onFiltersChange({ search: value });
+    setShowSuggestions(value.length >= 2);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  // Generar sugerencias de autocompletado
+  const suggestions = useMemo(() => {
+    if (!filters.search || filters.search.length < 2 || !products.length) {
+      return [];
+    }
+
+    const searchTerm = normalizeText(filters.search);
+    const matches: { product: Product; score: number }[] = [];
+
+    products.forEach(product => {
+      const name = normalizeText(product.name);
+      const description = product.description ? normalizeText(product.description) : '';
+      
+      let score = 0;
+      
+      // Coincidencia exacta al inicio del nombre (mayor prioridad)
+      if (name.startsWith(searchTerm)) {
+        score = 100;
+      }
+      // Coincidencia en cualquier parte del nombre
+      else if (name.includes(searchTerm)) {
+        score = 50;
+      }
+      // Coincidencia en descripción
+      else if (description.includes(searchTerm)) {
+        score = 25;
+      }
+      // Coincidencia en categoría
+      else {
+        const productCategory = categories.find(cat => cat.id === product.category_id);
+        if (productCategory && normalizeText(productCategory.name).includes(searchTerm)) {
+          score = 30;
+        }
+      }
+
+      if (score > 0) {
+        matches.push({ product, score });
+      }
+    });
+
+    // Ordenar por score y limitar a 5 sugerencias
+    return matches
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map(m => m.product);
+  }, [filters.search, products, categories]);
+
+  // Manejar teclado en sugerencias
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showSuggestions || suggestions.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+      } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+        e.preventDefault();
+        handleSelectSuggestion(suggestions[selectedSuggestionIndex]);
+      } else if (e.key === 'Escape') {
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showSuggestions, suggestions, selectedSuggestionIndex, handleSelectSuggestion]);
+
+  // Cerrar sugerencias al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/80 to-black/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-yellow-400/20 p-6 mb-8 relative overflow-hidden">
@@ -88,10 +206,12 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                   </div>
                   
                   <input
+                    ref={inputRef}
                     type="text"
                     value={filters.search}
-                    onChange={(e) => onFiltersChange({ search: e.target.value })}
-                    placeholder="Buscar por nombre, categoría..."
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onFocus={() => filters.search.length >= 2 && setShowSuggestions(true)}
+                    placeholder="Buscar productos..."
                     className="w-full pl-12 pr-14 py-4 bg-transparent text-white placeholder-gray-500 focus:outline-none font-medium text-base"
                   />
                   
@@ -126,12 +246,39 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 )}
               </div>
               
-              {/* Tooltip informativo - Fuera del contenedor para evitar conflictos con líneas */}
-              {!filters.search && (
-                <div className="absolute top-full left-0 right-0 mt-3 px-4 py-2.5 bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl z-[100]">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-pulse" />
-                    <p className="leading-relaxed">Escribe para buscar productos por nombre, categoría o descripción</p>
+              {/* Autocompletado - Sugerencias */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl shadow-2xl z-[100] overflow-hidden"
+                >
+                  <div className="max-h-80 overflow-y-auto">
+                    {suggestions.map((product, index) => (
+                      <motion.button
+                        key={product.id}
+                        onClick={() => handleSelectSuggestion(product)}
+                        onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                        className={`w-full px-4 py-3 flex items-center gap-3 text-left transition-colors ${
+                          selectedSuggestionIndex === index
+                            ? 'bg-yellow-400/20 border-l-2 border-yellow-400'
+                            : 'hover:bg-gray-700/50'
+                        }`}
+                        whileHover={{ x: 4 }}
+                      >
+                        <div className="flex-shrink-0 w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                          <Package className="w-5 h-5 text-yellow-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white font-medium truncate">{product.name}</div>
+                          {product.description && (
+                            <div className="text-gray-400 text-sm truncate">{product.description}</div>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0 text-yellow-400 font-bold">
+                          S/ {product.price.toFixed(2)}
+                        </div>
+                      </motion.button>
+                    ))}
                   </div>
                 </div>
               )}

@@ -67,11 +67,13 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
   }, [isOpen, product?.id, session, productType]);
   
   // Prevenir que se cambie a 'detalles' si es comida
-  useEffect(() => {
-    if (productType === 'comida' && activeTab === 'detalles') {
-      setActiveTab('descripcion');
+  const handleTabChange = (tab: string) => {
+    // Si intenta cambiar a 'detalles' y es comida, no permitirlo
+    if (tab === 'detalles' && productType === 'comida') {
+      return;
     }
-  }, [activeTab, productType]);
+    setActiveTab(tab);
+  };
 
   const checkCanReview = async () => {
     if (!product?.id || !session) {
@@ -248,7 +250,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                     {/* Pestañas */}
                     <div className="flex space-x-4 border-b border-gray-700">
                       <button 
-                        onClick={() => setActiveTab('descripcion')}
+                        onClick={() => handleTabChange('descripcion')}
                         className={`pb-3 px-2 font-semibold transition-colors ${
                           activeTab === 'descripcion' 
                             ? 'text-white border-b-2 border-cyan-400' 
@@ -259,7 +261,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       </button>
                       {productType === 'cerveza' && (
                         <button 
-                          onClick={() => setActiveTab('detalles')}
+                          onClick={() => handleTabChange('detalles')}
                           className={`pb-3 px-2 font-semibold transition-colors ${
                             activeTab === 'detalles' 
                               ? 'text-white border-b-2 border-cyan-400' 
@@ -270,7 +272,7 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                         </button>
                       )}
                       <button 
-                        onClick={() => setActiveTab('resenas')}
+                        onClick={() => handleTabChange('resenas')}
                         className={`pb-3 px-2 font-semibold transition-colors ${
                           activeTab === 'resenas' 
                             ? 'text-white border-b-2 border-cyan-400' 

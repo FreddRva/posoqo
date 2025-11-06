@@ -306,6 +306,7 @@ export const useProducts = () => {
 
   return {
     products: filteredProducts,
+    allProducts: products, // Productos sin filtrar para autocompletado
     categories,
     subcategories,
     loading,
