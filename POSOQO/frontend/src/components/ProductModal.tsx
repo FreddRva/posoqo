@@ -269,19 +269,23 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {/* SOLO mostrar DETALLES si NO es comida - Renderizado condicional estricto */}
-                      {currentProductType === 'cerveza' ? (
-                        <button 
-                          onClick={() => handleTabChange('detalles')}
-                          className={`pb-3 px-2 font-semibold transition-colors ${
-                            activeTab === 'detalles' 
-                              ? 'text-white border-b-2 border-cyan-400' 
-                              : 'text-gray-400 hover:text-white'
-                          }`}
-                        >
-                          DETALLES
-                        </button>
-                      ) : null}
+                      {/* Pestaña DETALLES - Ocultada completamente con CSS y renderizado condicional para comida */}
+                      <button 
+                        onClick={() => handleTabChange('detalles')}
+                        className={`pb-3 px-2 font-semibold transition-colors ${
+                          activeTab === 'detalles' 
+                            ? 'text-white border-b-2 border-cyan-400' 
+                            : 'text-gray-400 hover:text-white'
+                        } ${
+                          currentProductType === 'comida' 
+                            ? '!hidden !w-0 !p-0 !m-0 !opacity-0 !pointer-events-none' 
+                            : ''
+                        }`}
+                        style={currentProductType === 'comida' ? { display: 'none', visibility: 'hidden' } : {}}
+                        hidden={currentProductType === 'comida'}
+                      >
+                        DETALLES
+                      </button>
                       <button 
                         onClick={() => handleTabChange('resenas')}
                         className={`pb-3 px-2 font-semibold transition-colors ${
