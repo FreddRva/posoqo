@@ -65,18 +65,18 @@ func main() {
 			if e, ok := err.(*fiber.Error); ok {
 				code = e.Code
 			}
-			
+
 			isProduction := os.Getenv("NODE_ENV") == "production"
 			response := fiber.Map{
 				"error": "Error interno del servidor",
 				"code":  "INTERNAL_ERROR",
 			}
-			
+
 			// Solo mostrar detalles en desarrollo
 			if !isProduction {
 				response["details"] = err.Error()
 			}
-			
+
 			return c.Status(code).JSON(response)
 		},
 	})
@@ -128,6 +128,10 @@ func main() {
 
 	// Ruta pública para consultar DNI
 	api.Get("/dni/:dni", handlers.ConsultarDNI)
+
+	// Ruta pública para suscripción al sorteo
+	api.Post("/raffle/subscribe", handlers.SubscribeToRaffle)
+	api.Get("/raffle/config", handlers.GetCurrentRaffleConfig)
 
 	// Rutas de productos (públicas)
 	api.Get("/products", handlers.GetProducts)
@@ -338,6 +342,14 @@ func main() {
 	adminPublic.Post("/notifications", handlers.CreateNotification)
 	adminPublic.Put("/notifications/:id/read", handlers.MarkNotificationAsRead)
 	adminPublic.Get("/notifications/stats", handlers.GetNotificationStats)
+
+	// Rutas de administración de sorteos
+	adminPublic.Get("/raffles/configs", handlers.ListRaffleConfigs)
+	adminPublic.Post("/raffles/config", handlers.CreateOrUpdateRaffleConfig)
+	adminPublic.Put("/raffles/config", handlers.CreateOrUpdateRaffleConfig)
+	adminPublic.Get("/raffles/participants", handlers.ListRaffleParticipants)
+	adminPublic.Put("/raffles/participants/:id/winner", handlers.MarkWinner)
+	adminPublic.Get("/raffles/stats", handlers.GetRaffleStats)
 
 	// Rutas de notificaciones para usuarios normales
 	api.Get("/notifications", handlers.GetNotifications)

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { 
   Beer, 
@@ -50,7 +50,18 @@ export default function ChelaGratisPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [numeroParticipacion, setNumeroParticipacion] = useState<number | null>(null)
   const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; title: string; message: string } | null>(null)
+  const [raffleConfig, setRaffleConfig] = useState<{
+    titulo: string;
+    descripcion: string;
+    fecha_sorteo: string;
+    hora_sorteo: string;
+    premio_primero: string;
+    premio_segundo: string;
+    premio_tercero: string;
+    premio_consuelo: string;
+  } | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
@@ -64,31 +75,99 @@ export default function ChelaGratisPage() {
     e.preventDefault()
     
     setIsSubmitting(true)
+    setAlert(null)
     
-    // Simular envío
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
-    setAlert({
-      type: 'success',
-      title: '¡Suscripción Exitosa!',
-      message: 'Ya estás participando en el sorteo. Te notificaremos por email si eres ganador.'
-    })
-    
-    // Reset form after 5 seconds
-    setTimeout(() => {
-      setIsSubmitted(false)
-      setAlert(null)
-      setFormData({
-        nombre: "",
-        email: "",
-        telefono: "",
-        edad: "",
-        aceptaTerminos: false
+    try {
+      // Construir URL del API
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
+      const url = `${apiUrl.replace(/\/$/, '')}/api/raffle/subscribe`
+      
+      // Enviar datos al backend
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: formData.nombre.trim(),
+          email: formData.email.trim().toLowerCase(),
+          telefono: formData.telefono.trim(),
+          edad: parseInt(formData.edad),
+          aceptaTerminos: formData.aceptaTerminos,
+        }),
       })
-    }, 5000)
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al procesar la suscripción')
+      }
+      
+      if (data.success) {
+        setIsSubmitted(true)
+        setNumeroParticipacion(data.numero_participacion || null)
+        setAlert({
+          type: 'success',
+          title: '¡Suscripción Exitosa!',
+          message: data.message || 'Ya estás participando en el sorteo. Te notificaremos por email si eres ganador.'
+        })
+        
+        // Reset form after 5 seconds
+        setTimeout(() => {
+          setIsSubmitted(false)
+          setAlert(null)
+          setNumeroParticipacion(null)
+          setFormData({
+            nombre: "",
+            email: "",
+            telefono: "",
+            edad: "",
+            aceptaTerminos: false
+          })
+        }, 5000)
+      } else {
+        throw new Error(data.error || 'Error al procesar la suscripción')
+      }
+    } catch (error: any) {
+      console.error('Error en suscripción:', error)
+      setAlert({
+        type: 'error',
+        title: 'Error en la Suscripción',
+        message: error.message || 'Hubo un problema al procesar tu suscripción. Por favor intenta nuevamente.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
+  // Cargar configuración del sorteo desde el backend
+  useEffect(() => {
+    const loadRaffleConfig = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com'
+        const url = `${apiUrl.replace(/\/$/, '')}/api/raffle/config`
+        const response = await fetch(url)
+        if (response.ok) {
+          const data = await response.json()
+          setRaffleConfig(data)
+        }
+      } catch (error) {
+        console.error('Error cargando configuración del sorteo:', error)
+        // Usar valores por defecto si falla
+        setRaffleConfig({
+          titulo: "Sorteo Mensual POSOQO",
+          descripcion: "Participa en nuestro sorteo mensual de cervezas artesanales POSOQO. La participación es completamente gratuita.",
+          fecha_sorteo: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split('T')[0],
+          hora_sorteo: "20:00:00",
+          premio_primero: "Caja de 12 Cervezas",
+          premio_segundo: "Pack de 6 Cervezas",
+          premio_tercero: "Pack de 3 Cervezas",
+          premio_consuelo: "1 Cerveza + Descuento"
+        })
+      }
+    }
+    loadRaffleConfig()
+  }, [])
 
   const steps = [
     { step: 1, title: "Suscripción", desc: "Completa el formulario con tus datos", icon: FileText },
@@ -97,7 +176,12 @@ export default function ChelaGratisPage() {
     { step: 4, title: "Notificación", desc: "Los ganadores son contactados", icon: Bell }
   ]
 
-  const premios = [
+  const premios = raffleConfig ? [
+    { place: Trophy, title: "Primer Lugar", prize: raffleConfig.premio_primero, color: "from-yellow-400 to-amber-500" },
+    { place: AwardIcon, title: "Segundo Lugar", prize: raffleConfig.premio_segundo, color: "from-gray-300 to-gray-400" },
+    { place: Medal, title: "Tercer Lugar", prize: raffleConfig.premio_tercero, color: "from-orange-400 to-orange-500" },
+    { place: Gift, title: "Premios Consuelo", prize: raffleConfig.premio_consuelo, color: "from-yellow-400/50 to-amber-400/50" }
+  ] : [
     { place: Trophy, title: "Primer Lugar", prize: "Caja de 12 Cervezas", color: "from-yellow-400 to-amber-500" },
     { place: AwardIcon, title: "Segundo Lugar", prize: "Pack de 6 Cervezas", color: "from-gray-300 to-gray-400" },
     { place: Medal, title: "Tercer Lugar", prize: "Pack de 3 Cervezas", color: "from-orange-400 to-orange-500" },
@@ -196,8 +280,7 @@ export default function ChelaGratisPage() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
             >
-            Participa en nuestro sorteo mensual de cervezas artesanales POSOQO. 
-            La participación es completamente gratuita.
+            {raffleConfig?.descripcion || "Participa en nuestro sorteo mensual de cervezas artesanales POSOQO. La participación es completamente gratuita."}
             </motion.p>
           
             <motion.a
@@ -425,12 +508,14 @@ export default function ChelaGratisPage() {
                     <p className="text-gray-300 mb-4">
                       Ya estás participando en el sorteo de este mes. Te notificaremos por email si eres ganador.
                     </p>
-                        <div className="bg-gradient-to-r from-yellow-400/10 to-amber-400/10 border border-yellow-400/30 p-4 rounded-xl flex items-center justify-center gap-2">
-                          <Trophy className="w-5 h-5 text-yellow-400" />
-                          <p className="text-yellow-400 font-medium">
-                            Tu número de participación: #{Math.floor(Math.random() * 1000) + 100}
-                      </p>
-                    </div>
+                        {numeroParticipacion && (
+                          <div className="bg-gradient-to-r from-yellow-400/10 to-amber-400/10 border border-yellow-400/30 p-4 rounded-xl flex items-center justify-center gap-2">
+                            <Trophy className="w-5 h-5 text-yellow-400" />
+                            <p className="text-yellow-400 font-medium">
+                              Tu número de participación: #{numeroParticipacion}
+                            </p>
+                          </div>
+                        )}
                       </motion.div>
                 )}
               </div>
@@ -544,13 +629,17 @@ export default function ChelaGratisPage() {
                     <div className="flex items-center justify-center gap-3 mb-2">
                       <Calendar className="w-6 h-6 text-yellow-400" />
                       <p className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">
-                        {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                        {raffleConfig?.fecha_sorteo 
+                          ? new Date(raffleConfig.fecha_sorteo).toLocaleDateString('es-ES', { month: 'long', year: 'numeric', day: 'numeric' })
+                          : new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                       </p>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <Clock className="w-4 h-4 text-yellow-400" />
                       <p className="text-yellow-400 font-medium">
-                        Último día del mes a las 8:00 PM
+                        {raffleConfig?.hora_sorteo 
+                          ? `A las ${raffleConfig.hora_sorteo.slice(0, 5)}`
+                          : 'Último día del mes a las 8:00 PM'}
                       </p>
                     </div>
                   </div>
