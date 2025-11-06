@@ -12,7 +12,7 @@ import {
 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
 
-  Beer, Utensils, Calendar, Users as UsersIcon, Search, Sparkles, Store
+  Beer, Utensils, Calendar, Users as UsersIcon, Search, Sparkles, Store, ArrowRight
 } from "lucide-react";
 
 import { useCart } from "@/contexts/CartContext";
