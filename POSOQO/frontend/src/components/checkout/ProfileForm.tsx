@@ -37,15 +37,15 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white rounded-2xl p-8 shadow-xl border border-gray-200"
+      className="bg-black/80 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-yellow-400/20"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-          <User className="w-6 h-6 text-blue-600" />
+        <div className="w-12 h-12 bg-gradient-to-br from-yellow-400/20 to-amber-400/20 border border-yellow-400/30 rounded-xl flex items-center justify-center">
+          <User className="w-6 h-6 text-yellow-400" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Información Personal</h2>
-          <p className="text-gray-600">Completa tus datos para continuar</p>
+          <h2 className="text-2xl font-bold text-white">Información Personal</h2>
+          <p className="text-gray-400">Completa tus datos para continuar</p>
         </div>
       </div>
 
@@ -54,10 +54,10 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3"
+          className="mb-6 p-4 bg-red-500/10 border border-red-400/30 rounded-xl flex items-center gap-3 backdrop-blur-sm"
         >
-          <AlertCircle className="w-5 h-5 text-red-600" />
-          <span className="text-red-800">{error}</span>
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-red-300">{error}</span>
         </motion.div>
       )}
 
@@ -65,23 +65,23 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3"
+          className="mb-6 p-4 bg-green-500/10 border border-green-400/30 rounded-xl flex items-center gap-3 backdrop-blur-sm"
         >
-          <CheckCircle className="w-5 h-5 text-green-600" />
-          <span className="text-green-800">{success}</span>
+          <CheckCircle className="w-5 h-5 text-green-400" />
+          <span className="text-green-300">{success}</span>
         </motion.div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Nombre */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Nombre *</label>
+          <label className="text-sm font-medium text-gray-300">Nombre *</label>
           <div className="relative">
             <input
               type="text"
               value={profileForm.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
               placeholder="Tu nombre"
             />
           </div>
@@ -89,13 +89,13 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
 
         {/* Apellido */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Apellido *</label>
+          <label className="text-sm font-medium text-gray-300">Apellido *</label>
           <div className="relative">
             <input
               type="text"
               value={profileForm.last_name}
               onChange={(e) => handleInputChange('last_name', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
               placeholder="Tu apellido"
             />
           </div>
@@ -103,14 +103,14 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
 
         {/* DNI */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">DNI *</label>
+          <label className="text-sm font-medium text-gray-300">DNI *</label>
           <div className="relative">
             <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={profileForm.dni}
               onChange={(e) => handleInputChange('dni', e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
               placeholder="12345678"
             />
           </div>
@@ -118,14 +118,14 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
 
         {/* Teléfono */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Teléfono *</label>
+          <label className="text-sm font-medium text-gray-300">Teléfono *</label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="tel"
               value={profileForm.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
               placeholder="987654321"
             />
           </div>
@@ -139,7 +139,7 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
           whileTap={{ scale: 0.98 }}
           onClick={onSave}
           disabled={saving || !profileForm.name || !profileForm.last_name || !profileForm.dni || !profileForm.phone}
-          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200"
+          className="flex-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black py-3 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-yellow-400/50"
         >
           {saving ? (
             <>
@@ -158,7 +158,7 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onCancel}
-          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200"
+          className="px-6 py-3 border border-white/10 hover:border-white/20 text-gray-300 hover:text-white rounded-xl font-semibold hover:bg-white/5 transition-all duration-200"
         >
           Cancelar
         </motion.button>

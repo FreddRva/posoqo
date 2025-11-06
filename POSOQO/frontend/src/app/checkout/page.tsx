@@ -145,7 +145,7 @@ export default function CheckoutPage() {
 
   if (!isClient || profileLoading || cartLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-neutral-900 text-amber-400">
+      <div className="flex justify-center items-center min-h-screen bg-black text-yellow-400">
         <Loader2 className="animate-spin mr-2" size={32} /> Cargando...
       </div>
     );
@@ -208,35 +208,65 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-black text-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <motion.h1
+        {/* Hero Section */}
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-5xl font-extrabold text-center text-amber-400 mb-12 tracking-tight"
+          className="text-center mb-12"
         >
-          Finalizar Compra
-        </motion.h1>
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-400/10 to-amber-400/10 border border-yellow-400/30 rounded-full mb-6">
+            <CreditCard className="w-5 h-5 text-yellow-400" />
+            <span className="text-yellow-400 font-semibold tracking-wider uppercase text-sm">
+              Checkout
+            </span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
+            <span className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent drop-shadow-2xl">
+              Finalizar Compra
+            </span>
+          </h1>
+        </motion.div>
 
-        <div className="flex justify-center mb-8">
+        {/* Steps Indicator */}
+        <div className="flex justify-center mb-12">
           <div className="flex items-center space-x-4">
             <motion.div
-              className={`flex items-center p-3 rounded-full ${step === 1 ? 'bg-amber-500 text-neutral-900' : 'bg-neutral-700 text-neutral-300'}`}
-              whileHover={{ scale: 1.05 }}
+              className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all duration-200 ${
+                step === 1 
+                  ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black shadow-lg shadow-yellow-400/50' 
+                  : 'bg-white/5 text-gray-400 border border-white/10'
+              }`}
+              whileHover={{ scale: step === 1 ? 1 : 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <User className="mr-2" />
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                step === 1 ? 'bg-black/20' : 'bg-white/5'
+              }`}>
+                <User className="w-4 h-4" />
+              </div>
               <span className="font-semibold">1. Datos Personales y Dirección</span>
             </motion.div>
-            <div className="w-8 h-1 bg-neutral-700 rounded-full"></div>
+            <div className={`w-12 h-1 rounded-full transition-all duration-200 ${
+              step === 2 ? 'bg-gradient-to-r from-yellow-400 to-amber-500' : 'bg-white/10'
+            }`}></div>
             <motion.div
-              className={`flex items-center p-3 rounded-full ${step === 2 ? 'bg-amber-500 text-neutral-900' : 'bg-neutral-700 text-neutral-300'} ${!profileComplete || !location ? 'opacity-50 cursor-not-allowed' : ''}`}
-              whileHover={{ scale: 1.05 }}
+              className={`flex items-center gap-3 px-6 py-3 rounded-xl transition-all duration-200 ${
+                step === 2 
+                  ? 'bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-black shadow-lg shadow-yellow-400/50' 
+                  : 'bg-white/5 text-gray-400 border border-white/10'
+              } ${!profileComplete || !location ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              whileHover={{ scale: step === 2 && (profileComplete && location) ? 1 : (profileComplete && location ? 1.05 : 1) }}
               whileTap={{ scale: 0.95 }}
               onClick={() => (profileComplete && location ? setStep(2) : null)}
             >
-              <CreditCard className="mr-2" />
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                step === 2 ? 'bg-black/20' : 'bg-white/5'
+              }`}>
+                <CreditCard className="w-4 h-4" />
+              </div>
               <span className="font-semibold">2. Pago</span>
             </motion.div>
           </div>
@@ -293,7 +323,7 @@ export default function CheckoutPage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={saveCurrentAddress}
-                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors"
+                        className="flex-1 px-6 py-3 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-yellow-400/50"
                       >
                         Guardar Dirección
                       </motion.button>
@@ -302,7 +332,7 @@ export default function CheckoutPage() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setAddressMode('select')}
-                        className="px-6 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition-colors"
+                        className="px-6 py-3 border border-white/10 hover:border-white/20 text-gray-300 hover:text-white rounded-xl font-semibold hover:bg-white/5 transition-all duration-200"
                       >
                         Cancelar
                       </motion.button>
@@ -351,9 +381,9 @@ export default function CheckoutPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setStep(1)}
-                  className="mb-8 bg-neutral-700 text-white font-bold py-3 px-6 rounded-xl hover:bg-neutral-600 transition-colors duration-300 flex items-center"
+                  className="mb-8 bg-white/5 hover:bg-white/10 text-white font-semibold py-3 px-6 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2"
                 >
-                  <ChevronLeft className="mr-2" size={20} /> Volver a Datos Personales
+                  <ChevronLeft className="w-5 h-5" /> Volver a Datos Personales
                 </motion.button>
                 <StripeElementsForm
                   amount={total}

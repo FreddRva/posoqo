@@ -278,17 +278,15 @@ export default function CartPage() {
             )}
           </AnimatePresence>
 
-          {/* Vistos Recientemente - Fuera del resumen */}
-          {!summary.isEmpty && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="mt-8"
-            >
-              <RecentlyViewed />
-            </motion.div>
-          )}
+          {/* Vistos Recientemente - Siempre visible */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8"
+          >
+            <RecentlyViewed />
+          </motion.div>
         </div>
       </section>
     </div>
