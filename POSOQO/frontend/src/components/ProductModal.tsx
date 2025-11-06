@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, MessageSquare, Send, Package, Store } from "lucide-react";
 import { useState, useEffect } from "react";
+import React from "react";
 import { getImageUrl, getApiUrl } from "@/lib/config";
 import { useSession } from "next-auth/react";
 import { apiFetch } from "@/lib/api";
@@ -42,8 +43,33 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
   
+  // Detectar si es comida basado en productType Y propiedades del producto
+  // Si el producto NO tiene propiedades de cerveza (abv, ibu), es comida
+  const isComida = React.useMemo(() => {
+    // Si el prop productType es explícitamente 'comida', es comida
+    if (productType === 'comida') return true;
+    
+    // Si no hay producto, no es comida
+    if (!product) return false;
+    
+    // Si el producto NO tiene propiedades de cerveza (abv, ibu, estilo), probablemente es comida
+    const hasBeerProperties = !!(product.abv || product.ibu || product.estilo || product.style);
+    
+    // Si productType es 'cerveza' pero el producto no tiene propiedades de cerveza, 
+    // y productType no fue explícitamente pasado, podría ser comida
+    if (productType === 'cerveza' && !hasBeerProperties && product.category) {
+      const categoryLower = product.category.toLowerCase();
+      if (categoryLower.includes('comida') || categoryLower.includes('food') || categoryLower.includes('gastronom')) {
+        return true;
+      }
+    }
+    
+    // Si no tiene propiedades de cerveza y productType no es 'cerveza', es comida
+    return !hasBeerProperties;
+  }, [productType, product]);
+  
   // Asegurar que productType sea válido
-  const currentProductType = productType === 'comida' ? 'comida' : 'cerveza';
+  const currentProductType = isComida ? 'comida' : 'cerveza';
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
@@ -269,23 +295,19 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
                       >
                         DESCRIPCIÓN
                       </button>
-                      {/* Pestaña DETALLES - Ocultada completamente con CSS y renderizado condicional para comida */}
-                      <button 
-                        onClick={() => handleTabChange('detalles')}
-                        className={`pb-3 px-2 font-semibold transition-colors ${
-                          activeTab === 'detalles' 
-                            ? 'text-white border-b-2 border-cyan-400' 
-                            : 'text-gray-400 hover:text-white'
-                        } ${
-                          currentProductType === 'comida' 
-                            ? '!hidden !w-0 !p-0 !m-0 !opacity-0 !pointer-events-none' 
-                            : ''
-                        }`}
-                        style={currentProductType === 'comida' ? { display: 'none', visibility: 'hidden' } : {}}
-                        hidden={currentProductType === 'comida'}
-                      >
-                        DETALLES
-                      </button>
+                      {/* Pestaña DETALLES - NO RENDERIZAR en absoluto si es comida */}
+                      {!isComida && (
+                        <button 
+                          onClick={() => handleTabChange('detalles')}
+                          className={`pb-3 px-2 font-semibold transition-colors ${
+                            activeTab === 'detalles' 
+                              ? 'text-white border-b-2 border-cyan-400' 
+                              : 'text-gray-400 hover:text-white'
+                          }`}
+                        >
+                          DETALLES
+                        </button>
+                      )}
                       <button 
                         onClick={() => handleTabChange('resenas')}
                         className={`pb-3 px-2 font-semibold transition-colors ${
