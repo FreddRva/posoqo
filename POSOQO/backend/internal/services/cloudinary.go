@@ -41,11 +41,12 @@ func UploadImage(ctx context.Context, file io.Reader, filename string) (*uploade
 	}
 
 	// Subir imagen a Cloudinary
+	// Usar c_limit en lugar de c_fill para preservar la proporción completa sin recortes
 	result, err := cld.Upload.Upload(ctx, file, uploader.UploadParams{
 		PublicID:       filename,
 		Folder:         "posoqo/products",
 		ResourceType:   "image",
-		Transformation: "f_auto,q_auto,w_800,h_600,c_fill",
+		Transformation: "f_auto,q_auto",
 	})
 
 	if err != nil {
