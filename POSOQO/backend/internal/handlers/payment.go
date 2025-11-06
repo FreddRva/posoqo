@@ -215,6 +215,78 @@ func CreateStripePaymentIntent(c *fiber.Ctx) error {
 	})
 }
 
+// Crear PaymentIntent para adelanto de reserva
+func CreateReservationPaymentIntent(c *fiber.Ctx) error {
+	// Verificar autenticación
+	claims, ok := c.Locals("user").(jwt.MapClaims)
+	if !ok {
+		return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+	}
+
+	userID := int64(claims["id"].(float64))
+
+	var req struct {
+		Amount   float64 `json:"amount"`
+		Currency string  `json:"currency"`
+		Date     string  `json:"date"`
+		Time     string  `json:"time"`
+		People   int     `json:"people"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+	}
+
+	if req.Amount <= 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "Monto inválido"})
+	}
+
+	// Validar y establecer currency por defecto
+	if req.Currency == "" {
+		req.Currency = "pen"
+	}
+
+	// Crear la reserva primero con status 'pendiente'
+	var reservationID string
+	err := db.DB.QueryRow(context.Background(),
+		`INSERT INTO reservations (user_id, date, time, people, payment_method, advance, status) 
+		 VALUES ($1, $2, $3, $4, 'tarjeta', $5, 'pendiente') RETURNING id`,
+		userID, req.Date, req.Time, req.People, req.Amount).Scan(&reservationID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear la reserva"})
+	}
+
+	// Crear el PaymentIntent de Stripe
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	if stripe.Key == "" {
+		db.DB.Exec(context.Background(), "UPDATE reservations SET status='cancelada' WHERE id=$1", reservationID)
+		return c.Status(500).JSON(fiber.Map{"error": "Stripe no configurado"})
+	}
+
+	amountInCents := int64(req.Amount * 100)
+
+	params := &stripe.PaymentIntentParams{
+		Amount:   stripe.Int64(amountInCents),
+		Currency: stripe.String(req.Currency),
+		Metadata: map[string]string{
+			"type":    "reservation",
+			"id":      reservationID,
+			"user_id": fmt.Sprintf("%d", userID),
+		},
+	}
+
+	pi, err := paymentintent.New(params)
+	if err != nil {
+		db.DB.Exec(context.Background(), "UPDATE reservations SET status='cancelada' WHERE id=$1", reservationID)
+		return c.Status(500).JSON(fiber.Map{"error": "Error creando PaymentIntent"})
+	}
+
+	return c.JSON(fiber.Map{
+		"clientSecret":  pi.ClientSecret,
+		"reservationId": reservationID,
+	})
+}
+
 // Obtener historial de pagos
 func GetPaymentHistory(c *fiber.Ctx) error {
 	var userID int64
@@ -486,9 +558,10 @@ func handlePaymentSucceeded(event stripe.Event) {
 
 	// Obtener metadata del payment intent
 	typeStr := paymentIntent.Metadata["type"]
-	orderID := paymentIntent.Metadata["id"]
+	id := paymentIntent.Metadata["id"]
 
-	if typeStr == "order" && orderID != "" {
+	if typeStr == "order" && id != "" {
+		orderID := id
 		// Obtener información del pedido
 		var userID int64
 		var total float64
@@ -542,6 +615,60 @@ func handlePaymentSucceeded(event stripe.Event) {
 
 				// Crear notificación de pedido recibido
 				CreateOrderNotification(orderID, userIDStrLocal, "recibido")
+			}
+		}
+	} else if typeStr == "reservation" && id != "" {
+		reservationID := id
+		// Obtener información de la reserva
+		var userID int64
+		var advance float64
+		err := db.DB.QueryRow(context.Background(),
+			"SELECT user_id, advance FROM reservations WHERE id=$1", reservationID).Scan(&userID, &advance)
+
+		if err == nil {
+			// Registrar pago
+			_, _ = db.DB.Exec(context.Background(),
+				`INSERT INTO payments (user_id, reservation_id, stripe_payment_id, amount, status, method) 
+				 VALUES ($1, $2, $3, $4, 'paid', 'stripe')
+				 ON CONFLICT (stripe_payment_id) DO UPDATE SET status = 'paid'`,
+				userID, reservationID, paymentIntent.ID, float64(paymentIntent.Amount)/100.0,
+			)
+
+			// Actualizar estado de la reserva a 'confirmada'
+			_, _ = db.DB.Exec(context.Background(), "UPDATE reservations SET status='confirmada' WHERE id=$1", reservationID)
+
+			// Crear notificación de pago exitoso con IA
+			if userID > 0 {
+				userIDStrLocal := fmt.Sprintf("%d", userID)
+
+				// Obtener nombre del usuario
+				var userName string
+				db.DB.QueryRow(context.Background(), "SELECT name FROM users WHERE id=$1", userID).Scan(&userName)
+				if userName == "" {
+					userName = "Usuario"
+				}
+
+				// Crear notificación de pago con IA
+				ctx := services.NotificationContext{
+					Type:       "payment",
+					Action:     "success",
+					UserName:   userName,
+					EntityID:   "",
+					Amount:     float64(paymentIntent.Amount) / 100.0,
+					Status:     "paid",
+					IsForAdmin: false,
+				}
+
+				title, message, notifType, priority, err := services.GenerateSmartNotification(ctx)
+				if err != nil {
+					fmt.Printf("Error generando notificación de pago con IA: %v\n", err)
+					// Fallback a notificación simple
+					CreateAutomaticNotification("success", "Adelanto Pagado",
+						fmt.Sprintf("Tu adelanto de S/%.2f para la reserva ha sido procesado exitosamente", float64(paymentIntent.Amount)/100.0),
+						&userIDStrLocal, &reservationID)
+				} else {
+					CreateAutomaticNotificationWithPriority(notifType, title, message, &userIDStrLocal, &reservationID, priority)
+				}
 			}
 		}
 	} else {

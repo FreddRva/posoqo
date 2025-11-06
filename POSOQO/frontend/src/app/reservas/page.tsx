@@ -23,6 +23,11 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { apiFetch } from '@/lib/api'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
+import ReservationPaymentForm from '@/components/reservations/ReservationPaymentForm'
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RcbC4CL70N5NrKOIPYs3SiN0fsiVUf903Vp94tDj6yyu56QHx3MrMn0K6JIBvZ4vVvgzjgbihX5cRfRCi40I25G00lqp7TAxk')
 
 interface Reservation {
   id: string
@@ -95,6 +100,9 @@ export default function ReservationsPage() {
     advance: 0
   })
   const [submitting, setSubmitting] = useState(false)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [reservationId, setReservationId] = useState<string | null>(null)
   const [alert, setAlert] = useState<{
     show: boolean
     type: 'success' | 'error' | 'warning' | 'info'
@@ -151,6 +159,36 @@ export default function ReservationsPage() {
       return
     }
 
+    // Si el método de pago es tarjeta y hay adelanto, crear payment intent
+    if (formData.payment_method === 'tarjeta' && formData.advance > 0) {
+      try {
+        setSubmitting(true)
+        const accessToken = (session as any)?.accessToken
+        const response = await apiFetch<{ clientSecret: string; reservationId: string }>('/create-reservation-payment-intent', {
+          method: 'POST',
+          body: JSON.stringify({
+            amount: formData.advance,
+            currency: 'pen',
+            date: formData.date,
+            time: formData.time,
+            people: formData.people
+          }),
+          authToken: accessToken
+        })
+        
+        setClientSecret(response.clientSecret)
+        setReservationId(response.reservationId)
+        setShowPaymentForm(true)
+      } catch (error: any) {
+        console.error('Error creando payment intent:', error)
+        showAlert('error', 'Error', error.message || 'Error al procesar el pago. Por favor intenta nuevamente.')
+      } finally {
+        setSubmitting(false)
+      }
+      return
+    }
+
+    // Para otros métodos de pago, crear la reserva directamente
     try {
       setSubmitting(true)
       const accessToken = (session as any)?.accessToken
@@ -176,6 +214,29 @@ export default function ReservationsPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentForm(false)
+    setClientSecret(null)
+    setReservationId(null)
+    setFormData({ 
+      date: '', 
+      time: '', 
+      people: 1, 
+      payment_method: 'efectivo', 
+      advance: 0 
+    })
+    setShowForm(false)
+    loadReservations()
+    showAlert('success', 'Reserva creada', 'Tu reserva ha sido creada exitosamente con el adelanto pagado. Te contactaremos pronto.')
+  }
+
+  const handlePaymentCancel = () => {
+    setShowPaymentForm(false)
+    setClientSecret(null)
+    setReservationId(null)
+    showAlert('warning', 'Pago cancelado', 'La reserva no se completó. Puedes intentar nuevamente.')
   }
 
   if (!session) {
@@ -280,7 +341,7 @@ export default function ReservationsPage() {
       {/* Hero Section */}
       <section 
         ref={heroRef}
-        className="relative pt-32 pb-16 px-6 overflow-hidden"
+        className="relative pt-24 pb-12 px-6 overflow-hidden"
       >
         <div className="absolute inset-0">
           <div className="absolute inset-0 opacity-20">
@@ -355,9 +416,24 @@ export default function ReservationsPage() {
                 </motion.div>
               )}
 
+              {/* Formulario de pago con Stripe */}
+              <AnimatePresence>
+                {showPaymentForm && clientSecret && reservationId && (
+                  <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    <ReservationPaymentForm
+                      amount={formData.advance}
+                      clientSecret={clientSecret}
+                      reservationId={reservationId}
+                      onSuccess={handlePaymentSuccess}
+                      onCancel={handlePaymentCancel}
+                    />
+                  </Elements>
+                )}
+              </AnimatePresence>
+
               {/* Formulario de nueva reserva */}
               <AnimatePresence>
-                {showForm && (
+                {showForm && !showPaymentForm && (
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -445,7 +521,9 @@ export default function ReservationsPage() {
                         <div>
                           <label className="block text-purple-300 font-semibold mb-2 flex items-center gap-2">
                             <CreditCard className="w-4 h-4" />
-                            Adelanto (S/)
+                            Adelanto (S/) {formData.payment_method === 'tarjeta' && formData.advance > 0 && (
+                              <span className="text-xs text-yellow-400">* Requerido para tarjeta</span>
+                            )}
                           </label>
                           <input
                             type="number"
@@ -455,9 +533,26 @@ export default function ReservationsPage() {
                             onChange={(e) => setFormData({...formData, advance: parseFloat(e.target.value) || 0})}
                             className="w-full px-5 py-3 bg-black/50 border border-white/10 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
                             placeholder="0.00"
+                            required={formData.payment_method === 'tarjeta'}
                           />
+                          {formData.payment_method === 'tarjeta' && formData.advance === 0 && (
+                            <p className="text-xs text-yellow-400 mt-1">El adelanto es obligatorio para pagos con tarjeta</p>
+                          )}
                         </div>
                       </div>
+                      
+                      {formData.payment_method === 'tarjeta' && formData.advance > 0 && (
+                        <div className="p-4 bg-gradient-to-r from-yellow-400/10 to-amber-400/10 border border-yellow-400/30 rounded-xl">
+                          <div className="flex items-center gap-2 text-yellow-400 mb-2">
+                            <AlertTriangle className="w-5 h-5" />
+                            <span className="font-semibold">Pago con Tarjeta</span>
+                          </div>
+                          <p className="text-sm text-gray-300">
+                            Se procesará un adelanto de <span className="font-bold text-yellow-400">S/ {formData.advance.toFixed(2)}</span> mediante Stripe. 
+                            El resto se pagará al momento de la reserva.
+                          </p>
+                        </div>
+                      )}
                       
                       <div className="flex justify-end gap-4">
                         <button
@@ -742,3 +837,4 @@ export default function ReservationsPage() {
     </div>
   )
 }
+

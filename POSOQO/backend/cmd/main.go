@@ -175,6 +175,7 @@ func main() {
 	// Endpoint de pago con Stripe
 	api.Post("/pay", handlers.CreateStripeCheckout)
 	api.Post("/create-payment-intent", middleware.AuthMiddleware(), handlers.CreateStripePaymentIntent)
+	api.Post("/create-reservation-payment-intent", middleware.AuthMiddleware(), handlers.CreateReservationPaymentIntent)
 	api.Post("/stripe/webhook", handlers.StripeWebhook)
 
 	// Historial de pagos y reembolsos
