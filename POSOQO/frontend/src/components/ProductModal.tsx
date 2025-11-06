@@ -1,9 +1,10 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { XMarkIcon, StarIcon } from "@heroicons/react/24/outline";
-import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { X, Star, MessageSquare, Send, Package } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getImageUrl, getApiUrl } from "@/lib/config";
+import { useSession } from "next-auth/react";
 
 interface Product {
   id: string;
@@ -17,6 +18,15 @@ interface Product {
   ibu?: string;
   color?: string;
   image_url?: string;
+  rating?: number;
+  estilo?: string;
+}
+
+interface Review {
+  rating: number;
+  comment: string;
+  created_at: string;
+  user_name: string;
 }
 
 interface ProductModalProps {
@@ -26,245 +36,368 @@ interface ProductModalProps {
   productType?: 'cerveza' | 'comida';
 }
 
-// Datos de reseñas de ejemplo
-const sampleReviews = [
-  {
-    id: 1,
-    name: "María González",
-    rating: 5,
-    comment: "¡Increíble sabor! La mejor cerveza artesanal que he probado. Definitivamente la recomiendo.",
-    date: "2024-01-15"
-  },
-  {
-    id: 2,
-    name: "Carlos Mendoza",
-    rating: 4,
-    comment: "Muy buena calidad, sabor auténtico y fresco. Perfecta para acompañar una buena comida.",
-    date: "2024-01-10"
-  },
-  {
-    id: 3,
-    name: "Ana Rodríguez",
-    rating: 5,
-    comment: "Excelente producto, superó mis expectativas. El servicio también fue muy bueno.",
-    date: "2024-01-08"
-  },
-  {
-    id: 4,
-    name: "Luis Pérez",
-    rating: 4,
-    comment: "Buena relación calidad-precio. La recomiendo para ocasiones especiales.",
-    date: "2024-01-05"
-  }
-];
-
 export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [submittingReview, setSubmittingReview] = useState(false);
   
+  // Cargar reseñas cuando se abre el modal
+  useEffect(() => {
+    if (isOpen && product?.id) {
+      loadReviews();
+    }
+  }, [isOpen, product?.id]);
+
+  const loadReviews = async () => {
+    if (!product?.id) return;
+    
+    setLoadingReviews(true);
+    try {
+      const response = await fetch(getApiUrl(`products/${product.id}/reviews`));
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data.reviews || []);
+        
+        // Calcular promedio de rating
+        if (data.reviews && data.reviews.length > 0) {
+          const avg = data.reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / data.reviews.length;
+          setAverageRating(avg);
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando reseñas:', error);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!product?.id || !session || selectedRating === 0) {
+      alert('Debes estar autenticado y seleccionar una calificación');
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const response = await fetch(getApiUrl(`products/${product.id}/reviews`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          rating: selectedRating,
+          comment: reviewComment.trim()
+        })
+      });
+
+      if (response.ok) {
+        setReviewComment('');
+        setSelectedRating(0);
+        loadReviews(); // Recargar reseñas
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Error al enviar la reseña');
+      }
+    } catch (error) {
+      console.error('Error enviando reseña:', error);
+      alert('Error al enviar la reseña');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   if (!product) return null;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        >
-          {/* Fondo con efecto de cerveza */}
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-900/90 via-stone-800/95 to-stone-900/90 backdrop-blur-sm">
-            {/* Efecto de espuma de cerveza */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-amber-200/20 via-amber-100/10 to-transparent"></div>
-            
-            {/* Patrón de burbujas */}
-            <div className="absolute inset-0">
-              <div className="absolute top-20 left-10 w-3 h-3 bg-amber-300/30 rounded-full animate-pulse"></div>
-              <div className="absolute top-40 right-20 w-2 h-2 bg-amber-200/40 rounded-full animate-pulse delay-1000"></div>
-              <div className="absolute bottom-40 left-20 w-2.5 h-2.5 bg-amber-300/20 rounded-full animate-pulse delay-2000"></div>
-              <div className="absolute bottom-20 right-10 w-1.5 h-1.5 bg-amber-200/50 rounded-full animate-pulse delay-1500"></div>
-            </div>
-          </div>
-
-          {/* Modal principal */}
+        <>
+          {/* Backdrop */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 50 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative bg-gradient-to-br from-stone-100 via-amber-50 to-stone-200 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[85vh] overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            onClick={onClose}
+          />
+          
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 50 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Botón cerrar */}
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 z-20 p-2 bg-stone-800/80 hover:bg-stone-700/80 rounded-full text-white transition-colors duration-200"
-            >
-              <XMarkIcon className="w-6 h-6" />
-            </button>
-
-            <div className="flex flex-col lg:flex-row h-full">
-              {/* Imagen del producto */}
-              <div className="relative lg:w-1/2 p-6 lg:p-8">
-                <div className="relative h-64 lg:h-full">
-                  {/* Efecto de resplandor detrás de la imagen */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/30 via-amber-300/20 to-amber-200/10 rounded-2xl blur-xl scale-110"></div>
-                  
-                  {/* Contenedor de imagen */}
-                  <div className="relative h-full bg-gradient-to-br from-amber-100/40 to-stone-200/60 rounded-2xl p-6 border border-amber-300/30 shadow-lg">
+            <div className="bg-gray-900 rounded-2xl border border-gray-700 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              {/* Header */}
+              <div className="relative p-6 border-b border-gray-700">
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                
+                <div className="flex items-center gap-4">
+                  {/* Imagen del producto */}
+                  <div className="relative w-24 h-24 bg-gray-800 rounded-xl overflow-hidden flex items-center justify-center">
                     <img
-                      src={product.image_url?.startsWith('http') ? product.image_url : `${process.env.NEXT_PUBLIC_UPLOADS_URL || 'https://posoqo-backend.onrender.com'}${product.image_url || ''}`}
+                      src={getImageUrl(product.image_url || product.image || '')}
                       alt={product.name}
                       className="w-full h-full object-contain"
                     />
                   </div>
                   
-                  {/* Efecto de brillo en la imagen */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-200/20 via-transparent to-transparent rounded-2xl pointer-events-none"></div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-white mb-2">{product.name}</h2>
+                    {product.price && (
+                      <div className="text-2xl font-bold text-white">
+                        S/ {product.price.toFixed(2)}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Información del producto */}
-              <div className="lg:w-1/2 p-6 lg:p-8 flex flex-col h-full">
-                <div className="flex-1">
-                  {/* Nombre del producto */}
-                  <h2 className="text-2xl lg:text-3xl font-bold text-stone-800 mb-3">
-                    {product.name}
-                  </h2>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Imagen grande */}
+                  <div className="space-y-4">
+                    <div className="relative bg-gray-800 rounded-xl overflow-hidden aspect-square flex items-center justify-center p-8">
+                      <img
+                        src={getImageUrl(product.image_url || product.image || '')}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  </div>
 
-
-                  {/* Pestañas */}
-                  <div className="flex space-x-4 mb-4 border-b border-stone-300">
-                    <button 
-                      onClick={() => setActiveTab('descripcion')}
-                      className={`font-semibold pb-2 transition-colors ${
-                        activeTab === 'descripcion' 
-                          ? 'text-stone-800 border-b-2 border-amber-500' 
-                          : 'text-stone-600 hover:text-stone-800'
-                      }`}
-                    >
-                      DESCRIPCIÓN
-                    </button>
-                    {productType === 'cerveza' && (
+                  {/* Información */}
+                  <div className="space-y-6">
+                    {/* Pestañas */}
+                    <div className="flex space-x-4 border-b border-gray-700">
                       <button 
-                        onClick={() => setActiveTab('detalles')}
-                        className={`font-semibold pb-2 transition-colors ${
-                          activeTab === 'detalles' 
-                            ? 'text-stone-800 border-b-2 border-amber-500' 
-                            : 'text-stone-600 hover:text-stone-800'
+                        onClick={() => setActiveTab('descripcion')}
+                        className={`pb-3 px-2 font-semibold transition-colors ${
+                          activeTab === 'descripcion' 
+                            ? 'text-white border-b-2 border-cyan-400' 
+                            : 'text-gray-400 hover:text-white'
                         }`}
                       >
-                        DETALLES
+                        DESCRIPCIÓN
                       </button>
-                    )}
-                    <button 
-                      onClick={() => setActiveTab('resenas')}
-                      className={`font-semibold pb-2 transition-colors ${
-                        activeTab === 'resenas' 
-                          ? 'text-stone-800 border-b-2 border-amber-500' 
-                          : 'text-stone-600 hover:text-stone-800'
-                      }`}
-                    >
-                      RESEÑAS
-                    </button>
-                  </div>
+                      {productType === 'cerveza' && (
+                        <button 
+                          onClick={() => setActiveTab('detalles')}
+                          className={`pb-3 px-2 font-semibold transition-colors ${
+                            activeTab === 'detalles' 
+                              ? 'text-white border-b-2 border-cyan-400' 
+                              : 'text-gray-400 hover:text-white'
+                          }`}
+                        >
+                          DETALLES
+                        </button>
+                      )}
+                      <button 
+                        onClick={() => setActiveTab('resenas')}
+                        className={`pb-3 px-2 font-semibold transition-colors ${
+                          activeTab === 'resenas' 
+                            ? 'text-white border-b-2 border-cyan-400' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        RESEÑAS ({reviews.length})
+                      </button>
+                    </div>
 
-                  {/* Contenido de pestañas */}
-                  <div className="mb-6 min-h-[200px]">
-                    {activeTab === 'descripcion' && (
-                      <div>
-                        <p className="text-stone-700 leading-relaxed text-base">
-                          {product.description}
-                        </p>
-                      </div>
-                    )}
-
-                    {activeTab === 'detalles' && productType === 'cerveza' && (
-                      <div className="grid grid-cols-2 gap-3">
-                        {product.abv && (
-                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                            <span className="text-xs font-semibold text-stone-600">ABV</span>
-                            <div className="text-lg font-bold text-amber-700">{product.abv}</div>
-                          </div>
-                        )}
-                        {product.ibu && (
-                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                            <span className="text-xs font-semibold text-stone-600">IBU</span>
-                            <div className="text-lg font-bold text-amber-700">{product.ibu}</div>
-                          </div>
-                        )}
-                        {product.style && (
-                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                            <span className="text-xs font-semibold text-stone-600">ESTILO</span>
-                            <div className="text-lg font-bold text-amber-700">{product.style}</div>
-                          </div>
-                        )}
-                        {product.color && (
-                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                            <span className="text-xs font-semibold text-stone-600">COLOR</span>
-                            <div className="text-lg font-bold text-amber-700">{product.color}</div>
-                          </div>
-                        )}
-                        {product.category && (
-                          <div className="bg-amber-100/50 rounded-lg p-3 border border-amber-200/50">
-                            <span className="text-xs font-semibold text-stone-600">CATEGORÍA</span>
-                            <div className="text-lg font-bold text-amber-700">{product.category}</div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {activeTab === 'resenas' && (
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <StarSolid key={star} className="w-5 h-5 text-amber-400" />
-                            ))}
-                          </div>
-                          <span className="text-stone-600 font-medium">4.5 de 5 estrellas</span>
-                          <span className="text-stone-500 text-sm">({sampleReviews.length} reseñas)</span>
+                    {/* Contenido de pestañas */}
+                    <div className="min-h-[300px]">
+                      {activeTab === 'descripcion' && (
+                        <div>
+                          <p className="text-gray-300 leading-relaxed">
+                            {product.description}
+                          </p>
                         </div>
-                        
-                        <div className="space-y-3 max-h-48 overflow-y-auto">
-                          {sampleReviews.map((review) => (
-                            <div key={review.id} className="bg-stone-50 rounded-lg p-4 border border-stone-200">
-                              <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-semibold text-stone-800">{review.name}</h4>
-                                <div className="flex">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <StarSolid 
-                                      key={star} 
-                                      className={`w-4 h-4 ${
-                                        star <= review.rating ? 'text-amber-400' : 'text-stone-300'
-                                      }`} 
-                                    />
-                                  ))}
+                      )}
+
+                      {activeTab === 'detalles' && productType === 'cerveza' && (
+                        <div className="grid grid-cols-2 gap-4">
+                          {product.abv && (
+                            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                              <div className="text-xs text-gray-400 mb-1 uppercase">ABV</div>
+                              <div className="text-lg font-bold text-white">{product.abv}</div>
+                            </div>
+                          )}
+                          {product.ibu && (
+                            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                              <div className="text-xs text-gray-400 mb-1 uppercase">IBU</div>
+                              <div className="text-lg font-bold text-white">{product.ibu}</div>
+                            </div>
+                          )}
+                          {product.estilo && (
+                            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                              <div className="text-xs text-gray-400 mb-1 uppercase">ESTILO</div>
+                              <div className="text-lg font-bold text-white">{product.estilo}</div>
+                            </div>
+                          )}
+                          {product.color && (
+                            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                              <div className="text-xs text-gray-400 mb-1 uppercase">COLOR</div>
+                              <div className="text-lg font-bold text-white">{product.color}</div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {activeTab === 'resenas' && (
+                        <div className="space-y-6">
+                          {/* Rating promedio */}
+                          <div className="flex items-center gap-4 pb-4 border-b border-gray-700">
+                            <div className="flex items-center gap-2">
+                              {Array.from({ length: 5 }).map((_, i) => {
+                                const starValue = i + 1;
+                                const isFilled = starValue <= Math.floor(averageRating);
+                                return (
+                                  <Star
+                                    key={i}
+                                    className={`w-5 h-5 ${
+                                      isFilled
+                                        ? 'fill-cyan-400 text-cyan-400'
+                                        : 'fill-gray-600 text-gray-600'
+                                    }`}
+                                  />
+                                );
+                              })}
+                            </div>
+                            <span className="text-white font-semibold">
+                              {averageRating > 0 ? averageRating.toFixed(1) : '0.0'}
+                            </span>
+                            <span className="text-gray-400 text-sm">
+                              ({reviews.length} {reviews.length === 1 ? 'reseña' : 'reseñas'})
+                            </span>
+                          </div>
+
+                          {/* Formulario de reseña */}
+                          {session && (
+                            <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                              <h3 className="text-white font-semibold mb-3">Escribe tu reseña</h3>
+                              
+                              {/* Rating selector */}
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-gray-400 text-sm">Calificación:</span>
+                                <div className="flex gap-1">
+                                  {Array.from({ length: 5 }).map((_, i) => {
+                                    const starValue = i + 1;
+                                    return (
+                                      <button
+                                        key={i}
+                                        onClick={() => setSelectedRating(starValue)}
+                                        className="focus:outline-none"
+                                      >
+                                        <Star
+                                          className={`w-5 h-5 transition-colors ${
+                                            starValue <= selectedRating
+                                              ? 'fill-yellow-400 text-yellow-400'
+                                              : 'fill-gray-600 text-gray-600 hover:fill-gray-500'
+                                          }`}
+                                        />
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
-                              <p className="text-stone-700 text-sm mb-2">{review.comment}</p>
-                              <span className="text-stone-500 text-xs">{review.date}</span>
+
+                              {/* Comentario */}
+                              <textarea
+                                value={reviewComment}
+                                onChange={(e) => setReviewComment(e.target.value)}
+                                placeholder="Escribe tu comentario..."
+                                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 resize-none"
+                                rows={3}
+                              />
+
+                              {/* Botón enviar */}
+                              <button
+                                onClick={handleSubmitReview}
+                                disabled={submittingReview || selectedRating === 0}
+                                className="mt-3 w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                              >
+                                <Send className="w-4 h-4" />
+                                {submittingReview ? 'Enviando...' : 'Enviar Reseña'}
+                              </button>
                             </div>
-                          ))}
+                          )}
+
+                          {/* Lista de reseñas */}
+                          <div className="space-y-4">
+                            {loadingReviews ? (
+                              <div className="text-gray-400 text-center py-8">Cargando reseñas...</div>
+                            ) : reviews.length === 0 ? (
+                              <div className="text-gray-400 text-center py-8">
+                                <MessageSquare className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                                <p>No hay reseñas aún</p>
+                              </div>
+                            ) : (
+                              reviews.map((review, index) => (
+                                <div key={index} className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="font-semibold text-white">{review.user_name}</h4>
+                                    <div className="flex items-center gap-1">
+                                      {Array.from({ length: 5 }).map((_, i) => {
+                                        const starValue = i + 1;
+                                        return (
+                                          <Star
+                                            key={i}
+                                            className={`w-4 h-4 ${
+                                              starValue <= review.rating
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'fill-gray-600 text-gray-600'
+                                            }`}
+                                          />
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                  {review.comment && (
+                                    <p className="text-gray-300 text-sm mb-2">{review.comment}</p>
+                                  )}
+                                  <span className="text-gray-500 text-xs">
+                                    {new Date(review.created_at).toLocaleDateString('es-ES', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Botón de acción */}
-                <div className="mt-6 pt-4 border-t border-stone-200">
-                  <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-3 px-6 rounded-xl text-base transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                    VER EN TIENDA
-                  </button>
-                </div>
+              {/* Footer */}
+              <div className="p-6 border-t border-gray-700 bg-gray-900">
+                <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider">
+                  Agregar al Carrito
+                </button>
               </div>
             </div>
-
-            {/* Efecto de resplandor en el borde */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-amber-400/10 to-amber-400/0 rounded-3xl pointer-events-none"></div>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
-} 
+}
