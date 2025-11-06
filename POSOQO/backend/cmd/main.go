@@ -126,6 +126,9 @@ func main() {
 	// Ruta de contacto (pública)
 	api.Post("/contact", handlers.ContactUs)
 
+	// Ruta pública para crear reclamos (sin autenticación)
+	api.Post("/complaints", handlers.CreateComplaint)
+
 	// Ruta pública para consultar DNI
 	api.Get("/dni/:dni", handlers.ConsultarDNI)
 

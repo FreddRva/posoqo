@@ -52,7 +52,7 @@ export default function Footer() {
                   <li><a href="/como-comprar" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Cómo comprar</a></li>
                   <li><a href="/envios" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Envíos</a></li>
                   <li><a href="/devoluciones" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Devoluciones</a></li>
-                  <li><a href="/reclamos" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Libro de reclamaciones</a></li>
+                  <li><a href="/reclamos" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors font-semibold">📋 Libro de Reclamaciones</a></li>
                 </ul>
               </div>
 
@@ -99,6 +99,7 @@ export default function Footer() {
           <a href="/privacidad" className="hover:text-yellow-400 transition-colors">Política de privacidad</a>
           <a href="/accesibilidad" className="hover:text-yellow-400 transition-colors">Accesibilidad</a>
           <a href="/ayuda" className="hover:text-yellow-400 transition-colors">Ayuda</a>
+          <a href="/reclamos" className="hover:text-yellow-400 transition-colors font-semibold">📋 Reclamos</a>
         </div>
       </div>
 
