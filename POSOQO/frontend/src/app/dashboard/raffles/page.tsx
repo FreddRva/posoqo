@@ -64,7 +64,9 @@ export default function RafflesPage() {
   useEffect(() => {
     loadConfigs();
     const now = new Date();
-    setSelectedMes(now.toISOString().slice(0, 7));
+    const currentMonth = now.toISOString().slice(0, 7);
+    console.log('Mes actual establecido:', currentMonth);
+    setSelectedMes(currentMonth);
   }, []);
 
   useEffect(() => {
@@ -131,9 +133,11 @@ export default function RafflesPage() {
 
   const loadStats = async (mes: string) => {
     try {
+      console.log('Cargando estadísticas para mes:', mes);
       const response = await apiFetch<{ total_participants: number; total_winners: number }>(
         `/admin/raffles/stats?mes_sorteo=${mes}`
       );
+      console.log('Estadísticas recibidas:', response);
       setStats(response);
     } catch (error) {
       console.error('Error cargando estadísticas:', error);
