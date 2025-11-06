@@ -27,23 +27,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
     >
       {/* Imagen del producto */}
-      <div className="relative min-h-[200px] bg-gray-100 flex items-center justify-center p-4">
+      <div className="relative bg-gray-100 flex items-center justify-center rounded-t-xl" style={{ minHeight: '250px', padding: '20px' }}>
         {product.image_url ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <img
-              src={getImageUrl(product.image_url)}
-              alt={product.name}
-              className="max-w-full max-h-[200px] w-auto h-auto object-contain"
-              style={{ objectFit: 'contain' }}
-              onError={(e) => {
-                const target = e.currentTarget;
-                target.style.display = 'none';
-              }}
-            />
-          </div>
+          <img
+            src={getImageUrl(product.image_url)}
+            alt={product.name}
+            className="max-w-full max-h-[250px] w-auto h-auto"
+            style={{ 
+              objectFit: 'contain',
+              display: 'block',
+              width: 'auto',
+              height: 'auto'
+            }}
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.style.display = 'none';
+            }}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             <Package className="w-12 h-12" />
