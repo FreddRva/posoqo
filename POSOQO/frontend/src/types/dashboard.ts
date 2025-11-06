@@ -20,6 +20,7 @@ export interface Product {
   is_active?: boolean;
   is_featured?: boolean;
   stock?: number;
+  rating?: number;
 }
 
 export interface ProductFormData {

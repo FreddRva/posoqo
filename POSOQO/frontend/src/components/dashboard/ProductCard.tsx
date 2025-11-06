@@ -30,7 +30,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className="relative bg-gray-900/95 backdrop-blur-sm rounded-2xl overflow-visible border border-gray-700/50 hover:border-cyan-400/50 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/20"
     >
       {/* Contenedor principal con espacio para la imagen flotante */}
-      <div className="relative pt-48">
+      <div className="relative pt-48 group">
         {/* Imagen del producto - FLOTANTE estilo Fortnite */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-30 group-hover:z-40 -translate-y-8 group-hover:-translate-y-12 transition-transform duration-300">
           <motion.div
