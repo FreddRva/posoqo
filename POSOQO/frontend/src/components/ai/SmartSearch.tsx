@@ -72,15 +72,31 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
       const response = await apiFetch('ai/search', {
         method: 'POST',
         body: JSON.stringify({ query }),
-      }) as { success: boolean; results?: SearchResult[] };
+      }) as { success: boolean; results?: SearchResult[]; count?: number; error?: string };
 
-      if (response.success && response.results) {
+      // Si hay resultados, mostrarlos sin importar el estado de success
+      if (response.results && response.results.length > 0) {
         setResults(response.results);
+        setError(null); // Limpiar cualquier error previo si hay resultados
+      } else if (response.success) {
+        // No hay resultados pero la búsqueda fue exitosa
+        setResults([]);
+        setError(null);
       } else {
-        setError('No se encontraron resultados');
+        // Si success es false y no hay resultados
+        setResults([]);
+        setError(response.error || 'No se encontraron resultados');
       }
     } catch (err: any) {
-      setError(err.message || 'Error al buscar');
+      console.error('Error en búsqueda inteligente:', err);
+      // Si hay un error, verificar si podemos usar búsqueda simple como fallback
+      // Por ahora, solo mostrar error si no hay resultados previos
+      if (results.length === 0) {
+        setError('Error al buscar. Intenta con otra búsqueda.');
+      } else {
+        // Si ya hay resultados, no mostrar el error
+        setError(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -172,8 +188,8 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
               </div>
             )}
 
-            {/* Error */}
-            {error && (
+            {/* Error - Solo mostrar si realmente hay un error y no hay resultados */}
+            {error && results.length === 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
                 <p className="text-red-800">{error}</p>
               </div>

@@ -338,10 +338,32 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 	// Obtener productos
 	products, err := getAllProducts()
 	if err != nil {
+		log.Printf("Error al obtener productos en búsqueda inteligente: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
 			"error":   "Error al obtener productos",
 		})
+	}
+
+	// Si no hay productos, retornar vacío
+	if len(products) == 0 {
+		return c.JSON(fiber.Map{
+			"success": true,
+			"results": []map[string]interface{}{},
+			"count":   0,
+		})
+	}
+
+	// Verificar si el servicio de Gemini está disponible
+	if geminiService == nil {
+		log.Printf("Servicio de Gemini no inicializado, usando búsqueda simple")
+		return performSimpleSearchForProducts(c, req.Query, products)
+	}
+
+	// Verificar si la API key está configurada
+	if geminiService.APIKey == "" {
+		log.Printf("GEMINI_API_KEY no configurada, usando búsqueda simple")
+		return performSimpleSearchForProducts(c, req.Query, products)
 	}
 
 	// Filtrar productos relevantes primero (búsqueda simple)
@@ -350,14 +372,36 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 	
 	log.Printf("[Búsqueda] Query limpia: '%s'", query)
 	
+	// Normalizar query (remover plurales comunes para búsqueda más flexible)
+	querySingular := query
+	if strings.HasSuffix(query, "es") {
+		querySingular = strings.TrimSuffix(query, "es")
+	} else if strings.HasSuffix(query, "s") {
+		querySingular = strings.TrimSuffix(query, "s")
+	}
+	
 	for _, p := range products {
-		name := strings.ToLower(p["name"].(string))
-		description := strings.ToLower(p["description"].(string))
+		// Validar que los campos existan y sean del tipo correcto
+		name, ok1 := p["name"].(string)
+		if !ok1 {
+			log.Printf("[Búsqueda] Error: nombre no es string en producto %v", p["id"])
+			continue
+		}
 		
-		// Pre-filtrar productos que podrían ser relevantes
-		if strings.Contains(name, query) || strings.Contains(description, query) {
+		description, ok2 := p["description"].(string)
+		if !ok2 {
+			log.Printf("[Búsqueda] Error: descripción no es string en producto %v", p["id"])
+			description = ""
+		}
+		
+		nameLower := strings.ToLower(name)
+		descriptionLower := strings.ToLower(description)
+		
+		// Pre-filtrar productos que podrían ser relevantes (búsqueda flexible con singular/plural)
+		if strings.Contains(nameLower, query) || strings.Contains(descriptionLower, query) ||
+		   strings.Contains(nameLower, querySingular) || strings.Contains(descriptionLower, querySingular) {
 			relevantProducts = append(relevantProducts, p)
-			log.Printf("[Búsqueda] Producto pre-filtrado: %s", p["name"])
+			log.Printf("[Búsqueda] Producto pre-filtrado: %s", name)
 			if len(relevantProducts) >= 20 { // Máximo 20 productos pre-filtrados
 				break
 			}
@@ -379,12 +423,24 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 	// Crear lista ultra compacta
 	var productList strings.Builder
 	for _, p := range relevantProducts {
+		// Validar que el nombre exista y sea string
+		name, ok := p["name"].(string)
+		if !ok {
+			log.Printf("[Búsqueda] Error: nombre no es string, saltando producto")
+			continue
+		}
+		
+		id, ok := p["id"].(string)
+		if !ok {
+			log.Printf("[Búsqueda] Error: id no es string, saltando producto")
+			continue
+		}
+		
 		// Solo primeras 30 caracteres del nombre para ahorrar tokens
-		name := p["name"].(string)
 		if len(name) > 30 {
 			name = name[:30] + "..."
 		}
-		productList.WriteString(fmt.Sprintf("%s|%s\n", p["id"], name))
+		productList.WriteString(fmt.Sprintf("%s|%s\n", id, name))
 	}
 	
 	// Prompt balanceado (no muy largo, pero claro)
@@ -393,26 +449,33 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 Productos disponibles:
 %s
 
-Retorna SOLO los IDs de productos relevantes separados por comas.
-Si no hay relevantes: NINGUNO`, req.Query, productList.String())
+INSTRUCCIONES:
+- Retorna SOLO los IDs de productos relevantes separados por comas
+- NO agregues texto adicional, solo los IDs
+- Si no hay productos relevantes, responde: NINGUNO
+- Los IDs deben estar separados solo por comas, sin espacios ni otros caracteres
+
+Ejemplo de respuesta correcta: id1,id2,id3
+Ejemplo si no hay resultados: NINGUNO`, req.Query, productList.String())
 
 	// Generar búsqueda con Gemini con límite de tokens aumentado
+	// Usar temperatura baja para respuestas más consistentes
 	response, err := geminiService.GenerateContent(prompt, &services.GenerationConfig{
-		Temperature:     0.2,
-		MaxOutputTokens: 512, // Aumentado para permitir más IDs en la respuesta
+		Temperature:     0.1, // Reducido para respuestas más determinísticas
+		MaxOutputTokens: 256, // Reducido ya que solo necesitamos IDs
+		TopK:            1,   // Solo la mejor respuesta
 	})
 	if err != nil {
-		log.Printf("Error en búsqueda inteligente: %v", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error en la búsqueda",
-		})
+		log.Printf("[Búsqueda] Error en búsqueda inteligente con Gemini: %v", err)
+		// Si falla Gemini, usar búsqueda simple como fallback
+		log.Printf("[Búsqueda] Usando búsqueda simple como fallback para query: '%s'", req.Query)
+		return performSimpleSearchForProducts(c, req.Query, products)
 	}
 
 	// Verificar si la respuesta está vacía
 	response = strings.TrimSpace(response)
 	if response == "" {
-		log.Printf("Error en búsqueda inteligente: respuesta vacía de Gemini")
+		log.Printf("[Búsqueda] Respuesta vacía de Gemini, usando fallback")
 		// Fallback: búsqueda simple por nombre/descripción
 		return performSimpleSearchForProducts(c, req.Query, products)
 	}
@@ -420,11 +483,28 @@ Si no hay relevantes: NINGUNO`, req.Query, productList.String())
 	// Limpiar la respuesta de posible texto adicional
 	// Remover comillas, saltos de línea, y texto explicativo
 	response = strings.ReplaceAll(response, "\"", "")
-	response = strings.ReplaceAll(response, "\n", "")
-	response = strings.Split(response, ".")[0] // Tomar solo la primera línea antes de un punto
+	response = strings.ReplaceAll(response, "\n", " ")
+	response = strings.ReplaceAll(response, "\r", " ")
+	
+	// Buscar la parte relevante de la respuesta (puede tener texto antes o después)
+	// Intentar extraer solo los IDs si la respuesta contiene texto adicional
+	if strings.Contains(response, "IDs:") {
+		parts := strings.Split(response, "IDs:")
+		if len(parts) > 1 {
+			response = strings.TrimSpace(parts[1])
+		}
+	}
+	
+	// Si hay un punto, tomar solo la primera parte
+	if strings.Contains(response, ".") {
+		response = strings.Split(response, ".")[0]
+	}
+	
+	// Limpiar espacios y caracteres especiales
 	response = strings.TrimSpace(response)
+	response = strings.Trim(response, ".,;:!?")
 
-	log.Printf("[Búsqueda] Query: %s | Respuesta de Gemini: %s", req.Query, response)
+	log.Printf("[Búsqueda] Query: '%s' | Respuesta procesada de Gemini: '%s'", req.Query, response)
 
 	// Si no hay resultados
 	if response == "NINGUNO" || response == "" {
@@ -446,9 +526,18 @@ Si no hay relevantes: NINGUNO`, req.Query, productList.String())
 			continue
 		}
 		
+		// Remover posibles caracteres adicionales del ID
+		id = strings.Trim(id, ".,;:!?\"'[]{}()")
+		
 		found := false
 		for _, product := range products {
-			if product["id"] == id {
+			// Validar que el ID del producto sea string
+			productID, ok := product["id"].(string)
+			if !ok {
+				continue
+			}
+			
+			if productID == id {
 				results = append(results, map[string]interface{}{
 					"product":   product,
 					"relevance": 1.0,
@@ -493,14 +582,35 @@ Si no hay relevantes: NINGUNO`, req.Query, productList.String())
 
 // performSimpleSearchForProducts realiza una búsqueda simple como fallback
 func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[string]interface{}) error {
-	query = strings.ToLower(query)
+	query = strings.ToLower(strings.TrimSpace(query))
 	var results []map[string]interface{}
 
-	for _, p := range products {
-		name := strings.ToLower(p["name"].(string))
-		description := strings.ToLower(p["description"].(string))
+	// Normalizar query (remover plurales comunes para búsqueda más flexible)
+	querySingular := query
+	if strings.HasSuffix(query, "es") {
+		querySingular = strings.TrimSuffix(query, "es")
+	} else if strings.HasSuffix(query, "s") {
+		querySingular = strings.TrimSuffix(query, "s")
+	}
 
-		if strings.Contains(name, query) || strings.Contains(description, query) {
+	for _, p := range products {
+		// Validar que los campos existan y sean del tipo correcto
+		name, ok1 := p["name"].(string)
+		if !ok1 {
+			continue
+		}
+		
+		description, ok2 := p["description"].(string)
+		if !ok2 {
+			description = ""
+		}
+
+		nameLower := strings.ToLower(name)
+		descriptionLower := strings.ToLower(description)
+
+		// Búsqueda flexible que acepta singular y plural
+		if strings.Contains(nameLower, query) || strings.Contains(descriptionLower, query) ||
+		   strings.Contains(nameLower, querySingular) || strings.Contains(descriptionLower, querySingular) {
 			results = append(results, map[string]interface{}{
 				"product":   p,
 				"relevance": 0.8,
@@ -703,8 +813,25 @@ func getProductsContext() (string, error) {
 		if i >= 10 { // Limitar a 10 productos para el contexto
 			break
 		}
+		
+		// Validar tipos de datos
+		name, ok1 := product["name"].(string)
+		if !ok1 {
+			continue
+		}
+		
+		description, ok2 := product["description"].(string)
+		if !ok2 {
+			description = ""
+		}
+		
+		price, ok3 := product["price"].(float64)
+		if !ok3 {
+			price = 0.0
+		}
+		
 		context.WriteString(fmt.Sprintf("- %s: %s (S/ %.2f)\n", 
-			product["name"], product["description"], product["price"]))
+			name, description, price))
 	}
 
 	return context.String(), nil
@@ -721,7 +848,8 @@ func getAllProducts() ([]map[string]interface{}, error) {
 
 	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
-		return nil, err
+		log.Printf("Error en consulta getAllProducts: %v", err)
+		return nil, fmt.Errorf("error al consultar productos: %w", err)
 	}
 	defer rows.Close()
 
@@ -729,13 +857,19 @@ func getAllProducts() ([]map[string]interface{}, error) {
 	for rows.Next() {
 		var id, name, description, categoryID, imageURL, estilo, abv, ibu, color string
 		var price float64
-		var stock int
+		var stock sql.NullInt64
 		var isActive bool
 
 		err := rows.Scan(&id, &name, &description, &price, &categoryID, &imageURL, 
 			&stock, &isActive, &estilo, &abv, &ibu, &color)
 		if err != nil {
+			log.Printf("Error al escanear producto: %v", err)
 			continue
+		}
+
+		stockValue := 0
+		if stock.Valid {
+			stockValue = int(stock.Int64)
 		}
 
 		products = append(products, map[string]interface{}{
@@ -745,13 +879,18 @@ func getAllProducts() ([]map[string]interface{}, error) {
 			"price":       price,
 			"category_id": categoryID,
 			"image_url":   imageURL,
-			"stock":       stock,
+			"stock":       stockValue,
 			"is_active":   isActive,
 			"estilo":      estilo,
 			"abv":         abv,
 			"ibu":         ibu,
 			"color":       color,
 		})
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Error después de iterar productos: %v", err)
+		return nil, fmt.Errorf("error al procesar resultados: %w", err)
 	}
 
 	return products, nil
