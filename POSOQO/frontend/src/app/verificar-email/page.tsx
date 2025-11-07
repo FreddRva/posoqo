@@ -1,10 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getApiUrl } from "@/lib/config";
 
-export default function VerificarEmailPage() {
+function VerificarEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
@@ -87,6 +87,7 @@ export default function VerificarEmailPage() {
     if (email) {
       handleGetVerificationLink(email);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email]);
 
   return (
@@ -214,3 +215,30 @@ export default function VerificarEmailPage() {
   );
 }
 
+export default function VerificarEmailPage() {
+  return (
+    <Suspense fallback={
+      <div 
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(/FondoPoS.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="w-full max-w-lg relative z-10">
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-8">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent mb-4"></div>
+              <p className="text-white font-medium">Cargando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <VerificarEmailContent />
+    </Suspense>
+  );
+}
