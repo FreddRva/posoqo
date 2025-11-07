@@ -49,8 +49,15 @@ func UpsertReview(c *fiber.Ctx) error {
 			"error": "Solo puedes reseñar productos que hayas comprado y recibido. Tu pedido debe estar en estado 'entregado' para poder reseñar."})
 	}
 
-	p := bluemonday.UGCPolicy()
-	safeComment := p.Sanitize(strings.TrimSpace(req.Comment))
+	// Sanitizar comentario solo si no está vacío
+	trimmedComment := strings.TrimSpace(req.Comment)
+	var safeComment string
+	if trimmedComment != "" {
+		p := bluemonday.UGCPolicy()
+		safeComment = p.Sanitize(trimmedComment)
+	} else {
+		safeComment = ""
+	}
 
 	_, err = db.DB.Exec(context.Background(),
 		`INSERT INTO reviews (user_id, product_id, rating, comment)
@@ -82,7 +89,7 @@ func ListProductReviews(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al contar reseñas"})
 	}
 	offset := (page - 1) * limit
-	listQuery := `SELECT r.rating, r.comment, r.created_at, u.name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
+	listQuery := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
 	rows, err := db.DB.Query(context.Background(), listQuery, productID, limit, offset)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener reseñas"})
@@ -145,7 +152,7 @@ func ListMyReviews(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
 	userID := int64(claims["id"].(float64))
 	rows, err := db.DB.Query(context.Background(),
-		`SELECT r.rating, r.comment, r.created_at, p.name
+		`SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, p.name
 		 FROM reviews r
 		 JOIN products p ON r.product_id = p.id
 		 WHERE r.user_id = $1
