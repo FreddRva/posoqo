@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"html/template"
+	"net"
 	"net/smtp"
 	"os"
 	"strings"
@@ -197,7 +198,7 @@ const emailVerificationTemplate = `
 // Enviar email de verificación
 func sendVerificationEmail(userID int64, email, name string) error {
 	fmt.Printf("[EMAIL] Iniciando envío de email a: %s (userID: %d)\n", email, userID)
-	
+
 	// Crear token de verificación
 	verification, err := createVerificationToken(userID, email)
 	if err != nil {
@@ -218,7 +219,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			passwordMasked = "****"
 		}
 	}
-	
+
 	fmt.Printf("[EMAIL] Configuración SMTP:\n")
 	fmt.Printf("  - SMTP_HOST: %s\n", config.SMTPHost)
 	fmt.Printf("  - SMTP_PORT: %s\n", config.SMTPPort)
@@ -294,17 +295,80 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	message.WriteString("\r\n")
 	message.WriteString(body.String())
 
-	// Enviar email
+	// Enviar email con timeout
 	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
 	fmt.Printf("[EMAIL] Intentando enviar email a través de: %s\n", addr)
 	fmt.Printf("[EMAIL] From: %s <%s>\n", config.FromName, config.FromEmail)
 	fmt.Printf("[EMAIL] To: %s\n", email)
 	fmt.Printf("[EMAIL] Tamaño del mensaje: %d bytes\n", len(message.String()))
 	
-	err = smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
+	// Crear conexión con timeout
+	dialer := &net.Dialer{
+		Timeout: 15 * time.Second,
+	}
+	
+	fmt.Printf("[EMAIL] Estableciendo conexión SMTP con timeout de 15 segundos...\n")
+	conn, err := dialer.Dial("tcp", addr)
 	if err != nil {
-		fmt.Printf("[EMAIL] ❌ Error enviando email: %v\n", err)
-		return fmt.Errorf("error enviando email SMTP: %w", err)
+		fmt.Printf("[EMAIL] ❌ Error conectando a SMTP: %v\n", err)
+		return fmt.Errorf("error conectando a servidor SMTP: %w", err)
+	}
+	defer conn.Close()
+	
+	fmt.Printf("[EMAIL] Conexión establecida, autenticando...\n")
+	client, err := smtp.NewClient(conn, config.SMTPHost)
+	if err != nil {
+		fmt.Printf("[EMAIL] ❌ Error creando cliente SMTP: %v\n", err)
+		return fmt.Errorf("error creando cliente SMTP: %w", err)
+	}
+	defer client.Quit()
+	
+	// Configurar timeout para operaciones
+	deadline := time.Now().Add(30 * time.Second)
+	conn.SetDeadline(deadline)
+	
+	// Autenticar
+	fmt.Printf("[EMAIL] Iniciando autenticación...\n")
+	if err = client.Auth(auth); err != nil {
+		fmt.Printf("[EMAIL] ❌ Error en autenticación SMTP: %v\n", err)
+		return fmt.Errorf("error en autenticación SMTP: %w", err)
+	}
+	fmt.Printf("[EMAIL] Autenticación exitosa\n")
+	
+	// Configurar remitente
+	fmt.Printf("[EMAIL] Configurando remitente...\n")
+	if err = client.Mail(config.FromEmail); err != nil {
+		fmt.Printf("[EMAIL] ❌ Error configurando remitente: %v\n", err)
+		return fmt.Errorf("error configurando remitente: %w", err)
+	}
+	
+	// Configurar destinatario
+	fmt.Printf("[EMAIL] Configurando destinatario...\n")
+	if err = client.Rcpt(email); err != nil {
+		fmt.Printf("[EMAIL] ❌ Error configurando destinatario: %v\n", err)
+		return fmt.Errorf("error configurando destinatario: %w", err)
+	}
+	
+	// Enviar datos
+	fmt.Printf("[EMAIL] Enviando contenido del email...\n")
+	writer, err := client.Data()
+	if err != nil {
+		fmt.Printf("[EMAIL] ❌ Error iniciando envío de datos: %v\n", err)
+		return fmt.Errorf("error iniciando envío de datos: %w", err)
+	}
+	
+	messageBytes := []byte(message.String())
+	_, err = writer.Write(messageBytes)
+	if err != nil {
+		writer.Close()
+		fmt.Printf("[EMAIL] ❌ Error escribiendo datos: %v\n", err)
+		return fmt.Errorf("error escribiendo datos: %w", err)
+	}
+	
+	err = writer.Close()
+	if err != nil {
+		fmt.Printf("[EMAIL] ❌ Error cerrando escritor: %v\n", err)
+		return fmt.Errorf("error cerrando escritor: %w", err)
 	}
 	
 	fmt.Printf("[EMAIL] ✅ Email enviado exitosamente a %s\n", email)
@@ -465,13 +529,13 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 		fmt.Printf("[RESEND] Iniciando proceso de envío de email en background para: %s\n", req.Email)
 		config := getEmailConfig()
 		smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
-		
+
 		fmt.Printf("[RESEND] SMTP configurado: %v\n", smtpConfigured)
 		fmt.Printf("[RESEND] SMTP_HOST: %s\n", config.SMTPHost)
 		fmt.Printf("[RESEND] SMTP_USER: %s\n", config.SMTPUser)
 		fmt.Printf("[RESEND] SMTP_PASSWORD presente: %v\n", config.SMTPPassword != "")
 		fmt.Printf("[RESEND] FROM_EMAIL: %s\n", config.FromEmail)
-		
+
 		if smtpConfigured {
 			fmt.Printf("[RESEND] Intentando enviar email...\n")
 			sendErr := sendVerificationEmail(userID, req.Email, name)
