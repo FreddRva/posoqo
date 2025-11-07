@@ -92,7 +92,6 @@ export default function LoginPage() {
     setGeneralError(null);
     setUnverifiedEmail(null);
     setResendStatus(null);
-    setVerificationUrl(null);
 
     try {
       // Primero intentar login directamente con el backend para obtener errores específicos
