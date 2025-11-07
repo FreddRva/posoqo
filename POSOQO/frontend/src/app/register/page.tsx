@@ -42,6 +42,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Hooks de Next.js
   const router = useRouter();
@@ -162,6 +164,7 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         setGeneralError(data.error || "Error al registrar usuario");
+        setSuccess(false);
       } else {
         const userEmail = formData.email.trim().toLowerCase();
         
@@ -175,8 +178,15 @@ export default function RegisterPage() {
           confirmPassword: "",
         });
         
-        // Redirigir a página de verificación de email
-        router.push(`/verificar-email?email=${encodeURIComponent(userEmail)}`);
+        // Mostrar mensaje de éxito
+        setGeneralError(null);
+        setSuccess(true);
+        setSuccessMessage(`¡Cuenta creada exitosamente! Se ha enviado un email de verificación a ${userEmail}. Por favor, revisa tu bandeja de entrada y verifica tu email antes de iniciar sesión.`);
+        
+        // Redirigir al login después de 5 segundos
+        setTimeout(() => {
+          router.push(`/login`);
+        }, 5000);
       }
     } catch (error) {
       setGeneralError("Error de conexión. Intenta de nuevo.");
@@ -409,8 +419,24 @@ export default function RegisterPage() {
               </div>
             </div>
 
+            {/* Mensaje de éxito */}
+            {success && successMessage && (
+              <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/50 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-green-200 text-sm font-semibold mb-1">¡Registro exitoso!</p>
+                    <p className="text-green-300 text-xs leading-relaxed">{successMessage}</p>
+                    <p className="text-green-400 text-xs mt-2 font-medium">Redirigiendo al login en unos segundos...</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Error general */}
-            {generalError && (
+            {generalError && !success && (
               <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/50 rounded-lg p-3">
                 <p className="text-red-200 text-xs font-semibold flex items-center">
                   <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

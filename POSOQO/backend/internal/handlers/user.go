@@ -242,7 +242,7 @@ func RegisterUser(c *fiber.Ctx) error {
 	logRegistration(req.Email, clientIP, userAgent)
 
 	return c.Status(http.StatusCreated).JSON(fiber.Map{
-		"message": "Usuario registrado correctamente. Por favor, verifica tu email antes de iniciar sesión.",
+		"message": "Usuario registrado correctamente. Se ha enviado un email de verificación a tu correo electrónico. Por favor, revisa tu bandeja de entrada y verifica tu email antes de iniciar sesión.",
 		"user": fiber.Map{
 			"name":  req.Name,
 			"email": req.Email,
