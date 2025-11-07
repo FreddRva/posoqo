@@ -320,6 +320,31 @@ Formato: id1,id2,id3`, formatProductsForAI(products))
 
 // SmartSearchHandler búsqueda inteligente con IA
 func SmartSearchHandler(c *fiber.Ctx) error {
+	// Agregar recover para capturar cualquier panic
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("[Búsqueda] Panic recuperado: %v", r)
+			// Intentar usar búsqueda simple como último recurso
+			products, err := getAllProducts()
+			if err == nil && len(products) > 0 {
+				var req SearchRequest
+				if c.BodyParser(&req) == nil && req.Query != "" {
+					performSimpleSearchForProducts(c, req.Query, products)
+					return
+				}
+			}
+			c.Status(500).JSON(fiber.Map{
+				"success": false,
+				"error":   "Error interno del servidor",
+			})
+		}
+	}()
+
+	type SearchRequest struct {
+		Query string `json:"query"`
+		Limit int    `json:"limit,omitempty"`
+	}
+
 	var req SearchRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -335,13 +360,15 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// Obtener productos
+	// Obtener productos con manejo de error mejorado
 	products, err := getAllProducts()
 	if err != nil {
-		log.Printf("Error al obtener productos en búsqueda inteligente: %v", err)
-		return c.Status(500).JSON(fiber.Map{
-			"success": false,
-			"error":   "Error al obtener productos",
+		log.Printf("[Búsqueda] Error al obtener productos: %v", err)
+		// Retornar respuesta vacía en lugar de error 500
+		return c.JSON(fiber.Map{
+			"success": true,
+			"results": []map[string]interface{}{},
+			"count":   0,
 		})
 	}
 
@@ -356,15 +383,16 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 
 	// Verificar si el servicio de Gemini está disponible
 	if geminiService == nil {
-		log.Printf("Servicio de Gemini no inicializado, usando búsqueda simple")
+		log.Printf("[Búsqueda] Servicio de Gemini no inicializado, usando búsqueda simple")
 		return performSimpleSearchForProducts(c, req.Query, products)
 	}
 
 	// Verificar si la API key está configurada
 	if geminiService.APIKey == "" {
-		log.Printf("GEMINI_API_KEY no configurada, usando búsqueda simple")
+		log.Printf("[Búsqueda] GEMINI_API_KEY no configurada, usando búsqueda simple")
 		return performSimpleSearchForProducts(c, req.Query, products)
 	}
+
 
 	// Filtrar productos relevantes primero (búsqueda simple)
 	query := strings.ToLower(strings.TrimSpace(req.Query))
@@ -585,13 +613,23 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 	query = strings.ToLower(strings.TrimSpace(query))
 	var results []map[string]interface{}
 
+	if query == "" {
+		return c.JSON(fiber.Map{
+			"success": true,
+			"results": []map[string]interface{}{},
+			"count":   0,
+		})
+	}
+
 	// Normalizar query (remover plurales comunes para búsqueda más flexible)
 	querySingular := query
 	if strings.HasSuffix(query, "es") {
 		querySingular = strings.TrimSuffix(query, "es")
-	} else if strings.HasSuffix(query, "s") {
+	} else if strings.HasSuffix(query, "s") && len(query) > 1 {
 		querySingular = strings.TrimSuffix(query, "s")
 	}
+
+	log.Printf("[Búsqueda Simple] Buscando: '%s' (singular: '%s') en %d productos", query, querySingular, len(products))
 
 	for _, p := range products {
 		// Validar que los campos existan y sean del tipo correcto
@@ -605,12 +643,49 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 			description = ""
 		}
 
+		// También buscar en estilo, abv, ibu, color si existen
+		estilo, _ := p["estilo"].(string)
+		if estilo == "" {
+			estilo = ""
+		}
+
 		nameLower := strings.ToLower(name)
 		descriptionLower := strings.ToLower(description)
+		estiloLower := strings.ToLower(estilo)
 
 		// Búsqueda flexible que acepta singular y plural
-		if strings.Contains(nameLower, query) || strings.Contains(descriptionLower, query) ||
-		   strings.Contains(nameLower, querySingular) || strings.Contains(descriptionLower, querySingular) {
+		// También buscar palabras individuales si la query tiene múltiples palabras
+		matches := false
+		
+		// Buscar coincidencias exactas primero
+		if strings.Contains(nameLower, query) || strings.Contains(descriptionLower, query) || 
+		   strings.Contains(estiloLower, query) {
+			matches = true
+		}
+		
+		// Buscar con singular si es diferente
+		if querySingular != query {
+			if strings.Contains(nameLower, querySingular) || strings.Contains(descriptionLower, querySingular) ||
+			   strings.Contains(estiloLower, querySingular) {
+				matches = true
+			}
+		}
+		
+		// Si la query tiene múltiples palabras, buscar cada palabra individualmente
+		words := strings.Fields(query)
+		if len(words) > 1 {
+			for _, word := range words {
+				if len(word) >= 3 { // Solo palabras de 3 o más caracteres
+					if strings.Contains(nameLower, word) || strings.Contains(descriptionLower, word) ||
+					   strings.Contains(estiloLower, word) {
+						matches = true
+						break
+					}
+				}
+			}
+		}
+
+		if matches {
 			results = append(results, map[string]interface{}{
 				"product":   p,
 				"relevance": 0.8,
@@ -618,6 +693,8 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 			})
 		}
 	}
+
+	log.Printf("[Búsqueda Simple] Encontrados %d resultados", len(results))
 
 	// Limitar a 10 resultados
 	if len(results) > 10 {
@@ -838,9 +915,20 @@ func getProductsContext() (string, error) {
 }
 
 func getAllProducts() ([]map[string]interface{}, error) {
+	// Agregar recover para evitar panics
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("[getAllProducts] Panic recuperado: %v", r)
+		}
+	}()
+
 	query := `
-		SELECT id, name, description, price, category_id, image_url, stock, is_active,
-		       COALESCE(estilo, ''), COALESCE(abv, ''), COALESCE(ibu, ''), COALESCE(color, '')
+		SELECT id, name, description, price, category_id, image_url, 
+		       COALESCE(stock, 0) as stock, is_active,
+		       COALESCE(estilo, '') as estilo, 
+		       COALESCE(abv, '') as abv, 
+		       COALESCE(ibu, '') as ibu, 
+		       COALESCE(color, '') as color
 		FROM products
 		WHERE is_active = true
 		ORDER BY created_at DESC
@@ -848,7 +936,7 @@ func getAllProducts() ([]map[string]interface{}, error) {
 
 	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
-		log.Printf("Error en consulta getAllProducts: %v", err)
+		log.Printf("[getAllProducts] Error en consulta: %v", err)
 		return nil, fmt.Errorf("error al consultar productos: %w", err)
 	}
 	defer rows.Close()
@@ -857,19 +945,14 @@ func getAllProducts() ([]map[string]interface{}, error) {
 	for rows.Next() {
 		var id, name, description, categoryID, imageURL, estilo, abv, ibu, color string
 		var price float64
-		var stock sql.NullInt64
+		var stock int
 		var isActive bool
 
 		err := rows.Scan(&id, &name, &description, &price, &categoryID, &imageURL, 
 			&stock, &isActive, &estilo, &abv, &ibu, &color)
 		if err != nil {
-			log.Printf("Error al escanear producto: %v", err)
+			log.Printf("[getAllProducts] Error al escanear producto: %v", err)
 			continue
-		}
-
-		stockValue := 0
-		if stock.Valid {
-			stockValue = int(stock.Int64)
 		}
 
 		products = append(products, map[string]interface{}{
@@ -879,7 +962,7 @@ func getAllProducts() ([]map[string]interface{}, error) {
 			"price":       price,
 			"category_id": categoryID,
 			"image_url":   imageURL,
-			"stock":       stockValue,
+			"stock":       stock,
 			"is_active":   isActive,
 			"estilo":      estilo,
 			"abv":         abv,
