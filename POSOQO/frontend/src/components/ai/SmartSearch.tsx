@@ -24,13 +24,26 @@ export default function SmartSearch({ isOpen, onClose }: SmartSearchProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [suggestions] = useState([
-    'Cerveza amarga para carnes rojas',
-    'Bebida refrescante para el verano',
-    'Comida picante',
-    'Cerveza suave para principiantes',
-    'Maridaje con pizza',
-  ]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  
+  // Cargar sugerencias desde el backend
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      try {
+        const response = await apiFetch<{ success: boolean; suggestions?: string[] }>('ai/suggestions');
+        if (response.success && response.suggestions) {
+          setSuggestions(response.suggestions);
+        }
+      } catch (err) {
+        console.error('Error cargando sugerencias:', err);
+        // Sugerencias por defecto si falla
+        setSuggestions(['comidas', 'bebidas', 'cervezas', 'refrescos']);
+      }
+    };
+    if (isOpen) {
+      loadSuggestions();
+    }
+  }, [isOpen]);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 

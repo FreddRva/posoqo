@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/posoqo/backend/internal/db"
@@ -316,6 +317,73 @@ Formato: id1,id2,id3`, formatProductsForAI(products))
 		"products":     recommendedProducts,
 		"count":        len(recommendedProducts),
 	})
+}
+
+// GetSearchSuggestions devuelve sugerencias de búsqueda basadas en productos y categorías
+func GetSearchSuggestions(c *fiber.Ctx) error {
+	products, err := getAllProducts()
+	if err != nil {
+		log.Printf("[Sugerencias] Error al obtener productos: %v", err)
+		return c.JSON(fiber.Map{
+			"success": true,
+			"suggestions": []string{},
+		})
+	}
+
+	// Obtener categorías únicas
+	categoryMap := make(map[string]bool)
+	suggestions := []string{}
+
+	for _, p := range products {
+		categoryName, _ := p["category_name"].(string)
+		parentCategoryName, _ := p["parent_category_name"].(string)
+		name, _ := p["name"].(string)
+
+		// Agregar categorías
+		if categoryName != "" && !categoryMap[categoryName] {
+			categoryMap[categoryName] = true
+			suggestions = append(suggestions, categoryName)
+		}
+		if parentCategoryName != "" && !categoryMap[parentCategoryName] {
+			categoryMap[parentCategoryName] = true
+			suggestions = append(suggestions, parentCategoryName)
+		}
+
+		// Agregar nombres de productos populares (primeros 10)
+		if len(suggestions) < 20 && name != "" {
+			// Solo agregar si no es muy largo
+			if len(name) <= 30 {
+				suggestions = append(suggestions, name)
+			}
+		}
+	}
+
+	// Agregar términos comunes
+	commonTerms := []string{"comidas", "bebidas", "cervezas", "refrescos", "alimentos"}
+	for _, term := range commonTerms {
+		if !contains(suggestions, term) {
+			suggestions = append(suggestions, term)
+		}
+	}
+
+	// Limitar a 15 sugerencias
+	if len(suggestions) > 15 {
+		suggestions = suggestions[:15]
+	}
+
+	return c.JSON(fiber.Map{
+		"success":    true,
+		"suggestions": suggestions,
+	})
+}
+
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 // SmartSearchHandler búsqueda inteligente con IA
@@ -631,6 +699,23 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 
 	log.Printf("[Búsqueda Simple] Buscando: '%s' (singular: '%s') en %d productos", query, querySingular, len(products))
 
+	// Mapeo de términos comunes a categorías
+	categoryMap := map[string][]string{
+		"comida":   {"comida", "comidas", "alimento", "alimentos", "food"},
+		"bebida":   {"bebida", "bebidas", "drink", "drinks"},
+		"cerveza":  {"cerveza", "cervezas", "beer", "beers"},
+		"refresco": {"refresco", "refrescos", "soda", "gaseosa"},
+	}
+
+	// Normalizar query para búsqueda de categorías
+	queryForCategory := strings.ToLower(query)
+	if strings.HasSuffix(queryForCategory, "s") {
+		queryForCategory = strings.TrimSuffix(queryForCategory, "s")
+	}
+	if strings.HasSuffix(queryForCategory, "es") {
+		queryForCategory = strings.TrimSuffix(queryForCategory, "es")
+	}
+
 	for _, p := range products {
 		// Validar que los campos existan y sean del tipo correcto
 		name, ok1 := p["name"].(string)
@@ -649,37 +734,103 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 			estilo = ""
 		}
 
+		// Obtener información de categoría
+		categoryName, _ := p["category_name"].(string)
+		parentCategoryName, _ := p["parent_category_name"].(string)
+
 		nameLower := strings.ToLower(name)
 		descriptionLower := strings.ToLower(description)
 		estiloLower := strings.ToLower(estilo)
+		categoryNameLower := strings.ToLower(categoryName)
+		parentCategoryNameLower := strings.ToLower(parentCategoryName)
 
 		// Búsqueda flexible que acepta singular y plural
 		// También buscar palabras individuales si la query tiene múltiples palabras
 		matches := false
+		relevance := 0.8
 		
-		// Buscar coincidencias exactas primero
-		if strings.Contains(nameLower, query) || strings.Contains(descriptionLower, query) || 
-		   strings.Contains(estiloLower, query) {
-			matches = true
-		}
-		
-		// Buscar con singular si es diferente
-		if querySingular != query {
-			if strings.Contains(nameLower, querySingular) || strings.Contains(descriptionLower, querySingular) ||
-			   strings.Contains(estiloLower, querySingular) {
+		// 1. Buscar en categorías (mayor prioridad)
+		if categoryNameLower != "" || parentCategoryNameLower != "" {
+			// Buscar coincidencia directa en nombres de categoría
+			if strings.Contains(categoryNameLower, query) || strings.Contains(parentCategoryNameLower, query) {
 				matches = true
+				relevance = 1.0 // Mayor relevancia si coincide con categoría
+			}
+			
+			// Buscar con singular
+			if querySingular != query {
+				if strings.Contains(categoryNameLower, querySingular) || strings.Contains(parentCategoryNameLower, querySingular) {
+					matches = true
+					relevance = 1.0
+				}
+			}
+			
+			// Buscar usando el mapeo de términos comunes
+			for categoryKey, terms := range categoryMap {
+				for _, term := range terms {
+					if term == query || term == querySingular || term == queryForCategory {
+						if strings.Contains(categoryNameLower, categoryKey) || strings.Contains(parentCategoryNameLower, categoryKey) {
+							matches = true
+							relevance = 1.0
+						}
+					}
+				}
 			}
 		}
 		
-		// Si la query tiene múltiples palabras, buscar cada palabra individualmente
+		// 2. Buscar coincidencias en nombre (alta prioridad)
+		if strings.Contains(nameLower, query) {
+			matches = true
+			if relevance < 0.9 {
+				relevance = 0.9
+			}
+		}
+		
+		// 3. Buscar con singular en nombre
+		if querySingular != query {
+			if strings.Contains(nameLower, querySingular) {
+				matches = true
+				if relevance < 0.85 {
+					relevance = 0.85
+				}
+			}
+		}
+		
+		// 4. Buscar en descripción y estilo
+		if strings.Contains(descriptionLower, query) || strings.Contains(estiloLower, query) {
+			matches = true
+			if relevance < 0.8 {
+				relevance = 0.8
+			}
+		}
+		
+		if querySingular != query {
+			if strings.Contains(descriptionLower, querySingular) || strings.Contains(estiloLower, querySingular) {
+				matches = true
+				if relevance < 0.75 {
+					relevance = 0.75
+				}
+			}
+		}
+		
+		// 5. Si la query tiene múltiples palabras, buscar cada palabra individualmente
 		words := strings.Fields(query)
 		if len(words) > 1 {
 			for _, word := range words {
 				if len(word) >= 3 { // Solo palabras de 3 o más caracteres
-					if strings.Contains(nameLower, word) || strings.Contains(descriptionLower, word) ||
-					   strings.Contains(estiloLower, word) {
+					if strings.Contains(nameLower, word) {
 						matches = true
+						if relevance < 0.7 {
+							relevance = 0.7
+						}
 						break
+					}
+					if strings.Contains(descriptionLower, word) || strings.Contains(estiloLower, word) ||
+					   strings.Contains(categoryNameLower, word) || strings.Contains(parentCategoryNameLower, word) {
+						matches = true
+						if relevance < 0.6 {
+							relevance = 0.6
+						}
 					}
 				}
 			}
@@ -688,11 +839,18 @@ func performSimpleSearchForProducts(c *fiber.Ctx, query string, products []map[s
 		if matches {
 			results = append(results, map[string]interface{}{
 				"product":   p,
-				"relevance": 0.8,
+				"relevance": relevance,
 				"reason":    "Coincide con tu búsqueda",
 			})
 		}
 	}
+	
+	// Ordenar por relevancia (mayor a menor)
+	sort.Slice(results, func(i, j int) bool {
+		relI := results[i]["relevance"].(float64)
+		relJ := results[j]["relevance"].(float64)
+		return relI > relJ
+	})
 
 	log.Printf("[Búsqueda Simple] Encontrados %d resultados", len(results))
 
@@ -923,15 +1081,19 @@ func getAllProducts() ([]map[string]interface{}, error) {
 	}()
 
 	query := `
-		SELECT id, name, description, price, category_id, image_url, 
-		       COALESCE(stock, 0) as stock, is_active,
-		       COALESCE(estilo, '') as estilo, 
-		       COALESCE(abv, '') as abv, 
-		       COALESCE(ibu, '') as ibu, 
-		       COALESCE(color, '') as color
-		FROM products
-		WHERE is_active = true
-		ORDER BY created_at DESC
+		SELECT p.id, p.name, p.description, p.price, p.category_id, p.image_url, 
+		       COALESCE(p.stock, 0) as stock, p.is_active,
+		       COALESCE(p.estilo, '') as estilo, 
+		       COALESCE(p.abv, '') as abv, 
+		       COALESCE(p.ibu, '') as ibu, 
+		       COALESCE(p.color, '') as color,
+		       COALESCE(c.name, '') as category_name,
+		       COALESCE(parent_cat.name, '') as parent_category_name
+		FROM products p
+		LEFT JOIN categories c ON p.category_id = c.id
+		LEFT JOIN categories parent_cat ON c.parent_id = parent_cat.id
+		WHERE p.is_active = true
+		ORDER BY p.created_at DESC
 	`
 
 	rows, err := db.DB.Query(context.Background(), query)
@@ -943,31 +1105,33 @@ func getAllProducts() ([]map[string]interface{}, error) {
 
 	var products []map[string]interface{}
 	for rows.Next() {
-		var id, name, description, categoryID, imageURL, estilo, abv, ibu, color string
+		var id, name, description, categoryID, imageURL, estilo, abv, ibu, color, categoryName, parentCategoryName string
 		var price float64
 		var stock int
 		var isActive bool
 
 		err := rows.Scan(&id, &name, &description, &price, &categoryID, &imageURL, 
-			&stock, &isActive, &estilo, &abv, &ibu, &color)
+			&stock, &isActive, &estilo, &abv, &ibu, &color, &categoryName, &parentCategoryName)
 		if err != nil {
 			log.Printf("[getAllProducts] Error al escanear producto: %v", err)
 			continue
 		}
 
 		products = append(products, map[string]interface{}{
-			"id":          id,
-			"name":        name,
-			"description": description,
-			"price":       price,
-			"category_id": categoryID,
-			"image_url":   imageURL,
-			"stock":       stock,
-			"is_active":   isActive,
-			"estilo":      estilo,
-			"abv":         abv,
-			"ibu":         ibu,
-			"color":       color,
+			"id":                  id,
+			"name":                name,
+			"description":         description,
+			"price":               price,
+			"category_id":         categoryID,
+			"category_name":       categoryName,
+			"parent_category_name": parentCategoryName,
+			"image_url":           imageURL,
+			"stock":               stock,
+			"is_active":           isActive,
+			"estilo":              estilo,
+			"abv":                 abv,
+			"ibu":                 ibu,
+			"color":               color,
 		})
 	}
 
