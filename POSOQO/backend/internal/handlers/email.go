@@ -196,19 +196,41 @@ const emailVerificationTemplate = `
 
 // Enviar email de verificación
 func sendVerificationEmail(userID int64, email, name string) error {
+	fmt.Printf("[EMAIL] Iniciando envío de email a: %s (userID: %d)\n", email, userID)
+	
 	// Crear token de verificación
 	verification, err := createVerificationToken(userID, email)
 	if err != nil {
+		fmt.Printf("[EMAIL] Error creando token: %v\n", err)
 		return err
 	}
+	fmt.Printf("[EMAIL] Token creado exitosamente: %s\n", verification.Token[:16]+"...")
 
 	// Obtener configuración de email
 	config := getEmailConfig()
 
+	// Log de configuración (sin mostrar password completo)
+	passwordMasked := ""
+	if config.SMTPPassword != "" {
+		if len(config.SMTPPassword) > 8 {
+			passwordMasked = config.SMTPPassword[:4] + "****" + config.SMTPPassword[len(config.SMTPPassword)-4:]
+		} else {
+			passwordMasked = "****"
+		}
+	}
+	
+	fmt.Printf("[EMAIL] Configuración SMTP:\n")
+	fmt.Printf("  - SMTP_HOST: %s\n", config.SMTPHost)
+	fmt.Printf("  - SMTP_PORT: %s\n", config.SMTPPort)
+	fmt.Printf("  - SMTP_USER: %s\n", config.SMTPUser)
+	fmt.Printf("  - SMTP_PASSWORD: %s\n", passwordMasked)
+	fmt.Printf("  - FROM_EMAIL: %s\n", config.FromEmail)
+	fmt.Printf("  - FROM_NAME: %s\n", config.FromName)
+
 	// Verificar que la configuración esté completa
 	if config.SMTPHost == "" || config.SMTPUser == "" || config.SMTPPassword == "" {
-		// En desarrollo, solo retornar el token
-		return nil
+		fmt.Printf("[EMAIL] ⚠️ Configuración SMTP incompleta - no se enviará email\n")
+		return fmt.Errorf("configuración SMTP incompleta")
 	}
 
 	// Construir URL de verificación
@@ -274,7 +296,19 @@ func sendVerificationEmail(userID int64, email, name string) error {
 
 	// Enviar email
 	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
-	return smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
+	fmt.Printf("[EMAIL] Intentando enviar email a través de: %s\n", addr)
+	fmt.Printf("[EMAIL] From: %s <%s>\n", config.FromName, config.FromEmail)
+	fmt.Printf("[EMAIL] To: %s\n", email)
+	fmt.Printf("[EMAIL] Tamaño del mensaje: %d bytes\n", len(message.String()))
+	
+	err = smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
+	if err != nil {
+		fmt.Printf("[EMAIL] ❌ Error enviando email: %v\n", err)
+		return fmt.Errorf("error enviando email SMTP: %w", err)
+	}
+	
+	fmt.Printf("[EMAIL] ✅ Email enviado exitosamente a %s\n", email)
+	return nil
 }
 
 // VerificarEmail godoc
@@ -420,24 +454,34 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 
 	// Responder inmediatamente con el token
 	response := fiber.Map{
-		"message":         "Token de verificación generado",
-		"token":           verification.Token,
+		"message":          "Token de verificación generado",
+		"token":            verification.Token,
 		"verification_url": verificationURL,
 		"development_mode": true,
 	}
 
 	// Enviar email en background (no bloquear la respuesta)
 	go func() {
+		fmt.Printf("[RESEND] Iniciando proceso de envío de email en background para: %s\n", req.Email)
 		config := getEmailConfig()
 		smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
 		
+		fmt.Printf("[RESEND] SMTP configurado: %v\n", smtpConfigured)
+		fmt.Printf("[RESEND] SMTP_HOST: %s\n", config.SMTPHost)
+		fmt.Printf("[RESEND] SMTP_USER: %s\n", config.SMTPUser)
+		fmt.Printf("[RESEND] SMTP_PASSWORD presente: %v\n", config.SMTPPassword != "")
+		fmt.Printf("[RESEND] FROM_EMAIL: %s\n", config.FromEmail)
+		
 		if smtpConfigured {
+			fmt.Printf("[RESEND] Intentando enviar email...\n")
 			sendErr := sendVerificationEmail(userID, req.Email, name)
 			if sendErr != nil {
-				fmt.Printf("Error enviando email en background: %v\n", sendErr)
+				fmt.Printf("[RESEND] ❌ Error enviando email en background: %v\n", sendErr)
 			} else {
-				fmt.Printf("Email enviado exitosamente a %s\n", req.Email)
+				fmt.Printf("[RESEND] ✅ Email enviado exitosamente a %s\n", req.Email)
 			}
+		} else {
+			fmt.Printf("[RESEND] ⚠️ SMTP no configurado - email no se enviará\n")
 		}
 	}()
 
