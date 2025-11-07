@@ -409,7 +409,7 @@ func main() {
 	// Obtener puerto de variable de entorno
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "4000"
 	}
 
 	// Iniciar servidor
