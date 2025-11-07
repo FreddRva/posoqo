@@ -355,8 +355,18 @@ export default function ServicesPage() {
                           </div>
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-stone-900">{service.name}</div>
-                          <div className="text-sm text-stone-500 whitespace-pre-line">{service.description}</div>
+                          <div className="text-sm font-semibold text-stone-900 mb-2">{service.name}</div>
+                          <div className="text-sm text-stone-500">
+                            {service.description ? (
+                              <ul className="list-disc list-inside space-y-1">
+                                {service.description.split('\n').filter(line => line.trim()).map((line, idx) => (
+                                  <li key={idx} className="whitespace-normal">{line.trim()}</li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <span className="text-stone-400 italic">Sin descripción</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>

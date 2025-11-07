@@ -5,7 +5,8 @@ import Image from 'next/image'
 import { getImageUrl } from '@/lib/config'
 import { ServicesSectionProps } from '@/types/homepage'
 import { ServiceSkeleton, ErrorWithRetry } from '@/components/LoadingStates'
-import { Star, ArrowRight, Sparkles, Zap } from 'lucide-react'
+import { Star, ArrowRight, Sparkles, Zap, CheckCircle2 } from 'lucide-react'
+import { ServiceModal } from '@/components/ServiceModal'
 
 export const ServicesSection: React.FC<ServicesSectionProps> = ({
   services,
@@ -15,6 +16,18 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 }) => {
   const sectionRef = React.useRef(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
+  const [selectedService, setSelectedService] = React.useState<any>(null)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+
+  const handleServiceClick = (service: any) => {
+    setSelectedService(service)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedService(null)
+  }
 
   if (loading) {
     return (
@@ -237,9 +250,21 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   </h3>
 
                   {service.description && (
-                    <p className="text-gray-400 text-base leading-relaxed mb-6 group-hover:text-gray-300 transition-colors duration-300 line-clamp-3">
-                      {service.description}
-                    </p>
+                    <div className="mb-6">
+                      <ul className="space-y-2 text-gray-400 text-base group-hover:text-gray-300 transition-colors duration-300">
+                        {service.description.split('\n').filter(line => line.trim()).slice(0, 3).map((line, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                            <span className="flex-1">{line.trim()}</span>
+                          </li>
+                        ))}
+                        {service.description.split('\n').filter(line => line.trim()).length > 3 && (
+                          <li className="text-yellow-400 text-sm font-medium pt-2">
+                            +{service.description.split('\n').filter(line => line.trim()).length - 3} características más
+                          </li>
+                        )}
+                      </ul>
+                    </div>
                   )}
 
                   {/* Precio si está disponible */}
@@ -256,6 +281,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
                   {/* Botón de acción */}
                   <motion.button
+                    onClick={() => handleServiceClick(service)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="w-full px-6 py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-500/50"
@@ -274,6 +300,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Modal de servicio */}
+      <ServiceModal
+        service={selectedService}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </section>
   )
 }
