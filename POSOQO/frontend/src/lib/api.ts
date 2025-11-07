@@ -420,17 +420,18 @@ export async function apiFetch<T>(
           // Obtener headers actualizados con el nuevo token
           const method = (fetchOptions.method || 'GET').toUpperCase();
           const needsCSRF = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
-          const retryHeaders = await getRequestHeaders(needsCSRF);
+          const baseHeaders = await getRequestHeaders(needsCSRF);
           
-          // Actualizar el header de Authorization con el nuevo token
-          retryHeaders['Authorization'] = `Bearer ${newToken}`;
+          // Crear nuevo objeto de headers con el token actualizado
+          const retryHeaders: HeadersInit = {
+            ...(baseHeaders as Record<string, string>),
+            'Authorization': `Bearer ${newToken}`,
+            ...(fetchOptions.headers as Record<string, string> || {}),
+          };
           
           const retryRes = await fetch(getApiUrl(endpoint), {
             ...fetchOptions,
-            headers: {
-              ...retryHeaders,
-              ...fetchOptions.headers,
-            },
+            headers: retryHeaders,
             signal,
           });
           
