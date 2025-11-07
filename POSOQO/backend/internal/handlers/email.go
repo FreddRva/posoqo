@@ -212,11 +212,26 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	}
 
 	// Construir URL de verificación
-	baseURL := os.Getenv("BASE_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:3000"
+	// La URL debe apuntar directamente al endpoint del backend
+	backendURL := os.Getenv("BACKEND_URL")
+	if backendURL == "" {
+		// Si no hay BACKEND_URL configurada, usar BASE_URL si es del backend, sino construirla
+		baseURL := os.Getenv("BASE_URL")
+		if strings.Contains(baseURL, "onrender.com") && strings.Contains(baseURL, "backend") {
+			backendURL = baseURL
+		} else if strings.Contains(baseURL, "onrender.com") {
+			// Si BASE_URL es del frontend, construir la del backend
+			backendURL = strings.Replace(baseURL, "frontend", "backend", -1)
+			if backendURL == baseURL {
+				// Si no tiene frontend en la URL, asumir que es el backend
+				backendURL = baseURL
+			}
+		} else {
+			// Para desarrollo local
+			backendURL = "http://localhost:4000"
+		}
 	}
-	verificationURL := fmt.Sprintf("%s/verify-email?token=%s", baseURL, verification.Token)
+	verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", backendURL, verification.Token)
 
 	// Preparar datos para el template
 	data := struct {
