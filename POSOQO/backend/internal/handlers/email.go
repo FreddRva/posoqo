@@ -420,11 +420,22 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 		).Scan(&token, &expiresAt)
 
 		if err == nil {
-			baseURL := os.Getenv("BASE_URL")
-			if baseURL == "" {
-				baseURL = "http://localhost:3000"
+			// Usar la misma lógica que en sendVerificationEmail para obtener la URL del backend
+			backendURL := os.Getenv("BACKEND_URL")
+			if backendURL == "" {
+				renderURL := os.Getenv("RENDER_EXTERNAL_URL")
+				if renderURL != "" {
+					backendURL = renderURL
+				} else {
+					baseURL := os.Getenv("BASE_URL")
+					if strings.Contains(baseURL, "onrender.com") {
+						backendURL = baseURL
+					} else {
+						backendURL = "http://localhost:4000"
+					}
+				}
 			}
-			verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", baseURL, token)
+			verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", backendURL, token)
 
 			response["token"] = token
 			response["verification_url"] = verificationURL
