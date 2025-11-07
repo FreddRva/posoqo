@@ -173,6 +173,7 @@ func main() {
 	ai := api.Group("/ai")
 	ai.Get("/health", handlers.HealthCheckAI)
 	ai.Get("/models", handlers.ListModelsHandler)
+	ai.Get("/suggestions", handlers.GetSearchSuggestions)
 	ai.Post("/chatbot", handlers.ChatbotHandler)
 	ai.Post("/recommend", handlers.RecommendProductsHandler)
 	ai.Post("/search", handlers.SmartSearchHandler)
