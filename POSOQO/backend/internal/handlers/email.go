@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"html/template"
@@ -295,80 +296,97 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	message.WriteString("\r\n")
 	message.WriteString(body.String())
 
-	// Enviar email con timeout
+	// Enviar email - Intentar método simple primero (más confiable)
 	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
 	fmt.Printf("[EMAIL] Intentando enviar email a través de: %s\n", addr)
 	fmt.Printf("[EMAIL] From: %s <%s>\n", config.FromName, config.FromEmail)
 	fmt.Printf("[EMAIL] To: %s\n", email)
 	fmt.Printf("[EMAIL] Tamaño del mensaje: %d bytes\n", len(message.String()))
 	
-	// Crear conexión con timeout
-	dialer := &net.Dialer{
-		Timeout: 15 * time.Second,
-	}
-	
-	fmt.Printf("[EMAIL] Estableciendo conexión SMTP con timeout de 15 segundos...\n")
-	conn, err := dialer.Dial("tcp", addr)
+	// Intentar método simple primero (funciona mejor con la mayoría de servidores SMTP)
+	fmt.Printf("[EMAIL] Intentando envío directo con smtp.SendMail...\n")
+	err = smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
 	if err != nil {
-		fmt.Printf("[EMAIL] ❌ Error conectando a SMTP: %v\n", err)
-		return fmt.Errorf("error conectando a servidor SMTP: %w", err)
-	}
-	defer conn.Close()
-	
-	fmt.Printf("[EMAIL] Conexión establecida, autenticando...\n")
-	client, err := smtp.NewClient(conn, config.SMTPHost)
-	if err != nil {
-		fmt.Printf("[EMAIL] ❌ Error creando cliente SMTP: %v\n", err)
-		return fmt.Errorf("error creando cliente SMTP: %w", err)
-	}
-	defer client.Quit()
-	
-	// Configurar timeout para operaciones
-	deadline := time.Now().Add(30 * time.Second)
-	conn.SetDeadline(deadline)
-	
-	// Autenticar
-	fmt.Printf("[EMAIL] Iniciando autenticación...\n")
-	if err = client.Auth(auth); err != nil {
-		fmt.Printf("[EMAIL] ❌ Error en autenticación SMTP: %v\n", err)
-		return fmt.Errorf("error en autenticación SMTP: %w", err)
-	}
-	fmt.Printf("[EMAIL] Autenticación exitosa\n")
-	
-	// Configurar remitente
-	fmt.Printf("[EMAIL] Configurando remitente...\n")
-	if err = client.Mail(config.FromEmail); err != nil {
-		fmt.Printf("[EMAIL] ❌ Error configurando remitente: %v\n", err)
-		return fmt.Errorf("error configurando remitente: %w", err)
-	}
-	
-	// Configurar destinatario
-	fmt.Printf("[EMAIL] Configurando destinatario...\n")
-	if err = client.Rcpt(email); err != nil {
-		fmt.Printf("[EMAIL] ❌ Error configurando destinatario: %v\n", err)
-		return fmt.Errorf("error configurando destinatario: %w", err)
-	}
-	
-	// Enviar datos
-	fmt.Printf("[EMAIL] Enviando contenido del email...\n")
-	writer, err := client.Data()
-	if err != nil {
-		fmt.Printf("[EMAIL] ❌ Error iniciando envío de datos: %v\n", err)
-		return fmt.Errorf("error iniciando envío de datos: %w", err)
-	}
-	
-	messageBytes := []byte(message.String())
-	_, err = writer.Write(messageBytes)
-	if err != nil {
-		writer.Close()
-		fmt.Printf("[EMAIL] ❌ Error escribiendo datos: %v\n", err)
-		return fmt.Errorf("error escribiendo datos: %w", err)
-	}
-	
-	err = writer.Close()
-	if err != nil {
-		fmt.Printf("[EMAIL] ❌ Error cerrando escritor: %v\n", err)
-		return fmt.Errorf("error cerrando escritor: %w", err)
+		fmt.Printf("[EMAIL] ❌ Error con smtp.SendMail: %v\n", err)
+		fmt.Printf("[EMAIL] Intentando método alternativo con conexión manual...\n")
+		
+		// Método alternativo: conexión manual con STARTTLS
+		dialer := &net.Dialer{
+			Timeout: 10 * time.Second,
+		}
+		
+		fmt.Printf("[EMAIL] Estableciendo conexión SMTP...\n")
+		conn, dialErr := dialer.Dial("tcp", addr)
+		if dialErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error conectando a SMTP: %v\n", dialErr)
+			return fmt.Errorf("error conectando a servidor SMTP: %w (método directo: %v)", dialErr, err)
+		}
+		defer conn.Close()
+		
+		fmt.Printf("[EMAIL] Conexión establecida\n")
+		client, clientErr := smtp.NewClient(conn, config.SMTPHost)
+		if clientErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error creando cliente SMTP: %v\n", clientErr)
+			return fmt.Errorf("error creando cliente SMTP: %w", clientErr)
+		}
+		defer client.Quit()
+		
+		// Configurar timeout
+		deadline := time.Now().Add(20 * time.Second)
+		conn.SetDeadline(deadline)
+		
+		// STARTTLS si es necesario (puerto 587)
+		if config.SMTPPort == "587" {
+			fmt.Printf("[EMAIL] Iniciando STARTTLS...\n")
+			tlsConfig := &tls.Config{
+				ServerName:         config.SMTPHost,
+				InsecureSkipVerify: false,
+			}
+			if starttlsErr := client.StartTLS(tlsConfig); starttlsErr != nil {
+				fmt.Printf("[EMAIL] ⚠️ Error en STARTTLS (continuando): %v\n", starttlsErr)
+			} else {
+				fmt.Printf("[EMAIL] STARTTLS exitoso\n")
+			}
+		}
+		
+		// Autenticar
+		fmt.Printf("[EMAIL] Autenticando...\n")
+		if authErr := client.Auth(auth); authErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error en autenticación: %v\n", authErr)
+			return fmt.Errorf("error en autenticación SMTP: %w", authErr)
+		}
+		fmt.Printf("[EMAIL] Autenticación exitosa\n")
+		
+		// Configurar remitente
+		if mailErr := client.Mail(config.FromEmail); mailErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error configurando remitente: %v\n", mailErr)
+			return fmt.Errorf("error configurando remitente: %w", mailErr)
+		}
+		
+		// Configurar destinatario
+		if rcptErr := client.Rcpt(email); rcptErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error configurando destinatario: %v\n", rcptErr)
+			return fmt.Errorf("error configurando destinatario: %w", rcptErr)
+		}
+		
+		// Enviar datos
+		writer, dataErr := client.Data()
+		if dataErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error iniciando envío de datos: %v\n", dataErr)
+			return fmt.Errorf("error iniciando envío de datos: %w", dataErr)
+		}
+		
+		messageBytes := []byte(message.String())
+		if _, writeErr := writer.Write(messageBytes); writeErr != nil {
+			writer.Close()
+			fmt.Printf("[EMAIL] ❌ Error escribiendo datos: %v\n", writeErr)
+			return fmt.Errorf("error escribiendo datos: %w", writeErr)
+		}
+		
+		if closeErr := writer.Close(); closeErr != nil {
+			fmt.Printf("[EMAIL] ❌ Error cerrando escritor: %v\n", closeErr)
+			return fmt.Errorf("error cerrando escritor: %w", closeErr)
+		}
 	}
 	
 	fmt.Printf("[EMAIL] ✅ Email enviado exitosamente a %s\n", email)
