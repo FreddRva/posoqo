@@ -876,9 +876,10 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 			COALESCE(created_at, NOW()) as created_at,
 			COALESCE(updated_at, NOW()) as updated_at
 		FROM users
-		ORDER BY id DESC
+		ORDER BY created_at DESC
 	`)
 	if err != nil {
+		log.Printf("[USERS] Error en query: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Error al obtener usuarios",
 			"details": err.Error(),
@@ -887,7 +888,9 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	users := []fiber.Map{}
+	rowCount := 0
 	for rows.Next() {
+		rowCount++
 		var id int64
 		var name, lastName, email, role string
 		var emailVerified bool
@@ -896,7 +899,7 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
 			// Log el error específico para debug
-			fmt.Printf("Error escaneando usuario: %v\n", err)
+			log.Printf("[USERS] Error escaneando usuario fila %d: %v", rowCount, err)
 			continue
 		}
 
@@ -905,6 +908,8 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		if fullName == "" {
 			fullName = "Usuario"
 		}
+
+		log.Printf("[USERS] Usuario encontrado: ID=%d, Name=%s, Email=%s, Role=%s", id, fullName, email, role)
 
 		user := fiber.Map{
 			"id":             id,
@@ -917,6 +922,8 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		}
 		users = append(users, user)
 	}
+
+	log.Printf("[USERS] Total usuarios encontrados: %d (filas procesadas: %d)", len(users), rowCount)
 
 	return c.JSON(fiber.Map{
 		"data": users,
