@@ -43,8 +43,22 @@ var AuthRateLimiter = limiter.New(limiter.Config{
 	},
 })
 
-// CORS configurado para producción
-// Se configura dinámicamente según el entorno usando una función
+// GetCorsConfig retorna la configuración de CORS
+// Se llama como función para asegurar que las variables de entorno estén disponibles
+func GetCorsConfig() cors.Config {
+	return cors.Config{
+		AllowOriginsFunc: func(origin string) bool {
+			return isOriginAllowed(origin)
+		},
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH,HEAD",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin,X-CSRF-Token",
+		AllowCredentials: true,
+		ExposeHeaders:    "Content-Length,Authorization",
+		MaxAge:           86400, // 24 horas
+	}
+}
+
+// CorsConfig mantiene compatibilidad hacia atrás (deprecated, usar GetCorsConfig)
 var CorsConfig = cors.Config{
 	AllowOriginsFunc: func(origin string) bool {
 		return isOriginAllowed(origin)
@@ -75,16 +89,18 @@ func isOriginAllowed(origin string) bool {
 
 		// Soporte para wildcards (ej: *.vercel.app)
 		if strings.Contains(allowed, "*") {
-			// Reemplazar * con regex pattern
-			// Ejemplo: "https://*.vercel.app" -> debe coincidir con "https://cualquier-cosa.vercel.app"
+			// Patrón: "https://*.vercel.app" debe coincidir con "https://posoqo.vercel.app"
 			if strings.HasPrefix(allowed, "https://*.") {
-				// Patrón: https://*.dominio.com
+				// Extraer el dominio después del wildcard (ej: "vercel.app")
 				domain := strings.TrimPrefix(allowed, "https://*.")
+				// Verificar que el origin termine con ".dominio" y empiece con "https://"
+				// Ejemplo: origin="https://posoqo.vercel.app", domain="vercel.app"
+				// Debe cumplir: termina con ".vercel.app" Y empieza con "https://"
 				if strings.HasSuffix(origin, "."+domain) && strings.HasPrefix(origin, "https://") {
 					return true
 				}
 			} else if strings.HasPrefix(allowed, "http://*.") {
-				// Patrón: http://*.dominio.com
+				// Patrón: "http://*.dominio.com"
 				domain := strings.TrimPrefix(allowed, "http://*.")
 				if strings.HasSuffix(origin, "."+domain) && strings.HasPrefix(origin, "http://") {
 					return true
@@ -105,13 +121,18 @@ func getAllowedOrigins() []string {
 		for i := range origins {
 			origins[i] = strings.TrimSpace(origins[i])
 		}
+		log.Printf("[CORS] Usando origins personalizados de CORS_ORIGINS: %v", origins)
 		return origins
 	}
 
 	env := os.Getenv("NODE_ENV")
-
+	
+	// Si estamos en Render (detectado por RENDER=true o NODE_ENV=production)
+	// o si no hay NODE_ENV configurado pero estamos en un entorno de producción
+	isRender := os.Getenv("RENDER") == "true" || env == "production"
+	
 	// Origins para desarrollo
-	if env != "production" {
+	if !isRender && env != "production" {
 		return []string{
 			"http://localhost:3000",
 			"http://127.0.0.1:3000",
@@ -120,13 +141,11 @@ func getAllowedOrigins() []string {
 		}
 	}
 
-	// Origins para producción
+	// Origins para producción (Render o producción)
+	// Por defecto permite posoqo.vercel.app y cualquier subdominio de vercel.app
 	return []string{
 		"https://posoqo.vercel.app",
 		"https://*.vercel.app", // Soporte para cualquier subdominio de vercel
-		"https://posoqo.com",
-		"https://www.posoqo.com",
-		"https://*.posoqo.com", // Soporte para cualquier subdominio
 	}
 }
 
