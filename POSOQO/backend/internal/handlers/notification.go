@@ -27,25 +27,32 @@ type Notification struct {
 // GetNotifications obtiene notificaciones para un usuario específico
 func GetNotifications(c *fiber.Ctx) error {
 	userID := c.Query("user_id")
+	limit := c.QueryInt("limit", 50)
+	offset := c.QueryInt("offset", 0)
 
 	var query string
 	var args []interface{}
 
 	if userID != "" {
-		// Notificaciones específicas del usuario
-		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1), read_at, created_at 
+		// Notificaciones específicas del usuario (optimizado con índice)
+		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1) as priority, 
+		                read_at, created_at, order_id
 		         FROM notifications 
 		         WHERE user_id = $1 
+		           AND (expires_at IS NULL OR expires_at > NOW())
 		         ORDER BY priority DESC, created_at DESC 
-		         LIMIT 50`
-		args = []interface{}{userID}
+		         LIMIT $2 OFFSET $3`
+		args = []interface{}{userID, limit, offset}
 	} else {
 		// Notificaciones de admin (sin user_id)
-		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1), read_at, created_at 
+		query = `SELECT id, user_id, type, title, message, COALESCE(priority, 1) as priority, 
+		                read_at, created_at, order_id
 		         FROM notifications 
 		         WHERE user_id IS NULL 
+		           AND (expires_at IS NULL OR expires_at > NOW())
 		         ORDER BY priority DESC, created_at DESC 
-		         LIMIT 50`
+		         LIMIT $1 OFFSET $2`
+		args = []interface{}{limit, offset}
 	}
 
 	rows, err := db.DB.Query(context.Background(), query, args...)
@@ -58,7 +65,7 @@ func GetNotifications(c *fiber.Ctx) error {
 	for rows.Next() {
 		var n Notification
 		var readAt *time.Time
-		err := rows.Scan(&n.ID, &n.UserID, &n.Type, &n.Title, &n.Message, &n.Priority, &readAt, &n.CreatedAt)
+		err := rows.Scan(&n.ID, &n.UserID, &n.Type, &n.Title, &n.Message, &n.Priority, &readAt, &n.CreatedAt, &n.OrderID)
 		if err != nil {
 			continue
 		}
@@ -141,16 +148,32 @@ func CreateNotification(c *fiber.Ctx) error {
 // MarkNotificationAsRead marca una notificación como leída
 func MarkNotificationAsRead(c *fiber.Ctx) error {
 	notificationID := c.Params("id")
+	userID := c.Query("user_id")
 
-	// Actualizar la notificación marcándola como leída
-	query := `UPDATE notifications SET read_at = CURRENT_TIMESTAMP WHERE id = $1`
-	result, err := db.DB.Exec(context.Background(), query, notificationID)
+	var query string
+	var args []interface{}
+
+	// Si hay user_id, validar que la notificación pertenezca al usuario
+	if userID != "" {
+		query = `UPDATE notifications 
+		         SET read_at = CURRENT_TIMESTAMP, is_read = TRUE 
+		         WHERE id = $1 AND user_id = $2 AND read_at IS NULL`
+		args = []interface{}{notificationID, userID}
+	} else {
+		// Para admin (notificaciones sin user_id)
+		query = `UPDATE notifications 
+		         SET read_at = CURRENT_TIMESTAMP, is_read = TRUE 
+		         WHERE id = $1 AND user_id IS NULL AND read_at IS NULL`
+		args = []interface{}{notificationID}
+	}
+
+	result, err := db.DB.Exec(context.Background(), query, args...)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error marcando notificación como leída"})
 	}
 
 	if result.RowsAffected() == 0 {
-		return c.Status(404).JSON(fiber.Map{"error": "Notificación no encontrada"})
+		return c.Status(404).JSON(fiber.Map{"error": "Notificación no encontrada o ya leída"})
 	}
 
 	return c.JSON(fiber.Map{
@@ -159,99 +182,67 @@ func MarkNotificationAsRead(c *fiber.Ctx) error {
 	})
 }
 
-// GetNotificationStats obtiene estadísticas de notificaciones
+// GetNotificationStats obtiene estadísticas de notificaciones (optimizado con una sola query)
 func GetNotificationStats(c *fiber.Ctx) error {
 	userID := c.Query("user_id")
 
-	// Obtener estadísticas de notificaciones no leídas
-	var unreadQuery string
-	var unreadArgs []interface{}
+	var query string
+	var args []interface{}
 
+	// Query optimizada que obtiene todas las estadísticas en una sola consulta
 	if userID != "" {
-		// Estadísticas para usuario específico
-		unreadQuery = `SELECT type, COUNT(*) as count
-		               FROM notifications
-		               WHERE user_id = $1 AND read_at IS NULL
-		               GROUP BY type`
-		unreadArgs = []interface{}{userID}
+		query = `SELECT 
+		            COUNT(*) FILTER (WHERE read_at IS NULL) as unread,
+		            COUNT(*) FILTER (WHERE type = 'order' AND read_at IS NULL) as orders,
+		            COUNT(*) FILTER (WHERE type = 'user' AND read_at IS NULL) as users,
+		            COUNT(*) FILTER (WHERE type = 'product' AND read_at IS NULL) as products,
+		            COUNT(*) FILTER (WHERE type = 'system' AND read_at IS NULL) as system,
+		            COUNT(*) FILTER (WHERE type = 'info' AND read_at IS NULL) as info,
+		            COUNT(*) FILTER (WHERE type = 'success' AND read_at IS NULL) as success,
+		            COUNT(*) FILTER (WHERE type = 'warning' AND read_at IS NULL) as warning,
+		            COUNT(*) FILTER (WHERE type = 'error' AND read_at IS NULL) as error,
+		            COUNT(*) as total
+		         FROM notifications
+		         WHERE user_id = $1 
+		           AND (expires_at IS NULL OR expires_at > NOW())`
+		args = []interface{}{userID}
 	} else {
 		// Estadísticas para admin
-		unreadQuery = `SELECT type, COUNT(*) as count
-		               FROM notifications
-		               WHERE user_id IS NULL AND read_at IS NULL
-		               GROUP BY type`
+		query = `SELECT 
+		            COUNT(*) FILTER (WHERE read_at IS NULL) as unread,
+		            COUNT(*) FILTER (WHERE type = 'order' AND read_at IS NULL) as orders,
+		            COUNT(*) FILTER (WHERE type = 'user' AND read_at IS NULL) as users,
+		            COUNT(*) FILTER (WHERE type = 'product' AND read_at IS NULL) as products,
+		            COUNT(*) FILTER (WHERE type = 'system' AND read_at IS NULL) as system,
+		            COUNT(*) FILTER (WHERE type = 'info' AND read_at IS NULL) as info,
+		            COUNT(*) FILTER (WHERE type = 'success' AND read_at IS NULL) as success,
+		            COUNT(*) FILTER (WHERE type = 'warning' AND read_at IS NULL) as warning,
+		            COUNT(*) FILTER (WHERE type = 'error' AND read_at IS NULL) as error,
+		            COUNT(*) as total
+		         FROM notifications
+		         WHERE user_id IS NULL 
+		           AND (expires_at IS NULL OR expires_at > NOW())`
 	}
 
-	unreadRows, err := db.DB.Query(context.Background(), unreadQuery, unreadArgs...)
+	var unread, orders, users, products, system, info, success, warning, errorCount, total int
+	err := db.DB.QueryRow(context.Background(), query, args...).Scan(
+		&unread, &orders, &users, &products, &system, &info, &success, &warning, &errorCount, &total,
+	)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error obteniendo estadísticas"})
 	}
-	defer unreadRows.Close()
-
-	// Obtener estadísticas totales
-	var totalQuery string
-	var totalArgs []interface{}
-
-	if userID != "" {
-		totalQuery = `SELECT type, COUNT(*) as count
-		              FROM notifications
-		              WHERE user_id = $1
-		              GROUP BY type`
-		totalArgs = []interface{}{userID}
-	} else {
-		totalQuery = `SELECT type, COUNT(*) as count
-		              FROM notifications
-		              WHERE user_id IS NULL
-		              GROUP BY type`
-	}
-
-	totalRows, err := db.DB.Query(context.Background(), totalQuery, totalArgs...)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Error obteniendo estadísticas"})
-	}
-	defer totalRows.Close()
 
 	stats := fiber.Map{
-		"total":    0,
-		"unread":   0,
-		"orders":   0,
-		"users":    0,
-		"products": 0,
-		"system":   0,
-	}
-
-	// Procesar notificaciones no leídas
-	for unreadRows.Next() {
-		var notificationType string
-		var count int
-		if err := unreadRows.Scan(&notificationType, &count); err != nil {
-			continue
-		}
-
-		// Mapear tipos a categorías
-		switch notificationType {
-		case "order":
-			stats["orders"] = count
-		case "user":
-			stats["users"] = count
-		case "product":
-			stats["products"] = count
-		case "system":
-			stats["system"] = count
-		case "admin":
-			stats["admin"] = count
-		}
-		stats["unread"] = stats["unread"].(int) + count
-	}
-
-	// Procesar total de notificaciones
-	for totalRows.Next() {
-		var notificationType string
-		var count int
-		if err := totalRows.Scan(&notificationType, &count); err != nil {
-			continue
-		}
-		stats["total"] = stats["total"].(int) + count
+		"total":    total,
+		"unread":   unread,
+		"orders":   orders,
+		"users":    users,
+		"products": products,
+		"system":   system,
+		"info":     info,
+		"success":  success,
+		"warning":  warning,
+		"error":    errorCount,
 	}
 
 	return c.JSON(fiber.Map{
@@ -329,26 +320,29 @@ func MarkAllNotificationsAsRead(c *fiber.Ctx) error {
 	var args []interface{}
 
 	if userID != "" {
-		// Para usuario específico
+		// Para usuario específico (optimizado: solo actualiza las no leídas)
 		query = `UPDATE notifications 
-		         SET is_read = true, updated_at = NOW() 
-		         WHERE user_id = $1 AND is_read = false`
+		         SET read_at = CURRENT_TIMESTAMP, is_read = TRUE, updated_at = NOW() 
+		         WHERE user_id = $1 AND read_at IS NULL`
 		args = []interface{}{userID}
 	} else {
 		// Para admin (todas las notificaciones sin user_id)
 		query = `UPDATE notifications 
-		         SET is_read = true, updated_at = NOW() 
-		         WHERE user_id IS NULL AND is_read = false`
+		         SET read_at = CURRENT_TIMESTAMP, is_read = TRUE, updated_at = NOW() 
+		         WHERE user_id IS NULL AND read_at IS NULL`
 	}
 
-	_, err := db.DB.Exec(context.Background(), query, args...)
+	result, err := db.DB.Exec(context.Background(), query, args...)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Error marcando notificaciones como leídas"})
 	}
 
+	rowsAffected := result.RowsAffected()
+
 	return c.JSON(fiber.Map{
-		"success": true,
-		"message": "Todas las notificaciones marcadas como leídas",
+		"success":       true,
+		"message":       "Todas las notificaciones marcadas como leídas",
+		"rows_affected": rowsAffected,
 	})
 }
 

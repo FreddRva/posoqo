@@ -12,7 +12,8 @@ import {
 
   ShoppingCart, Menu, X, User, Bell, Heart, Package, Crown, LogOut,
 
-  Beer, Utensils, Calendar, Users as UsersIcon, Search, Sparkles, Store, ArrowRight
+  Beer, Utensils, Calendar, Users as UsersIcon, Search, Sparkles, Store, ArrowRight,
+  CheckCircle2, XCircle, AlertCircle, Info, Check
 } from "lucide-react";
 
 import { useCart } from "@/contexts/CartContext";
@@ -37,7 +38,7 @@ export default function Navbar() {
 
   const { summary } = useCart();
 
-  const { notifications, stats, markAsRead } = useNotifications();
+  const { notifications, stats, markAsRead, markAllAsRead } = useNotifications();
 
   
 
@@ -299,18 +300,29 @@ export default function Navbar() {
                       >
 
                         <div className="p-4 border-b border-white/10">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between mb-2">
                             <h3 className="text-white font-semibold text-sm flex items-center gap-2">
                               <Bell className="w-4 h-4 text-yellow-400" />
                               Notificaciones
                             </h3>
                             {stats.unread > 0 && (
-                              <span className="text-xs text-yellow-400 font-medium">{stats.unread} nuevas</span>
+                              <span className="text-xs text-yellow-400 font-medium bg-yellow-400/10 px-2 py-1 rounded-full">
+                                {stats.unread} nueva{stats.unread !== 1 ? 's' : ''}
+                              </span>
                             )}
                           </div>
+                          {stats.unread > 0 && (
+                            <button
+                              onClick={() => markAllAsRead()}
+                              className="w-full text-xs text-gray-400 hover:text-yellow-400 transition-colors duration-150 flex items-center justify-center gap-1.5 py-1.5 rounded-lg hover:bg-white/5"
+                            >
+                              <Check className="w-3 h-3" />
+                              Marcar todas como leídas
+                            </button>
+                          )}
                         </div>
 
-                        <div className="max-h-80 overflow-y-auto">
+                        <div className="max-h-96 overflow-y-auto scrollbar-thin">
 
                           {notifications.length === 0 ? (
 
@@ -324,59 +336,118 @@ export default function Navbar() {
                           ) : (
 
                             <div className="p-2">
-                              {notifications.slice(0, 5).map((notif) => (
+                              {notifications.slice(0, 10).map((notif) => {
+                                // Iconos por tipo de notificación
+                                const getNotificationIcon = () => {
+                                  switch (notif.type) {
+                                    case 'success':
+                                      return <CheckCircle2 className="w-4 h-4" />;
+                                    case 'error':
+                                      return <XCircle className="w-4 h-4" />;
+                                    case 'warning':
+                                      return <AlertCircle className="w-4 h-4" />;
+                                    case 'info':
+                                    default:
+                                      return <Info className="w-4 h-4" />;
+                                  }
+                                };
 
-                                <div
+                                const getNotificationColor = () => {
+                                  switch (notif.type) {
+                                    case 'success':
+                                      return {
+                                        bg: 'bg-green-500/20',
+                                        text: 'text-green-400',
+                                        border: 'border-green-500/30'
+                                      };
+                                    case 'error':
+                                      return {
+                                        bg: 'bg-red-500/20',
+                                        text: 'text-red-400',
+                                        border: 'border-red-500/30'
+                                      };
+                                    case 'warning':
+                                      return {
+                                        bg: 'bg-yellow-500/20',
+                                        text: 'text-yellow-400',
+                                        border: 'border-yellow-500/30'
+                                      };
+                                    case 'info':
+                                    default:
+                                      return {
+                                        bg: 'bg-blue-500/20',
+                                        text: 'text-blue-400',
+                                        border: 'border-blue-500/30'
+                                      };
+                                  }
+                                };
 
-                                  key={notif.id}
+                                const colors = getNotificationColor();
 
-                                  onClick={() => markAsRead(notif.id)}
-
-                                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 cursor-pointer ${
-                                    !notif.is_read 
-                                      ? "bg-white/5" 
-                                      : "hover:bg-white/5"
-                                  }`}
-
-                                >
-                                  <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 ${
-                                    !notif.is_read
-                                      ? "bg-yellow-400/20"
-                                      : "bg-white/5 group-hover:bg-white/10"
-                                  }`}>
-                                    <Bell className={`w-4 h-4 transition-colors duration-150 ${
+                                return (
+                                  <div
+                                    key={notif.id}
+                                    onClick={() => {
+                                      if (!notif.is_read) {
+                                        markAsRead(notif.id);
+                                      }
+                                    }}
+                                    className={`group flex items-start gap-3 px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer border ${
+                                      !notif.is_read 
+                                        ? `${colors.bg} ${colors.border} border-opacity-50 hover:border-opacity-100` 
+                                        : "hover:bg-white/5 border-transparent"
+                                    }`}
+                                  >
+                                    <div className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 ${
                                       !notif.is_read
-                                        ? "text-yellow-400"
-                                        : "text-gray-400 group-hover:text-yellow-400"
-                                    }`} />
+                                        ? `${colors.bg} ${colors.text}`
+                                        : "bg-white/5 text-gray-400 group-hover:bg-white/10"
+                                    }`}>
+                                      {getNotificationIcon()}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className={`text-sm font-medium transition-colors duration-200 ${
+                                        !notif.is_read 
+                                          ? "text-white" 
+                                          : "text-gray-300 group-hover:text-white"
+                                      }`}>
+                                        {notif.title}
+                                      </p>
+                                      {notif.message && (
+                                        <p className="text-gray-500 text-xs mt-1 group-hover:text-gray-400 transition-colors duration-200 line-clamp-2">
+                                          {notif.message}
+                                        </p>
+                                      )}
+                                      <p className="text-gray-600 text-[10px] mt-1.5">
+                                        {new Date(notif.created_at).toLocaleDateString('es-ES', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          hour: '2-digit',
+                                          minute: '2-digit'
+                                        })}
+                                      </p>
+                                    </div>
+                                      {!notif.is_read && (
+                                        <div className={`w-2 h-2 ${colors.text.includes('green') ? 'bg-green-400' : colors.text.includes('red') ? 'bg-red-400' : colors.text.includes('yellow') ? 'bg-yellow-400' : 'bg-blue-400'} rounded-full flex-shrink-0 mt-1.5 animate-pulse`} />
+                                      )}
                                   </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-white text-sm font-medium group-hover:text-white transition-colors duration-150">
-                                      {notif.title}
-                                    </p>
-                                    <p className="text-gray-500 text-xs mt-0.5 group-hover:text-gray-400 transition-colors duration-150 line-clamp-2">
-                                      {notif.message}
-                                    </p>
-                                  </div>
-                                  {!notif.is_read && (
-                                    <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0" />
-                                  )}
-                                </div>
-
-                              ))}
+                                );
+                              })}
                             </div>
 
                           )}
 
                         </div>
 
-                        {notifications.length > 5 && (
+                        {notifications.length > 10 && (
                           <div className="p-3 border-t border-white/10">
                             <a 
                               href="/dashboard" 
                               className="group flex items-center justify-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5 transition-all duration-150"
                             >
-                              <span className="text-xs text-gray-400 group-hover:text-white font-medium transition-colors duration-150">Ver todas</span>
+                              <span className="text-xs text-gray-400 group-hover:text-white font-medium transition-colors duration-150">
+                                Ver todas ({notifications.length})
+                              </span>
                               <ArrowRight className="w-3 h-3 text-gray-400 group-hover:text-yellow-400 transition-colors duration-150" />
                             </a>
                           </div>

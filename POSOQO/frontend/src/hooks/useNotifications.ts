@@ -94,51 +94,68 @@ export function useNotifications() {
     }
   };
 
-  const markAsRead = async (notificationId: string) => {
-    try {
-      const endpoint = isAdmin ? `/admin/notifications/${notificationId}/read` : `/notifications/${notificationId}/read`;
-      const params = isAdmin ? '' : `?user_id=${userID}`;
+  const markAsRead = async (notificationId: string, optimistic: boolean = true) => {
+    // Optimistic update: actualizar UI inmediatamente
+    if (optimistic) {
+      const wasUnread = notifications.find(n => n.id === notificationId && !n.is_read);
       
-      const response = await apiFetch(`${endpoint}${params}`, {
-        method: 'PUT'
-      });
-      
-      // Actualizar estado local inmediatamente
       setNotifications(prevNotifications => 
         prevNotifications.map(n =>
           n.id === notificationId ? { ...n, is_read: true } : n
         )
       );
       
-      // Actualizar estadísticas inmediatamente desde el backend
-      try {
-        const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
-        const statsParams = isAdmin ? '' : `?user_id=${userID}`;
-        
-        const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
-        
-        if ((statsResponse as any).success) {
-          setStats({
-            total: (statsResponse as any).data.total || 0,
-            unread: (statsResponse as any).data.unread || 0,
-            orders: (statsResponse as any).data.orders || 0,
-            users: (statsResponse as any).data.users || 0,
-            products: (statsResponse as any).data.products || 0,
-            system: (statsResponse as any).data.system || 0,
-          });
-        }
-      } catch (error) {
-        console.error('Error actualizando estadísticas:', error);
+      // Actualizar stats optimistically
+      if (wasUnread) {
+        setStats(prevStats => ({
+          ...prevStats,
+          unread: Math.max(0, prevStats.unread - 1),
+        }));
       }
+    }
+    
+    try {
+      const endpoint = isAdmin ? `/admin/notifications/${notificationId}/read` : `/notifications/${notificationId}/read`;
+      const params = isAdmin ? '' : `?user_id=${userID}`;
+      
+      await apiFetch(`${endpoint}${params}`, {
+        method: 'PUT'
+      });
+      
+      // Sincronizar stats después de un breve delay (no bloquear UI)
+      setTimeout(async () => {
+        try {
+          const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
+          const statsParams = isAdmin ? '' : `?user_id=${userID}`;
+          
+          const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
+          
+          if ((statsResponse as any).success) {
+            setStats({
+              total: (statsResponse as any).data.total || 0,
+              unread: (statsResponse as any).data.unread || 0,
+              orders: (statsResponse as any).data.orders || 0,
+              users: (statsResponse as any).data.users || 0,
+              products: (statsResponse as any).data.products || 0,
+              system: (statsResponse as any).data.system || 0,
+            });
+          }
+        } catch (error) {
+          // Silenciosamente reintentar en el siguiente poll
+          console.error('Error actualizando estadísticas:', error);
+        }
+      }, 500);
       
     } catch (error) {
+      // Revertir optimistic update en caso de error
+      if (optimistic) {
+        setNotifications(prevNotifications => 
+          prevNotifications.map(n =>
+            n.id === notificationId ? { ...n, is_read: false } : n
+          )
+        );
+      }
       console.error('❌ Error marcando notificación como leída:', error);
-      console.error('🔍 Detalles del error:', {
-        notificationId,
-        userID,
-        isAdmin,
-        error: error instanceof Error ? error.message : error
-      });
     }
   };
 
@@ -153,41 +170,58 @@ export function useNotifications() {
   };
 
   const markAllAsRead = async () => {
+    // Optimistic update
+    const unreadCount = stats.unread;
+    setNotifications(prevNotifications => 
+      prevNotifications.map(n => ({ ...n, is_read: true }))
+    );
+    setStats(prevStats => ({
+      ...prevStats,
+      unread: 0,
+    }));
+    
     try {
-      // Marcar todas las notificaciones no leídas como leídas en el backend
       const endpoint = isAdmin ? '/admin/notifications/read-all' : '/notifications/read-all';
       const params = isAdmin ? '' : `?user_id=${userID}`;
       
-      const response = await apiFetch(`${endpoint}${params}`, {
+      await apiFetch(`${endpoint}${params}`, {
         method: 'PUT'
       });
       
-      // Actualizar estado local
-      setNotifications(notifications.map(n =>
-        !n.is_read ? { ...n, is_read: true } : n
-      ));
-      
-      // Actualizar estadísticas inmediatamente
-      try {
-        const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
-        const statsParams = isAdmin ? '' : `?user_id=${userID}`;
-        
-        const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
-        
-        if ((statsResponse as any).success) {
-          setStats({
-            total: (statsResponse as any).data.total || 0,
-            unread: 0, // Todas marcadas como leídas
-            orders: (statsResponse as any).data.orders || 0,
-            users: (statsResponse as any).data.users || 0,
-            products: (statsResponse as any).data.products || 0,
-            system: (statsResponse as any).data.system || 0,
-          });
+      // Sincronizar stats después de un breve delay
+      setTimeout(async () => {
+        try {
+          const statsEndpoint = isAdmin ? '/admin/notifications/stats' : '/notifications/stats';
+          const statsParams = isAdmin ? '' : `?user_id=${userID}`;
+          
+          const statsResponse = await apiFetch(`${statsEndpoint}${statsParams}`);
+          
+          if ((statsResponse as any).success) {
+            setStats({
+              total: (statsResponse as any).data.total || 0,
+              unread: 0,
+              orders: (statsResponse as any).data.orders || 0,
+              users: (statsResponse as any).data.users || 0,
+              products: (statsResponse as any).data.products || 0,
+              system: (statsResponse as any).data.system || 0,
+            });
+          }
+        } catch (error) {
+          console.error('Error actualizando estadísticas:', error);
         }
-      } catch (error) {
-        console.error('❌ Error actualizando estadísticas:', error);
-      }
+      }, 500);
     } catch (error) {
+      // Revertir en caso de error
+      setNotifications(prevNotifications => 
+        prevNotifications.map(n => {
+          const wasUnread = !n.is_read;
+          return { ...n, is_read: wasUnread ? false : true };
+        })
+      );
+      setStats(prevStats => ({
+        ...prevStats,
+        unread: unreadCount,
+      }));
       console.error('Error marcando todas las notificaciones como leídas:', error);
     }
   };
@@ -255,8 +289,9 @@ export function useNotifications() {
     if (session) {
       loadNotifications();
       
-      // Polling cada 5 minutos para reducir recargues
-      const interval = setInterval(loadNotifications, 300000);
+      // Polling más frecuente: 30 segundos para usuarios normales, 15 segundos para admin
+      const pollInterval = isAdmin ? 15000 : 30000;
+      const interval = setInterval(loadNotifications, pollInterval);
       
       // Escuchar eventos de actualización de notificaciones
       const handleNotificationUpdate = () => {
