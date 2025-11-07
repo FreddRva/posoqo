@@ -30,6 +30,8 @@ export default function LoginPage() {
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
   // Hooks
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -159,23 +161,78 @@ export default function LoginPage() {
     }
   };
 
-  const handleResendVerification = async () => {
-    if (!unverifiedEmail) return;
+  const handleResendVerification = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!unverifiedEmail || resendLoading) return;
+    
     setResendStatus(null);
+    setVerificationUrl(null);
+    setResendLoading(true);
+    
     try {
-      const res = await fetch(getApiUrl("/resend-verification"), {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com/api';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 30000);
+      
+      const res = await fetch(`${apiUrl}/resend-verification`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: JSON.stringify({ email: unverifiedEmail }),
+        signal: controller.signal,
+      }).catch((fetchError) => {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          throw new Error("TIMEOUT");
+        }
+        throw fetchError;
       });
-      const data = await res.json();
-      if (res.ok) {
-        setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
-      } else {
-        setResendStatus(data.error || "No se pudo reenviar el email.");
+      
+      clearTimeout(timeoutId);
+      
+      if (!res.ok) {
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch {
+          errorData = { error: `Error ${res.status}: ${res.statusText}` };
+        }
+        throw new Error(errorData.error || `Error ${res.status}`);
       }
-    } catch (e) {
-      setResendStatus("Error de conexión al reenviar email.");
+      
+      const data = await res.json();
+      
+      // Siempre mostrar el enlace de verificación si está disponible
+      if (data.verification_url) {
+        setVerificationUrl(data.verification_url);
+        setResendStatus("Usa el enlace de abajo para verificar tu email:");
+      } else if (data.message) {
+        setResendStatus(data.message);
+        // Si hay token pero no URL, construirla
+        if (data.token) {
+          const backendUrl = apiUrl.replace('/api', '');
+          const url = `${backendUrl}/api/verify-email?token=${data.token}`;
+          setVerificationUrl(url);
+        }
+      } else {
+        setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
+      }
+    } catch (error: any) {
+      console.error("Error reenviando verificación:", error);
+      if (error.message === 'TIMEOUT' || error.name === 'AbortError') {
+        setResendStatus("La solicitud tardó demasiado. Intenta de nuevo.");
+      } else {
+        setResendStatus(`Error: ${error.message || "No se pudo conectar con el servidor"}`);
+      }
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -340,18 +397,29 @@ export default function LoginPage() {
                   Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
                 </p>
                 <button
-                  onClick={handleResendVerification}
+                  type="button"
+                  onClick={(e) => handleResendVerification(e)}
                   className="w-full bg-white hover:bg-gray-100 text-black font-bold px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
+                  disabled={resendLoading || (!!resendStatus && resendStatus.startsWith("¡Email"))}
                 >
-                  Reenviar email de verificación
+                  {resendLoading ? "Enviando..." : "Reenviar email de verificación"}
                 </button>
                 {resendStatus && (
-                  <p className={`mt-2.5 text-xs font-semibold ${
-                    resendStatus.startsWith('¡Email') ? 'text-green-200' : 'text-red-200'
-                  }`}>
-                    {resendStatus}
-                  </p>
+                  <div className="mt-2.5 text-xs font-semibold">
+                    <p className={resendStatus.startsWith('¡Email') ? 'text-green-200' : resendStatus.startsWith('Usa el') ? 'text-yellow-200' : 'text-red-200'}>
+                      {resendStatus}
+                    </p>
+                    {verificationUrl && (
+                      <a 
+                        href={verificationUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="mt-2 block text-blue-300 hover:text-blue-200 underline break-all bg-black/20 p-2 rounded"
+                      >
+                        {verificationUrl}
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
             )}
