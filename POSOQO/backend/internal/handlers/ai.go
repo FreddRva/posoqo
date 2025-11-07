@@ -516,7 +516,7 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 		}
 	}
 	
-	// Crear lista ultra compacta
+	// Crear lista ultra compacta con información de categoría
 	var productList strings.Builder
 	for _, p := range relevantProducts {
 		// Validar que el nombre exista y sea string
@@ -532,27 +532,56 @@ func SmartSearchHandler(c *fiber.Ctx) error {
 			continue
 		}
 		
-		// Solo primeras 30 caracteres del nombre para ahorrar tokens
-		if len(name) > 30 {
-			name = name[:30] + "..."
+		// Obtener información de categoría
+		categoryName, _ := p["category_name"].(string)
+		parentCategoryName, _ := p["parent_category_name"].(string)
+		
+		// Construir categoría completa
+		categoryInfo := ""
+		if parentCategoryName != "" && categoryName != "" {
+			categoryInfo = fmt.Sprintf(" [%s > %s]", parentCategoryName, categoryName)
+		} else if categoryName != "" {
+			categoryInfo = fmt.Sprintf(" [%s]", categoryName)
+		} else if parentCategoryName != "" {
+			categoryInfo = fmt.Sprintf(" [%s]", parentCategoryName)
 		}
-		productList.WriteString(fmt.Sprintf("%s|%s\n", id, name))
+		
+		// Solo primeras 40 caracteres del nombre para ahorrar tokens
+		nameDisplay := name
+		if len(nameDisplay) > 40 {
+			nameDisplay = nameDisplay[:40] + "..."
+		}
+		productList.WriteString(fmt.Sprintf("%s|%s%s\n", id, nameDisplay, categoryInfo))
 	}
 	
-	// Prompt balanceado (no muy largo, pero claro)
-	prompt := fmt.Sprintf(`Usuario busca: "%s"
+	// Prompt mejorado con contexto de categorías
+	prompt := fmt.Sprintf(`Eres un asistente experto en búsqueda de productos para POSOQO, una tienda de cervezas artesanales y comidas.
+
+Usuario busca: "%s"
 
 Productos disponibles:
 %s
 
-INSTRUCCIONES:
-- Retorna SOLO los IDs de productos relevantes separados por comas
-- NO agregues texto adicional, solo los IDs
-- Si no hay productos relevantes, responde: NINGUNO
-- Los IDs deben estar separados solo por comas, sin espacios ni otros caracteres
+INSTRUCCIONES IMPORTANTES:
+1. Analiza la intención del usuario. Por ejemplo:
+   - "comidas" o "alimentos" = productos de categorías relacionadas con comida/alimentos
+   - "bebidas" = productos de categorías relacionadas con bebidas
+   - "cervezas" = productos de categorías relacionadas con cerveza
+   - "refrescos" = productos de categorías relacionadas con refrescos/gaseosas
 
-Ejemplo de respuesta correcta: id1,id2,id3
-Ejemplo si no hay resultados: NINGUNO`, req.Query, productList.String())
+2. Considera las categorías mostradas entre corchetes []. Si el usuario busca "comidas", prioriza productos que tengan categorías relacionadas con comida/alimentos.
+
+3. Si la búsqueda es genérica (como "comidas", "bebidas"), busca productos cuya categoría coincida con el término buscado, incluso si el nombre no lo contiene directamente.
+
+4. Retorna SOLO los IDs de productos relevantes separados por comas, SIN espacios.
+5. NO agregues texto adicional, explicaciones ni formato.
+6. Si no hay productos relevantes, responde exactamente: NINGUNO
+
+Ejemplos de respuestas correctas:
+- id1,id2,id3
+- NINGUNO
+
+IMPORTANTE: Si el usuario busca términos como "comidas", "bebidas", "cervezas", "refrescos", busca en las CATEGORÍAS, no solo en los nombres.`, req.Query, productList.String())
 
 	// Generar búsqueda con Gemini con límite de tokens aumentado
 	// Usar temperatura baja para respuestas más consistentes
