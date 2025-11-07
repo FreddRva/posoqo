@@ -28,9 +28,9 @@ var GeneralRateLimiter = limiter.New(limiter.Config{
 	},
 })
 
-// Rate limiter específico para autenticación (más restrictivo)
+// Rate limiter específico para autenticación (menos restrictivo para permitir verificación de email)
 var AuthRateLimiter = limiter.New(limiter.Config{
-	Max:        5,                // Máximo 5 intentos
+	Max:        20,               // Máximo 20 intentos (aumentado para permitir verificación)
 	Expiration: 15 * time.Minute, // Por 15 minutos
 	KeyGenerator: func(c *fiber.Ctx) string {
 		return c.IP() + ":" + c.Path() // Rate limit por IP + endpoint

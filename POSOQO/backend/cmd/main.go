@@ -119,7 +119,7 @@ func main() {
 	auth.Post("/refresh", handlers.RefreshToken)
 	auth.Post("/social-login", handlers.SocialLogin)
 
-	// Rutas de verificación de email (públicas)
+	// Rutas de verificación de email (públicas, sin rate limiting estricto)
 	api.Get("/verify-email", handlers.VerifyEmail)
 	api.Post("/resend-verification", handlers.ResendVerificationEmail)
 
