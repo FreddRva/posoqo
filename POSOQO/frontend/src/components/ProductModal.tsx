@@ -144,9 +144,6 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
         `products/${product.id}/reviews?t=${timestamp}`
       );
       
-      console.log('[REVIEWS] Reseñas recibidas del backend:', data);
-      console.log('[REVIEWS] Total de reseñas:', data.reviews?.length || 0);
-      
       const reviewsList = data.reviews || [];
       setReviews(reviewsList);
       
@@ -159,25 +156,21 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
             `products/${product.id}/reviews?limit=${data.pagination.total}&t=${timestamp}`
           );
           const allReviews = allReviewsData.reviews || [];
-          console.log('[REVIEWS] Todas las reseñas cargadas:', allReviews.length);
           if (allReviews.length > 0) {
             const avg = allReviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / allReviews.length;
             setAverageRating(avg);
-            console.log('[REVIEWS] Promedio calculado:', avg);
           } else {
             setAverageRating(0);
           }
         } else {
           const avg = reviewsList.reduce((sum: number, r: Review) => sum + r.rating, 0) / reviewsList.length;
           setAverageRating(avg);
-          console.log('[REVIEWS] Promedio calculado (sin paginación):', avg);
         }
       } else {
         setAverageRating(0);
-        console.log('[REVIEWS] No hay reseñas, promedio = 0');
       }
     } catch (error) {
-      console.error('[REVIEWS] Error cargando reseñas:', error);
+      console.error('Error cargando reseñas:', error);
       setReviews([]);
       setAverageRating(0);
     } finally {

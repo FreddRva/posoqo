@@ -26,6 +26,8 @@ import { apiFetch } from '@/lib/api'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import ReservationPaymentForm from '@/components/reservations/ReservationPaymentForm'
+import { consultarDNI } from '@/lib/dni'
+import { FileText, CheckCircle, Loader2 as Loader2Icon, AlertCircle as AlertCircleIcon } from 'lucide-react'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RcbC4CL70N5NrKOIPYs3SiN0fsiVUf903Vp94tDj6yyu56QHx3MrMn0K6JIBvZ4vVvgzjgbihX5cRfRCi40I25G00lqp7TAxk')
 
@@ -109,6 +111,17 @@ export default function ReservationsPage() {
     title: string
     message: string
   } | null>(null)
+  const [profile, setProfile] = useState<any>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
+  const [showDNIForm, setShowDNIForm] = useState(false)
+  const [dniData, setDniData] = useState({
+    dni: '',
+    name: '',
+    last_name: '',
+    phone: ''
+  })
+  const [consultandoDNI, setConsultandoDNI] = useState(false)
+  const [dniVerificado, setDniVerificado] = useState(false)
   
   const heroRef = useRef(null)
   const heroInView = useInView(heroRef, { once: true, margin: "-100px" })
@@ -141,7 +154,66 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     loadReservations()
+    loadProfile()
   }, [session])
+
+  const loadProfile = async () => {
+    if (!session) return
+    try {
+      setProfileLoading(true)
+      const accessToken = (session as any)?.accessToken
+      const response = await apiFetch<any>('/profile', {
+        authToken: accessToken
+      })
+      setProfile(response)
+      if (response) {
+        setDniData({
+          dni: response.dni || '',
+          name: response.name || '',
+          last_name: response.last_name || '',
+          phone: response.phone || ''
+        })
+      }
+    } catch (error) {
+      console.error('Error cargando perfil:', error)
+    } finally {
+      setProfileLoading(false)
+    }
+  }
+
+  const handleDNIBlur = async () => {
+    const dniValue = dniData.dni.trim()
+    
+    if (!/^\d{8}$/.test(dniValue)) {
+      setDniVerificado(false)
+      return
+    }
+
+    if (dniData.name.trim() !== '' && dniData.last_name.trim() !== '') {
+      return
+    }
+
+    setConsultandoDNI(true)
+    setDniVerificado(false)
+    try {
+      const result = await consultarDNI(dniValue)
+      if (result) {
+        setDniData({
+          ...dniData,
+          name: dniData.name.trim() || result.nombres,
+          last_name: dniData.last_name.trim() || `${result.apellido_paterno || ''} ${result.apellido_materno || ''}`.trim()
+        })
+        setDniVerificado(true)
+      } else {
+        setDniVerificado(false)
+      }
+    } catch (error) {
+      console.error('Error consultando DNI:', error)
+      setDniVerificado(false)
+    } finally {
+      setConsultandoDNI(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -157,6 +229,36 @@ export default function ReservationsPage() {
     if (selectedDate < today) {
       showAlert('error', 'Fecha inválida', 'No puedes reservar para fechas pasadas')
       return
+    }
+
+    // Validar DNI antes de proceder al pago
+    if (formData.payment_method === 'tarjeta' && formData.advance > 0) {
+      // Verificar si el perfil tiene DNI completo
+      if (!profile?.dni || !profile?.name || !profile?.last_name || !profile?.phone) {
+        // Si no tiene DNI completo, mostrar formulario de DNI
+        if (!dniData.dni || !dniData.name || !dniData.last_name || !dniData.phone) {
+          setShowDNIForm(true)
+          return
+        }
+        // Si tiene datos en el formulario pero no están guardados, guardarlos primero
+        try {
+          const accessToken = (session as any)?.accessToken
+          await apiFetch('/profile', {
+            method: 'PUT',
+            body: JSON.stringify({
+              dni: dniData.dni,
+              name: dniData.name,
+              last_name: dniData.last_name,
+              phone: dniData.phone
+            }),
+            authToken: accessToken
+          })
+          await loadProfile()
+        } catch (error) {
+          showAlert('error', 'Error', 'Error al guardar los datos. Por favor intenta nuevamente.')
+          return
+        }
+      }
     }
 
     // Si el método de pago es tarjeta y hay adelanto, crear payment intent
@@ -362,9 +464,160 @@ export default function ReservationsPage() {
                 </motion.div>
               )}
 
+              {/* Formulario de DNI */}
+              <AnimatePresence>
+                {showDNIForm && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="bg-black/80 backdrop-blur-xl rounded-2xl p-8 border border-purple-400/20 mb-6"
+                  >
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent flex items-center gap-3">
+                        <FileText className="w-6 h-6 text-purple-400" />
+                        Información Requerida
+                      </h2>
+                      <button
+                        onClick={() => setShowDNIForm(false)}
+                        className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <p className="text-gray-300 mb-6">
+                        Para procesar el pago, necesitamos tu información personal. Completa los siguientes campos:
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-purple-300 font-semibold mb-2">DNI *</label>
+                          <div className="relative">
+                            <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                              type="text"
+                              value={dniData.dni}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 8)
+                                setDniData({...dniData, dni: value})
+                                setDniVerificado(false)
+                              }}
+                              onBlur={handleDNIBlur}
+                              maxLength={8}
+                              className={`w-full pl-12 pr-12 py-3 bg-black/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+                                dniVerificado 
+                                  ? 'border-green-400/50 focus:ring-green-400/50' 
+                                  : 'border-white/10 focus:ring-purple-400/50'
+                              }`}
+                              placeholder="12345678"
+                              disabled={consultandoDNI}
+                            />
+                            {consultandoDNI && (
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <Loader2Icon className="w-5 h-5 text-purple-400 animate-spin" />
+                              </div>
+                            )}
+                            {dniVerificado && !consultandoDNI && (
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                <CheckCircle className="w-5 h-5 text-green-400" />
+                              </div>
+                            )}
+                          </div>
+                          {dniVerificado && (
+                            <p className="text-xs text-green-400 mt-1 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3" />
+                              DNI verificado - Datos autocompletados
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-purple-300 font-semibold mb-2">Teléfono *</label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                              type="tel"
+                              value={dniData.phone}
+                              onChange={(e) => setDniData({...dniData, phone: e.target.value})}
+                              className="w-full pl-12 pr-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
+                              placeholder="987654321"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-purple-300 font-semibold mb-2">Nombre *</label>
+                          <input
+                            type="text"
+                            value={dniData.name}
+                            onChange={(e) => setDniData({...dniData, name: e.target.value})}
+                            className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
+                            placeholder="Tu nombre"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-purple-300 font-semibold mb-2">Apellido *</label>
+                          <input
+                            type="text"
+                            value={dniData.last_name}
+                            onChange={(e) => setDniData({...dniData, last_name: e.target.value})}
+                            className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
+                            placeholder="Tu apellido"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-4 mt-6">
+                        <button
+                          type="button"
+                          onClick={() => setShowDNIForm(false)}
+                          className="px-6 py-3 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-lg transition-all border border-white/10"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!dniData.dni || !dniData.name || !dniData.last_name || !dniData.phone) {
+                              showAlert('error', 'Error', 'Por favor completa todos los campos')
+                              return
+                            }
+                            try {
+                              const accessToken = (session as any)?.accessToken
+                              await apiFetch('/profile', {
+                                method: 'PUT',
+                                body: JSON.stringify(dniData),
+                                authToken: accessToken
+                              })
+                              await loadProfile()
+                              setShowDNIForm(false)
+                              // Proceder con el envío del formulario
+                              const fakeEvent = { preventDefault: () => {} } as React.FormEvent
+                              handleSubmit(fakeEvent)
+                            } catch (error: any) {
+                              showAlert('error', 'Error', error.message || 'Error al guardar los datos')
+                            }
+                          }}
+                          disabled={!dniData.dni || !dniData.name || !dniData.last_name || !dniData.phone}
+                          className="px-6 py-3 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 hover:from-purple-300 hover:via-pink-300 hover:to-purple-400 text-black font-bold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Continuar al Pago
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Formulario de pago con Stripe */}
               <AnimatePresence>
-                {showPaymentForm && clientSecret && reservationId && (
+                {showPaymentForm && clientSecret && reservationId && !showDNIForm && (
                   <Elements stripe={stripePromise} options={{ clientSecret }}>
                     <ReservationPaymentForm
                       amount={formData.advance}
@@ -379,7 +632,7 @@ export default function ReservationsPage() {
 
               {/* Formulario de nueva reserva */}
               <AnimatePresence>
-                {showForm && !showPaymentForm && (
+                {showForm && !showPaymentForm && !showDNIForm && (
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -458,8 +711,6 @@ export default function ReservationsPage() {
                             required
                           >
                             <option value="tarjeta">Tarjeta</option>
-                            <option value="yape">Yape</option>
-                            <option value="plin">Plin</option>
                           </select>
                         </div>
                         <div>
@@ -498,52 +749,6 @@ export default function ReservationsPage() {
                         </div>
                       )}
 
-                      {(formData.payment_method === 'yape' || formData.payment_method === 'plin') && formData.advance > 0 && (
-                        <div className="p-6 bg-gradient-to-r from-green-400/10 to-emerald-400/10 border border-green-400/30 rounded-xl">
-                          <div className="flex items-center gap-2 text-green-400 mb-4">
-                            <CreditCard className="w-5 h-5" />
-                            <span className="font-semibold text-lg">Pago con {formData.payment_method === 'yape' ? 'Yape' : 'Plin'}</span>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-2 gap-6">
-                            {/* QR Code */}
-                            <div className="flex flex-col items-center">
-                              <p className="text-sm text-gray-300 mb-3 font-medium">Escanea el código QR</p>
-                              <div className="bg-white p-4 rounded-xl shadow-lg">
-                                <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                                  <span className="text-gray-400 text-xs text-center px-4">
-                                    {formData.payment_method === 'yape' ? 'QR Yape' : 'QR Plin'}
-                                    <br />
-                                    (Imagen QR aquí)
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Número de teléfono */}
-                            <div className="flex flex-col justify-center">
-                              <p className="text-sm text-gray-300 mb-3 font-medium">O transfiere al número:</p>
-                              <div className="bg-black/50 border border-white/10 rounded-xl p-4">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <Phone className="w-5 h-5 text-green-400" />
-                                  <span className="text-gray-400 text-sm">Número de {formData.payment_method === 'yape' ? 'Yape' : 'Plin'}:</span>
-                                </div>
-                                <p className="text-2xl font-bold text-green-400 font-mono">
-                                  {formData.payment_method === 'yape' ? '966 123 456' : '966 123 457'}
-                                </p>
-                                <div className="mt-4 p-3 bg-green-400/10 border border-green-400/30 rounded-lg">
-                                  <p className="text-xs text-gray-300 mb-1">Monto a pagar:</p>
-                                  <p className="text-xl font-bold text-green-400">S/ {formData.advance.toFixed(2)}</p>
-                                </div>
-                                <p className="text-xs text-yellow-400 mt-3">
-                                  ⚠️ Envía el comprobante después de realizar el pago
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
                       <div className="flex justify-end gap-4">
                         <button
                           type="button"

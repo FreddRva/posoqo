@@ -268,10 +268,10 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                         <div className="flex-shrink-0 w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
                           <Package className="w-5 h-5 text-yellow-400" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-white font-medium truncate">{product.name}</div>
+                        <div className="flex-1 min-w-0 pr-2">
+                          <div className="text-white font-medium truncate mb-1">{product.name}</div>
                           {product.description && (
-                            <div className="text-gray-400 text-sm truncate">{product.description}</div>
+                            <div className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{product.description}</div>
                           )}
                         </div>
                         <div className="flex-shrink-0 text-yellow-400 font-bold">
