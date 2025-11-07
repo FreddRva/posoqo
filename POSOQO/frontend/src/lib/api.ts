@@ -521,7 +521,18 @@ export async function apiFetch<T>(
       let errorData;
       try {
         errorData = await res.json();
-      } catch {}
+        // Si el error tiene resultados, retornarlos aunque el status no sea 200
+        // Esto es útil cuando el backend devuelve resultados del fallback aunque haya un error parcial
+        if (errorData.results && Array.isArray(errorData.results) && errorData.results.length > 0) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[API] Respuesta con status ${res.status} pero contiene resultados, retornando resultados:`, errorData.results.length);
+          }
+          return errorData as T;
+        }
+      } catch {
+        // Si no se puede parsear como JSON, lanzar error
+        throw handleApiError(res, {});
+      }
       throw handleApiError(res, errorData);
     }
     return res.json();
