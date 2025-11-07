@@ -74,28 +74,11 @@ export const validatePeruvianCellphone = (phone: string): { isValid: boolean; er
     };
   }
 
-  // Validar que empiece con 9
+  // Validar que empiece con 9 (requisito para números móviles peruanos)
   if (!cellphoneNumber.startsWith('9')) {
     return {
       isValid: false,
       error: 'Los números de celular peruanos deben empezar con 9'
-    };
-  }
-
-  // Validar segundo dígito (operadores reales)
-  // Operadores válidos en Perú:
-  // - 93x, 94x (Claro)
-  // - 96x (Claro, Movistar, Bitel)
-  // - 97x (Movistar, Entel)
-  // - 98x (Movistar, Bitel)
-  // - 99x (Entel)
-  const secondDigit = cellphoneNumber.charAt(1);
-  const validSecondDigits = ['3', '4', '6', '7', '8', '9'];
-  
-  if (!validSecondDigits.includes(secondDigit)) {
-    return {
-      isValid: false,
-      error: `Número inválido. Los celulares peruanos deben empezar con 93, 94, 96, 97, 98 o 99`
     };
   }
 
