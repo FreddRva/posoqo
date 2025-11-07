@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { getApiUrl } from "@/lib/config";
 
 // Tipos TypeScript para mejor seguridad de tipos
 interface RegisterForm {
@@ -147,7 +148,7 @@ export default function RegisterPage() {
     setSuccess(false);
 
     try {
-      const response = await fetch("http://localhost:4000/api/register", {
+      const response = await fetch(getApiUrl("/register"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

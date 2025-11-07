@@ -4,6 +4,7 @@ import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { getApiUrl } from "@/lib/config";
 
 // Tipos
 interface LoginForm {
@@ -125,7 +126,7 @@ export default function LoginPage() {
     if (!unverifiedEmail) return;
     setResendStatus(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/resend-verification`, {
+      const res = await fetch(getApiUrl("/resend-verification"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: unverifiedEmail }),
