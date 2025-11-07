@@ -653,6 +653,8 @@ export default function ReservationsPage() {
                       amount={formData.advance}
                       clientSecret={clientSecret}
                       reservationId={reservationId}
+                      userDni={profile?.dni || dniData.dni}
+                      userName={profile?.name ? `${profile.name} ${profile.last_name || ''}`.trim() : `${dniData.name} ${dniData.last_name || ''}`.trim()}
                       onSuccess={handlePaymentSuccess}
                       onCancel={handlePaymentCancel}
                     />

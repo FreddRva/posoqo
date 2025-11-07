@@ -221,6 +221,16 @@ export default function CompletarPerfilPage() {
               setPhone(e.target.value);
               setPhoneError(null);
             }}
+            onBlur={() => {
+              if (phone.trim()) {
+                const phoneValidation = validatePeruvianCellphone(phone);
+                if (!phoneValidation.isValid) {
+                  setPhoneError(phoneValidation.error || "El teléfono es inválido");
+                } else {
+                  setPhoneError(null);
+                }
+              }
+            }}
             className={`w-full px-4 py-3 bg-transparent border-b-2 text-white placeholder-white/50 focus:outline-none text-sm font-medium ${
               phoneError 
                 ? 'border-red-400 focus:border-red-400' 

@@ -10,13 +10,17 @@ export const validatePhone = (phone: string): boolean => {
 };
 
 /**
- * Valida un número de celular peruano
+ * Valida un número de celular peruano REAL
+ * Valida operadores reales: Movistar, Claro, Entel, Bitel, etc.
  * Acepta formatos:
- * - 987654321 (9 dígitos, empieza con 9)
+ * - 987654321 (9 dígitos, empieza con 9 y segundo dígito válido)
  * - +51 987654321
  * - 51 987654321
  * - 0051 987654321
  * - (51) 987654321
+ * 
+ * Operadores válidos (segundo dígito):
+ * - 93x, 94x, 96x, 97x, 98x, 99x (celulares)
  */
 export const validatePeruvianCellphone = (phone: string): { isValid: boolean; error?: string } => {
   if (!phone || !phone.trim()) {
@@ -29,70 +33,77 @@ export const validatePeruvianCellphone = (phone: string): { isValid: boolean; er
   // Limpiar el número: remover espacios, guiones, paréntesis
   const cleaned = phone.trim().replace(/[\s\-\(\)]/g, '');
 
-  // Patrones válidos para celulares peruanos
-  // 1. Número directo: 987654321 (9 dígitos, empieza con 9)
-  // 2. Con código país: +51987654321 o 51987654321 o 0051987654321
-  const patterns = [
-    /^9\d{8}$/,                    // 9 dígitos, empieza con 9
-    /^\+?51\d{9}$/,                // +51 o 51 seguido de 9 dígitos
-    /^0051\d{9}$/,                 // 0051 seguido de 9 dígitos
-  ];
+  // Extraer solo dígitos para validación
+  const digitsOnly = cleaned.replace(/\D/g, '');
 
-  const isValid = patterns.some(pattern => pattern.test(cleaned));
-
-  if (!isValid) {
-    // Verificar si tiene caracteres no numéricos permitidos
-    if (!/^[\d\+\s\-\(\)]+$/.test(phone)) {
-      return {
-        isValid: false,
-        error: 'El teléfono solo puede contener números y los caracteres: +, -, (, )'
-      };
-    }
-
-    // Verificar longitud básica
-    const digitsOnly = cleaned.replace(/\D/g, '');
-    if (digitsOnly.length < 9) {
-      return {
-        isValid: false,
-        error: 'El número debe tener al menos 9 dígitos'
-      };
-    }
-
-    if (digitsOnly.length > 12) {
-      return {
-        isValid: false,
-        error: 'El número no puede tener más de 12 dígitos'
-      };
-    }
-
-    // Verificar si empieza con 9 (sin código de país) o tiene código de país
-    if (digitsOnly.length === 9 && !digitsOnly.startsWith('9')) {
-      return {
-        isValid: false,
-        error: 'Los números de celular peruanos deben empezar con 9'
-      };
-    }
-
-    // Si tiene código de país, verificar que el número completo sea válido
-    if (digitsOnly.length > 9) {
-      if (!digitsOnly.startsWith('51')) {
-        return {
-          isValid: false,
-          error: 'El código de país debe ser 51 (Perú)'
-        };
-      }
-      const numberPart = digitsOnly.substring(digitsOnly.length - 9);
-      if (!numberPart.startsWith('9')) {
-        return {
-          isValid: false,
-          error: 'Los números de celular peruanos deben empezar con 9'
-        };
-      }
-    }
-
+  // Verificar caracteres permitidos
+  if (!/^[\d\+\s\-\(\)]+$/.test(phone)) {
     return {
       isValid: false,
-      error: 'Formato de teléfono inválido. Use: 987654321 o +51 987654321'
+      error: 'El teléfono solo puede contener números y los caracteres: +, -, (, )'
+    };
+  }
+
+  // Validar longitud
+  if (digitsOnly.length < 9) {
+    return {
+      isValid: false,
+      error: 'El número debe tener al menos 9 dígitos'
+    };
+  }
+
+  if (digitsOnly.length > 12) {
+    return {
+      isValid: false,
+      error: 'El número no puede tener más de 12 dígitos'
+    };
+  }
+
+  // Extraer el número de celular (últimos 9 dígitos)
+  let cellphoneNumber: string;
+  if (digitsOnly.length === 9) {
+    cellphoneNumber = digitsOnly;
+  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('51')) {
+    cellphoneNumber = digitsOnly.substring(2);
+  } else if (digitsOnly.length === 13 && digitsOnly.startsWith('0051')) {
+    cellphoneNumber = digitsOnly.substring(4);
+  } else {
+    return {
+      isValid: false,
+      error: 'Formato inválido. Use: 987654321 o +51 987654321'
+    };
+  }
+
+  // Validar que empiece con 9
+  if (!cellphoneNumber.startsWith('9')) {
+    return {
+      isValid: false,
+      error: 'Los números de celular peruanos deben empezar con 9'
+    };
+  }
+
+  // Validar segundo dígito (operadores reales)
+  // Operadores válidos en Perú:
+  // - 93x, 94x (Claro)
+  // - 96x (Claro, Movistar, Bitel)
+  // - 97x (Movistar, Entel)
+  // - 98x (Movistar, Bitel)
+  // - 99x (Entel)
+  const secondDigit = cellphoneNumber.charAt(1);
+  const validSecondDigits = ['3', '4', '6', '7', '8', '9'];
+  
+  if (!validSecondDigits.includes(secondDigit)) {
+    return {
+      isValid: false,
+      error: `Número inválido. Los celulares peruanos deben empezar con 93, 94, 96, 97, 98 o 99`
+    };
+  }
+
+  // Validar que los 9 dígitos sean numéricos
+  if (!/^\d{9}$/.test(cellphoneNumber)) {
+    return {
+      isValid: false,
+      error: 'El número debe contener exactamente 9 dígitos'
     };
   }
 

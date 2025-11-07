@@ -243,11 +243,11 @@ function ProductsContent() {
                 <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
                 <span className="text-yellow-400 font-semibold">Productos Encontrados</span>
                 <div className="text-2xl font-bold text-white">
-                  {products.length}
-            </div>
+                  {loading ? '...' : (products?.length || allProducts?.length || 0)}
+                </div>
                 <div className="text-gray-400">productos</div>
-          </div>
-        </div>
+              </div>
+            </div>
           </div>
           
           <div className="flex items-center gap-3">

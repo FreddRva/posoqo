@@ -273,6 +273,14 @@ export default function RegisterPage() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
+                onBlur={() => {
+                  if (formData.phone.trim()) {
+                    const phoneValidation = validatePeruvianCellphone(formData.phone);
+                    if (!phoneValidation.isValid) {
+                      setErrors(prev => ({ ...prev, phone: phoneValidation.error || "El teléfono es inválido" }));
+                    }
+                  }
+                }}
                 className={`w-full px-4 py-3 bg-transparent border-b-2 transition-all duration-200 ${
                   errors.phone 
                     ? "border-red-400 text-white" 

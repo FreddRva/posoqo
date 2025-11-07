@@ -250,32 +250,45 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               {showSuggestions && suggestions.length > 0 && (
                 <div
                   ref={suggestionsRef}
-                  className="absolute top-full left-0 right-0 mt-2 bg-gradient-to-br from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-xl border border-yellow-400/30 rounded-xl shadow-2xl z-[100] overflow-hidden"
+                  className="absolute top-full left-0 right-0 mt-3 bg-gradient-to-br from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-2xl border-2 border-yellow-400/40 rounded-2xl shadow-2xl z-[100] overflow-hidden"
+                  style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(234, 179, 8, 0.2)' }}
                 >
-                  <div className="max-h-80 overflow-y-auto">
+                  {/* Header del dropdown */}
+                  <div className="px-4 py-2 bg-gradient-to-r from-yellow-400/10 to-amber-500/10 border-b border-yellow-400/20">
+                    <div className="flex items-center gap-2">
+                      <Package className="w-4 h-4 text-yellow-400" />
+                      <span className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">
+                        Sugerencias ({suggestions.length})
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-400/30 scrollbar-track-gray-800">
                     {suggestions.map((product, index) => (
                       <motion.button
                         key={product.id}
                         onClick={() => handleSelectSuggestion(product)}
                         onMouseEnter={() => setSelectedSuggestionIndex(index)}
-                        className={`w-full px-4 py-3 flex items-center gap-3 text-left transition-colors ${
+                        className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-all duration-200 ${
                           selectedSuggestionIndex === index
-                            ? 'bg-yellow-400/20 border-l-2 border-yellow-400'
-                            : 'hover:bg-gray-700/50'
+                            ? 'bg-gradient-to-r from-yellow-400/25 to-amber-500/25 border-l-4 border-yellow-400 shadow-lg'
+                            : 'hover:bg-gray-700/60 border-l-4 border-transparent'
                         }`}
-                        whileHover={{ x: 4 }}
+                        whileHover={{ x: 2 }}
                       >
-                        <div className="flex-shrink-0 w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
-                          <Package className="w-5 h-5 text-yellow-400" />
+                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center border border-gray-600/50 shadow-inner">
+                          <Package className="w-6 h-6 text-yellow-400" />
                         </div>
-                        <div className="flex-1 min-w-0 pr-2">
-                          <div className="text-white font-medium truncate mb-1">{product.name}</div>
+                        <div className="flex-1 min-w-0 pr-3">
+                          <div className="text-white font-semibold text-base truncate mb-1.5">{product.name}</div>
                           {product.description && (
-                            <div className="text-gray-400 text-sm line-clamp-2 leading-relaxed">{product.description}</div>
+                            <div className="text-gray-400 text-xs line-clamp-2 leading-relaxed pr-2">{product.description}</div>
                           )}
                         </div>
-                        <div className="flex-shrink-0 text-yellow-400 font-bold">
-                          S/ {product.price.toFixed(2)}
+                        <div className="flex-shrink-0 text-right">
+                          <div className="text-yellow-400 font-bold text-lg">
+                            S/ {product.price.toFixed(2)}
+                          </div>
                         </div>
                       </motion.button>
                     ))}

@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { CreditCard, CheckCircle, AlertCircle, Loader2, X } from "lucide-react";
+import { CreditCard, CheckCircle, AlertCircle, Loader2, X, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ReservationPaymentFormProps {
   amount: number;
   clientSecret: string;
   reservationId: string;
+  userDni?: string;
+  userName?: string;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -16,12 +18,16 @@ export default function ReservationPaymentForm({
   amount,
   clientSecret,
   reservationId,
+  userDni,
+  userName,
   onSuccess,
   onCancel
 }: ReservationPaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [cardholderName, setCardholderName] = useState("");
+  const [cardholderName, setCardholderName] = useState(userName || "");
+  const [dni, setDni] = useState(userDni || "");
+  const [dniError, setDniError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -33,7 +39,25 @@ export default function ReservationPaymentForm({
       return;
     }
 
+    // Validar DNI
+    const dniTrimmed = dni.trim();
+    if (!dniTrimmed) {
+      setDniError("El DNI es requerido");
+      return;
+    }
+
+    if (!/^\d{8}$/.test(dniTrimmed)) {
+      setDniError("El DNI debe tener exactamente 8 dígitos");
+      return;
+    }
+
+    if (!cardholderName.trim()) {
+      setError("El nombre del titular es requerido");
+      return;
+    }
+
     setError(null);
+    setDniError(null);
     setProcessing(true);
 
     const cardElement = elements.getElement(CardNumberElement);
@@ -106,12 +130,47 @@ export default function ReservationPaymentForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-purple-300 font-semibold mb-2">
-              Nombre del titular de la tarjeta
+              DNI del titular *
+            </label>
+            <div className="relative">
+              <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={dni}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 8);
+                  setDni(value);
+                  setDniError(null);
+                }}
+                className={`w-full pl-12 pr-4 py-3 bg-black/50 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+                  dniError
+                    ? 'border-red-400/50 focus:ring-red-400 focus:border-red-400'
+                    : 'border-white/10 focus:ring-purple-400 focus:border-transparent'
+                }`}
+                placeholder="12345678"
+                maxLength={8}
+                required
+              />
+            </div>
+            {dniError && (
+              <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {dniError}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-purple-300 font-semibold mb-2">
+              Nombre del titular de la tarjeta *
             </label>
             <input
               type="text"
               value={cardholderName}
-              onChange={(e) => setCardholderName(e.target.value)}
+              onChange={(e) => {
+                setCardholderName(e.target.value);
+                setError(null);
+              }}
               className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all"
               placeholder="Juan Pérez"
               required
