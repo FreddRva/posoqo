@@ -393,64 +393,53 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 		})
 	}
 
-	// Verificar si SMTP está configurado
-	config := getEmailConfig()
-	smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
-
-	// Enviar email de verificación
-	var sendErr error
-	if smtpConfigured {
-		sendErr = sendVerificationEmail(userID, req.Email, name)
-		if sendErr != nil {
-			// Si falla el envío, aún así devolver el token
-			fmt.Printf("Error enviando email (continuando): %v\n", sendErr)
-		}
-	} else {
-		// Si SMTP no está configurado, crear el token pero no intentar enviarlo
-		_, createErr := createVerificationToken(userID, req.Email)
-		if createErr != nil {
-			fmt.Printf("Error creando token: %v\n", createErr)
-		}
+	// Crear nuevo token inmediatamente (sin esperar)
+	verification, createErr := createVerificationToken(userID, req.Email)
+	if createErr != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al crear token de verificación",
+		})
 	}
 
-	response := fiber.Map{
-		"message": "Email de verificación reenviado exitosamente",
-	}
-
-	// Siempre incluir el token en la respuesta para facilitar la verificación
-	// Buscar token activo más reciente
-	var token string
-	var expiresAt time.Time
-	err = db.DB.QueryRow(context.Background(),
-		"SELECT token, expires_at FROM email_verifications WHERE user_id = $1 AND used = false AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1",
-		userID,
-	).Scan(&token, &expiresAt)
-
-	if err == nil {
-		// Usar la misma lógica que en sendVerificationEmail para obtener la URL del backend
-		backendURL := os.Getenv("BACKEND_URL")
-		if backendURL == "" {
-			renderURL := os.Getenv("RENDER_EXTERNAL_URL")
-			if renderURL != "" {
-				backendURL = renderURL
+	// Construir URL de verificación inmediatamente
+	backendURL := os.Getenv("BACKEND_URL")
+	if backendURL == "" {
+		renderURL := os.Getenv("RENDER_EXTERNAL_URL")
+		if renderURL != "" {
+			backendURL = renderURL
+		} else {
+			baseURL := os.Getenv("BASE_URL")
+			if strings.Contains(baseURL, "onrender.com") {
+				backendURL = baseURL
 			} else {
-				baseURL := os.Getenv("BASE_URL")
-				if strings.Contains(baseURL, "onrender.com") {
-					backendURL = baseURL
-				} else {
-					backendURL = "http://localhost:4000"
-				}
+				backendURL = "http://localhost:4000"
 			}
 		}
-		verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", backendURL, token)
-
-		response["token"] = token
-		response["verification_url"] = verificationURL
-		if !smtpConfigured || sendErr != nil {
-			response["development_mode"] = true
-			response["message"] = "Usa este enlace para verificar tu email: " + verificationURL
-		}
 	}
+	verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", backendURL, verification.Token)
+
+	// Responder inmediatamente con el token
+	response := fiber.Map{
+		"message":         "Token de verificación generado",
+		"token":           verification.Token,
+		"verification_url": verificationURL,
+		"development_mode": true,
+	}
+
+	// Enviar email en background (no bloquear la respuesta)
+	go func() {
+		config := getEmailConfig()
+		smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
+		
+		if smtpConfigured {
+			sendErr := sendVerificationEmail(userID, req.Email, name)
+			if sendErr != nil {
+				fmt.Printf("Error enviando email en background: %v\n", sendErr)
+			} else {
+				fmt.Printf("Email enviado exitosamente a %s\n", req.Email)
+			}
+		}
+	}()
 
 	return c.JSON(response)
 }
