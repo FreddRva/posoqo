@@ -123,6 +123,9 @@ func main() {
 	api.Post("/forgot-password", handlers.ForgotPassword)
 	api.Post("/reset-password", handlers.ResetPassword)
 
+	// Ruta para obtener token CSRF
+	api.Get("/csrf-token", middleware.GenerateCSRFTokenHandler)
+
 	// Rutas de verificación de email (públicas, sin rate limiting estricto)
 	api.Get("/verify-email", handlers.VerifyEmail)
 	api.Post("/resend-verification", handlers.ResendVerificationEmail)

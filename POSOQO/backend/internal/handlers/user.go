@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/posoqo/backend/internal/db"
+	"github.com/posoqo/backend/internal/models"
 	"github.com/posoqo/backend/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -91,6 +92,31 @@ func logAuthAttempt(email, ip, userAgent, status string) {
 func logRegistration(email, ip, userAgent string) {
 	log.Printf("[REGISTER] %s | IP: %s | User-Agent: %s | Status: SUCCESS",
 		email, ip, userAgent)
+}
+
+// createAuditLog crea un log de auditoría en la base de datos
+func createAuditLog(ctx context.Context, userID *int64, action, resourceType string, resourceID *int64, ipAddress, userAgent, method, path, requestBody string, responseStatus int, errorMessage, metadata string) {
+	auditLog := &models.AuditLog{
+		UserID:         userID,
+		Action:         action,
+		ResourceType:   resourceType,
+		ResourceID:     resourceID,
+		IPAddress:      ipAddress,
+		UserAgent:      userAgent,
+		RequestMethod:  method,
+		RequestPath:    path,
+		RequestBody:    requestBody,
+		ResponseStatus: responseStatus,
+		ErrorMessage:   errorMessage,
+		Metadata:       metadata,
+	}
+
+	// Ejecutar en goroutine para no bloquear la respuesta
+	go func() {
+		if err := models.CreateAuditLog(context.Background(), auditLog); err != nil {
+			log.Printf("[ERROR] Error creating audit log: %v", err)
+		}
+	}()
 }
 
 type RegisterRequest struct {
@@ -232,13 +258,15 @@ type LoginRequest struct {
 // @Failure 401 {object} map[string]string
 // @Router /api/login [post]
 func LoginUser(c *fiber.Ctx) error {
-	// Obtener información del cliente para auditoría
+	ctx := context.Background()
 	clientIP := c.IP()
 	userAgent := c.Get("User-Agent")
+	startTime := time.Now() // Para protección contra timing attacks
 
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
 		logAuthAttempt("unknown", clientIP, userAgent, "INVALID_DATA")
+		createAuditLog(ctx, nil, "LOGIN_ATTEMPT", "user", nil, clientIP, userAgent, "POST", "/api/auth/login", "", 400, "Invalid request data", "")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Datos inválidos"})
 	}
 
@@ -248,43 +276,183 @@ func LoginUser(c *fiber.Ctx) error {
 
 	if req.Email == "" || req.Password == "" {
 		logAuthAttempt(req.Email, clientIP, userAgent, "EMPTY_CREDENTIALS")
+		createAuditLog(ctx, nil, "LOGIN_ATTEMPT", "user", nil, clientIP, userAgent, "POST", "/api/auth/login", "", 400, "Empty credentials", "")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Email y contraseña son obligatorios"})
 	}
 
-	// Buscar usuario en la base de datos
+	// 1. VERIFICAR BLOQUEO DE CUENTA
+	lock, err := models.CheckAccountLock(ctx, req.Email, clientIP)
+	if err == nil && lock != nil {
+		remaining := time.Until(lock.LockedUntil)
+		logAuthAttempt(req.Email, clientIP, userAgent, "ACCOUNT_LOCKED")
+		createAuditLog(ctx, nil, "LOGIN_ATTEMPT", "user", nil, clientIP, userAgent, "POST", "/api/auth/login", "", 423, "Account locked", fmt.Sprintf(`{"locked_until": "%s", "remaining_minutes": %.0f}`, lock.LockedUntil, remaining.Minutes()))
+		return c.Status(423).JSON(fiber.Map{
+			"error":             "Cuenta bloqueada temporalmente debido a múltiples intentos fallidos",
+			"locked_until":      lock.LockedUntil,
+			"remaining_minutes": int(remaining.Minutes()) + 1,
+		})
+	}
+
+	// 2. VERIFICAR INTENTOS FALLIDOS RECIENTES
+	failedAttempts, err := models.GetFailedLoginAttempts(ctx, req.Email, clientIP, utils.FailedAttemptWindow)
+	if err != nil {
+		log.Printf("[ERROR] Error checking failed attempts: %v", err)
+	}
+
+	if failedAttempts >= utils.MaxFailedAttempts {
+		// Bloquear cuenta
+		lockUntil := time.Now().Add(utils.GetLockoutDuration())
+		accountLock := &models.AccountLock{
+			Email:       req.Email,
+			IPAddress:   clientIP,
+			LockedUntil: lockUntil,
+			LockReason:  "Too many failed login attempts",
+		}
+		models.CreateAccountLock(ctx, accountLock)
+
+		logAuthAttempt(req.Email, clientIP, userAgent, "ACCOUNT_LOCKED_AUTO")
+		createAuditLog(ctx, nil, "ACCOUNT_LOCKED", "user", nil, clientIP, userAgent, "POST", "/api/auth/login", "", 423, "Account auto-locked", fmt.Sprintf(`{"locked_until": "%s"}`, lockUntil))
+
+		return c.Status(423).JSON(fiber.Map{
+			"error":             "Cuenta bloqueada temporalmente debido a múltiples intentos fallidos",
+			"locked_until":      lockUntil,
+			"remaining_minutes": utils.LockoutDurationMinutes,
+		})
+	}
+
+	// 3. BUSCAR USUARIO (protección contra timing attack - siempre buscar, incluso si no existe)
 	var id int64
 	var name, email, hash, role string
 	var emailVerified bool
-	err := db.DB.QueryRow(context.Background(),
+	var userExists bool
+
+	err = db.DB.QueryRow(ctx,
 		"SELECT id, name, email, password, role, email_verified FROM users WHERE email=$1",
 		req.Email).Scan(&id, &name, &email, &hash, &role, &emailVerified)
 
 	if err != nil {
-		logAuthAttempt(req.Email, clientIP, userAgent, "USER_NOT_FOUND")
+		userExists = false
+		// Crear hash dummy para prevenir timing attacks
+		dummyHash, _ := bcrypt.GenerateFromPassword([]byte("dummy"), bcrypt.DefaultCost)
+		hash = string(dummyHash)
+	} else {
+		userExists = true
+	}
+
+	// 4. VERIFICAR CONTRASEÑA (siempre ejecutar para prevenir timing attacks)
+	passwordValid := false
+	if userExists {
+		if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)); err == nil {
+			passwordValid = true
+		}
+	} else {
+		// Comparar con hash dummy para mantener tiempo constante
+		bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password))
+	}
+
+	// 5. VERIFICAR EMAIL VERIFICADO (solo si usuario existe y contraseña válida)
+	if !userExists || !passwordValid || !emailVerified {
+		// Registrar intento fallido
+		failureReason := "INVALID_CREDENTIALS"
+		if userExists && passwordValid && !emailVerified {
+			failureReason = "EMAIL_NOT_VERIFIED"
+		}
+
+		attempt := &models.LoginAttempt{
+			Email:         req.Email,
+			IPAddress:     clientIP,
+			UserAgent:     userAgent,
+			Success:       false,
+			FailureReason: failureReason,
+		}
+		if userExists {
+			attempt.UserID = &id
+		}
+		models.CreateLoginAttempt(ctx, attempt)
+
+		logAuthAttempt(req.Email, clientIP, userAgent, failureReason)
+		createAuditLog(ctx, &id, "LOGIN_ATTEMPT_FAILED", "user", &id, clientIP, userAgent, "POST", "/api/auth/login", "", 401, failureReason, "")
+
+		// Asegurar tiempo constante antes de responder (protección timing attack)
+		elapsed := time.Since(startTime)
+		minDuration := 200 * time.Millisecond // Mínimo 200ms para prevenir timing attacks
+		if elapsed < minDuration {
+			time.Sleep(minDuration - elapsed)
+		}
+
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
 	}
 
-	if !emailVerified {
-		// No revelar que el email no está verificado por seguridad
-		logAuthAttempt(req.Email, clientIP, userAgent, "EMAIL_NOT_VERIFIED")
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
+	// 6. VERIFICAR 2FA SI ESTÁ HABILITADO
+	user2FA, err := models.GetUser2FA(ctx, id)
+	if err == nil && user2FA != nil && user2FA.Enabled {
+		// Verificar código 2FA del request
+		var req2FA struct {
+			TotpCode string `json:"totp_code"`
+		}
+		c.BodyParser(&req2FA)
+
+		if req2FA.TotpCode == "" {
+			createAuditLog(ctx, &id, "LOGIN_2FA_REQUIRED", "user", &id, clientIP, userAgent, "POST", "/api/auth/login", "", 200, "", "")
+			return c.Status(http.StatusOK).JSON(fiber.Map{
+				"requires_2fa": true,
+				"message":      "Código 2FA requerido",
+			})
+		}
+
+		// Validar código TOTP
+		if !utils.ValidateTOTP(user2FA.Secret, req2FA.TotpCode) {
+			// También verificar backup codes
+			backupValid := false
+			for i, code := range user2FA.BackupCodes {
+				if utils.ConstantTimeCompare(code, req2FA.TotpCode) {
+					backupValid = true
+					// Remover código usado
+					user2FA.BackupCodes = append(user2FA.BackupCodes[:i], user2FA.BackupCodes[i+1:]...)
+					models.CreateUser2FA(ctx, user2FA)
+					break
+				}
+			}
+
+			if !backupValid {
+				attempt := &models.LoginAttempt{
+					UserID:        &id,
+					Email:         req.Email,
+					IPAddress:     clientIP,
+					UserAgent:     userAgent,
+					Success:       false,
+					FailureReason: "INVALID_2FA_CODE",
+				}
+				models.CreateLoginAttempt(ctx, attempt)
+				logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_2FA_CODE")
+				createAuditLog(ctx, &id, "LOGIN_2FA_FAILED", "user", &id, clientIP, userAgent, "POST", "/api/auth/login", "", 401, "Invalid 2FA code", "")
+				return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Código 2FA inválido"})
+			}
+		}
 	}
 
-	// Verificar contraseña con bcrypt
-	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)); err != nil {
-		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_PASSWORD")
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
+	// 7. LOGIN EXITOSO
+	// Registrar intento exitoso
+	attempt := &models.LoginAttempt{
+		UserID:    &id,
+		Email:     req.Email,
+		IPAddress: clientIP,
+		UserAgent: userAgent,
+		Success:   true,
 	}
+	models.CreateLoginAttempt(ctx, attempt)
 
 	// Generar par de tokens
 	tokenPair, err := generateTokenPair(id, name, email, role)
 	if err != nil {
 		logAuthAttempt(req.Email, clientIP, userAgent, "TOKEN_GENERATION_ERROR")
+		createAuditLog(ctx, &id, "LOGIN_TOKEN_ERROR", "user", &id, clientIP, userAgent, "POST", "/api/auth/login", "", 500, "Token generation failed", "")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error al generar tokens"})
 	}
 
 	// Log de auditoría exitoso
 	logAuthAttempt(req.Email, clientIP, userAgent, "SUCCESS")
+	createAuditLog(ctx, &id, "LOGIN_SUCCESS", "user", &id, clientIP, userAgent, "POST", "/api/auth/login", "", 200, "", "")
 
 	return c.JSON(fiber.Map{
 		"message": "Login exitoso",
@@ -1317,5 +1485,161 @@ func ResetPassword(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"message": "Contraseña restablecida exitosamente. Puedes iniciar sesión con tu nueva contraseña",
+	})
+}
+
+// Enable2FA habilita 2FA para un usuario
+func Enable2FA(c *fiber.Ctx) error {
+	ctx := context.Background()
+	claims := c.Locals("user").(jwt.MapClaims)
+	userID := int64(claims["id"].(float64))
+
+	// Obtener email del usuario primero
+	var email string
+	if err := db.DB.QueryRow(ctx, "SELECT email FROM users WHERE id=$1", userID).Scan(&email); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Usuario no encontrado",
+		})
+	}
+
+	// Generar secreto TOTP
+	secret, err := utils.GenerateTOTPSecret(email)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error generando secreto 2FA",
+		})
+	}
+
+	// Generar códigos de respaldo
+	backupCodes, err := utils.GenerateBackupCodes(10)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error generando códigos de respaldo",
+		})
+	}
+
+	// Obtener email del usuario
+	var email string
+	db.DB.QueryRow(ctx, "SELECT email FROM users WHERE id=$1", userID).Scan(&email)
+
+	// Crear configuración 2FA (sin habilitar aún)
+	user2FA := &models.User2FA{
+		UserID:      userID,
+		Secret:      secret,
+		Enabled:     false,
+		BackupCodes: backupCodes,
+	}
+
+	if err := models.CreateUser2FA(ctx, user2FA); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error guardando configuración 2FA",
+		})
+	}
+
+	// Generar URL del QR code
+	qrURL := utils.GenerateQRCodeURL(email, secret)
+
+	createAuditLog(ctx, &userID, "2FA_SETUP_INITIATED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/enable", "", 200, "", "")
+
+	return c.JSON(fiber.Map{
+		"secret":       secret,
+		"qr_code_url":  qrURL,
+		"backup_codes": backupCodes,
+		"message":      "Escanea el QR code con tu app de autenticación y confirma con un código",
+	})
+}
+
+// Confirm2FA confirma y habilita 2FA después de verificar el código
+func Confirm2FA(c *fiber.Ctx) error {
+	ctx := context.Background()
+	claims := c.Locals("user").(jwt.MapClaims)
+	userID := int64(claims["id"].(float64))
+
+	var req struct {
+		TotpCode string `json:"totp_code"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Código TOTP requerido",
+		})
+	}
+
+	// Obtener configuración 2FA
+	user2FA, err := models.GetUser2FA(ctx, userID)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Configuración 2FA no encontrada. Primero inicia la configuración.",
+		})
+	}
+
+	// Validar código TOTP
+	if !utils.ValidateTOTP(user2FA.Secret, req.TotpCode) {
+		createAuditLog(ctx, &userID, "2FA_SETUP_FAILED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/confirm", "", 401, "Invalid TOTP code", "")
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Código TOTP inválido",
+		})
+	}
+
+	// Habilitar 2FA
+	user2FA.Enabled = true
+	if err := models.CreateUser2FA(ctx, user2FA); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error habilitando 2FA",
+		})
+	}
+
+	createAuditLog(ctx, &userID, "2FA_ENABLED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/confirm", "", 200, "", "")
+
+	return c.JSON(fiber.Map{
+		"message":      "2FA habilitado correctamente",
+		"backup_codes": user2FA.BackupCodes,
+	})
+}
+
+// Disable2FA deshabilita 2FA para un usuario
+func Disable2FA(c *fiber.Ctx) error {
+	ctx := context.Background()
+	claims := c.Locals("user").(jwt.MapClaims)
+	userID := int64(claims["id"].(float64))
+
+	var req struct {
+		Password string `json:"password"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Contraseña requerida",
+		})
+	}
+
+	// Verificar contraseña
+	var hash string
+	if err := db.DB.QueryRow(ctx, "SELECT password FROM users WHERE id=$1", userID).Scan(&hash); err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Usuario no encontrado",
+		})
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)); err != nil {
+		createAuditLog(ctx, &userID, "2FA_DISABLE_FAILED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/disable", "", 401, "Invalid password", "")
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Contraseña incorrecta",
+		})
+	}
+
+	// Deshabilitar 2FA
+	user2FA := &models.User2FA{
+		UserID:  userID,
+		Enabled: false,
+	}
+	if err := models.CreateUser2FA(ctx, user2FA); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error deshabilitando 2FA",
+		})
+	}
+
+	createAuditLog(ctx, &userID, "2FA_DISABLED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/disable", "", 200, "", "")
+
+	return c.JSON(fiber.Map{
+		"message": "2FA deshabilitado correctamente",
 	})
 }

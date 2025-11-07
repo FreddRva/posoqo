@@ -12,6 +12,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/posoqo/backend/internal/models"
+	"github.com/posoqo/backend/internal/utils"
 )
 
 // Configuración de rate limiting por IP
@@ -126,11 +128,11 @@ func getAllowedOrigins() []string {
 	}
 
 	env := os.Getenv("NODE_ENV")
-	
+
 	// Si estamos en Render (detectado por RENDER=true o NODE_ENV=production)
 	// o si no hay NODE_ENV configurado pero estamos en un entorno de producción
 	isRender := os.Getenv("RENDER") == "true" || env == "production"
-	
+
 	// Origins para desarrollo
 	if !isRender && env != "production" {
 		return []string{
@@ -364,7 +366,7 @@ func SecurityHeaders() fiber.Handler {
 	}
 }
 
-// Middleware para validación de CSRF (simplificado)
+// Middleware para validación de CSRF completo
 func CSRFProtection() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Solo aplicar a métodos que modifican datos
@@ -372,17 +374,79 @@ func CSRFProtection() fiber.Handler {
 			return c.Next()
 		}
 
-		// Verificar header CSRF
+		// Obtener token CSRF del header
 		csrfToken := c.Get("X-CSRF-Token")
 		if csrfToken == "" {
 			return c.Status(http.StatusForbidden).JSON(fiber.Map{
 				"error": "Token CSRF requerido",
+				"code":  "CSRF_TOKEN_MISSING",
 			})
 		}
 
-		// Aquí se validaría el token CSRF contra la sesión
-		// Por simplicidad, solo verificamos que exista
+		// Obtener información del usuario si está autenticado
+		var userID *int64
+		if userInterface := c.Locals("user"); userInterface != nil {
+			if claims, ok := userInterface.(jwt.MapClaims); ok {
+				if id, ok := claims["id"].(float64); ok {
+					uid := int64(id)
+					userID = &uid
+				}
+			}
+		}
+
+		// Validar token CSRF
+		valid, err := models.ValidateCSRFToken(c.Context(), csrfToken, userID, c.IP())
+		if err != nil || !valid {
+			log.Printf("[SECURITY] CSRF token inválido - IP: %s, UserID: %v", c.IP(), userID)
+			return c.Status(http.StatusForbidden).JSON(fiber.Map{
+				"error": "Token CSRF inválido o expirado",
+				"code":  "CSRF_TOKEN_INVALID",
+			})
+		}
 
 		return c.Next()
 	}
+}
+
+// GenerateCSRFTokenHandler genera un token CSRF para el cliente
+func GenerateCSRFTokenHandler(c *fiber.Ctx) error {
+	// Generar token CSRF
+	token, err := utils.GenerateCSRFToken()
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error generando token CSRF",
+		})
+	}
+
+	// Obtener información del usuario si está autenticado
+	var userID *int64
+	if userInterface := c.Locals("user"); userInterface != nil {
+		if claims, ok := userInterface.(jwt.MapClaims); ok {
+			if id, ok := claims["id"].(float64); ok {
+				uid := int64(id)
+				userID = &uid
+			}
+		}
+	}
+
+	// Crear token CSRF en la base de datos
+	csrfToken := &models.CSRFToken{
+		Token:     token,
+		UserID:    userID,
+		IPAddress: c.IP(),
+		ExpiresAt: time.Now().Add(utils.CSRFTokenExpiry),
+		Used:      false,
+	}
+
+	if err := models.CreateCSRFToken(c.Context(), csrfToken); err != nil {
+		log.Printf("[ERROR] Error creando token CSRF: %v", err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error guardando token CSRF",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"csrf_token": token,
+		"expires_at": csrfToken.ExpiresAt,
+	})
 }
