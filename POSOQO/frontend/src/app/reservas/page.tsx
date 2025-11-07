@@ -597,17 +597,47 @@ export default function ReservationsPage() {
                               })
                               await loadProfile()
                               setShowDNIForm(false)
-                              // Proceder con el envío del formulario
-                              const fakeEvent = { preventDefault: () => {} } as React.FormEvent
-                              handleSubmit(fakeEvent)
+                              
+                              // Proceder directamente con la creación del payment intent
+                              if (formData.payment_method === 'tarjeta' && formData.advance > 0) {
+                                setSubmitting(true)
+                                try {
+                                  const response = await apiFetch<{ clientSecret: string; reservationId: string }>('/create-reservation-payment-intent', {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                      amount: formData.advance,
+                                      currency: 'pen',
+                                      date: formData.date,
+                                      time: formData.time,
+                                      people: formData.people
+                                    }),
+                                    authToken: accessToken
+                                  })
+                                  
+                                  setClientSecret(response.clientSecret)
+                                  setReservationId(response.reservationId)
+                                  setShowPaymentForm(true)
+                                } catch (error: any) {
+                                  console.error('Error creando payment intent:', error)
+                                  showAlert('error', 'Error', error.message || 'Error al procesar el pago. Por favor intenta nuevamente.')
+                                  setSubmitting(false)
+                                }
+                              }
                             } catch (error: any) {
                               showAlert('error', 'Error', error.message || 'Error al guardar los datos')
                             }
                           }}
-                          disabled={!dniData.dni || !dniData.name || !dniData.last_name || !dniData.phone}
-                          className="px-6 py-3 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 hover:from-purple-300 hover:via-pink-300 hover:to-purple-400 text-black font-bold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!dniData.dni || !dniData.name || !dniData.last_name || !dniData.phone || submitting}
+                          className="px-6 py-3 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 hover:from-purple-300 hover:via-pink-300 hover:to-purple-400 text-black font-bold rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                          Continuar al Pago
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            'Continuar al Pago'
+                          )}
                         </button>
                       </div>
                     </div>
