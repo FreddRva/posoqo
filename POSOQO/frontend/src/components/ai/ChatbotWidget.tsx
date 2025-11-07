@@ -128,14 +128,12 @@ export const ChatbotWidget: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            style={{ position: 'fixed', bottom: '112px', right: '24px', zIndex: 10000 }}
-            className="w-16 h-16 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 rounded-full shadow-2xl flex items-center justify-center text-black transition-all duration-300 group ring-2 ring-yellow-400/20 hover:ring-yellow-400/40"
+            style={{ position: 'fixed', bottom: '84px', right: '20px', zIndex: 10000 }}
+            className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-white transition-all duration-200 group"
             title="Asistente POSOQO con IA"
           >
-            <MessageCircle className="w-7 h-7 group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black/20 animate-pulse"></span>
-            {/* Efecto de brillo */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-300/20 to-amber-300/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <MessageCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
+            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
           </motion.button>
         )}
       </AnimatePresence>
