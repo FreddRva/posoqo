@@ -189,12 +189,9 @@ async function refreshAccessToken(): Promise<string | null> {
             console.error('Error guardando tokens en localStorage:', err);
           }
           
-          // Forzar actualización de la sesión de NextAuth (esto actualizará el JWT callback)
-          try {
-            await getSession({ trigger: true });
-          } catch (err) {
-            console.warn('Error actualizando sesión NextAuth:', err);
-          }
+          // Forzar actualización de la sesión de NextAuth
+          // NextAuth actualizará automáticamente la sesión en el próximo render
+          // No necesitamos hacer nada adicional aquí ya que los tokens están guardados en localStorage
           
           return accessToken;
         } else {
