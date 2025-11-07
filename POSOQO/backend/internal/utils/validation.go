@@ -69,6 +69,57 @@ func IsValidUUID(uuid string) bool {
 	return re.MatchString(uuid)
 }
 
+// Valida número de celular peruano
+// Acepta formatos: 987654321, +51 987654321, 51 987654321, 0051 987654321
+func IsValidPeruvianPhone(phone string) bool {
+	if phone == "" {
+		return false
+	}
+
+	// Limpiar el número: remover espacios, guiones, paréntesis
+	cleaned := strings.ReplaceAll(phone, " ", "")
+	cleaned = strings.ReplaceAll(cleaned, "-", "")
+	cleaned = strings.ReplaceAll(cleaned, "(", "")
+	cleaned = strings.ReplaceAll(cleaned, ")", "")
+
+	// Extraer solo dígitos
+	digitsOnly := ""
+	for _, char := range cleaned {
+		if char >= '0' && char <= '9' {
+			digitsOnly += string(char)
+		} else if char == '+' {
+			// Permitir + al inicio
+			if len(digitsOnly) == 0 {
+				continue
+			}
+		}
+	}
+
+	// Validar patrones de celular peruano
+	// 1. Número directo: 9 dígitos, empieza con 9
+	if len(digitsOnly) == 9 {
+		return digitsOnly[0] == '9'
+	}
+
+	// 2. Con código país: +51 o 51 seguido de 9 dígitos
+	if len(digitsOnly) == 11 {
+		if digitsOnly[:2] == "51" {
+			numberPart := digitsOnly[2:]
+			return len(numberPart) == 9 && numberPart[0] == '9'
+		}
+	}
+
+	// 3. Con código país completo: 0051 seguido de 9 dígitos
+	if len(digitsOnly) == 13 {
+		if digitsOnly[:4] == "0051" {
+			numberPart := digitsOnly[4:]
+			return len(numberPart) == 9 && numberPart[0] == '9'
+		}
+	}
+
+	return false
+}
+
 // Genera una contraseña aleatoria segura de longitud n
 func GenerateRandomPassword(n int) string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_"

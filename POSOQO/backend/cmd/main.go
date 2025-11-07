@@ -122,6 +122,8 @@ func main() {
 	// Rutas de verificación de email (públicas)
 	api.Get("/verify-email", handlers.VerifyEmail)
 	api.Post("/resend-verification", handlers.ResendVerificationEmail)
+	api.Get("/get-verification-token", handlers.GetVerificationToken)        // Solo desarrollo
+	api.Get("/verify-email-direct", handlers.VerifyEmailByEmail)              // Solo desarrollo
 
 	// Ruta de contacto (pública)
 	api.Post("/contact", handlers.ContactUs)
