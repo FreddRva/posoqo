@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, Phone, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { ProfileForm } from '@/types/checkout';
+import { validatePeruvianCellphone } from '@/lib/utils/validation';
 
 interface ProfileFormProps {
   profileForm: ProfileForm;
@@ -27,6 +28,7 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
 }) => {
   const [consultandoDNI, setConsultandoDNI] = useState(false);
   const [dniVerificado, setDniVerificado] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   const handleInputChange = (field: keyof ProfileForm, value: string) => {
     setProfileForm({
@@ -36,6 +38,10 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
     // Si cambia el DNI, resetear verificación
     if (field === 'dni') {
       setDniVerificado(false);
+    }
+    // Si cambia el teléfono, resetear error
+    if (field === 'phone') {
+      setPhoneError(null);
     }
   };
 
@@ -211,10 +217,30 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
               type="tel"
               value={profileForm.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 transition-all duration-200 text-white placeholder-gray-500"
-              placeholder="987654321"
+              onBlur={() => {
+                if (profileForm.phone.trim()) {
+                  const phoneValidation = validatePeruvianCellphone(profileForm.phone);
+                  if (!phoneValidation.isValid) {
+                    setPhoneError(phoneValidation.error || "El teléfono es inválido");
+                  } else {
+                    setPhoneError(null);
+                  }
+                }
+              }}
+              className={`w-full pl-12 pr-4 py-3 bg-white/5 border rounded-xl focus:ring-2 transition-all duration-200 text-white placeholder-gray-500 ${
+                phoneError 
+                  ? 'border-red-400/50 focus:ring-red-400/50 focus:border-red-400/50' 
+                  : 'border-white/10 focus:ring-yellow-400/50 focus:border-yellow-400/50'
+              }`}
+              placeholder="987654321 o +51 987654321"
             />
           </div>
+          {phoneError && (
+            <p className="text-xs text-red-400 flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {phoneError}
+            </p>
+          )}
         </div>
       </div>
 
@@ -223,8 +249,19 @@ export const ProfileFormComponent: React.FC<ProfileFormProps> = ({
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={onSave}
-          disabled={saving || !profileForm.name || !profileForm.last_name || !profileForm.dni || !profileForm.phone}
+          onClick={() => {
+            // Validar teléfono antes de guardar
+            if (profileForm.phone.trim()) {
+              const phoneValidation = validatePeruvianCellphone(profileForm.phone);
+              if (!phoneValidation.isValid) {
+                setPhoneError(phoneValidation.error || "El teléfono es inválido");
+                return;
+              }
+            }
+            setPhoneError(null);
+            onSave();
+          }}
+          disabled={saving || !profileForm.name || !profileForm.last_name || !profileForm.dni || !profileForm.phone || !!phoneError}
           className="flex-1 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black py-3 px-6 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-yellow-400/50"
         >
           {saving ? (

@@ -864,15 +864,6 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
-	// Primero contar el total de usuarios en la BD
-	var totalCount int
-	err := db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM users`).Scan(&totalCount)
-	if err != nil {
-		log.Printf("[USERS] Error contando usuarios: %v", err)
-	} else {
-		log.Printf("[USERS] Total usuarios en BD: %d", totalCount)
-	}
-
 	// Query con COALESCE para manejar valores NULL
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT 
@@ -888,7 +879,6 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		ORDER BY created_at DESC
 	`)
 	if err != nil {
-		log.Printf("[USERS] Error en query: %v", err)
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Error al obtener usuarios",
 			"details": err.Error(),
@@ -897,9 +887,7 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	defer rows.Close()
 
 	users := []fiber.Map{}
-	rowCount := 0
 	for rows.Next() {
-		rowCount++
 		var id int64
 		var name, lastName, email, role string
 		var emailVerified bool
@@ -907,8 +895,6 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 
 		err := rows.Scan(&id, &name, &lastName, &email, &role, &emailVerified, &createdAt, &updatedAt)
 		if err != nil {
-			// Log el error específico para debug
-			log.Printf("[USERS] Error escaneando usuario fila %d: %v", rowCount, err)
 			continue
 		}
 
@@ -917,8 +903,6 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		if fullName == "" {
 			fullName = "Usuario"
 		}
-
-		log.Printf("[USERS] Usuario encontrado: ID=%d, Name=%s, Email=%s, Role=%s", id, fullName, email, role)
 
 		user := fiber.Map{
 			"id":             id,
@@ -932,11 +916,8 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		users = append(users, user)
 	}
 
-	log.Printf("[USERS] Total usuarios encontrados: %d (filas procesadas: %d, total en BD: %d)", len(users), rowCount, totalCount)
-
 	return c.JSON(fiber.Map{
 		"data": users,
-		"total_in_db": totalCount,
 	})
 }
 

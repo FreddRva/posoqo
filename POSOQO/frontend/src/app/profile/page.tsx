@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useNotifications } from "@/hooks/useNotifications";
+import { validatePeruvianCellphone } from "@/lib/utils/validation";
 
 type TabType = "info" | "orders" | "addresses" | "notifications" | "settings";
 
@@ -52,6 +53,7 @@ export default function ProfilePage() {
   });
   const [consultandoDNI, setConsultandoDNI] = useState(false);
   const [dniVerificado, setDniVerificado] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const { notifications, stats } = useNotifications();
@@ -149,6 +151,9 @@ export default function ProfilePage() {
     if (e.target.name === 'dni') {
       setDniVerificado(false);
     }
+    if (e.target.name === 'phone') {
+      setPhoneError(null);
+    }
   }
 
   const handleDNIBlur = async () => {
@@ -204,6 +209,17 @@ export default function ProfilePage() {
   async function handleEditSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!session) return;
+    
+    // Validar teléfono si está presente
+    if (form.phone.trim()) {
+      const phoneValidation = validatePeruvianCellphone(form.phone);
+      if (!phoneValidation.isValid) {
+        setPhoneError(phoneValidation.error || "El teléfono es inválido");
+        return;
+      }
+    }
+    
+    setPhoneError(null);
     
     try {
       const accessToken = (session as any)?.accessToken;
@@ -790,12 +806,18 @@ export default function ProfilePage() {
               <label className="flex flex-col gap-2">
                 <span className="text-sm font-semibold text-gray-300">Teléfono</span>
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   value={form.phone}
                   onChange={handleChange}
-                  className="border-2 border-gray-600 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:border-yellow-400 focus:outline-none transition"
+                  className={`border-2 bg-gray-700/50 text-white rounded-lg px-4 py-2.5 focus:outline-none transition ${
+                    phoneError ? 'border-red-400' : 'border-gray-600 focus:border-yellow-400'
+                  }`}
+                  placeholder="987654321 o +51 987654321"
                 />
+                {phoneError && (
+                  <p className="text-red-400 text-xs mt-1">{phoneError}</p>
+                )}
               </label>
 
               <label className="flex flex-col gap-2">

@@ -70,23 +70,12 @@ export default function UsersPage() {
       setLoading(true);
       
       // Cargar usuarios desde el endpoint principal
-      console.log('[USERS] Cargando usuarios...');
       const response = await apiFetch<{ data: any[] }>('/admin/users/list');
-      console.log('[USERS] Respuesta recibida:', response);
-      
       if ((response as any).data) {
-        const usersData = (response as any).data;
-        console.log('[USERS] Total usuarios en respuesta:', usersData.length);
-        console.log('[USERS] Usuarios:', usersData);
-        setUsers(usersData);
-      } else {
-        console.warn('[USERS] No se encontró propiedad data en la respuesta');
-        setUsers([]);
+        setUsers((response as any).data);
       }
     } catch (error) {
-      console.error('[USERS] Error cargando usuarios:', error);
       showErrorAlert('Error de carga', 'No se pudieron cargar los usuarios. Intenta recargar la página.');
-      setUsers([]);
     } finally {
       setLoading(false);
     }

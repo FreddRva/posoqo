@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { getApiUrl } from "@/lib/config";
+import { validatePeruvianCellphone } from "@/lib/utils/validation";
 
 // Tipos TypeScript para mejor seguridad de tipos
 interface RegisterForm {
@@ -87,11 +88,10 @@ export default function RegisterPage() {
       newErrors.lastName = "El apellido debe contener solo letras (2-50 caracteres)";
     }
 
-    // Validar teléfono
-    if (!formData.phone.trim()) {
-      newErrors.phone = "El teléfono es requerido";
-    } else if (formData.phone.length < 6 || formData.phone.length > 20) {
-      newErrors.phone = "El teléfono debe tener entre 6 y 20 caracteres";
+    // Validar teléfono (celular peruano)
+    const phoneValidation = validatePeruvianCellphone(formData.phone);
+    if (!phoneValidation.isValid) {
+      newErrors.phone = phoneValidation.error || "El teléfono es inválido";
     }
 
     // Validar email
@@ -290,7 +290,7 @@ export default function RegisterPage() {
                     ? "border-red-400 text-white" 
                     : "border-white/30 text-white focus:border-yellow-400 placeholder-white/50"
                 } focus:outline-none text-sm font-medium`}
-                placeholder="999888777"
+                placeholder="987654321 o +51 987654321"
                 disabled={loading}
               />
               {errors.phone && (

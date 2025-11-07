@@ -3,12 +3,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { validatePeruvianCellphone } from "@/lib/utils/validation";
 
 export default function CompletarPerfilPage() {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -80,7 +82,19 @@ export default function CompletarPerfilPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setPhoneError(null);
     setSuccess(false);
+    
+    // Validar teléfono si está presente
+    if (phone.trim()) {
+      const phoneValidation = validatePeruvianCellphone(phone);
+      if (!phoneValidation.isValid) {
+        setPhoneError(phoneValidation.error || "El teléfono es inválido");
+        setLoading(false);
+        return;
+      }
+    }
+    
     try {
       await apiFetch("/profile", {
         method: "PUT",
@@ -201,11 +215,21 @@ export default function CompletarPerfilPage() {
           <input
             id="phone"
             type="tel"
-            placeholder="999888777"
+            placeholder="987654321 o +51 987654321"
             value={phone}
-            onChange={e => setPhone(e.target.value)}
-            className="w-full px-4 py-3 bg-transparent border-b-2 border-white/30 text-white focus:border-yellow-400 placeholder-white/50 focus:outline-none text-sm font-medium"
+            onChange={e => {
+              setPhone(e.target.value);
+              setPhoneError(null);
+            }}
+            className={`w-full px-4 py-3 bg-transparent border-b-2 text-white placeholder-white/50 focus:outline-none text-sm font-medium ${
+              phoneError 
+                ? 'border-red-400 focus:border-red-400' 
+                : 'border-white/30 focus:border-yellow-400'
+            }`}
           />
+          {phoneError && (
+            <p className="text-red-300 text-xs mt-1.5 font-medium">{phoneError}</p>
+          )}
         </div>
 
         {/* Mensajes */}
