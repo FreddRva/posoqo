@@ -192,7 +192,7 @@ func RegisterUser(c *fiber.Ctx) error {
 
 	// Verificar si el email ya existe
 	var exists bool
-	err := db.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)", req.Email).Scan(&exists)
+	err = db.DB.QueryRow(context.Background(), "SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)", req.Email).Scan(&exists)
 	if err != nil {
 		logAuthAttempt(req.Email, clientIP, userAgent, "DB_ERROR")
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error interno"})
