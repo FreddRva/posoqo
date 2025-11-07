@@ -215,20 +215,20 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	// La URL debe apuntar directamente al endpoint del backend
 	backendURL := os.Getenv("BACKEND_URL")
 	if backendURL == "" {
-		// Si no hay BACKEND_URL configurada, usar BASE_URL si es del backend, sino construirla
-		baseURL := os.Getenv("BASE_URL")
-		if strings.Contains(baseURL, "onrender.com") && strings.Contains(baseURL, "backend") {
-			backendURL = baseURL
-		} else if strings.Contains(baseURL, "onrender.com") {
-			// Si BASE_URL es del frontend, construir la del backend
-			backendURL = strings.Replace(baseURL, "frontend", "backend", -1)
-			if backendURL == baseURL {
-				// Si no tiene frontend en la URL, asumir que es el backend
-				backendURL = baseURL
-			}
+		// Si no hay BACKEND_URL configurada explícitamente, usar la URL del servicio actual de Render
+		// Render proporciona RENDER_EXTERNAL_URL automáticamente
+		renderURL := os.Getenv("RENDER_EXTERNAL_URL")
+		if renderURL != "" {
+			backendURL = renderURL
 		} else {
-			// Para desarrollo local
-			backendURL = "http://localhost:4000"
+			// Fallback: verificar si BASE_URL es del backend
+			baseURL := os.Getenv("BASE_URL")
+			if strings.Contains(baseURL, "onrender.com") {
+				backendURL = baseURL
+			} else {
+				// Para desarrollo local
+				backendURL = "http://localhost:4000"
+			}
 		}
 	}
 	verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", backendURL, verification.Token)
