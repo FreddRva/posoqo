@@ -43,6 +43,10 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   
   // Hooks de Next.js
   const router = useRouter();
@@ -134,6 +138,75 @@ export default function RegisterPage() {
     }
   };
 
+  // Obtener enlace de verificación
+  const handleGetVerificationLink = async (email: string) => {
+    setResendStatus(null);
+    setVerificationUrl(null);
+    setResendLoading(true);
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com/api';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 30000);
+      
+      const res = await fetch(`${apiUrl}/resend-verification`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({ email }),
+        signal: controller.signal,
+      }).catch((fetchError) => {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          throw new Error("TIMEOUT");
+        }
+        throw fetchError;
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!res.ok) {
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch {
+          errorData = { error: `Error ${res.status}: ${res.statusText}` };
+        }
+        throw new Error(errorData.error || `Error ${res.status}`);
+      }
+      
+      const data = await res.json();
+      
+      // Mostrar el enlace de verificación
+      if (data.verification_url) {
+        setVerificationUrl(data.verification_url);
+        setResendStatus("Usa el enlace de abajo para verificar tu email:");
+      } else if (data.message) {
+        setResendStatus(data.message);
+        if (data.token) {
+          const backendUrl = apiUrl.replace('/api', '');
+          const url = `${backendUrl}/api/verify-email?token=${data.token}`;
+          setVerificationUrl(url);
+        }
+      } else {
+        setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
+      }
+    } catch (error: any) {
+      console.error("Error obteniendo enlace de verificación:", error);
+      if (error.message === 'TIMEOUT' || error.name === 'AbortError') {
+        setResendStatus("La solicitud tardó demasiado. Intenta de nuevo.");
+      } else {
+        setResendStatus(`Error: ${error.message || "No se pudo obtener el enlace de verificación"}`);
+      }
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   // Manejar envío del formulario
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +238,9 @@ export default function RegisterPage() {
       if (!response.ok) {
         setGeneralError(data.error || "Error al registrar usuario");
       } else {
-      setSuccess(true);
+        setSuccess(true);
+        setRegisteredEmail(formData.email.trim().toLowerCase());
+        
         // Limpiar formulario después de registro exitoso
         setFormData({
           name: "",
@@ -176,10 +251,8 @@ export default function RegisterPage() {
           confirmPassword: "",
         });
         
-        // Redirigir al login después de 2 segundos
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
+        // Obtener enlace de verificación inmediatamente
+        handleGetVerificationLink(formData.email.trim().toLowerCase());
       }
     } catch (error) {
       setGeneralError("Error de conexión. Intenta de nuevo.");
@@ -216,12 +289,54 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Mensaje de éxito */}
+          {/* Mensaje de éxito y verificación */}
           {success && (
-            <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/50 rounded-lg p-4 mb-6">
-              <p className="text-green-200 text-sm font-semibold">
-                ¡Registro exitoso! Redirigiendo al login...
+            <div className="bg-yellow-500/20 backdrop-blur-sm border border-[#FFD700]/50 rounded-lg p-4 mb-6">
+              <p className="text-yellow-200 text-xs font-semibold mb-3">
+                ¡Cuenta creada exitosamente! Debes verificar tu email antes de iniciar sesión.
               </p>
+              
+              {resendLoading && (
+                <p className="text-yellow-200 text-xs mb-2">Obteniendo enlace de verificación...</p>
+              )}
+              
+              {resendStatus && (
+                <div className="mt-2.5 text-xs font-semibold">
+                  <p className={resendStatus.startsWith('¡Email') ? 'text-green-200' : resendStatus.startsWith('Usa el') ? 'text-yellow-200' : 'text-red-200'}>
+                    {resendStatus}
+                  </p>
+                  {verificationUrl && (
+                    <a 
+                      href={verificationUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="mt-2 block text-blue-300 hover:text-blue-200 underline break-all bg-black/20 p-2 rounded"
+                    >
+                      {verificationUrl}
+                    </a>
+                  )}
+                </div>
+              )}
+              
+              {registeredEmail && (
+                <button
+                  type="button"
+                  onClick={() => handleGetVerificationLink(registeredEmail)}
+                  className="mt-3 w-full bg-white hover:bg-gray-100 text-black font-bold px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  disabled={resendLoading}
+                >
+                  {resendLoading ? "Obteniendo..." : "Obtener enlace de verificación"}
+                </button>
+              )}
+              
+              <div className="mt-4 pt-3 border-t border-yellow-400/30">
+                <Link 
+                  href="/login" 
+                  className="block text-center text-yellow-200 hover:text-yellow-100 text-xs font-medium transition-colors duration-200"
+                >
+                  Ya verifiqué mi email, ir a login →
+                </Link>
+              </div>
             </div>
           )}
 

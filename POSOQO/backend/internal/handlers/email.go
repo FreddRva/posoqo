@@ -250,7 +250,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			backendURL = renderURL
 		} else {
 			// Fallback: verificar si BASE_URL es del backend
-			baseURL := os.Getenv("BASE_URL")
+	baseURL := os.Getenv("BASE_URL")
 			if strings.Contains(baseURL, "onrender.com") {
 				backendURL = baseURL
 			} else {
@@ -310,26 +310,26 @@ func sendVerificationEmail(userID int64, email, name string) error {
 		}
 		fmt.Printf("[EMAIL] ⚠️ Error con API REST de Resend: %v - intentando SMTP...\n", apiErr)
 	}
-	
+
 	// Enviar email - Intentar método simple primero (más confiable)
 	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
 	fmt.Printf("[EMAIL] Intentando enviar email a través de: %s\n", addr)
 	fmt.Printf("[EMAIL] From: %s <%s>\n", config.FromName, config.FromEmail)
 	fmt.Printf("[EMAIL] To: %s\n", email)
 	fmt.Printf("[EMAIL] Tamaño del mensaje: %d bytes\n", len(message.String()))
-	
+
 	// Intentar método simple primero (funciona mejor con la mayoría de servidores SMTP)
 	fmt.Printf("[EMAIL] Intentando envío directo con smtp.SendMail...\n")
 	err = smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
 	if err != nil {
 		fmt.Printf("[EMAIL] ❌ Error con smtp.SendMail: %v\n", err)
 		fmt.Printf("[EMAIL] Intentando método alternativo con conexión manual...\n")
-		
+
 		// Método alternativo: conexión manual con STARTTLS
 		dialer := &net.Dialer{
 			Timeout: 10 * time.Second,
 		}
-		
+
 		fmt.Printf("[EMAIL] Estableciendo conexión SMTP...\n")
 		conn, dialErr := dialer.Dial("tcp", addr)
 		if dialErr != nil {
@@ -337,7 +337,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			return fmt.Errorf("error conectando a servidor SMTP: %w (método directo: %v)", dialErr, err)
 		}
 		defer conn.Close()
-		
+
 		fmt.Printf("[EMAIL] Conexión establecida\n")
 		client, clientErr := smtp.NewClient(conn, config.SMTPHost)
 		if clientErr != nil {
@@ -345,11 +345,11 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			return fmt.Errorf("error creando cliente SMTP: %w", clientErr)
 		}
 		defer client.Quit()
-		
+
 		// Configurar timeout
 		deadline := time.Now().Add(20 * time.Second)
 		conn.SetDeadline(deadline)
-		
+
 		// STARTTLS si es necesario (puerto 587)
 		if config.SMTPPort == "587" {
 			fmt.Printf("[EMAIL] Iniciando STARTTLS...\n")
@@ -363,7 +363,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 				fmt.Printf("[EMAIL] STARTTLS exitoso\n")
 			}
 		}
-		
+
 		// Autenticar
 		fmt.Printf("[EMAIL] Autenticando...\n")
 		if authErr := client.Auth(auth); authErr != nil {
@@ -371,39 +371,39 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			return fmt.Errorf("error en autenticación SMTP: %w", authErr)
 		}
 		fmt.Printf("[EMAIL] Autenticación exitosa\n")
-		
+
 		// Configurar remitente
 		if mailErr := client.Mail(config.FromEmail); mailErr != nil {
 			fmt.Printf("[EMAIL] ❌ Error configurando remitente: %v\n", mailErr)
 			return fmt.Errorf("error configurando remitente: %w", mailErr)
 		}
-		
+
 		// Configurar destinatario
 		if rcptErr := client.Rcpt(email); rcptErr != nil {
 			fmt.Printf("[EMAIL] ❌ Error configurando destinatario: %v\n", rcptErr)
 			return fmt.Errorf("error configurando destinatario: %w", rcptErr)
 		}
-		
+
 		// Enviar datos
 		writer, dataErr := client.Data()
 		if dataErr != nil {
 			fmt.Printf("[EMAIL] ❌ Error iniciando envío de datos: %v\n", dataErr)
 			return fmt.Errorf("error iniciando envío de datos: %w", dataErr)
 		}
-		
+
 		messageBytes := []byte(message.String())
 		if _, writeErr := writer.Write(messageBytes); writeErr != nil {
 			writer.Close()
 			fmt.Printf("[EMAIL] ❌ Error escribiendo datos: %v\n", writeErr)
 			return fmt.Errorf("error escribiendo datos: %w", writeErr)
 		}
-		
+
 		if closeErr := writer.Close(); closeErr != nil {
 			fmt.Printf("[EMAIL] ❌ Error cerrando escritor: %v\n", closeErr)
 			return fmt.Errorf("error cerrando escritor: %w", closeErr)
 		}
 	}
-	
+
 	fmt.Printf("[EMAIL] ✅ Email enviado exitosamente a %s\n", email)
 	return nil
 }
@@ -411,6 +411,27 @@ func sendVerificationEmail(userID int64, email, name string) error {
 // sendEmailViaResendAPI envía email usando la API REST de Resend
 func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL string) error {
 	fmt.Printf("[RESEND API] Iniciando envío vía API REST...\n")
+	
+	// Si el FROM_EMAIL es onboarding@resend.dev (modo prueba), usar el email registrado en Resend
+	// En modo prueba, Resend solo permite enviar a tu propio email registrado
+	// Para producción, necesitas verificar un dominio
+	effectiveFromEmail := fromEmail
+	if fromEmail == "onboarding@resend.dev" {
+		// Intentar usar el email registrado en Resend (si está configurado)
+		registeredEmail := os.Getenv("RESEND_REGISTERED_EMAIL")
+		if registeredEmail == "" {
+			// Por defecto, si no hay RESEND_REGISTERED_EMAIL configurado, usar el mismo email del destinatario
+			// Esto funciona si estás enviando a tu propio email en modo prueba
+			effectiveFromEmail = toEmail
+			fmt.Printf("[RESEND API] ⚠️ Usando email de destino como remitente (modo prueba de Resend)\n")
+		} else {
+			effectiveFromEmail = registeredEmail
+			fmt.Printf("[RESEND API] Usando email registrado en Resend: %s\n", registeredEmail)
+		}
+	}
+	
+	fmt.Printf("[RESEND API] From: %s\n", effectiveFromEmail)
+	fmt.Printf("[RESEND API] To: %s\n", toEmail)
 	
 	// Preparar el cuerpo HTML del email
 	emailBody := fmt.Sprintf(`
@@ -457,48 +478,48 @@ func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL str
 	
 	// Estructura de la petición a Resend API
 	payload := map[string]interface{}{
-		"from":    fmt.Sprintf("%s <%s>", "POSOQO", fromEmail),
+		"from":    fmt.Sprintf("%s <%s>", "POSOQO", effectiveFromEmail),
 		"to":      []string{toEmail},
 		"subject": "Verifica tu email - POSOQO",
 		"html":    emailBody,
 	}
-	
+
 	jsonData, jsonErr := json.Marshal(payload)
 	if jsonErr != nil {
 		return fmt.Errorf("error creando JSON: %w", jsonErr)
 	}
-	
+
 	// Crear petición HTTP
 	req, reqErr := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(jsonData))
 	if reqErr != nil {
 		return fmt.Errorf("error creando petición: %w", reqErr)
 	}
-	
+
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 	req.Header.Set("Content-Type", "application/json")
-	
+
 	// Cliente HTTP con timeout
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	
+
 	fmt.Printf("[RESEND API] Enviando petición a Resend API...\n")
 	resp, httpErr := client.Do(req)
 	if httpErr != nil {
 		return fmt.Errorf("error en petición HTTP: %w", httpErr)
 	}
 	defer resp.Body.Close()
-	
+
 	body, readErr := io.ReadAll(resp.Body)
 	if readErr != nil {
 		return fmt.Errorf("error leyendo respuesta: %w", readErr)
 	}
-	
+
 	if resp.StatusCode != http.StatusOK {
 		fmt.Printf("[RESEND API] ❌ Error: Status %d, Body: %s\n", resp.StatusCode, string(body))
 		return fmt.Errorf("error de API: status %d, respuesta: %s", resp.StatusCode, string(body))
 	}
-	
+
 	fmt.Printf("[RESEND API] ✅ Respuesta exitosa: %s\n", string(body))
 	return nil
 }
