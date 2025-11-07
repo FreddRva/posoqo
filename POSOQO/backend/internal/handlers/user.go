@@ -612,7 +612,13 @@ func SocialLogin(c *fiber.Ctx) error {
 	var name, email, role string
 	err := db.DB.QueryRow(context.Background(), "SELECT id, name, email, role FROM users WHERE email=$1", req.Email).Scan(&id, &name, &email, &role)
 	if err == nil {
-		// Usuario ya existe, genera token y retorna info
+		// Usuario ya existe, actualizar email_verified a true (Google ya verificó el email)
+		_, err = db.DB.Exec(context.Background(), "UPDATE users SET email_verified = true WHERE id = $1", id)
+		if err != nil {
+			// Log el error pero continúa, no es crítico
+			fmt.Printf("Error actualizando email_verified para usuario %d: %v\n", id, err)
+		}
+		// Genera token y retorna info
 		tokenPair, err := generateTokenPair(id, name, email, role)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"error": "Error al generar tokens"})
@@ -623,10 +629,11 @@ func SocialLogin(c *fiber.Ctx) error {
 	}
 
 	// Crear usuario con password aleatorio/no usable
+	// Marcar email_verified como true porque Google ya verificó el email
 	fakePassword := utils.GenerateRandomPassword(32)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(fakePassword), bcrypt.DefaultCost)
 	err = db.DB.QueryRow(context.Background(),
-		"INSERT INTO users (name, last_name, dni, phone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6, 'user') RETURNING id",
+		"INSERT INTO users (name, last_name, dni, phone, email, password, role, email_verified) VALUES ($1, $2, $3, $4, $5, $6, 'user', true) RETURNING id",
 		req.Name, "", "", "", req.Email, string(hash)).Scan(&id)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "No se pudo crear usuario"})
@@ -1091,5 +1098,207 @@ func VerifyToken(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status":  "error",
 		"message": "Token inválido",
+	})
+}
+
+// ForgotPassword godoc
+// @Summary Solicitar código de recuperación de contraseña
+// @Description Envía un código de 6 dígitos al email del usuario para recuperar su contraseña
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param email body string true "Email del usuario"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /api/forgot-password [post]
+func ForgotPassword(c *fiber.Ctx) error {
+	var req struct {
+		Email string `json:"email"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Datos inválidos",
+		})
+	}
+
+	if req.Email == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Email requerido",
+		})
+	}
+
+	// Normalizar email
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+
+	// Validar formato de email
+	if !utils.IsValidEmail(req.Email) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Email inválido",
+		})
+	}
+
+	// Buscar usuario
+	var userID int64
+	var name string
+	var emailVerified bool
+	err := db.DB.QueryRow(context.Background(),
+		"SELECT id, name, email_verified FROM users WHERE email = $1",
+		req.Email,
+	).Scan(&userID, &name, &emailVerified)
+
+	if err != nil {
+		// Por seguridad, no revelar si el usuario existe o no
+		// Devolver éxito siempre para evitar enumeración de emails
+		return c.JSON(fiber.Map{
+			"message": "Si el email existe, recibirás un código de recuperación",
+		})
+	}
+
+	// Verificar que el email esté verificado
+	if !emailVerified {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "El email no está verificado. Por favor, verifica tu email primero.",
+		})
+	}
+
+	// Crear código de recuperación
+	resetCode, createErr := createPasswordResetCode(userID, req.Email)
+	if createErr != nil {
+		fmt.Printf("[FORGOT PASSWORD] Error creando código: %v\n", createErr)
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al generar código de recuperación",
+		})
+	}
+
+	// Enviar email con código en background
+	go func() {
+		fmt.Printf("[FORGOT PASSWORD] Enviando código de recuperación a: %s\n", req.Email)
+		sendErr := sendPasswordResetCode(userID, req.Email, name, resetCode.Code)
+		if sendErr != nil {
+			fmt.Printf("[FORGOT PASSWORD] ❌ Error enviando email: %v\n", sendErr)
+		} else {
+			fmt.Printf("[FORGOT PASSWORD] ✅ Email con código enviado exitosamente\n")
+		}
+	}()
+
+	// Por seguridad, no devolver el código en la respuesta
+	// Solo confirmar que se envió (si el usuario existe)
+	return c.JSON(fiber.Map{
+		"message": "Si el email existe y está verificado, recibirás un código de recuperación en tu correo",
+	})
+}
+
+// ResetPassword godoc
+// @Summary Restablecer contraseña con código
+// @Description Restablece la contraseña del usuario usando el código de verificación recibido por email
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param data body map[string]string true "Email, código y nueva contraseña"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Router /api/reset-password [post]
+func ResetPassword(c *fiber.Ctx) error {
+	var req struct {
+		Email       string `json:"email"`
+		Code        string `json:"code"`
+		NewPassword string `json:"new_password"`
+	}
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Datos inválidos",
+		})
+	}
+
+	// Validar campos requeridos
+	if req.Email == "" || req.Code == "" || req.NewPassword == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Email, código y nueva contraseña son requeridos",
+		})
+	}
+
+	// Normalizar email
+	req.Email = strings.TrimSpace(strings.ToLower(req.Email))
+	req.Code = strings.TrimSpace(req.Code)
+
+	// Validar formato de email
+	if !utils.IsValidEmail(req.Email) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Email inválido",
+		})
+	}
+
+	// Validar código (debe ser de 6 dígitos)
+	if len(req.Code) != 6 {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Código inválido. Debe ser de 6 dígitos",
+		})
+	}
+
+	// Validar contraseña fuerte
+	if !utils.IsStrongPassword(req.NewPassword) {
+		return c.Status(400).JSON(fiber.Map{
+			"error": "La contraseña debe tener al menos 8 caracteres, mayúscula, minúscula, número y símbolo",
+		})
+	}
+
+	// Buscar código de recuperación válido
+	var userID int64
+	var expiresAt time.Time
+	err := db.DB.QueryRow(context.Background(),
+		"SELECT user_id, expires_at FROM password_reset_codes WHERE email = $1 AND code = $2 AND used = false",
+		req.Email, req.Code,
+	).Scan(&userID, &expiresAt)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{
+			"error": "Código inválido o expirado",
+		})
+	}
+
+	// Verificar si el código ha expirado
+	if time.Now().After(expiresAt) {
+		return c.Status(401).JSON(fiber.Map{
+			"error": "Código expirado. Solicita uno nuevo",
+		})
+	}
+
+	// Hashear nueva contraseña
+	hash, hashErr := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if hashErr != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al procesar contraseña",
+		})
+	}
+
+	// Actualizar contraseña del usuario
+	_, updateErr := db.DB.Exec(context.Background(),
+		"UPDATE users SET password = $1 WHERE id = $2",
+		string(hash), userID,
+	)
+	if updateErr != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Error al actualizar contraseña",
+		})
+	}
+
+	// Marcar código como usado
+	_, markErr := db.DB.Exec(context.Background(),
+		"UPDATE password_reset_codes SET used = true WHERE email = $1 AND code = $2",
+		req.Email, req.Code,
+	)
+	if markErr != nil {
+		// Log error pero no fallar, la contraseña ya se cambió
+		fmt.Printf("[RESET PASSWORD] Error marcando código como usado: %v\n", markErr)
+	}
+
+	fmt.Printf("[RESET PASSWORD] ✅ Contraseña restablecida exitosamente para usuario ID: %d\n", userID)
+
+	return c.JSON(fiber.Map{
+		"message": "Contraseña restablecida exitosamente. Puedes iniciar sesión con tu nueva contraseña",
 	})
 }

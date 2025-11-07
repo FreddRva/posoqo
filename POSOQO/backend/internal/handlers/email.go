@@ -250,7 +250,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 			backendURL = renderURL
 		} else {
 			// Fallback: verificar si BASE_URL es del backend
-	baseURL := os.Getenv("BASE_URL")
+			baseURL := os.Getenv("BASE_URL")
 			if strings.Contains(baseURL, "onrender.com") {
 				backendURL = baseURL
 			} else {
@@ -411,7 +411,7 @@ func sendVerificationEmail(userID int64, email, name string) error {
 // sendEmailViaResendAPI envía email usando la API REST de Resend
 func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL string) error {
 	fmt.Printf("[RESEND API] Iniciando envío vía API REST...\n")
-	
+
 	// Si el FROM_EMAIL es onboarding@resend.dev (modo prueba), usar el email registrado en Resend
 	// En modo prueba, Resend solo permite enviar a tu propio email registrado
 	// Para producción, necesitas verificar un dominio
@@ -429,10 +429,10 @@ func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL str
 			fmt.Printf("[RESEND API] Usando email registrado en Resend: %s\n", registeredEmail)
 		}
 	}
-	
+
 	fmt.Printf("[RESEND API] From: %s\n", effectiveFromEmail)
 	fmt.Printf("[RESEND API] To: %s\n", toEmail)
-	
+
 	// Preparar el cuerpo HTML del email
 	emailBody := fmt.Sprintf(`
 <!DOCTYPE html>
@@ -475,7 +475,7 @@ func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL str
 </body>
 </html>
 `, name, verificationURL)
-	
+
 	// Estructura de la petición a Resend API
 	payload := map[string]interface{}{
 		"from":    fmt.Sprintf("%s <%s>", "POSOQO", effectiveFromEmail),
@@ -699,4 +699,413 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	}()
 
 	return c.JSON(response)
+}
+
+// Estructura para códigos de recuperación de contraseña
+type PasswordResetCode struct {
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	Code      string    `json:"code"`
+	Email     string    `json:"email"`
+	ExpiresAt time.Time `json:"expires_at"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// Generar código de 6 dígitos para recuperación de contraseña
+func generatePasswordResetCode() string {
+	// Generar número aleatorio de 6 dígitos (100000 a 999999)
+	min := 100000
+	max := 999999
+	// Generar número aleatorio
+	bytes := make([]byte, 4)
+	rand.Read(bytes)
+	// Convertir a entero y ajustar al rango
+	num := int(bytes[0])<<24 | int(bytes[1])<<16 | int(bytes[2])<<8 | int(bytes[3])
+	if num < 0 {
+		num = -num
+	}
+	codeNum := min + (num % (max - min + 1))
+	return fmt.Sprintf("%06d", codeNum)
+}
+
+// Crear código de recuperación en la base de datos
+func createPasswordResetCode(userID int64, email string) (*PasswordResetCode, error) {
+	code := generatePasswordResetCode()
+
+	// Código expira en 15 minutos
+	expiresAt := time.Now().Add(15 * time.Minute)
+
+	// Invalidar códigos anteriores no usados para el mismo usuario
+	_, err := db.DB.Exec(context.Background(),
+		"UPDATE password_reset_codes SET used = true WHERE user_id = $1 AND used = false",
+		userID,
+	)
+	if err != nil {
+		fmt.Printf("[PASSWORD RESET] Error invalidando códigos anteriores: %v\n", err)
+	}
+
+	// Insertar nuevo código en la base de datos
+	var id int64
+	err = db.DB.QueryRow(context.Background(),
+		"INSERT INTO password_reset_codes (user_id, code, email, expires_at) VALUES ($1, $2, $3, $4) RETURNING id",
+		userID, code, email, expiresAt,
+	).Scan(&id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &PasswordResetCode{
+		ID:        id,
+		UserID:    userID,
+		Code:      code,
+		Email:     email,
+		ExpiresAt: expiresAt,
+		CreatedAt: time.Now(),
+	}, nil
+}
+
+// Template HTML para email de recuperación de contraseña
+const passwordResetTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - POSOQO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        .title {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .code-container {
+            background: linear-gradient(135deg, #FFD700, #D4AF37);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #000;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 12px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">POSOQO</div>
+            <div class="title">Recuperar Contraseña</div>
+        </div>
+        
+        <div class="content">
+            <p>Hola {{.Name}},</p>
+            
+            <p>Recibimos una solicitud para recuperar la contraseña de tu cuenta en POSOQO.</p>
+            
+            <p>Utiliza el siguiente código para restablecer tu contraseña:</p>
+            
+            <div class="code-container">
+                <div class="code">{{.Code}}</div>
+            </div>
+            
+            <div class="warning">
+                <strong>Importante:</strong> 
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Este código expirará en 15 minutos</li>
+                    <li>No compartas este código con nadie</li>
+                    <li>Si no solicitaste este código, ignora este email</li>
+                </ul>
+            </div>
+            
+            <p>Si no solicitaste recuperar tu contraseña, puedes ignorar este email de forma segura.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Este es un email automático, no respondas a este mensaje.</p>
+            <p>&copy; 2024 POSOQO. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+`
+
+// Enviar email con código de recuperación de contraseña
+func sendPasswordResetCode(userID int64, email, name, code string) error {
+	fmt.Printf("[PASSWORD RESET] Iniciando envío de código a: %s (userID: %d)\n", email, userID)
+
+	// Obtener configuración de email
+	config := getEmailConfig()
+
+	// Verificar que la configuración esté completa
+	if config.SMTPHost == "" || config.SMTPUser == "" || config.SMTPPassword == "" {
+		fmt.Printf("[PASSWORD RESET] ⚠️ Configuración SMTP incompleta - no se enviará email\n")
+		return fmt.Errorf("configuración SMTP incompleta")
+	}
+
+	// Preparar datos para el template
+	data := struct {
+		Name string
+		Code string
+	}{
+		Name: name,
+		Code: code,
+	}
+
+	// Renderizar template
+	tmpl, err := template.New("passwordReset").Parse(passwordResetTemplate)
+	if err != nil {
+		return err
+	}
+
+	var body strings.Builder
+	if err := tmpl.Execute(&body, data); err != nil {
+		return err
+	}
+
+	// Configurar autenticación SMTP
+	auth := smtp.PlainAuth("", config.SMTPUser, config.SMTPPassword, config.SMTPHost)
+
+	// Preparar headers del email
+	headers := make(map[string]string)
+	headers["From"] = fmt.Sprintf("%s <%s>", config.FromName, config.FromEmail)
+	headers["To"] = email
+	headers["Subject"] = "Código de recuperación de contraseña - POSOQO"
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = "text/html; charset=UTF-8"
+
+	// Construir mensaje
+	var message strings.Builder
+	for key, value := range headers {
+		message.WriteString(fmt.Sprintf("%s: %s\r\n", key, value))
+	}
+	message.WriteString("\r\n")
+	message.WriteString(body.String())
+
+	// Intentar primero con API REST de Resend (más confiable)
+	if config.SMTPHost == "smtp.resend.com" && config.SMTPPassword != "" {
+		fmt.Printf("[PASSWORD RESET] Detectado Resend - intentando API REST...\n")
+		apiErr := sendPasswordResetCodeViaResendAPI(config.SMTPPassword, config.FromEmail, email, name, code)
+		if apiErr == nil {
+			fmt.Printf("[PASSWORD RESET] ✅ Email enviado exitosamente vía API REST de Resend\n")
+			return nil
+		}
+		fmt.Printf("[PASSWORD RESET] ⚠️ Error con API REST de Resend: %v - intentando SMTP...\n", apiErr)
+	}
+
+	// Enviar email vía SMTP
+	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
+	fmt.Printf("[PASSWORD RESET] Intentando enviar email a través de: %s\n", addr)
+
+	err = smtp.SendMail(addr, auth, config.FromEmail, []string{email}, []byte(message.String()))
+	if err != nil {
+		fmt.Printf("[PASSWORD RESET] ❌ Error con smtp.SendMail: %v\n", err)
+
+		// Método alternativo: conexión manual con STARTTLS
+		dialer := &net.Dialer{
+			Timeout: 10 * time.Second,
+		}
+
+		conn, dialErr := dialer.Dial("tcp", addr)
+		if dialErr != nil {
+			return fmt.Errorf("error conectando a servidor SMTP: %w", dialErr)
+		}
+		defer conn.Close()
+
+		client, clientErr := smtp.NewClient(conn, config.SMTPHost)
+		if clientErr != nil {
+			return fmt.Errorf("error creando cliente SMTP: %w", clientErr)
+		}
+		defer client.Quit()
+
+		deadline := time.Now().Add(20 * time.Second)
+		conn.SetDeadline(deadline)
+
+		if config.SMTPPort == "587" {
+			tlsConfig := &tls.Config{
+				ServerName:         config.SMTPHost,
+				InsecureSkipVerify: false,
+			}
+			if starttlsErr := client.StartTLS(tlsConfig); starttlsErr != nil {
+				fmt.Printf("[PASSWORD RESET] ⚠️ Error en STARTTLS: %v\n", starttlsErr)
+			}
+		}
+
+		if authErr := client.Auth(auth); authErr != nil {
+			return fmt.Errorf("error en autenticación SMTP: %w", authErr)
+		}
+
+		if mailErr := client.Mail(config.FromEmail); mailErr != nil {
+			return fmt.Errorf("error configurando remitente: %w", mailErr)
+		}
+
+		if rcptErr := client.Rcpt(email); rcptErr != nil {
+			return fmt.Errorf("error configurando destinatario: %w", rcptErr)
+		}
+
+		writer, dataErr := client.Data()
+		if dataErr != nil {
+			return fmt.Errorf("error iniciando envío de datos: %w", dataErr)
+		}
+
+		messageBytes := []byte(message.String())
+		if _, writeErr := writer.Write(messageBytes); writeErr != nil {
+			writer.Close()
+			return fmt.Errorf("error escribiendo datos: %w", writeErr)
+		}
+
+		if closeErr := writer.Close(); closeErr != nil {
+			return fmt.Errorf("error cerrando escritor: %w", closeErr)
+		}
+	}
+
+	fmt.Printf("[PASSWORD RESET] ✅ Email con código enviado exitosamente a %s\n", email)
+	return nil
+}
+
+// sendPasswordResetCodeViaResendAPI envía código de recuperación usando la API REST de Resend
+func sendPasswordResetCodeViaResendAPI(apiKey, fromEmail, toEmail, name, code string) error {
+	fmt.Printf("[RESEND API] Iniciando envío de código de recuperación vía API REST...\n")
+
+	effectiveFromEmail := fromEmail
+	if fromEmail == "onboarding@resend.dev" {
+		registeredEmail := os.Getenv("RESEND_REGISTERED_EMAIL")
+		if registeredEmail == "" {
+			effectiveFromEmail = toEmail
+		} else {
+			effectiveFromEmail = registeredEmail
+		}
+	}
+
+	emailBody := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - POSOQO</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 24px; font-weight: bold; color: #FFD700; margin-bottom: 10px;">POSOQO</div>
+            <div style="color: #333; font-size: 20px; margin-bottom: 20px;">Recuperar Contraseña</div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <p>Hola %s,</p>
+            
+            <p>Recibimos una solicitud para recuperar la contraseña de tu cuenta en POSOQO.</p>
+            
+            <p>Utiliza el siguiente código para restablecer tu contraseña:</p>
+            
+            <div style="background: linear-gradient(135deg, #FFD700, #D4AF37); padding: 20px; border-radius: 10px; text-align: center; margin: 30px 0;">
+                <div style="font-size: 36px; font-weight: bold; color: #000; letter-spacing: 8px; font-family: 'Courier New', monospace;">%s</div>
+            </div>
+            
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin: 20px 0;">
+                <strong>Importante:</strong> Este código expirará en 15 minutos. No compartas este código con nadie.
+            </div>
+            
+            <p>Si no solicitaste recuperar tu contraseña, puedes ignorar este email de forma segura.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
+            <p>Este es un email automático, no respondas a este mensaje.</p>
+            <p>&copy; 2024 POSOQO. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+`, name, code)
+
+	payload := map[string]interface{}{
+		"from":    fmt.Sprintf("%s <%s>", "POSOQO", effectiveFromEmail),
+		"to":      []string{toEmail},
+		"subject": "Código de recuperación de contraseña - POSOQO",
+		"html":    emailBody,
+	}
+
+	jsonData, jsonErr := json.Marshal(payload)
+	if jsonErr != nil {
+		return fmt.Errorf("error creando JSON: %w", jsonErr)
+	}
+
+	req, reqErr := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(jsonData))
+	if reqErr != nil {
+		return fmt.Errorf("error creando petición: %w", reqErr)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	resp, httpErr := client.Do(req)
+	if httpErr != nil {
+		return fmt.Errorf("error en petición HTTP: %w", httpErr)
+	}
+	defer resp.Body.Close()
+
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return fmt.Errorf("error leyendo respuesta: %w", readErr)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error de API: status %d, respuesta: %s", resp.StatusCode, string(body))
+	}
+
+	fmt.Printf("[RESEND API] ✅ Respuesta exitosa: %s\n", string(body))
+	return nil
 }
