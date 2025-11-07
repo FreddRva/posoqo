@@ -381,7 +381,7 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 	// Verificar si SMTP está configurado
 	config := getEmailConfig()
 	smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
-	
+
 	// Enviar email de verificación
 	err = sendVerificationEmail(userID, req.Email, name)
 	if err != nil {
@@ -403,14 +403,14 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 			"SELECT token, expires_at FROM email_verifications WHERE user_id = $1 AND used = false AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1",
 			userID,
 		).Scan(&token, &expiresAt)
-		
+
 		if err == nil {
 			baseURL := os.Getenv("BASE_URL")
 			if baseURL == "" {
 				baseURL = "http://localhost:3000"
 			}
 			verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", baseURL, token)
-			
+
 			response["token"] = token
 			response["verification_url"] = verificationURL
 			response["development_mode"] = true

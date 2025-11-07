@@ -92,10 +92,10 @@ func SubscribeToRaffle(c *fiber.Ctx) error {
 		})
 	}
 
-	if len(req.Telefono) < 9 || len(req.Telefono) > 20 {
+	if !utils.IsValidPeruvianPhone(req.Telefono) {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"success": false,
-			"error":   "El teléfono debe tener entre 9 y 20 caracteres",
+			"error":   "Número de teléfono inválido. Debe ser un número peruano válido (ej: 987654321 o +51 987654321)",
 		})
 	}
 
