@@ -136,7 +136,78 @@ async function refreshAccessToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   
   try {
-    // Obtener el refresh token del localStorage
+    // Primero intentar usar NextAuth para refrescar (más confiable)
+    try {
+      const { getSession } = await import('next-auth/react');
+      const session = await getSession();
+      
+      if (session && (session as any).refreshToken) {
+        const response = await fetch(getApiUrl('/auth/refresh'), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ refresh_token: (session as any).refreshToken }),
+        });
+        
+        if (response.ok) {
+          const tokenData = await response.json();
+          const accessToken = tokenData.tokens?.access_token || tokenData.access_token;
+          const refreshToken = tokenData.tokens?.refresh_token || tokenData.refresh_token;
+          const expiresIn = tokenData.tokens?.expires_in || tokenData.expires_in || 900;
+          
+          if (!accessToken) {
+            console.error('No se recibió access_token en la respuesta de refresh');
+            return null;
+          }
+          
+          // Actualizar localStorage primero
+          const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
+          if (nextAuthKey) {
+            try {
+              const currentData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
+              currentData.data = {
+                ...currentData.data,
+                accessToken: accessToken,
+                refreshToken: refreshToken || (session as any).refreshToken,
+                accessTokenExpires: Date.now() + (expiresIn * 1000),
+              };
+              localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
+            } catch (err) {
+              console.error('Error actualizando NextAuth localStorage:', err);
+            }
+          }
+          
+          // También guardar en nuestra key personalizada
+          try {
+            localStorage.setItem('posoqo.auth.tokens', JSON.stringify({
+              accessToken: accessToken,
+              refreshToken: refreshToken || (session as any).refreshToken,
+              accessTokenExpires: Date.now() + (expiresIn * 1000),
+            }));
+          } catch (err) {
+            console.error('Error guardando tokens en localStorage:', err);
+          }
+          
+          // Forzar actualización de la sesión de NextAuth (esto actualizará el JWT callback)
+          try {
+            await getSession({ trigger: true });
+          } catch (err) {
+            console.warn('Error actualizando sesión NextAuth:', err);
+          }
+          
+          return accessToken;
+        } else {
+          // Si el refresh falla, verificar el error
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Error refrescando token:', errorData);
+        }
+      }
+    } catch (nextAuthError) {
+      console.warn('Error refrescando con NextAuth:', nextAuthError);
+    }
+    
+    // Fallback: Intentar con localStorage
     const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
     if (nextAuthKey) {
       const data = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
@@ -158,18 +229,37 @@ async function refreshAccessToken(): Promise<string | null> {
           const currentData = JSON.parse(localStorage.getItem(nextAuthKey) || '{}');
           currentData.data = {
             ...currentData.data,
-            accessToken: tokenData.access_token,
-            refreshToken: tokenData.refresh_token,
-            accessTokenExpires: Date.now() + (tokenData.expires_in * 1000),
+            accessToken: tokenData.tokens?.access_token || tokenData.access_token,
+            refreshToken: tokenData.tokens?.refresh_token || tokenData.refresh_token,
+            accessTokenExpires: Date.now() + ((tokenData.tokens?.expires_in || tokenData.expires_in || 900) * 1000),
           };
           localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
           
-          return tokenData.access_token;
+          // Guardar también en nuestra key personalizada
+          localStorage.setItem('posoqo.auth.tokens', JSON.stringify({
+            accessToken: tokenData.tokens?.access_token || tokenData.access_token,
+            refreshToken: tokenData.tokens?.refresh_token || tokenData.refresh_token,
+            accessTokenExpires: Date.now() + ((tokenData.tokens?.expires_in || tokenData.expires_in || 900) * 1000),
+          }));
+          
+          return tokenData.tokens?.access_token || tokenData.access_token;
+        } else {
+          // Si el refresh falla, limpiar tokens
+          const errorData = await response.json().catch(() => ({}));
+          if (errorData.error === 'Refresh token expirado' || errorData.error === 'Refresh token inválido') {
+            // Limpiar tokens expirados
+            localStorage.removeItem(nextAuthKey);
+            localStorage.removeItem('posoqo.auth.tokens');
+            // Redirigir al login
+            if (typeof window !== 'undefined') {
+              window.location.href = '/login';
+            }
+          }
         }
       }
     }
   } catch (err) {
-    // Error silencioso para evitar logs innecesarios en producción
+    console.error('Error refrescando token:', err);
   }
   return null;
 }
@@ -228,6 +318,15 @@ export async function apiFetch<T>(
       const sessionToken = await getSessionToken();
       const authTokenResult = await getAuthToken();
       token = sessionToken || authTokenResult || undefined;
+    }
+    
+    // Si no hay token pero el endpoint requiere autenticación, intentar refrescar primero
+    if (!token && (endpoint.startsWith('/protected/') || endpoint.startsWith('/admin/'))) {
+      // Intentar obtener token refrescado
+      const refreshedToken = await refreshAccessToken();
+      if (refreshedToken) {
+        token = refreshedToken;
+      }
     }
 
     // Validar que el endpoint no esté vacío
@@ -303,27 +402,100 @@ export async function apiFetch<T>(
     }
     
     // Si el token expiró, intentar renovarlo y repetir la petición
-    if (res.status === 401 && token) {
-      const newToken = await refreshAccessToken();
+    if (res.status === 401) {
+      // Verificar si el error es realmente de token expirado
+      let errorData;
+      try {
+        errorData = await res.clone().json();
+      } catch {}
       
-      if (newToken) {
-        const retryRes = await fetch(getApiUrl(endpoint), {
-          ...fetchOptions,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${newToken}`,
-            ...fetchOptions.headers,
-          },
-        });
+      // Solo intentar refresh si es error de token expirado o si tenemos un token
+      const isTokenExpiredError = errorData?.code === 'TOKEN_EXPIRED' || 
+                                   errorData?.error === 'Token expirado' ||
+                                   errorData?.error === 'Token inválido';
+      
+      if (isTokenExpiredError || token) {
+        console.log('[API] Token expirado, intentando refrescar...');
+        const newToken = await refreshAccessToken();
         
-        if (!retryRes.ok) {
-          let errorData;
-          try {
-            errorData = await retryRes.json();
-          } catch {}
-          throw handleApiError(retryRes, errorData);
+        if (newToken) {
+          console.log('[API] Token refrescado exitosamente, reintentando request...');
+          // Obtener headers actualizados con el nuevo token
+          const method = (fetchOptions.method || 'GET').toUpperCase();
+          const needsCSRF = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
+          const retryHeaders = await getRequestHeaders(needsCSRF);
+          
+          // Actualizar el header de Authorization con el nuevo token
+          retryHeaders['Authorization'] = `Bearer ${newToken}`;
+          
+          const retryRes = await fetch(getApiUrl(endpoint), {
+            ...fetchOptions,
+            headers: {
+              ...retryHeaders,
+              ...fetchOptions.headers,
+            },
+            signal,
+          });
+          
+          if (retryRes.ok) {
+            console.log('[API] Request exitosa después del refresh');
+            return retryRes.json();
+          } else {
+            // Si aún falla después del refresh, puede ser otro error
+            let retryErrorData;
+            try {
+              retryErrorData = await retryRes.json();
+            } catch {}
+            
+            // Si es otro 401 después del refresh, el refresh token puede estar expirado
+            if (retryRes.status === 401) {
+              console.error('[API] Refresh token también expirado, limpiando sesión...');
+              if (typeof window !== 'undefined') {
+                // Limpiar tokens
+                localStorage.removeItem('posoqo.auth.tokens');
+                const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
+                if (nextAuthKey) {
+                  localStorage.removeItem(nextAuthKey);
+                }
+                // Limpiar sesión de NextAuth
+                const { signOut } = await import('next-auth/react');
+                signOut({ redirect: false }).then(() => {
+                  window.location.href = '/login?error=session_expired';
+                });
+                return Promise.reject(new Error('Sesión expirada. Por favor, inicia sesión nuevamente.'));
+              }
+            }
+            
+            throw handleApiError(retryRes, retryErrorData);
+          }
+        } else {
+          // Si no se pudo refrescar, verificar si realmente es un error de sesión
+          console.error('[API] No se pudo refrescar el token');
+          
+          // Solo redirigir si realmente es un error de autenticación
+          if (isTokenExpiredError) {
+            if (typeof window !== 'undefined') {
+              // Limpiar tokens
+              localStorage.removeItem('posoqo.auth.tokens');
+              const nextAuthKey = Object.keys(localStorage).find(key => key.includes('nextauth'));
+              if (nextAuthKey) {
+                localStorage.removeItem(nextAuthKey);
+              }
+              // Limpiar sesión de NextAuth y redirigir
+              const { signOut } = await import('next-auth/react');
+              signOut({ redirect: false }).then(() => {
+                setTimeout(() => {
+                  window.location.href = '/login?error=session_expired';
+                }, 1000);
+              });
+            }
+          }
+          
+          throw handleApiError(res, errorData);
         }
-        return retryRes.json();
+      } else {
+        // Si no es error de token expirado, lanzar el error normal
+        throw handleApiError(res, errorData);
       }
     }
     
