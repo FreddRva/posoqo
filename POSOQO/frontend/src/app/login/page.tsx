@@ -30,6 +30,7 @@ export default function LoginPage() {
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
   // Hooks
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -151,6 +152,7 @@ export default function LoginPage() {
   const handleResendVerification = async () => {
     if (!unverifiedEmail) return;
     setResendStatus(null);
+    setVerificationUrl(null);
     try {
       const res = await fetch(getApiUrl("/resend-verification"), {
         method: "POST",
@@ -159,13 +161,16 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        // Si hay URL de verificación (modo desarrollo), mostrar el enlace
+        // Si hay URL de verificación (modo desarrollo), guardarla
         if (data.verification_url) {
-          setResendStatus(`SMTP no configurado. Haz clic aquí para verificar: ${data.verification_url}`);
+          setVerificationUrl(data.verification_url);
+          setResendStatus("SMTP no configurado. Usa el enlace de abajo para verificar tu email.");
         } else {
+          setVerificationUrl(null);
           setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
         }
       } else {
+        setVerificationUrl(null);
         setResendStatus(data.error || "No se pudo reenviar el email.");
       }
     } catch (e) {
@@ -342,22 +347,18 @@ export default function LoginPage() {
                 </button>
                 {resendStatus && (
                   <div className="mt-2.5 text-xs font-semibold">
-                    {resendStatus.includes('http') ? (
-                      <div>
-                        <p className="text-yellow-200 mb-2">SMTP no configurado. Haz clic en el enlace para verificar:</p>
-                        <a 
-                          href={resendStatus.split('verificar: ')[1]} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-300 hover:text-blue-200 underline break-all"
-                        >
-                          {resendStatus.split('verificar: ')[1]}
-                        </a>
-                      </div>
-                    ) : (
-                      <p className={resendStatus.startsWith('¡Email') ? 'text-green-200' : 'text-red-200'}>
-                        {resendStatus}
-                      </p>
+                    <p className={resendStatus.startsWith('¡Email') ? 'text-green-200' : resendStatus.startsWith('SMTP') ? 'text-yellow-200' : 'text-red-200'}>
+                      {resendStatus}
+                    </p>
+                    {verificationUrl && (
+                      <a 
+                        href={verificationUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="mt-2 block text-blue-300 hover:text-blue-200 underline break-all"
+                      >
+                        {verificationUrl}
+                      </a>
                     )}
                   </div>
                 )}
