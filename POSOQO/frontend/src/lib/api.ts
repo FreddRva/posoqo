@@ -7,6 +7,38 @@ function isTokenExpired(expiryTimestamp?: number): boolean {
   return Date.now() >= expiryTimestamp;
 }
 
+// Variable para almacenar el token CSRF
+let csrfToken: string | null = null;
+let csrfTokenExpiry: number = 0;
+
+// Función para obtener el token CSRF
+async function getCSRFToken(): Promise<string | null> {
+  // Si el token existe y no ha expirado, retornarlo
+  if (csrfToken && Date.now() < csrfTokenExpiry) {
+    return csrfToken;
+  }
+
+  // Si no hay token o expiró, obtener uno nuevo
+  try {
+    const response = await fetch(getApiUrl('/csrf-token'), {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      csrfToken = data.csrf_token;
+      // El token expira en 24 horas, pero renovarlo cada 12 horas para estar seguro
+      csrfTokenExpiry = new Date(data.expires_at).getTime();
+      return csrfToken;
+    }
+  } catch (error) {
+    console.error('Error obteniendo token CSRF:', error);
+  }
+
+  return null;
+}
+
 // Función para obtener el token de autenticación de forma segura
 async function getAuthToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
@@ -76,6 +108,29 @@ async function getSessionToken(): Promise<string | null> {
   }
 }
 
+// Función auxiliar para agregar headers necesarios (Auth + CSRF)
+async function getRequestHeaders(includeCSRF: boolean = true): Promise<HeadersInit> {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  // Agregar token de autenticación
+  const authToken = await getAuthToken();
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+
+  // Agregar token CSRF solo para métodos que modifican datos
+  if (includeCSRF) {
+    const csrf = await getCSRFToken();
+    if (csrf) {
+      headers['X-CSRF-Token'] = csrf;
+    }
+  }
+
+  return headers;
+}
+
 // Función para renovar el token usando el refresh token
 async function refreshAccessToken(): Promise<string | null> {
   if (typeof window === "undefined") return null;
@@ -130,7 +185,15 @@ function handleApiError(response: Response, errorData?: any): Error {
     if (response.status === 401) {
       errorMsg = "Sesión expirada. Por favor, inicia sesión nuevamente.";
     } else if (response.status === 403) {
-      errorMsg = "No tienes permisos para realizar esta acción.";
+      // Si es error de CSRF, intentar obtener nuevo token y retry
+      if (errorData?.code === 'CSRF_TOKEN_MISSING' || errorData?.code === 'CSRF_TOKEN_INVALID') {
+        // Invalidar token CSRF actual
+        csrfToken = null;
+        csrfTokenExpiry = 0;
+        errorMsg = "Token de seguridad expirado. Intenta de nuevo.";
+      } else {
+        errorMsg = "No tienes permisos para realizar esta acción.";
+      }
     } else if (response.status === 404) {
       errorMsg = "Recurso no encontrado.";
     } else if (response.status === 429) {
@@ -187,9 +250,14 @@ export async function apiFetch<T>(
     
     let res: Response;
     try {
+      // Determinar si necesita CSRF (POST, PUT, DELETE, PATCH modifican datos)
+      const method = (fetchOptions.method || 'GET').toUpperCase();
+      const needsCSRF = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
+      
+      // Obtener headers con CSRF si es necesario
+      const baseHeaders = await getRequestHeaders(needsCSRF);
       const headers = {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...baseHeaders,
         ...fetchOptions.headers,
       };
       
@@ -200,6 +268,38 @@ export async function apiFetch<T>(
       });
     } finally {
       clearTimeout(timeoutId);
+    }
+    
+    // Si hay error de CSRF, obtener nuevo token y retry
+    if (res.status === 403) {
+      try {
+        const errorData = await res.clone().json();
+        if (errorData?.code === 'CSRF_TOKEN_MISSING' || errorData?.code === 'CSRF_TOKEN_INVALID') {
+          // Invalidar token CSRF y obtener uno nuevo
+          csrfToken = null;
+          csrfTokenExpiry = 0;
+          const method = (fetchOptions.method || 'GET').toUpperCase();
+          const needsCSRF = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
+          
+          if (needsCSRF) {
+            const retryHeaders = await getRequestHeaders(true);
+            const retryRes = await fetch(apiUrl, {
+              ...fetchOptions,
+              headers: {
+                ...retryHeaders,
+                ...fetchOptions.headers,
+              },
+              signal,
+            });
+            
+            if (retryRes.ok || retryRes.status !== 403) {
+              res = retryRes;
+            }
+          }
+        }
+      } catch (e) {
+        // Continuar con el error original si no se puede parsear
+      }
     }
     
     // Si el token expiró, intentar renovarlo y repetir la petición
