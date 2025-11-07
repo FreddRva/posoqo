@@ -864,6 +864,15 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 
 // GetAdminUsersListPublic obtiene la lista de usuarios (admin)
 func GetAdminUsersListPublic(c *fiber.Ctx) error {
+	// Primero contar el total de usuarios en la BD
+	var totalCount int
+	err := db.DB.QueryRow(context.Background(), `SELECT COUNT(*) FROM users`).Scan(&totalCount)
+	if err != nil {
+		log.Printf("[USERS] Error contando usuarios: %v", err)
+	} else {
+		log.Printf("[USERS] Total usuarios en BD: %d", totalCount)
+	}
+
 	// Query con COALESCE para manejar valores NULL
 	rows, err := db.DB.Query(context.Background(), `
 		SELECT 
@@ -923,10 +932,11 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 		users = append(users, user)
 	}
 
-	log.Printf("[USERS] Total usuarios encontrados: %d (filas procesadas: %d)", len(users), rowCount)
+	log.Printf("[USERS] Total usuarios encontrados: %d (filas procesadas: %d, total en BD: %d)", len(users), rowCount, totalCount)
 
 	return c.JSON(fiber.Map{
 		"data": users,
+		"total_in_db": totalCount,
 	})
 }
 
