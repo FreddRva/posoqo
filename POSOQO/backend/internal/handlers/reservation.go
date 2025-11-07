@@ -3,7 +3,9 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -54,8 +56,10 @@ func CreateReservation(c *fiber.Ctx) error {
 	if req.Advance < 0 {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Adelanto inválido"})
 	}
-	fmt.Printf("🔍 [DEBUG] Creando reserva - UserID: %d, Date: %s, Time: %s, People: %d, PaymentMethod: %s, Advance: %f\n",
-		userID, req.Date, req.Time, req.People, req.PaymentMethod, req.Advance)
+	// Log solo en desarrollo (sin datos sensibles)
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Creando reserva - UserID: %d, People: %d", userID, req.People)
+	}
 
 	// Obtener información del usuario para la notificación
 	var userName string
@@ -68,7 +72,7 @@ func CreateReservation(c *fiber.Ctx) error {
 		`INSERT INTO reservations (user_id, date, time, people, payment_method, advance) VALUES ($1, $2, $3, $4, $5, $6)`,
 		userID, req.Date, req.Time, req.People, req.PaymentMethod, req.Advance)
 	if err != nil {
-		fmt.Printf("❌ [DEBUG] Error creando reserva: %v\n", err)
+		log.Printf("[ERROR] Error creando reserva: %v", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "No se pudo crear la reserva"})
 	}
 
@@ -83,7 +87,10 @@ func CreateReservation(c *fiber.Ctx) error {
 	adminNotificationMessage := fmt.Sprintf("Nueva reserva de %s para el %s a las %s (%d personas)", userName, req.Date, req.Time, req.People)
 	CreateAutomaticNotification("info", adminNotificationTitle, adminNotificationMessage, nil, nil)
 
-	fmt.Printf("✅ [DEBUG] Reserva creada exitosamente con notificaciones\n")
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Reserva creada exitosamente")
+	}
 	return c.Status(http.StatusCreated).JSON(fiber.Map{"message": "Reserva creada"})
 }
 

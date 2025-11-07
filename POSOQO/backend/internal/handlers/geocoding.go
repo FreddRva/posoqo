@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -46,10 +48,11 @@ func SearchLocation(c *fiber.Ctx) error {
 	// Construir URL de Nominatim con encoding correcto
 	encodedQuery := url.QueryEscape(req.Query)
 	apiUrl := fmt.Sprintf("https://nominatim.openstreetmap.org/search?q=%s&format=json&limit=10&countrycodes=pe&addressdetails=1&extratags=1", encodedQuery)
-	
-	// Log para debug
-	fmt.Printf("🔍 Buscando: %s\n", req.Query)
-	fmt.Printf("🌐 URL: %s\n", apiUrl)
+
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Buscando ubicación: %s", req.Query)
+	}
 
 	// Crear cliente HTTP con timeout
 	client := &http.Client{

@@ -15,6 +15,11 @@ func IsValidEmail(email string) bool {
 	return re.MatchString(email)
 }
 
+// Valida contraseña: mínimo 8 caracteres
+func IsValidPassword(password string) bool {
+	return len(password) >= 8
+}
+
 // Valida contraseña fuerte: min 8, mayúscula, minúscula, número, símbolo
 func IsStrongPassword(password string) bool {
 	var hasMinLen, hasUpper, hasLower, hasNumber, hasSymbol bool

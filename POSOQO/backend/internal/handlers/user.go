@@ -395,7 +395,10 @@ func Profile(c *fiber.Ctx) error {
 	userEmail := claims["email"].(string)
 	userRole := claims["role"].(string)
 
-	log.Printf("[DEBUG] Profile - Request for user ID: %v, Name: %s, Email: %s", userID, userName, userEmail)
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Profile - Request for user ID: %v, Name: %s, Email: %s", userID, userName, utils.SanitizeForLog(userEmail))
+	}
 
 	// Una sola consulta que obtenga todos los datos
 	var name, lastName, dni, phone, email, role string
@@ -656,7 +659,10 @@ func UpdateProfile(c *fiber.Ctx) error {
 	userEmail := claims["email"].(string)
 	userRole := claims["role"].(string)
 
-	log.Printf("[DEBUG] UpdateProfile - Iniciando actualización para usuario ID: %v", userID)
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] UpdateProfile - Iniciando actualización para usuario ID: %v", userID)
+	}
 
 	type UpdateProfileRequest struct {
 		Name         string   `json:"name"`
@@ -675,8 +681,10 @@ func UpdateProfile(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Datos inválidos"})
 	}
 
-	// Log para debugging
-	log.Printf("[DEBUG] UpdateProfile - UserID: %v, Request: %+v", userID, req)
+	// Log solo en desarrollo (sin datos sensibles)
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] UpdateProfile - UserID: %v", userID)
+	}
 
 	// Validaciones más flexibles - solo validar si el campo no está vacío
 	if req.Name != "" && !utils.IsValidName(req.Name, 2, 50) {
@@ -696,7 +704,10 @@ func UpdateProfile(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número de teléfono inválido. Debe ser un celular peruano válido (ej: 987654321 o +51 987654321)"})
 	}
 
-	log.Printf("[DEBUG] UpdateProfile - Validaciones pasadas, verificando existencia de usuario")
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] UpdateProfile - Validaciones pasadas, verificando existencia de usuario")
+	}
 
 	// Verificar que el usuario existe antes de actualizar
 	var exists bool
@@ -706,7 +717,10 @@ func UpdateProfile(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Error al verificar usuario"})
 	}
 
-	log.Printf("[DEBUG] UpdateProfile - Usuario existe en BD: %v", exists)
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] UpdateProfile - Usuario existe en BD: %v", exists)
+	}
 
 	if !exists {
 		log.Printf("[WARNING] UpdateProfile - User not found in DB, creating user: %v", userID)
@@ -738,7 +752,10 @@ func UpdateProfile(c *fiber.Ctx) error {
 		lngValue = nil
 	}
 
-	log.Printf("[DEBUG] UpdateProfile - Preparando actualización con valores: lat=%v, lng=%v", latValue, lngValue)
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] UpdateProfile - Preparando actualización con valores: lat=%v, lng=%v", latValue, lngValue)
+	}
 
 	// Intentar actualizar todos los campos del perfil
 	_, err = db.DB.Exec(context.Background(),

@@ -21,9 +21,9 @@ func InitDB() error {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 
-	// Si no hay contraseña configurada, usar la contraseña por defecto
+	// Validar que la contraseña esté configurada (crítico para seguridad)
 	if password == "" {
-		password = "posoqoEvelinSuarez"
+		return fmt.Errorf("❌ DB_PASSWORD debe estar configurado en las variables de entorno. No se permite contraseña por defecto por seguridad")
 	}
 
 	// Determinar SSL mode según el entorno

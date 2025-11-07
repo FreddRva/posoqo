@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"net/url"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/posoqo/backend/internal/db"
@@ -43,10 +45,15 @@ func GetServices(c *fiber.Ctx) error {
 		ORDER BY id
 	`)
 	if err != nil {
-		fmt.Println("ERROR AL CONSULTAR SERVICIOS:", err)
+		log.Printf("[ERROR] Error consultando servicios: %v", err)
+		isProduction := os.Getenv("NODE_ENV") == "production"
+		errorMsg := "Error al obtener servicios"
+		if !isProduction {
+			errorMsg = "Error consultando servicios: " + err.Error()
+		}
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
-			"error":   "Error consultando servicios: " + err.Error(),
+			"error":   errorMsg,
 		})
 	}
 	defer rows.Close()
@@ -56,10 +63,15 @@ func GetServices(c *fiber.Ctx) error {
 		var s Service
 		err := rows.Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
 		if err != nil {
-			fmt.Println("ERROR AL LEER SERVICIO:", err)
+			log.Printf("[ERROR] Error leyendo servicio: %v", err)
+			isProduction := os.Getenv("NODE_ENV") == "production"
+			errorMsg := "Error al leer servicio"
+			if !isProduction {
+				errorMsg = "Error leyendo servicio: " + err.Error()
+			}
 			return c.Status(500).JSON(fiber.Map{
 				"success": false,
-				"error":   "Error leyendo servicio: " + err.Error(),
+				"error":   errorMsg,
 			})
 		}
 		services = append(services, ServiceResponse{
@@ -91,7 +103,7 @@ func GetService(c *fiber.Ctx) error {
 		WHERE id = $1 AND is_active = true
 	`, id).Scan(&s.ID, &s.Name, &s.Description, &s.Image, &s.IsActive, &s.CreatedAt, &s.UpdatedAt)
 	if err != nil {
-		fmt.Println("ERROR AL LEER SERVICIO POR ID:", err)
+		log.Printf("[ERROR] Error al leer servicio por ID: %v", err)
 		return c.Status(404).JSON(fiber.Map{
 			"success": false,
 			"error":   "Servicio no encontrado",

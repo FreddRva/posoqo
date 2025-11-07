@@ -1,58 +1,122 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestIsValidEmail(t *testing.T) {
-	cases := []struct {
-		input string
-		want  bool
+	tests := []struct {
+		name     string
+		email    string
+		expected bool
 	}{
-		{"test@example.com", true},
-		{"usuario@dominio.pe", true},
-		{"mal-email", false},
-		{"otro@.com", false},
-		{"", false},
+		{"Email válido", "test@example.com", true},
+		{"Email válido con subdominio", "test@mail.example.com", true},
+		{"Email inválido sin @", "testexample.com", false},
+		{"Email inválido sin dominio", "test@", false},
+		{"Email vacío", "", false},
+		{"Email con espacios", "test @example.com", false},
 	}
-	for _, c := range cases {
-		if got := IsValidEmail(c.input); got != c.want {
-			t.Errorf("IsValidEmail(%q) = %v; want %v", c.input, got, c.want)
-		}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, IsValidEmail(tt.email))
+		})
+	}
+}
+
+func TestIsValidPassword(t *testing.T) {
+	tests := []struct {
+		name     string
+		password string
+		expected bool
+	}{
+		{"Password válido (8 caracteres)", "password123", true},
+		{"Password válido (más de 8)", "P@ssw0rd!", true},
+		{"Password válido (exactamente 8)", "password", true},
+		{"Password muy corto (7 caracteres)", "short12", false},
+		{"Password muy corto (3 caracteres)", "abc", false},
+		{"Password vacío", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, IsValidPassword(tt.password))
+		})
 	}
 }
 
 func TestIsStrongPassword(t *testing.T) {
-	cases := []struct {
-		input string
-		want  bool
+	tests := []struct {
+		name     string
+		password string
+		expected bool
 	}{
-		{"Abcdef1!", true},
-		{"12345678", false},
-		{"abcdefgH", false},
-		{"Abcdefgh", false},
-		{"Abc1!", false},
+		{"Password fuerte válido", "P@ssw0rd!", true},
+		{"Password sin símbolo", "Password123", false},
+		{"Password sin mayúscula", "p@ssw0rd!", false},
+		{"Password sin minúscula", "P@SSW0RD!", false},
+		{"Password sin número", "P@ssword!", false},
+		{"Password muy corto", "P@ss0rd", false},
+		{"Password vacío", "", false},
 	}
-	for _, c := range cases {
-		if got := IsStrongPassword(c.input); got != c.want {
-			t.Errorf("IsStrongPassword(%q) = %v; want %v", c.input, got, c.want)
-		}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, IsStrongPassword(tt.password))
+		})
 	}
 }
 
 func TestIsValidName(t *testing.T) {
-	cases := []struct {
-		input    string
-		min, max int
-		want     bool
+	tests := []struct {
+		name     string
+		value    string
+		min      int
+		max      int
+		expected bool
 	}{
-		{"Juan Pérez", 2, 50, true},
-		{"A", 2, 50, false},
-		{"NombreConMuchosCaracteresQueSuperaElLimite", 2, 20, false},
-		{"José", 2, 50, true},
-		{"Nombre123", 2, 50, false},
+		{"Nombre válido", "John Doe", 2, 50, true},
+		{"Nombre muy corto", "J", 2, 50, false},
+		{"Nombre muy largo", string(make([]byte, 51)), 2, 50, false},
+		{"Nombre con números", "John123", 2, 50, false},
+		{"Nombre vacío", "", 2, 50, false},
 	}
-	for _, c := range cases {
-		if got := IsValidName(c.input, c.min, c.max); got != c.want {
-			t.Errorf("IsValidName(%q, %d, %d) = %v; want %v", c.input, c.min, c.max, got, c.want)
-		}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, IsValidName(tt.value, tt.min, tt.max))
+		})
+	}
+}
+
+func TestSanitizeForLog(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         string
+		expected      string
+		shouldBeEqual bool // Para casos especiales como string vacío
+	}{
+		{"Email", "user@example.com", "u***@example.com", false},
+		{"Token largo", "abcdefghijklmnopqrstuvwxyz1234567890", "abcd***7890", false},
+		{"String corto", "secret", "***", false},
+		{"String vacío", "", "", true}, // String vacío devuelve string vacío
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := SanitizeForLog(tt.input)
+			if tt.shouldBeEqual {
+				assert.Equal(t, tt.input, result)
+			} else {
+				// Verificar que el resultado no contiene información sensible completa
+				assert.NotEqual(t, tt.input, result)
+				if tt.expected != "" {
+					assert.Equal(t, tt.expected, result)
+				}
+			}
+		})
 	}
 }

@@ -116,7 +116,7 @@ func TestCartTables(c *fiber.Ctx) error {
 func TestStripeConfig(c *fiber.Ctx) error {
 	stripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	stripePublishableKey := os.Getenv("STRIPE_PUBLISHABLE_KEY")
-	
+
 	return c.JSON(fiber.Map{
 		"stripe_secret_key_configured":      stripeKey != "",
 		"stripe_publishable_key_configured": stripePublishableKey != "",
@@ -193,11 +193,11 @@ func DebugUsersTable(c *fiber.Ctx) error {
 	if err == nil {
 		defer rows.Close()
 		realUsers := []fiber.Map{}
-		
+
 		for rows.Next() {
 			var id int64
 			var name, email, role string
-			
+
 			if err := rows.Scan(&id, &name, &email, &role); err == nil {
 				user := fiber.Map{
 					"id":             id,
@@ -211,7 +211,7 @@ func DebugUsersTable(c *fiber.Ctx) error {
 				realUsers = append(realUsers, user)
 			}
 		}
-		
+
 		if len(realUsers) > 0 {
 			users = realUsers
 		}
@@ -726,9 +726,11 @@ func GetAdminServicesListPublic(c *fiber.Ctx) error {
 
 // Endpoint para obtener lista de pedidos (admin)
 func GetAdminOrdersListPublic(c *fiber.Ctx) error {
-	// Log para debug
-	fmt.Printf("[DEBUG] Iniciando GetAdminOrdersListPublic\n")
-	
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Iniciando GetAdminOrdersListPublic")
+	}
+
 	// Primero verificar si existen las columnas lat y lng
 	var hasCoordinates bool
 	err := db.DB.QueryRow(context.Background(), `
@@ -737,14 +739,17 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 			WHERE table_name = 'orders' AND column_name = 'lat'
 		)
 	`).Scan(&hasCoordinates)
-	
+
 	if err != nil {
-		fmt.Printf("[ERROR] Error verificando columnas: %v\n", err)
+		log.Printf("[ERROR] Error verificando columnas: %v", err)
 		hasCoordinates = false
 	}
-	
-	fmt.Printf("[DEBUG] Columnas de coordenadas existen: %v\n", hasCoordinates)
-	
+
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] Columnas de coordenadas existen: %v", hasCoordinates)
+	}
+
 	// Query dinámico según si existen las columnas
 	var query string
 	if hasCoordinates {
@@ -788,7 +793,7 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 			ORDER BY o.created_at DESC
 		`
 	}
-	
+
 	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		fmt.Printf("[ERROR] Error en query GetAdminOrdersListPublic: %v\n", err)
@@ -851,7 +856,10 @@ func GetAdminOrdersListPublic(c *fiber.Ctx) error {
 		orders = append(orders, order)
 	}
 
-	fmt.Printf("[DEBUG] GetAdminOrdersListPublic completado. Total órdenes: %d\n", len(orders))
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] GetAdminOrdersListPublic completado. Total órdenes: %d", len(orders))
+	}
 
 	return c.JSON(fiber.Map{
 		"success": true,
@@ -880,7 +888,7 @@ func GetAdminUsersListPublic(c *fiber.Ctx) error {
 	`)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"error": "Error al obtener usuarios",
+			"error":   "Error al obtener usuarios",
 			"details": err.Error(),
 		})
 	}

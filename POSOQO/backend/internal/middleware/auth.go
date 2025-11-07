@@ -15,8 +15,9 @@ import (
 )
 
 // Configuración de rate limiting por IP
+// Aumentado a 100 req/min para endpoints generales (apropiado para producción)
 var GeneralRateLimiter = limiter.New(limiter.Config{
-	Max:        10,              // Máximo 10 requests
+	Max:        100,             // Máximo 100 requests por minuto
 	Expiration: 1 * time.Minute, // Por minuto
 	KeyGenerator: func(c *fiber.Ctx) string {
 		return c.IP() // Rate limit por IP
@@ -43,13 +44,33 @@ var AuthRateLimiter = limiter.New(limiter.Config{
 })
 
 // CORS configurado para producción
+// Se configura dinámicamente según el entorno
 var CorsConfig = cors.Config{
-	AllowOrigins:     "http://localhost:3000,http://127.0.0.1:3000,https://posoqo.vercel.app,https://*.vercel.app", // Dominios permitidos
+	AllowOrigins:     getCorsOrigins(),
 	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
-	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin",
+	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin,X-CSRF-Token",
 	AllowCredentials: true,
 	ExposeHeaders:    "Content-Length,Authorization",
 	MaxAge:           86400, // 24 horas
+}
+
+// getCorsOrigins retorna los origins permitidos según el entorno
+func getCorsOrigins() string {
+	env := os.Getenv("NODE_ENV")
+	customOrigins := os.Getenv("CORS_ORIGINS")
+
+	// Si hay origins personalizados, usarlos
+	if customOrigins != "" {
+		return customOrigins
+	}
+
+	// Origins por defecto para desarrollo
+	if env != "production" {
+		return "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001"
+	}
+
+	// Origins para producción
+	return "https://posoqo.vercel.app,https://*.vercel.app,https://posoqo.com,https://*.posoqo.com"
 }
 
 // Middleware de autenticación mejorado

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 	"time"
@@ -17,6 +16,7 @@ import (
 	"github.com/posoqo/backend/internal/middleware"
 	"github.com/posoqo/backend/internal/migrations"
 	"github.com/posoqo/backend/internal/services"
+	"github.com/posoqo/backend/internal/utils"
 )
 
 // @title POSOQO API
@@ -385,34 +385,21 @@ func main() {
 		})
 	})
 
-	// Health check endpoint para verificar que el servidor esté funcionando
-	app.Get("/health", func(c *fiber.Ctx) error {
-		// Verificar conexión a base de datos
-		if err := db.DB.Ping(context.Background()); err != nil {
-			return c.Status(503).JSON(fiber.Map{
-				"status":    "error",
-				"message":   "Base de datos no disponible",
-				"timestamp": time.Now(),
-				"error":     err.Error(),
-			})
-		}
+	// Health check endpoint mejorado para verificar que el servidor esté funcionando
+	app.Get("/health", handlers.HealthCheck)
 
-		return c.JSON(fiber.Map{
-			"status":    "ok",
-			"message":   "POSOQO Backend funcionando correctamente",
-			"timestamp": time.Now(),
-			"version":   "1.0.0",
-			"database":  "connected",
-		})
-	})
-
-	// Ruta de prueba para verificar conexión a base de datos (sin /api)
-	app.Get("/test-db", handlers.TestDatabaseConnection)
-	app.Get("/test-users", handlers.TestUsersConnection)
-	app.Get("/test-table-structure", handlers.TestTableStructure)
-	app.Get("/test-user-exists", handlers.TestUserExists)
-	app.Get("/test-orders-location", handlers.TestOrdersLocation)
-	app.Get("/run-migrations", handlers.RunMigrations)
+	// Rutas de prueba/debug - SOLO EN DESARROLLO
+	// Estas rutas solo están disponibles en modo desarrollo para evitar exposición de información sensible
+	if os.Getenv("NODE_ENV") != "production" {
+		debugGroup := app.Group("/debug")
+		debugGroup.Get("/test-db", handlers.TestDatabaseConnection)
+		debugGroup.Get("/test-users", handlers.TestUsersConnection)
+		debugGroup.Get("/test-table-structure", handlers.TestTableStructure)
+		debugGroup.Get("/test-user-exists", handlers.TestUserExists)
+		debugGroup.Get("/test-orders-location", handlers.TestOrdersLocation)
+		debugGroup.Get("/run-migrations", handlers.RunMigrations)
+		log.Println("⚠️  Endpoints de debug habilitados (solo desarrollo)")
+	}
 
 	// Servir archivos estáticos de la carpeta uploads
 	app.Static("/uploads", "./uploads")
@@ -478,21 +465,17 @@ func setupEnvironment() {
 	if os.Getenv("DB_USER") == "" {
 		os.Setenv("DB_USER", "posoqo_user")
 	}
-	if os.Getenv("DB_PASSWORD") == "" {
-		log.Fatal("❌ DB_PASSWORD debe estar configurado en el archivo .env")
-	} else if isProduction {
-		log.Println("✅ DB_PASSWORD configurado correctamente")
-	}
+	// DB_PASSWORD es obligatorio - validado en InitDB()
 	if os.Getenv("DB_NAME") == "" {
 		os.Setenv("DB_NAME", "posoqo")
 	}
 
 	// Variable de entorno para puerto
 	if os.Getenv("PORT") == "" {
-		os.Setenv("PORT", "3000")
+		os.Setenv("PORT", "4000") // Cambiar a 4000 para consistencia
 	}
 
-	// Validar variables críticas en producción
+	// Validar variables críticas en producción usando utils
 	if isProduction {
 		requiredVars := []string{
 			"JWT_ACCESS_SECRET",
@@ -511,6 +494,11 @@ func setupEnvironment() {
 
 		if len(missingVars) > 0 {
 			log.Fatalf("❌ Variables de entorno faltantes en producción: %v", missingVars)
+		}
+
+		// Validar que los secrets no sean valores por defecto
+		if err := utils.ValidateEnvSecrets(); err != nil {
+			log.Fatal("❌ " + err.Error())
 		}
 
 		log.Println("✅ Todas las variables de entorno críticas están configuradas")

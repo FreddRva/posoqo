@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -388,10 +389,12 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 		mesSorteo = time.Now().Format("2006-01")
 	}
 
-	// Log para debug
-	log.Printf("[RAFFLE] Consultando participantes para mes: %s", mesSorteo)
+	// Log solo en desarrollo
+	if os.Getenv("NODE_ENV") != "production" {
+		log.Printf("[DEBUG] [RAFFLE] Consultando participantes para mes: %s", mesSorteo)
+	}
 
-	// Primero verificar qué meses existen en la base de datos
+	// Obtener meses disponibles
 	var availableMonths []string
 	monthRows, err := db.DB.Query(
 		context.Background(),
@@ -405,32 +408,6 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 				availableMonths = append(availableMonths, month)
 			}
 		}
-	}
-	log.Printf("[RAFFLE] Meses disponibles en BD: %v", availableMonths)
-
-	// Primero verificar directamente qué hay en la BD para este mes
-	var debugCount int
-	db.DB.QueryRow(
-		context.Background(),
-		`SELECT COUNT(*) FROM raffle_subscriptions WHERE TRIM(mes_sorteo) = TRIM($1)`,
-		mesSorteo,
-	).Scan(&debugCount)
-	log.Printf("[RAFFLE] Count con TRIM para %s: %d", mesSorteo, debugCount)
-
-	// Obtener todos los registros para debug
-	debugRows, _ := db.DB.Query(
-		context.Background(),
-		`SELECT id, mes_sorteo, nombre, email FROM raffle_subscriptions LIMIT 10`,
-	)
-	if debugRows != nil {
-		log.Printf("[RAFFLE] Primeros 10 registros en BD:")
-		for debugRows.Next() {
-			var id, mesDB, nombre, email string
-			if err := debugRows.Scan(&id, &mesDB, &nombre, &email); err == nil {
-				log.Printf("[RAFFLE]   ID: %s, Mes: '%s' (len=%d), Nombre: %s", id, mesDB, len(mesDB), nombre)
-			}
-		}
-		debugRows.Close()
 	}
 
 	rows, err := db.DB.Query(
@@ -487,10 +464,10 @@ func ListRaffleParticipants(c *fiber.Ctx) error {
 	log.Printf("[RAFFLE] Participantes encontrados: %d para mes %s", len(participants), mesSorteo)
 
 	return c.JSON(fiber.Map{
-		"mes_sorteo":        mesSorteo,
-		"participants":      participants,
-		"total":             len(participants),
-		"available_months":  availableMonths,
+		"mes_sorteo":       mesSorteo,
+		"participants":     participants,
+		"total":            len(participants),
+		"available_months": availableMonths,
 	})
 }
 
