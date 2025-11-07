@@ -95,14 +95,34 @@ func UpsertReview(c *fiber.Ctx) error {
 	// Verificar que la reseña se guardó correctamente
 	var savedRating int
 	var savedComment string
+	var savedProductID string
 	verifyErr := db.DB.QueryRow(context.Background(),
-		"SELECT rating, COALESCE(comment, '') FROM reviews WHERE user_id = $1 AND product_id = $2",
-		userID, productID).Scan(&savedRating, &savedComment)
+		"SELECT rating, COALESCE(comment, ''), product_id::text FROM reviews WHERE user_id = $1 AND product_id = $2",
+		userID, productID).Scan(&savedRating, &savedComment, &savedProductID)
 	
 	if verifyErr != nil {
 		fmt.Printf("[REVIEW] ⚠️ Error verificando reseña guardada: %v\n", verifyErr)
+		
+		// Intentar buscar todas las reseñas de este usuario para debug
+		var totalUserReviews int
+		countErr := db.DB.QueryRow(context.Background(),
+			"SELECT COUNT(*) FROM reviews WHERE user_id = $1", userID).Scan(&totalUserReviews)
+		if countErr == nil {
+			fmt.Printf("[REVIEW] Total de reseñas del usuario %d: %d\n", userID, totalUserReviews)
+		}
+		
+		// Intentar buscar todas las reseñas de este producto
+		var totalProductReviews int
+		prodErr := db.DB.QueryRow(context.Background(),
+			"SELECT COUNT(*) FROM reviews WHERE product_id = $1", productID).Scan(&totalProductReviews)
+		if prodErr == nil {
+			fmt.Printf("[REVIEW] Total de reseñas del producto %s: %d\n", productID, totalProductReviews)
+		} else {
+			fmt.Printf("[REVIEW] Error contando reseñas del producto: %v\n", prodErr)
+		}
 	} else {
-		fmt.Printf("[REVIEW] ✅ Verificación: Rating guardado: %d, Comment guardado: '%s'\n", savedRating, savedComment)
+		fmt.Printf("[REVIEW] ✅ Verificación: Rating guardado: %d, Comment guardado: '%s', ProductID: %s\n", savedRating, savedComment, savedProductID)
+		fmt.Printf("[REVIEW] ✅ ProductID recibido: %s, ProductID guardado: %s, Coinciden: %v\n", productID, savedProductID, productID == savedProductID)
 	}
 	
 	return c.Status(http.StatusCreated).JSON(fiber.Map{"message": "Reseña guardada"})
@@ -122,33 +142,58 @@ func ListProductReviews(c *fiber.Ctx) error {
 
 	fmt.Printf("[REVIEW LIST] Listando reseñas para producto %s (página %d, límite %d)\n", productID, page, limit)
 
-	countQuery := `SELECT COUNT(*) FROM reviews WHERE product_id=$1`
+	// Verificar que el productID es un UUID válido y listar todas las reseñas para debug
+	var allProductIDs []string
+	allRows, _ := db.DB.Query(context.Background(), "SELECT DISTINCT product_id::text FROM reviews LIMIT 10")
+	defer allRows.Close()
+	for allRows.Next() {
+		var pid string
+		if err := allRows.Scan(&pid); err == nil {
+			allProductIDs = append(allProductIDs, pid)
+		}
+	}
+	fmt.Printf("[REVIEW LIST] ProductIDs de reseñas existentes (primeros 10): %v\n", allProductIDs)
+
+	countQuery := `SELECT COUNT(*) FROM reviews WHERE product_id=$1::uuid`
 	var total int
 	if err := db.DB.QueryRow(context.Background(), countQuery, productID).Scan(&total); err != nil {
-		fmt.Printf("[REVIEW LIST] Error contando reseñas: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{"error": "Error al contar reseñas"})
+		fmt.Printf("[REVIEW LIST] Error contando reseñas (con cast UUID): %v\n", err)
+		// Intentar con texto directo
+		productIDTrimmed := strings.TrimSpace(productID)
+		if err2 := db.DB.QueryRow(context.Background(), 
+			`SELECT COUNT(*) FROM reviews WHERE product_id::text = $1`, productIDTrimmed).Scan(&total); err2 != nil {
+			fmt.Printf("[REVIEW LIST] Error también con texto: %v\n", err2)
+			return c.Status(500).JSON(fiber.Map{"error": "Error al contar reseñas"})
+		}
 	}
 	
-	fmt.Printf("[REVIEW LIST] Total de reseñas en BD: %d\n", total)
+	fmt.Printf("[REVIEW LIST] Total de reseñas en BD para producto %s: %d\n", productID, total)
 	
 	offset := (page - 1) * limit
-	listQuery := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
+	listQuery := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1::uuid ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
 	rows, err := db.DB.Query(context.Background(), listQuery, productID, limit, offset)
 	if err != nil {
-		fmt.Printf("[REVIEW LIST] Error consultando reseñas: %v\n", err)
-		return c.Status(500).JSON(fiber.Map{"error": "Error al obtener reseñas"})
+		fmt.Printf("[REVIEW LIST] Error consultando reseñas (con cast UUID): %v\n", err)
+		// Intentar sin cast explícito pero con trim
+		productIDTrimmed := strings.TrimSpace(productID)
+		listQuerySimple := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id::text = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
+		rows, err = db.DB.Query(context.Background(), listQuerySimple, productIDTrimmed, limit, offset)
+		if err != nil {
+			fmt.Printf("[REVIEW LIST] Error también con texto: %v\n", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Error al obtener reseñas"})
+		}
 	}
 	defer rows.Close()
 
 	reviews := []fiber.Map{}
 	for rows.Next() {
 		var rating int
-		var comment, createdAt, userName string
-		if err := rows.Scan(&rating, &comment, &createdAt, &userName); err != nil {
+		var comment, createdAt, userName, rowProductID string
+		if err := rows.Scan(&rating, &comment, &createdAt, &userName, &rowProductID); err != nil {
 			fmt.Printf("[REVIEW LIST] Error escaneando fila: %v\n", err)
 			continue
 		}
-		fmt.Printf("[REVIEW LIST] Reseña encontrada: Rating=%d, Comment='%s', User=%s\n", rating, comment, userName)
+		fmt.Printf("[REVIEW LIST] Reseña encontrada: Rating=%d, Comment='%s', User=%s, ProductID=%s\n", rating, comment, userName, rowProductID)
 		reviews = append(reviews, fiber.Map{
 			"rating":     rating,
 			"comment":    comment,
