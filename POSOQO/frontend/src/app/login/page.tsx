@@ -149,10 +149,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleResendVerification = async () => {
+  const handleResendVerification = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!unverifiedEmail) return;
     setResendStatus(null);
     setVerificationUrl(null);
+    setLoading(true);
     try {
       const res = await fetch(getApiUrl("/resend-verification"), {
         method: "POST",
@@ -175,6 +180,8 @@ export default function LoginPage() {
       }
     } catch (e) {
       setResendStatus("Error de conexión al reenviar email.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -339,11 +346,12 @@ export default function LoginPage() {
                   Debes verificar tu email antes de iniciar sesión. ¿No recibiste el email?
                 </p>
                 <button
-                  onClick={handleResendVerification}
+                  type="button"
+                  onClick={(e) => handleResendVerification(e)}
                   className="w-full bg-white hover:bg-gray-100 text-black font-bold px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  disabled={!!resendStatus && resendStatus.startsWith("¡Email")}
+                  disabled={loading || (!!resendStatus && resendStatus.startsWith("¡Email"))}
                 >
-                  Reenviar email de verificación
+                  {loading ? "Enviando..." : "Reenviar email de verificación"}
                 </button>
                 {resendStatus && (
                   <div className="mt-2.5 text-xs font-semibold">
