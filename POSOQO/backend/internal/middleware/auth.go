@@ -44,33 +44,90 @@ var AuthRateLimiter = limiter.New(limiter.Config{
 })
 
 // CORS configurado para producción
-// Se configura dinámicamente según el entorno
+// Se configura dinámicamente según el entorno usando una función
 var CorsConfig = cors.Config{
-	AllowOrigins:     getCorsOrigins(),
-	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+	AllowOriginsFunc: func(origin string) bool {
+		return isOriginAllowed(origin)
+	},
+	AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH,HEAD",
 	AllowHeaders:     "Origin,Content-Type,Accept,Authorization,X-Requested-With,Access-Control-Allow-Origin,X-CSRF-Token",
 	AllowCredentials: true,
 	ExposeHeaders:    "Content-Length,Authorization",
 	MaxAge:           86400, // 24 horas
 }
 
-// getCorsOrigins retorna los origins permitidos según el entorno
-func getCorsOrigins() string {
-	env := os.Getenv("NODE_ENV")
-	customOrigins := os.Getenv("CORS_ORIGINS")
-
-	// Si hay origins personalizados, usarlos
-	if customOrigins != "" {
-		return customOrigins
+// isOriginAllowed verifica si un origin está permitido
+func isOriginAllowed(origin string) bool {
+	// Permitir requests sin origin (por ejemplo, Postman, curl, aplicaciones móviles)
+	if origin == "" {
+		return true
 	}
 
-	// Origins por defecto para desarrollo
+	// Obtener origins permitidos
+	allowedOrigins := getAllowedOrigins()
+
+	// Verificar cada origin permitido
+	for _, allowed := range allowedOrigins {
+		// Coincidencia exacta
+		if origin == allowed {
+			return true
+		}
+
+		// Soporte para wildcards (ej: *.vercel.app)
+		if strings.Contains(allowed, "*") {
+			// Reemplazar * con regex pattern
+			// Ejemplo: "https://*.vercel.app" -> debe coincidir con "https://cualquier-cosa.vercel.app"
+			if strings.HasPrefix(allowed, "https://*.") {
+				// Patrón: https://*.dominio.com
+				domain := strings.TrimPrefix(allowed, "https://*.")
+				if strings.HasSuffix(origin, "."+domain) && strings.HasPrefix(origin, "https://") {
+					return true
+				}
+			} else if strings.HasPrefix(allowed, "http://*.") {
+				// Patrón: http://*.dominio.com
+				domain := strings.TrimPrefix(allowed, "http://*.")
+				if strings.HasSuffix(origin, "."+domain) && strings.HasPrefix(origin, "http://") {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// getAllowedOrigins retorna la lista de origins permitidos
+func getAllowedOrigins() []string {
+	customOrigins := os.Getenv("CORS_ORIGINS")
+	if customOrigins != "" {
+		// Dividir por comas y limpiar espacios
+		origins := strings.Split(customOrigins, ",")
+		for i := range origins {
+			origins[i] = strings.TrimSpace(origins[i])
+		}
+		return origins
+	}
+
+	env := os.Getenv("NODE_ENV")
+
+	// Origins para desarrollo
 	if env != "production" {
-		return "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001"
+		return []string{
+			"http://localhost:3000",
+			"http://127.0.0.1:3000",
+			"http://localhost:3001",
+			"http://localhost:3002",
+		}
 	}
 
 	// Origins para producción
-	return "https://posoqo.vercel.app,https://*.vercel.app,https://posoqo.com,https://*.posoqo.com"
+	return []string{
+		"https://posoqo.vercel.app",
+		"https://*.vercel.app", // Soporte para cualquier subdominio de vercel
+		"https://posoqo.com",
+		"https://www.posoqo.com",
+		"https://*.posoqo.com", // Soporte para cualquier subdominio
+	}
 }
 
 // Middleware de autenticación mejorado
