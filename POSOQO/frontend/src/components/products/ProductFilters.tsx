@@ -330,18 +330,18 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </div>
 
         {/* Botones de acción */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-yellow-400/30 relative z-10">
-          <motion.button
-            onClick={onResetFilters}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-red-500/20 to-pink-500/20 backdrop-blur-sm border border-red-400/30 text-red-400 rounded-xl hover:from-red-500/30 hover:to-pink-500/30 transition-all duration-300 group"
-          >
-            <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-            <span className="font-semibold">Limpiar Filtros</span>
-          </motion.button>
-
+        <div className="flex items-center justify-end mt-8 pt-6 border-t border-yellow-400/30 relative z-10">
           <div className="flex items-center gap-4">
+            <motion.button
+              onClick={onResetFilters}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-red-500/20 to-pink-500/20 backdrop-blur-sm border border-red-400/30 text-red-400 rounded-xl hover:from-red-500/30 hover:to-pink-500/30 transition-all duration-300 group"
+            >
+              <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+              <span className="font-semibold">Limpiar Filtros</span>
+            </motion.button>
+            
             <span className="text-sm font-semibold text-gray-300">
               Vista:
             </span>

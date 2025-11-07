@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, MessageSquare, Send, Package, Store } from "lucide-react";
+import { X, Star, MessageSquare, Send, Package, Store, ShoppingCart } from "lucide-react";
 import { useState, useEffect } from "react";
 import React from "react";
 import { getImageUrl, getApiUrl } from "@/lib/config";
@@ -37,9 +37,11 @@ interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   productType?: 'cerveza' | 'comida';
+  onAddToCart?: (product: Product) => void;
+  showAddToCart?: boolean; // Si es true, muestra "Agregar al Carrito" en lugar de "Ver Tienda"
 }
 
-export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza' }: ProductModalProps) {
+export default function ProductModal({ product, isOpen, onClose, productType = 'cerveza', onAddToCart, showAddToCart = false }: ProductModalProps) {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('descripcion');
   
@@ -501,12 +503,25 @@ export default function ProductModal({ product, isOpen, onClose, productType = '
 
               {/* Footer */}
               <div className="p-6 border-t border-gray-700 bg-gray-900">
-                <Link href="/products">
-                  <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider flex items-center justify-center gap-2">
-                    <Store className="w-5 h-5" />
-                    Ver Tienda
+                {showAddToCart && onAddToCart && product ? (
+                  <button 
+                    onClick={() => {
+                      onAddToCart(product);
+                      onClose();
+                    }}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    Agregar al Carrito
                   </button>
-                </Link>
+                ) : (
+                  <Link href="/products">
+                    <button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-wider flex items-center justify-center gap-2">
+                      <Store className="w-5 h-5" />
+                      Ver Tienda
+                    </button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

@@ -113,16 +113,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 >
                   <Eye className="w-5 h-5" />
                 </motion.button>
-                <Link href="/products">
-                  <motion.button
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-3 bg-white/20 backdrop-blur-sm text-white border border-white/30 rounded-xl hover:bg-white/30 shadow-lg transition-all duration-300"
-                    title="Ver tienda"
-                  >
-                    <Store className="w-5 h-5" />
-                  </motion.button>
-                </Link>
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToCart(product);
+                  }}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm text-green-400 border border-green-400/30 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 shadow-lg transition-all duration-300"
+                  title="Agregar al carrito"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                </motion.button>
               </div>
             </div>
           </div>
@@ -247,19 +249,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Eye className="w-5 h-5" />
           </motion.button>
           
-          <Link href="/products">
-            <motion.button
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              whileHover={{ scale: 1.1, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-3 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 border border-white/30 shadow-lg transition-all duration-300"
-              title="Ver tienda"
-            >
-              <Store className="w-5 h-5" />
-            </motion.button>
-          </Link>
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product);
+            }}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-3 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm text-green-400 rounded-xl hover:from-green-500/30 hover:to-emerald-500/30 border border-green-400/30 shadow-lg transition-all duration-300"
+            title="Agregar al carrito"
+          >
+            <ShoppingCart className="w-5 h-5" />
+          </motion.button>
         </motion.div>
       </div>
 
@@ -297,22 +298,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Botón de acción principal */}
-        <Link href="/products">
-          <motion.button
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
+        <motion.button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart(product);
+          }}
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full px-6 py-3.5 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:via-amber-300 hover:to-yellow-400 text-black font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-yellow-400/50 group-hover:shadow-xl"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <span>Agregar al Carrito</span>
+          <motion.span
+            animate={{ x: [0, 4, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <Store className="w-5 h-5" />
-            <span>Ver Tienda</span>
-            <motion.span
-              animate={{ x: [0, 4, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <ArrowRight className="w-4 h-4" />
-            </motion.span>
-          </motion.button>
-        </Link>
+            <ArrowRight className="w-4 h-4" />
+          </motion.span>
+        </motion.button>
       </div>
     </motion.div>
   );
