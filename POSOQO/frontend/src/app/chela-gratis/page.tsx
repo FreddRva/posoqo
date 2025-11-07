@@ -71,8 +71,46 @@ export default function ChelaGratisPage() {
     }))
   }
 
+  // Validación de teléfono peruano
+  const validatePeruvianPhone = (phone: string): boolean => {
+    // Remover espacios, guiones, paréntesis y el símbolo +
+    let cleaned = phone.replace(/[\s\-\(\)\+]/g, '');
+    
+    // Validar que solo contenga dígitos
+    if (!/^\d+$/.test(cleaned)) {
+      return false;
+    }
+    
+    // Si empieza con 51 (código de país), removerlo
+    if (cleaned.startsWith('51') && cleaned.length > 2) {
+      cleaned = cleaned.substring(2);
+    }
+    
+    // Validar que tenga 9 dígitos y empiece con 9 (celular)
+    if (cleaned.length === 9) {
+      return cleaned.startsWith('9');
+    }
+    
+    // También aceptar números de 8 dígitos (fijos) que empiecen con 0
+    if (cleaned.length === 8) {
+      return cleaned.startsWith('0');
+    }
+    
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validar teléfono antes de enviar
+    if (!validatePeruvianPhone(formData.telefono)) {
+      setAlert({
+        type: 'error',
+        title: 'Teléfono Inválido',
+        message: 'Por favor ingresa un número de celular peruano válido (ej: 987654321 o +51 987654321)'
+      })
+      return
+    }
     
     setIsSubmitting(true)
     setAlert(null)

@@ -192,7 +192,7 @@ func RequireRole(roles ...string) fiber.Handler {
 
 		// Log de intento de acceso no autorizado
 		userID := user["id"]
-		log.Printf("[SECURITY] Intento de acceso no autorizado - UserID: %v, Role: %s, Required: %v, Path: %s", 
+		log.Printf("[SECURITY] Intento de acceso no autorizado - UserID: %v, Role: %s, Required: %v, Path: %s",
 			userID, userRole, roles, c.Path())
 
 		return c.Status(http.StatusForbidden).JSON(fiber.Map{

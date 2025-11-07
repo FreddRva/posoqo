@@ -142,9 +142,9 @@ func RegisterUser(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Apellido inválido (solo letras, 2-50 caracteres)"})
 	}
 	// DNI es opcional - no se valida en el registro, se puede completar después
-	if !utils.IsValidString(req.Phone, 6, 20) {
+	if !utils.IsValidPeruvianPhone(req.Phone) {
 		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_PHONE")
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número inválido (6-20 caracteres)"})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número de teléfono inválido. Debe ser un celular peruano válido (ej: 987654321 o +51 987654321)"})
 	}
 	if !utils.IsValidEmail(req.Email) {
 		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_EMAIL")
@@ -265,10 +265,9 @@ func LoginUser(c *fiber.Ctx) error {
 	}
 
 	if !emailVerified {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Debes verificar tu email antes de iniciar sesión.",
-			"code":  "EMAIL_NOT_VERIFIED",
-		})
+		// No revelar que el email no está verificado por seguridad
+		logAuthAttempt(req.Email, clientIP, userAgent, "EMAIL_NOT_VERIFIED")
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Credenciales inválidas"})
 	}
 
 	// Verificar contraseña con bcrypt
@@ -685,9 +684,9 @@ func UpdateProfile(c *fiber.Ctx) error {
 		log.Printf("[ERROR] UpdateProfile - DNI inválido: %s", req.DNI)
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "DNI inválido (8-12 caracteres)"})
 	}
-	if req.Phone != "" && !utils.IsValidString(req.Phone, 6, 20) {
+	if req.Phone != "" && !utils.IsValidPeruvianPhone(req.Phone) {
 		log.Printf("[ERROR] UpdateProfile - Teléfono inválido: %s", req.Phone)
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número inválido (6-20 caracteres)"})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Número de teléfono inválido. Debe ser un celular peruano válido (ej: 987654321 o +51 987654321)"})
 	}
 
 	log.Printf("[DEBUG] UpdateProfile - Validaciones pasadas, verificando existencia de usuario")
