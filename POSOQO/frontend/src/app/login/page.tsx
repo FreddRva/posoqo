@@ -31,6 +31,7 @@ export default function LoginPage() {
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
   // Hooks
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -154,17 +155,33 @@ export default function LoginPage() {
       e.preventDefault();
       e.stopPropagation();
     }
-    if (!unverifiedEmail) return;
+    if (!unverifiedEmail || resendLoading) return;
+    
     setResendStatus(null);
     setVerificationUrl(null);
-    setLoading(true);
+    setResendLoading(true);
+    
     try {
-      const res = await fetch(getApiUrl("/resend-verification"), {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com/api';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
+      
+      const res = await fetch(`${apiUrl}/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: unverifiedEmail }),
+        signal: controller.signal,
       });
-      const data = await res.json();
+      
+      clearTimeout(timeoutId);
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        throw new Error("Error al procesar la respuesta del servidor");
+      }
+      
       if (res.ok) {
         // Si hay URL de verificación (modo desarrollo), guardarla
         if (data.verification_url) {
@@ -176,12 +193,17 @@ export default function LoginPage() {
         }
       } else {
         setVerificationUrl(null);
-        setResendStatus(data.error || "No se pudo reenviar el email.");
+        setResendStatus(data.error || `Error: ${res.status} ${res.statusText}`);
       }
-    } catch (e) {
-      setResendStatus("Error de conexión al reenviar email.");
+    } catch (error: any) {
+      console.error("Error reenviando verificación:", error);
+      if (error.name === 'AbortError') {
+        setResendStatus("La solicitud tardó demasiado. Intenta de nuevo.");
+      } else {
+        setResendStatus(`Error de conexión: ${error instanceof Error ? error.message : "No se pudo conectar con el servidor"}`);
+      }
     } finally {
-      setLoading(false);
+      setResendLoading(false);
     }
   };
 
@@ -349,9 +371,9 @@ export default function LoginPage() {
                   type="button"
                   onClick={(e) => handleResendVerification(e)}
                   className="w-full bg-white hover:bg-gray-100 text-black font-bold px-4 py-2.5 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  disabled={loading || (!!resendStatus && resendStatus.startsWith("¡Email"))}
+                  disabled={resendLoading || (!!resendStatus && resendStatus.startsWith("¡Email"))}
                 >
-                  {loading ? "Enviando..." : "Reenviar email de verificación"}
+                  {resendLoading ? "Enviando..." : "Reenviar email de verificación"}
                 </button>
                 {resendStatus && (
                   <div className="mt-2.5 text-xs font-semibold">
