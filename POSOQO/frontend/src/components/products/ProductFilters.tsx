@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, X, ChevronDown, Grid3X3, List, Package } from 'lucide-react';
+import Image from 'next/image';
 import { Category, FilterState, SortOption, ViewMode, Product } from '@/types/products';
+import { getImageUrl } from '@/lib/config';
 
 interface ProductFiltersProps {
   categories: Category[];
@@ -32,6 +34,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -55,9 +58,41 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     inputRef.current?.blur();
   }, [onFiltersChange]);
 
+  const updateSuggestionPosition = useCallback(() => {
+    if (inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const scrollX = window.scrollX;
+      
+      // Calcular posición considerando el espacio disponible
+      let top = rect.bottom + scrollY + 12;
+      let left = rect.left + scrollX;
+      let width = rect.width;
+      
+      // Ajustar si está muy cerca del borde derecho
+      const maxWidth = Math.min(600, window.innerWidth - 32);
+      if (left + width > window.innerWidth - 16) {
+        left = window.innerWidth - width - 16;
+      }
+      
+      // Ajustar si está muy cerca del borde izquierdo
+      if (left < 16) {
+        left = 16;
+        width = Math.min(width, window.innerWidth - 32);
+      }
+      
+      setSuggestionPosition({ top, left, width });
+    }
+  }, []);
+
   const handleSearchChange = (value: string) => {
     onFiltersChange({ search: value });
-    setShowSuggestions(value.length >= 2);
+    if (value.length >= 2) {
+      updateSuggestionPosition();
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+    }
     setSelectedSuggestionIndex(-1);
   };
 
@@ -133,6 +168,27 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showSuggestions, suggestions, selectedSuggestionIndex, handleSelectSuggestion]);
+
+  // Actualizar posición al hacer scroll o resize
+  useEffect(() => {
+    if (!showSuggestions) return;
+
+    const handleScroll = () => {
+      updateSuggestionPosition();
+    };
+
+    const handleResize = () => {
+      updateSuggestionPosition();
+    };
+
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [showSuggestions, updateSuggestionPosition]);
 
   // Cerrar sugerencias al hacer click fuera
   useEffect(() => {
@@ -210,7 +266,12 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleSearchChange(e.target.value)}
-                    onFocus={() => filters.search.length >= 2 && setShowSuggestions(true)}
+                    onFocus={() => {
+                      if (filters.search.length >= 2) {
+                        updateSuggestionPosition();
+                        setShowSuggestions(true);
+                      }
+                    }}
                     placeholder="Buscar productos..."
                     className="w-full pl-12 pr-14 py-4 bg-transparent text-white placeholder-gray-500 focus:outline-none font-medium text-base"
                   />
@@ -246,55 +307,117 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 )}
               </div>
               
-              {/* Autocompletado - Sugerencias */}
-              {showSuggestions && suggestions.length > 0 && (
-                <div
-                  ref={suggestionsRef}
-                  className="absolute top-full left-0 right-0 mt-3 bg-gradient-to-br from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-2xl border-2 border-yellow-400/40 rounded-2xl shadow-2xl z-[100] overflow-hidden"
-                  style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(234, 179, 8, 0.2)' }}
-                >
-                  {/* Header del dropdown */}
-                  <div className="px-4 py-2 bg-gradient-to-r from-yellow-400/10 to-amber-500/10 border-b border-yellow-400/20">
-                    <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-yellow-400" />
-                      <span className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">
-                        Sugerencias ({suggestions.length})
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-400/30 scrollbar-track-gray-800">
-                    {suggestions.map((product, index) => (
-                      <motion.button
-                        key={product.id}
-                        onClick={() => handleSelectSuggestion(product)}
-                        onMouseEnter={() => setSelectedSuggestionIndex(index)}
-                        className={`w-full px-4 py-3.5 flex items-center gap-3 text-left transition-all duration-200 ${
-                          selectedSuggestionIndex === index
-                            ? 'bg-gradient-to-r from-yellow-400/25 to-amber-500/25 border-l-4 border-yellow-400 shadow-lg'
-                            : 'hover:bg-gray-700/60 border-l-4 border-transparent'
-                        }`}
-                        whileHover={{ x: 2 }}
-                      >
-                        <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center border border-gray-600/50 shadow-inner">
-                          <Package className="w-6 h-6 text-yellow-400" />
-                        </div>
-                        <div className="flex-1 min-w-0 pr-3">
-                          <div className="text-white font-semibold text-base truncate mb-1.5">{product.name}</div>
-                          {product.description && (
-                            <div className="text-gray-400 text-xs line-clamp-2 leading-relaxed pr-2">{product.description}</div>
-                          )}
-                        </div>
-                        <div className="flex-shrink-0 text-right">
-                          <div className="text-yellow-400 font-bold text-lg">
-                            S/ {product.price.toFixed(2)}
+              {/* Autocompletado - Sugerencias Flotantes */}
+              <AnimatePresence>
+                {showSuggestions && suggestions.length > 0 && (
+                  <>
+                    {/* Overlay para cerrar al hacer click fuera */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-[99]"
+                      onClick={() => setShowSuggestions(false)}
+                    />
+                    
+                    {/* Panel flotante de sugerencias */}
+                    <motion.div
+                      ref={suggestionsRef}
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                      className="fixed z-[100] bg-gradient-to-br from-gray-900/98 via-gray-800/98 to-gray-900/98 backdrop-blur-2xl border-2 border-yellow-400/40 rounded-2xl shadow-2xl overflow-hidden"
+                      style={{
+                        top: `${suggestionPosition.top}px`,
+                        left: `${suggestionPosition.left}px`,
+                        width: `${suggestionPosition.width}px`,
+                        maxWidth: '600px',
+                        maxHeight: '70vh',
+                        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(234, 179, 8, 0.2)'
+                      }}
+                    >
+                      {/* Header del dropdown */}
+                      <div className="px-4 py-3 bg-gradient-to-r from-yellow-400/10 to-amber-500/10 border-b border-yellow-400/20">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Package className="w-4 h-4 text-yellow-400" />
+                            <span className="text-xs font-semibold text-yellow-400 uppercase tracking-wider">
+                              Sugerencias ({suggestions.length})
+                            </span>
                           </div>
+                          <button
+                            onClick={() => setShowSuggestions(false)}
+                            className="p-1 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                            aria-label="Cerrar sugerencias"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      </div>
+                      
+                      {/* Lista de sugerencias con imágenes */}
+                      <div className="max-h-[calc(70vh-60px)] overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-400/30 scrollbar-track-gray-800">
+                        {suggestions.map((product, index) => (
+                          <motion.button
+                            key={product.id}
+                            onClick={() => handleSelectSuggestion(product)}
+                            onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                            className={`w-full px-4 py-4 flex items-start gap-4 text-left transition-all duration-200 border-b border-gray-700/50 last:border-b-0 ${
+                              selectedSuggestionIndex === index
+                                ? 'bg-gradient-to-r from-yellow-400/20 to-amber-500/20 border-l-4 border-yellow-400'
+                                : 'hover:bg-gray-700/40 border-l-4 border-transparent'
+                            }`}
+                            whileHover={{ x: 4 }}
+                          >
+                            {/* Imagen del producto */}
+                            <div className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600/50 shadow-lg group-hover:border-yellow-400/50 transition-colors">
+                              <Image
+                                src={getImageUrl(product.image_url || product.image || '/placeholder-product.jpg')}
+                                alt={product.name}
+                                fill
+                                className="object-cover"
+                                sizes="64px"
+                              />
+                              {/* Overlay sutil */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                            </div>
+                            
+                            {/* Información del producto */}
+                            <div className="flex-1 min-w-0 pr-2">
+                              <div className="text-white font-semibold text-base truncate mb-1.5 group-hover:text-yellow-400 transition-colors">
+                                {product.name}
+                              </div>
+                              {product.description && (
+                                <div className="text-gray-400 text-xs line-clamp-2 leading-relaxed mb-2">
+                                  {product.description}
+                                </div>
+                              )}
+                              {product.category && (
+                                <div className="text-yellow-400/70 text-xs font-medium mb-1">
+                                  {product.category}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Precio */}
+                            <div className="flex-shrink-0 text-right">
+                              <div className="text-yellow-400 font-bold text-lg mb-1">
+                                S/ {product.price?.toFixed(2) || '0.00'}
+                              </div>
+                              {product.stock !== undefined && product.stock > 0 && (
+                                <div className="text-xs text-green-400 font-medium">
+                                  En stock
+                                </div>
+                              )}
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
