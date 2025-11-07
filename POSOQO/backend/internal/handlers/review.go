@@ -170,13 +170,13 @@ func ListProductReviews(c *fiber.Ctx) error {
 	fmt.Printf("[REVIEW LIST] Total de reseñas en BD para producto %s: %d\n", productID, total)
 	
 	offset := (page - 1) * limit
-	listQuery := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1::uuid ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
+	listQuery := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at::text, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = $1::uuid ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
 	rows, err := db.DB.Query(context.Background(), listQuery, productID, limit, offset)
 	if err != nil {
 		fmt.Printf("[REVIEW LIST] Error consultando reseñas (con cast UUID): %v\n", err)
 		// Intentar sin cast explícito pero con trim
 		productIDTrimmed := strings.TrimSpace(productID)
-		listQuerySimple := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id::text = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
+		listQuerySimple := `SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at::text, u.name, r.product_id::text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id::text = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`
 		rows, err = db.DB.Query(context.Background(), listQuerySimple, productIDTrimmed, limit, offset)
 		if err != nil {
 			fmt.Printf("[REVIEW LIST] Error también con texto: %v\n", err)
@@ -193,7 +193,7 @@ func ListProductReviews(c *fiber.Ctx) error {
 			fmt.Printf("[REVIEW LIST] Error escaneando fila: %v\n", err)
 			continue
 		}
-		fmt.Printf("[REVIEW LIST] Reseña encontrada: Rating=%d, Comment='%s', User=%s, ProductID=%s\n", rating, comment, userName, rowProductID)
+		fmt.Printf("[REVIEW LIST] Reseña encontrada: Rating=%d, Comment='%s', User=%s, ProductID=%s, CreatedAt=%s\n", rating, comment, userName, rowProductID, createdAt)
 		reviews = append(reviews, fiber.Map{
 			"rating":     rating,
 			"comment":    comment,
@@ -246,7 +246,7 @@ func ListMyReviews(c *fiber.Ctx) error {
 	claims := c.Locals("user").(jwt.MapClaims)
 	userID := int64(claims["id"].(float64))
 	rows, err := db.DB.Query(context.Background(),
-		`SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at, p.name
+		`SELECT r.rating, COALESCE(r.comment, '') as comment, r.created_at::text, p.name
 		 FROM reviews r
 		 JOIN products p ON r.product_id = p.id
 		 WHERE r.user_id = $1
