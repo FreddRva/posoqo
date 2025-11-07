@@ -3,16 +3,124 @@ package utils
 import (
 	"crypto/rand"
 	"math/big"
+	"net"
 	"regexp"
 	"strings"
 	"unicode"
 )
 
-// Valida formato de email
+// Valida formato de email con validación más estricta
 func IsValidEmail(email string) bool {
 	email = strings.TrimSpace(email)
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	return re.MatchString(email)
+	if email == "" {
+		return false
+	}
+
+	// Validación básica de formato
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	if !emailRegex.MatchString(email) {
+		return false
+	}
+
+	// Validaciones adicionales
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false
+	}
+
+	localPart := parts[0]
+	domain := parts[1]
+
+	// Validar parte local (antes del @)
+	if len(localPart) == 0 || len(localPart) > 64 {
+		return false
+	}
+
+	// Validar dominio
+	if len(domain) == 0 || len(domain) > 255 {
+		return false
+	}
+
+	// Rechazar emails temporales comunes
+	tempEmailDomains := []string{
+		"10minutemail.com",
+		"guerrillamail.com",
+		"mailinator.com",
+		"tempmail.com",
+		"throwaway.email",
+		"yopmail.com",
+		"maildrop.cc",
+		"getnada.com",
+	}
+	domainLower := strings.ToLower(domain)
+	for _, tempDomain := range tempEmailDomains {
+		if strings.Contains(domainLower, tempDomain) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// Verifica que el dominio del email tenga registros MX (servidores de email)
+// Esto verifica que el dominio pueda recibir emails
+// Retorna true si el dominio tiene registros MX válidos, false si no
+func VerifyEmailDomain(email string) (bool, error) {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return false, nil
+	}
+
+	domain := parts[1]
+
+	// Dominios comunes que sabemos que son válidos (para evitar consultas DNS innecesarias)
+	knownValidDomains := []string{
+		"gmail.com", "googlemail.com",
+		"yahoo.com", "yahoo.es", "ymail.com",
+		"hotmail.com", "outlook.com", "live.com", "msn.com",
+		"icloud.com", "me.com", "mac.com",
+		"protonmail.com", "proton.me",
+		"yandex.com", "mail.com", "aol.com",
+	}
+	domainLower := strings.ToLower(domain)
+	for _, validDomain := range knownValidDomains {
+		if domainLower == validDomain {
+			return true, nil
+		}
+	}
+
+	// Intentar resolver registros MX del dominio
+	// Los registros MX indican qué servidores pueden recibir emails para este dominio
+	mxRecords, err := net.LookupMX(domain)
+	if err != nil {
+		// Si no se pueden resolver los registros MX, intentar verificar si el dominio existe
+		// Algunos dominios pequeños pueden no tener registros MX pero sí registros A/AAAA
+		_, lookupErr := net.LookupHost(domain)
+		if lookupErr != nil {
+			// El dominio no existe en absoluto
+			return false, err
+		}
+		// El dominio existe pero no tiene registros MX
+		// Por seguridad, rechazamos dominios sin MX ya que no pueden recibir emails confiablemente
+		return false, nil
+	}
+
+	// Si hay al menos un registro MX válido, el dominio puede recibir emails
+	if len(mxRecords) > 0 {
+		// Verificar que al menos uno tenga un host válido
+		for _, mx := range mxRecords {
+			if mx.Host != "" && mx.Host != "." {
+				// Limpiar el host (quitar punto final si existe)
+				host := strings.TrimSuffix(mx.Host, ".")
+				if host != "" {
+					return true, nil
+				}
+			}
+		}
+	}
+
+	// No se encontraron registros MX válidos
+	return false, nil
 }
 
 // Valida contraseña: mínimo 8 caracteres

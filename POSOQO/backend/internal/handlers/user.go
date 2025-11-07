@@ -174,8 +174,17 @@ func RegisterUser(c *fiber.Ctx) error {
 	}
 	if !utils.IsValidEmail(req.Email) {
 		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_EMAIL")
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido o dominio no válido"})
 	}
+
+	// Verificar que el dominio del email tenga registros MX (puede recibir emails)
+	// Esto verifica que el dominio realmente exista y pueda recibir emails
+	domainValid, err := utils.VerifyEmailDomain(req.Email)
+	if err != nil || !domainValid {
+		logAuthAttempt(req.Email, clientIP, userAgent, "INVALID_EMAIL_DOMAIN")
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "El dominio del email no existe o no puede recibir correos. Por favor, usa un email válido."})
+	}
+
 	if !utils.IsStrongPassword(req.Password) {
 		logAuthAttempt(req.Email, clientIP, userAgent, "WEAK_PASSWORD")
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "La contraseña debe tener al menos 8 caracteres, mayúscula, minúscula, número y símbolo"})
