@@ -19,7 +19,8 @@ import {
   Sparkles,
   ArrowRight,
   X,
-  Shield
+  Shield,
+  FileText
 } from 'lucide-react'
 import Link from 'next/link'
 import { apiFetch } from '@/lib/api'
@@ -27,7 +28,6 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import ReservationPaymentForm from '@/components/reservations/ReservationPaymentForm'
 import { consultarDNI } from '@/lib/dni'
-import { FileText, CheckCircle, Loader2 as Loader2Icon, AlertCircle as AlertCircleIcon } from 'lucide-react'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RcbC4CL70N5NrKOIPYs3SiN0fsiVUf903Vp94tDj6yyu56QHx3MrMn0K6JIBvZ4vVvgzjgbihX5cRfRCi40I25G00lqp7TAxk')
 
@@ -516,7 +516,7 @@ export default function ReservationsPage() {
                             />
                             {consultandoDNI && (
                               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                <Loader2Icon className="w-5 h-5 text-purple-400 animate-spin" />
+                                <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
                               </div>
                             )}
                             {dniVerificado && !consultandoDNI && (
