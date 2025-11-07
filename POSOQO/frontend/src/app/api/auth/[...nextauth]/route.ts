@@ -58,14 +58,31 @@ const handler = NextAuth({
           });
 
           if (!res.ok) {
-            return null;
+            // Si hay error, intentar obtener el mensaje de error del backend
+            let errorMessage = "Credenciales inválidas";
+            let errorCode = "INVALID_CREDENTIALS";
+            
+            try {
+              const errorData = await res.json();
+              if (errorData.error) {
+                errorMessage = errorData.error;
+              }
+              if (errorData.code) {
+                errorCode = errorData.code;
+              }
+            } catch (e) {
+              // Si no se puede parsear el error, usar el mensaje por defecto
+            }
+            
+            // Lanzar error con código para que NextAuth lo maneje
+            throw new Error(`${errorCode}:${errorMessage}`);
           }
 
           const data = await res.json();
           
           // Validar respuesta del backend
           if (!data.user || !data.tokens) {
-            return null;
+            throw new Error("INVALID_RESPONSE:Respuesta inválida del servidor");
           }
           
           // Guardar tokens en el usuario para el callback jwt
@@ -78,8 +95,12 @@ const handler = NextAuth({
             refreshToken: data.tokens?.refresh_token,
             accessTokenExpires: Date.now() + (data.tokens?.expires_in || 900) * 1000,
           };
-        } catch (error) {
-          // Error silencioso para evitar logs innecesarios
+        } catch (error: any) {
+          // Si es un error con código (EMAIL_NOT_VERIFIED, etc), retornar null
+          // pero guardar el error en una forma que NextAuth pueda manejarlo
+          // NextAuth no expone directamente errores de authorize, así que
+          // retornamos null y el frontend debe manejar esto de otra manera
+          console.error("Error en authorize:", error?.message);
           return null;
         }
       }
@@ -115,6 +136,8 @@ const handler = NextAuth({
           // Ignora errores para no bloquear el login
         }
       }
+      // Para credenciales, si authorize retornó un usuario, permitir el login
+      // Si authorize lanzó un error, NextAuth lo capturará y lo pasará al frontend
       return true;
     },
     async jwt({ token, user, account }) {

@@ -94,6 +94,35 @@ export default function LoginPage() {
     setResendStatus(null);
 
     try {
+      // Primero intentar login directamente con el backend para obtener errores específicos
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://posoqo-backend.onrender.com/api';
+      const loginRes = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password,
+        }),
+      });
+
+      const loginData = await loginRes.json();
+
+      // Si hay un error específico del backend, manejarlo
+      if (!loginRes.ok) {
+        if (loginData.code === "EMAIL_NOT_VERIFIED" || loginData.error?.includes("verificar tu email")) {
+          setUnverifiedEmail(formData.email.trim().toLowerCase());
+          setLoading(false);
+          return;
+        } else {
+          setGeneralError(loginData.error || "Credenciales inválidas. Verifica tu email y contraseña.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Si el login al backend fue exitoso, ahora usar NextAuth para crear la sesión
       const result = await signIn("credentials", {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
@@ -101,11 +130,7 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        if (result.error.includes("EMAIL_NOT_VERIFIED") || result.error.includes("verificar tu email")) {
-          setUnverifiedEmail(formData.email.trim().toLowerCase());
-        } else {
-          setGeneralError("Credenciales inválidas. Verifica tu email y contraseña.");
-        }
+        setGeneralError("Error al iniciar sesión. Intenta de nuevo.");
       } else if (result?.ok) {
         const redirectPath = typeof window !== 'undefined' ? localStorage.getItem('redirectAfterLogin') : null;
         if (redirectPath && redirectPath !== '/login') {
@@ -116,6 +141,7 @@ export default function LoginPage() {
         }
       }
     } catch (error) {
+      console.error("Error en login:", error);
       setGeneralError("Error de conexión. Intenta de nuevo.");
     } finally {
       setLoading(false);
