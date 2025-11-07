@@ -360,6 +360,7 @@ func main() {
 	adminPublic.Get("/notifications", handlers.GetNotifications)
 	adminPublic.Post("/notifications", handlers.CreateNotification)
 	adminPublic.Put("/notifications/:id/read", handlers.MarkNotificationAsRead)
+	adminPublic.Put("/notifications/read-all", handlers.MarkAllNotificationsAsRead)
 	adminPublic.Get("/notifications/stats", handlers.GetNotificationStats)
 
 	// Rutas de administración de sorteos

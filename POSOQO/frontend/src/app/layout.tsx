@@ -7,6 +7,8 @@ import { RecentlyViewedProvider } from "@/lib/recentlyViewedContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ErrorBoundaryProvider } from "@/components/ErrorBoundaryProvider";
 import { ChatbotWidget } from "@/components/ai";
+import { AgeVerificationModal } from "@/components/AgeVerificationModal";
+import { CookieBanner } from "@/components/CookieBanner";
 
 export const metadata: Metadata = {
   title: "POSOQO",
@@ -27,9 +29,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <CartProvider>
               <NotificationProvider>
                 <RecentlyViewedProvider>
+                  {/* Modal de verificación de edad - Se muestra primero */}
+                  <AgeVerificationModal />
+                  
                   <DashboardWrapper>
                   {children}
                   </DashboardWrapper>
+                  
+                  {/* Banner de cookies - Se muestra después de verificar edad */}
+                  <CookieBanner />
+                  
                   <ChatbotWidget />
                 </RecentlyViewedProvider>
               </NotificationProvider>
