@@ -28,13 +28,13 @@ export const ContactSection: React.FC = () => {
     { 
       icon: Phone, 
       title: "Teléfono", 
-      content: "+51 999 999 999", 
+      content: "966 123 456", 
       description: "Línea directa de atención"
     },
     { 
       icon: Mail, 
       title: "Email", 
-      content: "info@posoqo.com", 
+      content: "caposoqo@gmail.com", 
       description: "Respuesta en menos de 24 horas"
     },
     { 
@@ -213,7 +213,7 @@ export const ContactSection: React.FC = () => {
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-yellow-400/20 rounded-xl focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all duration-300 bg-black/50 text-white placeholder-gray-500"
-                      placeholder="+51 999 999 999"
+                      placeholder="966 123 456"
                     />
                   </div>
                 </div>

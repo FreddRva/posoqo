@@ -62,7 +62,7 @@ export default function Footer() {
                 <ul className="space-y-2">
                   <li><a href="https://facebook.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Facebook</a></li>
                   <li><a href="https://instagram.com/posoqo" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">Instagram</a></li>
-                  <li><a href="https://wa.me/51956099690" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">WhatsApp</a></li>
+                  <li><a href="https://wa.me/51966123456" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-yellow-400 transition-colors">WhatsApp</a></li>
                 </ul>
               </div>
 

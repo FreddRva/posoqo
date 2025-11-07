@@ -28,8 +28,8 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState({
     siteName: 'POSOQO',
     siteDescription: 'Cerveza artesanal de calidad',
-    contactEmail: 'info@posoqo.com',
-    contactPhone: '+51 999 999 999',
+    contactEmail: 'caposoqo@gmail.com',
+    contactPhone: '966 123 456',
     address: 'Lima, Perú',
     businessHours: 'Lun-Dom: 12:00 - 23:00',
     socialMedia: {

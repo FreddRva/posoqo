@@ -101,7 +101,7 @@ func sendContactEmail(req ContactRequest) {
 	// Configuración del email
 	toEmail := os.Getenv("FROM_EMAIL")
 	if toEmail == "" {
-		toEmail = "contacto@posoqo.com" // Email por defecto
+		toEmail = "caposoqo@gmail.com" // Email por defecto
 	}
 
 	subject := fmt.Sprintf("Nuevo mensaje de contacto: %s", req.Subject)

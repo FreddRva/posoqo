@@ -125,9 +125,9 @@ export default function ContactoPage() {
     { 
       icon: Mail, 
       title: "Email", 
-      content: "info@posoqo.com", 
+      content: "caposoqo@gmail.com", 
       description: "Respuesta en 2-4 horas",
-      link: "mailto:info@posoqo.com"
+      link: "mailto:caposoqo@gmail.com"
     },
     { 
       icon: MapPin, 

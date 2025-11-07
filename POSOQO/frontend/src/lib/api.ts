@@ -157,7 +157,9 @@ async function refreshAccessToken(): Promise<string | null> {
           const expiresIn = tokenData.tokens?.expires_in || tokenData.expires_in || 900;
           
           if (!accessToken) {
-            console.error('No se recibió access_token en la respuesta de refresh');
+            if (process.env.NODE_ENV === 'development') {
+              console.error('No se recibió access_token en la respuesta de refresh');
+            }
             return null;
           }
           
@@ -174,7 +176,9 @@ async function refreshAccessToken(): Promise<string | null> {
               };
               localStorage.setItem(nextAuthKey, JSON.stringify(currentData));
             } catch (err) {
-              console.error('Error actualizando NextAuth localStorage:', err);
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Error actualizando NextAuth localStorage:', err);
+              }
             }
           }
           
@@ -186,7 +190,9 @@ async function refreshAccessToken(): Promise<string | null> {
               accessTokenExpires: Date.now() + (expiresIn * 1000),
             }));
           } catch (err) {
-            console.error('Error guardando tokens en localStorage:', err);
+            if (process.env.NODE_ENV === 'development') {
+              console.error('Error guardando tokens en localStorage:', err);
+            }
           }
           
           // Forzar actualización de la sesión de NextAuth
@@ -197,11 +203,15 @@ async function refreshAccessToken(): Promise<string | null> {
         } else {
           // Si el refresh falla, verificar el error
           const errorData = await response.json().catch(() => ({}));
-          console.error('Error refrescando token:', errorData);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error refrescando token:', errorData);
+          }
         }
       }
     } catch (nextAuthError) {
-      console.warn('Error refrescando con NextAuth:', nextAuthError);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Error refrescando con NextAuth:', nextAuthError);
+      }
     }
     
     // Fallback: Intentar con localStorage
@@ -412,11 +422,15 @@ export async function apiFetch<T>(
                                    errorData?.error === 'Token inválido';
       
       if (isTokenExpiredError || token) {
-        console.log('[API] Token expirado, intentando refrescar...');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[API] Token expirado, intentando refrescar...');
+        }
         const newToken = await refreshAccessToken();
         
         if (newToken) {
-          console.log('[API] Token refrescado exitosamente, reintentando request...');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[API] Token refrescado exitosamente, reintentando request...');
+          }
           // Obtener headers actualizados con el nuevo token
           const method = (fetchOptions.method || 'GET').toUpperCase();
           const needsCSRF = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
@@ -436,7 +450,9 @@ export async function apiFetch<T>(
           });
           
           if (retryRes.ok) {
-            console.log('[API] Request exitosa después del refresh');
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[API] Request exitosa después del refresh');
+            }
             return retryRes.json();
           } else {
             // Si aún falla después del refresh, puede ser otro error
@@ -447,7 +463,9 @@ export async function apiFetch<T>(
             
             // Si es otro 401 después del refresh, el refresh token puede estar expirado
             if (retryRes.status === 401) {
-              console.error('[API] Refresh token también expirado, limpiando sesión...');
+              if (process.env.NODE_ENV === 'development') {
+                console.error('[API] Refresh token también expirado, limpiando sesión...');
+              }
               if (typeof window !== 'undefined') {
                 // Limpiar tokens
                 localStorage.removeItem('posoqo.auth.tokens');
@@ -468,7 +486,9 @@ export async function apiFetch<T>(
           }
         } else {
           // Si no se pudo refrescar, verificar si realmente es un error de sesión
-          console.error('[API] No se pudo refrescar el token');
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[API] No se pudo refrescar el token');
+          }
           
           // Solo redirigir si realmente es un error de autenticación
           if (isTokenExpiredError) {

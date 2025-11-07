@@ -146,7 +146,7 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
                 {/* Botón de acción */}
                 <div className="mt-8 flex flex-col sm:flex-row gap-4">
                   <a
-                    href="https://wa.me/51956099690"
+                    href="https://wa.me/51966123456"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-green-500/50"

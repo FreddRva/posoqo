@@ -169,7 +169,7 @@ export default function AyudaPage() {
                   Enviar Mensaje
                 </motion.a>
                 <motion.a
-                  href="https://wa.me/51956099690"
+                  href="https://wa.me/51966123456"
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.05 }}
