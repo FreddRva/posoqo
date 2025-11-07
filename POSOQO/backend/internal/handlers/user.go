@@ -1518,10 +1518,6 @@ func Enable2FA(c *fiber.Ctx) error {
 		})
 	}
 
-	// Obtener email del usuario
-	var email string
-	db.DB.QueryRow(ctx, "SELECT email FROM users WHERE id=$1", userID).Scan(&email)
-
 	// Crear configuración 2FA (sin habilitar aún)
 	user2FA := &models.User2FA{
 		UserID:      userID,
@@ -1537,7 +1533,12 @@ func Enable2FA(c *fiber.Ctx) error {
 	}
 
 	// Generar URL del QR code
-	qrURL := utils.GenerateQRCodeURL(email, secret)
+	qrURL, err := utils.GenerateQRCodeURL(email, secret)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error generando QR code",
+		})
+	}
 
 	createAuditLog(ctx, &userID, "2FA_SETUP_INITIATED", "user", &userID, c.IP(), c.Get("User-Agent"), "POST", "/api/auth/2fa/enable", "", 200, "", "")
 
