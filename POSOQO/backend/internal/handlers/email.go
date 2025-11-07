@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net"
+	"net/http"
 	"net/smtp"
 	"os"
 	"strings"
@@ -296,6 +300,17 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	message.WriteString("\r\n")
 	message.WriteString(body.String())
 
+	// Intentar primero con API REST de Resend (más confiable en Render)
+	if config.SMTPHost == "smtp.resend.com" && config.SMTPPassword != "" {
+		fmt.Printf("[EMAIL] Detectado Resend - intentando API REST...\n")
+		apiErr := sendEmailViaResendAPI(config.SMTPPassword, config.FromEmail, email, name, verificationURL)
+		if apiErr == nil {
+			fmt.Printf("[EMAIL] ✅ Email enviado exitosamente vía API REST de Resend\n")
+			return nil
+		}
+		fmt.Printf("[EMAIL] ⚠️ Error con API REST de Resend: %v - intentando SMTP...\n", apiErr)
+	}
+	
 	// Enviar email - Intentar método simple primero (más confiable)
 	addr := fmt.Sprintf("%s:%s", config.SMTPHost, config.SMTPPort)
 	fmt.Printf("[EMAIL] Intentando enviar email a través de: %s\n", addr)
@@ -390,6 +405,101 @@ func sendVerificationEmail(userID int64, email, name string) error {
 	}
 	
 	fmt.Printf("[EMAIL] ✅ Email enviado exitosamente a %s\n", email)
+	return nil
+}
+
+// sendEmailViaResendAPI envía email usando la API REST de Resend
+func sendEmailViaResendAPI(apiKey, fromEmail, toEmail, name, verificationURL string) error {
+	fmt.Printf("[RESEND API] Iniciando envío vía API REST...\n")
+	
+	// Preparar el cuerpo HTML del email
+	emailBody := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifica tu email - POSOQO</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
+    <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 24px; font-weight: bold; color: #FFD700; margin-bottom: 10px;">POSOQO</div>
+            <div style="color: #333; font-size: 20px; margin-bottom: 20px;">Verifica tu dirección de email</div>
+        </div>
+        
+        <div style="margin-bottom: 30px;">
+            <p>Hola %s,</p>
+            
+            <p>Gracias por registrarte en POSOQO. Para completar tu registro, necesitamos verificar tu dirección de email.</p>
+            
+            <p>Haz clic en el botón de abajo para verificar tu email:</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="%s" style="display: inline-block; background: linear-gradient(135deg, #FFD700, #D4AF37); color: #000; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">Verificar Email</a>
+            </div>
+            
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin: 20px 0;">
+                <strong>Importante:</strong> Este enlace expirará en 24 horas por seguridad.
+            </div>
+            
+            <p>Si no creaste esta cuenta, puedes ignorar este email.</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 12px;">
+            <p>Este es un email automático, no respondas a este mensaje.</p>
+            <p>&copy; 2024 POSOQO. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
+`, name, verificationURL)
+	
+	// Estructura de la petición a Resend API
+	payload := map[string]interface{}{
+		"from":    fmt.Sprintf("%s <%s>", "POSOQO", fromEmail),
+		"to":      []string{toEmail},
+		"subject": "Verifica tu email - POSOQO",
+		"html":    emailBody,
+	}
+	
+	jsonData, jsonErr := json.Marshal(payload)
+	if jsonErr != nil {
+		return fmt.Errorf("error creando JSON: %w", jsonErr)
+	}
+	
+	// Crear petición HTTP
+	req, reqErr := http.NewRequest("POST", "https://api.resend.com/emails", bytes.NewBuffer(jsonData))
+	if reqErr != nil {
+		return fmt.Errorf("error creando petición: %w", reqErr)
+	}
+	
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	
+	// Cliente HTTP con timeout
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	
+	fmt.Printf("[RESEND API] Enviando petición a Resend API...\n")
+	resp, httpErr := client.Do(req)
+	if httpErr != nil {
+		return fmt.Errorf("error en petición HTTP: %w", httpErr)
+	}
+	defer resp.Body.Close()
+	
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return fmt.Errorf("error leyendo respuesta: %w", readErr)
+	}
+	
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("[RESEND API] ❌ Error: Status %d, Body: %s\n", resp.StatusCode, string(body))
+		return fmt.Errorf("error de API: status %d, respuesta: %s", resp.StatusCode, string(body))
+	}
+	
+	fmt.Printf("[RESEND API] ✅ Respuesta exitosa: %s\n", string(body))
 	return nil
 }
 
