@@ -159,7 +159,12 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
+        // Si hay URL de verificación (modo desarrollo), mostrar el enlace
+        if (data.verification_url) {
+          setResendStatus(`SMTP no configurado. Haz clic aquí para verificar: ${data.verification_url}`);
+        } else {
+          setResendStatus("¡Email de verificación reenviado! Revisa tu bandeja de entrada.");
+        }
       } else {
         setResendStatus(data.error || "No se pudo reenviar el email.");
       }
@@ -336,11 +341,25 @@ export default function LoginPage() {
                   Reenviar email de verificación
                 </button>
                 {resendStatus && (
-                  <p className={`mt-2.5 text-xs font-semibold ${
-                    resendStatus.startsWith('¡Email') ? 'text-green-200' : 'text-red-200'
-                  }`}>
-                    {resendStatus}
-                  </p>
+                  <div className="mt-2.5 text-xs font-semibold">
+                    {resendStatus.includes('http') ? (
+                      <div>
+                        <p className="text-yellow-200 mb-2">SMTP no configurado. Haz clic en el enlace para verificar:</p>
+                        <a 
+                          href={resendStatus.split('verificar: ')[1]} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-300 hover:text-blue-200 underline break-all"
+                        >
+                          {resendStatus.split('verificar: ')[1]}
+                        </a>
+                      </div>
+                    ) : (
+                      <p className={resendStatus.startsWith('¡Email') ? 'text-green-200' : 'text-red-200'}>
+                        {resendStatus}
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
             )}

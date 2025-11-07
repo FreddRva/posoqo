@@ -378,14 +378,45 @@ func ResendVerificationEmail(c *fiber.Ctx) error {
 		})
 	}
 
+	// Verificar si SMTP está configurado
+	config := getEmailConfig()
+	smtpConfigured := config.SMTPHost != "" && config.SMTPUser != "" && config.SMTPPassword != ""
+	
 	// Enviar email de verificación
-	if err := sendVerificationEmail(userID, req.Email, name); err != nil {
+	err = sendVerificationEmail(userID, req.Email, name)
+	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Error al enviar email de verificación",
 		})
 	}
 
-	return c.JSON(fiber.Map{
+	response := fiber.Map{
 		"message": "Email de verificación reenviado exitosamente",
-	})
+	}
+
+	// Si SMTP no está configurado, incluir el token en la respuesta (solo desarrollo)
+	if !smtpConfigured {
+		// Buscar token activo más reciente
+		var token string
+		var expiresAt time.Time
+		err = db.DB.QueryRow(context.Background(),
+			"SELECT token, expires_at FROM email_verifications WHERE user_id = $1 AND used = false AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1",
+			userID,
+		).Scan(&token, &expiresAt)
+		
+		if err == nil {
+			baseURL := os.Getenv("BASE_URL")
+			if baseURL == "" {
+				baseURL = "http://localhost:3000"
+			}
+			verificationURL := fmt.Sprintf("%s/api/verify-email?token=%s", baseURL, token)
+			
+			response["token"] = token
+			response["verification_url"] = verificationURL
+			response["development_mode"] = true
+			response["message"] = "SMTP no configurado. Usa este enlace para verificar: " + verificationURL
+		}
+	}
+
+	return c.JSON(response)
 }
