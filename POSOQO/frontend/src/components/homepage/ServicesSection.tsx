@@ -26,7 +26,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    setSelectedService(null)
+    // Limpiar selectedService después de que la animación se complete
+    // El modal maneja la animación internamente, así que esperamos un poco
+    setTimeout(() => {
+      setSelectedService(null)
+    }, 350) // Tiempo suficiente para la animación (300ms + margen)
   }
 
   if (loading) {

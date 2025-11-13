@@ -22,56 +22,110 @@ interface ServiceModalProps {
 }
 
 export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
-  if (!service) return null;
+  // Mantener una referencia al servicio durante la animación de salida
+  const [displayService, setDisplayService] = React.useState<Service | null>(service);
+
+  // Actualizar displayService cuando se proporciona un nuevo servicio
+  React.useEffect(() => {
+    if (service) {
+      setDisplayService(service);
+    }
+  }, [service]);
 
   // Parsear descripción en viñetas
-  const descriptionItems = service.description
-    ? service.description.split('\n').filter(line => line.trim())
+  const descriptionItems = displayService?.description
+    ? displayService.description.split('\n').filter(line => line.trim())
     : [];
 
   // Bloquear scroll cuando el modal está abierto
   React.useEffect(() => {
-    if (isOpen) {
+    if (isOpen && displayService) {
+      // Guardar el estilo original
+      const originalStyle = window.getComputedStyle(document.body).overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      
+      return () => {
+        // Restaurar el estilo original al desmontar
+        document.body.style.overflow = originalStyle;
+      };
+    } else if (!isOpen) {
+      // Restaurar overflow cuando se cierra
+      document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = 'unset';
+  }, [isOpen, displayService]);
+
+  // Manejar el cierre del modal
+  const handleClose = React.useCallback((e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    onClose();
+  }, [onClose]);
+
+  // Manejar tecla Escape
+  React.useEffect(() => {
+    if (!isOpen || !displayService) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
     };
-  }, [isOpen]);
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, displayService, handleClose]);
+
+  // No renderizar si no hay servicio para mostrar
+  if (!displayService) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
+    <AnimatePresence 
+      onExitComplete={() => {
+        // Limpiar displayService después de que la animación se complete
+        setDisplayService(null);
+        document.body.style.overflow = '';
+      }}
+    >
+      {/* Renderizar cuando isOpen es true y displayService existe */}
+      {/* AnimatePresence detectará cuando isOpen cambia y animará la salida */}
+      {isOpen && displayService && (
         <>
           {/* Backdrop */}
           <motion.div
+            key={`backdrop-${displayService.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9998]"
-            onClick={onClose}
+            onClick={handleClose}
           />
 
           {/* Modal */}
           <motion.div
+            key={`service-modal-${displayService.id}`}
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-black/95 backdrop-blur-xl border border-yellow-400/20 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div 
+              className="bg-black/95 backdrop-blur-xl border border-yellow-400/20 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Header */}
               <div className="relative">
-                {service.image_url && (
+                {displayService.image_url && (
                   <div className="relative h-64 md:h-80 w-full overflow-hidden rounded-t-3xl">
                     <Image
-                      src={getImageUrl(service.image_url)}
-                      alt={service.name}
+                      src={getImageUrl(displayService.image_url)}
+                      alt={displayService.name}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 800px"
@@ -91,8 +145,10 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
 
                 {/* Botón cerrar */}
                 <button
-                  onClick={onClose}
-                  className="absolute top-4 left-4 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/20"
+                  onClick={handleClose}
+                  className="absolute top-4 left-4 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-colors border border-white/20 z-10"
+                  type="button"
+                  aria-label="Cerrar modal"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -102,7 +158,7 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
               <div className="p-8">
                 {/* Título */}
                 <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">
-                  {service.name}
+                  {displayService.name}
                 </h2>
 
                 {/* Descripción en viñetas */}
@@ -124,12 +180,12 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
                 )}
 
                 {/* Precio */}
-                {service.price && (
+                {displayService.price && (
                   <div className="mb-6 p-6 bg-yellow-400/10 rounded-xl border border-yellow-400/20">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-lg font-medium">Precio desde</span>
                       <span className="text-4xl font-bold text-yellow-400">
-                        S/ {service.price.toFixed(2)}
+                        S/ {displayService.price.toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -154,8 +210,9 @@ export function ServiceModal({ service, isOpen, onClose }: ServiceModalProps) {
                     <span>Contactar por WhatsApp</span>
                   </a>
                   <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="px-6 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-300 border border-gray-700"
+                    type="button"
                   >
                     Cerrar
                   </button>

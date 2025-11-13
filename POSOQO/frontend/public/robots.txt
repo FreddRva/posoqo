@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Excluir páginas privadas
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /verificar-email
+Disallow: /completar-perfil
+
+# Sitemap
+Sitemap: https://posoqo.com/sitemap.xml
+
+
+
+
